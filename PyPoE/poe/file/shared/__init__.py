@@ -72,7 +72,7 @@ Exceptions & Warnings
 import abc
 import os
 import re
-import requests
+from urllib import request, parse
 from enum import IntEnum
 from io import BytesIO
 from typing import Union, List, Dict, Callable, Any
@@ -173,8 +173,9 @@ class AbstractFileReadOnly(ReprMixin):
             return function(*args, buffer=BytesIO(file_path_or_raw), **kwargs)
         elif isinstance(file_path_or_raw, str):
             if file_path_or_raw.startswith(("http://", "https://")):
-                print(f"downloading {file_path_or_raw}")
-                return function(*args, buffer=BytesIO(requests.get(file_path_or_raw).content), **kwargs)
+                parsed = parse.urlparse(file_path_or_raw)
+                url = parsed.scheme + "://" + parsed.netloc + parse.quote(parsed.path) + "?" + parse.quote(parsed.query)
+                return function(*args, buffer=request.urlopen(url), **kwargs)
             with open(file_path_or_raw, 'rb') as f:
                 return function(*args, buffer=f, **kwargs)
         else:
@@ -270,8 +271,6 @@ class AbstractFile(AbstractFileReadOnly):
         elif isinstance(file_path_or_raw, bytes):
             return function(*args, buffer=BytesIO(file_path_or_raw), **kwargs)
         elif isinstance(file_path_or_raw, str):
-            if file_path_or_raw.startswith(("http://", "https://")):
-                return function(*args, buffer=BytesIO(requests.get(file_path_or_raw).content), **kwargs)
             with open(file_path_or_raw, 'wb') as f:
                 return function(*args, buffer=f, **kwargs)
         else:
