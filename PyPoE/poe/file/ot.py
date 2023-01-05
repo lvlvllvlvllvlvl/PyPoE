@@ -107,7 +107,7 @@ class StatsKeyValueSection(AbstractKeyValueSection):
 @doc(append=AbstractKeyValueFile)
 class OTFile(AbstractKeyValueFile):
     """
-    Representation of a .ot file.
+    Representation of a .it file.
     """
 
     SECTIONS = dict((s.NAME, s) for s in [
@@ -121,7 +121,7 @@ class OTFile(AbstractKeyValueFile):
         StatsKeyValueSection,
     ])
 
-    EXTENSION = '.ot'
+    EXTENSION = '.it'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
