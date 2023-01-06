@@ -793,7 +793,7 @@ class DatReader(ReprMixin):
 
         # Unpacking the entire row in one go will help breaking down the
         # function calls significantly
-        row_unpacked = struct.unpack(self.cast_row, data_raw)
+        row_unpacked = struct.unpack(self.cast_row, data_raw[:self.cast_size])
         i = 0
         for spec, casts in self.cast_spec:
             if casts[0][0] in [3, 6]:
@@ -842,15 +842,14 @@ class DatReader(ReprMixin):
         if self.specification is None:
             self.cast_size = self.table_record_length
 
-        if self.cast_size != self.table_record_length:
+        if (self.cast_size > self.table_record_length):
             raise SpecificationError(
                 SpecificationError.ERRORS.RUNTIME_ROWSIZE_MISMATCH,
-                '"%(name)s": Specification row size %(spec_size)s vs real size %(cast_size)s' % {
-                    'name': self.file_name,
-                    'spec_size': self.cast_size,
-                    'cast_size': self.table_record_length
-                }
+                f'"{self.file_name}s": Specification row size {self.cast_size}s vs real size {self.table_record_length}s'
             )
+
+        if self.cast_size != self.table_record_length:
+            print(f'"{self.file_name}s": Specification row size {self.cast_size}s vs real size {self.table_record_length}s')
 
         self.table_data = []
 

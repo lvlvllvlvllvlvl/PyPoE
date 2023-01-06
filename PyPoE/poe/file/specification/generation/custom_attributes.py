@@ -7,7 +7,7 @@ class CustomizedField:
 
 custom_attributes = {
     'BaseItemTypes.dat': {
-        'ModDomainsKey': CustomizedField(
+        'ModDomain': CustomizedField(
             enum='MOD_DOMAIN',
         ),
     },
@@ -29,6 +29,9 @@ custom_attributes = {
     'GrantedEffectsPerLevel.dat': {
         'StatInterpolationTypesKeys': CustomizedField(
             enum='STAT_INTERPOLATION_TYPES',
+        ),
+        'CooldownBypassType': CustomizedField(
+            enum='COOLDOWN_BYPASS_TYPES',
         ),
     },
     'HarvestObjects.dat': {
