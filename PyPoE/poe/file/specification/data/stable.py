@@ -19223,6 +19223,10 @@ specification = Specification({
                 name='Unknown38',
                 type='int',
             ),
+            Field(
+                name='Unknown39',
+                type='int',
+            ),
         ),
     ),
     'MonsterVarietiesArtVariations.dat': File(
@@ -20489,19 +20493,23 @@ specification = Specification({
             ),
             Field(
                 name='QuestState1',
-                type='int',
+                type='ref|out',
+                key='QuestStates.dat',
             ),
             Field(
                 name='QuestState2',
-                type='int',
+                type='ref|out',
+                key='QuestStates.dat',
             ),
             Field(
                 name='QuestState3',
-                type='int',
+                type='ref|out',
+                key='QuestStates.dat',
             ),
             Field(
                 name='QuestState4',
-                type='int',
+                type='ref|out',
+                key='QuestStates.dat',
             ),
             Field(
                 name='IsDisabled',
