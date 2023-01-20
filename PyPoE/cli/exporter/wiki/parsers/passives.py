@@ -142,11 +142,11 @@ class PassiveSkillParser(parser.BaseParser):
             'template': 'flavour_text',
             'default': '',
         }),
-        ('Reminder_ClientStringsKeys', {
+        ('ReminderTextKeys', {
             'template': 'reminder_text',
             'format': lambda value: '<br>'.join([x['Text'] for x in value]),
             'default': '',
-            'condition': lambda passive: passive['Reminder_ClientStringsKeys']
+            'condition': lambda passive: passive['ReminderTextKeys']
         }),
         ('PassiveSkillBuffsKeys', {
             'template': 'buff_id',
