@@ -17721,10 +17721,6 @@ specification = Specification({
                 type='int',
             ),
             Field(
-                name='Unknown17',
-                type='int',
-            ),
-            Field(
                 name='BuffTemplate',
                 type='ref|out',
                 key='BuffTemplates.dat',
@@ -17743,7 +17739,7 @@ specification = Specification({
                 type='ref|list|ref|out',
             ),
             Field(
-                name='Unknown18',
+                name='Unknown17',
                 type='int',
             ),
             Field(
