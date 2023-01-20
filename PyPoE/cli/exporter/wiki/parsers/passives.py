@@ -337,9 +337,18 @@ class PassiveSkillParser(parser.BaseParser):
 
             # For now this is being added to the stat text
             for ps_buff in passive['PassiveSkillBuffsKeys']:
-                stat_ids = [stat['Id'] for stat in
-                            ps_buff['BuffDefinitionsKey']['StatsKeys']]
+                buff_defs = ps_buff['BuffDefinitionsKey']
+                stat_ids = [stat['Id'] for stat in buff_defs['StatsKeys']]
                 values = ps_buff['Buff_StatValues']
+
+                # There's an additional set of stats for buffs and auras that do not have
+                # an explicit value associated with them but should be treated as if they
+                # had a value of 1.
+                binary_stat_ids = [stat['Id'] for stat in buff_defs['Binary_StatsKeys']]
+                for id in binary_stat_ids:
+                    stat_ids.append(id)
+                    values.append(1)
+
                 #if passive['Id'] == 'AscendancyChampion7':
                 #    index = stat_ids.index('damage_taken_+%_from_hits')
                 #    del stat_ids[index]
