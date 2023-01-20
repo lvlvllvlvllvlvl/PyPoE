@@ -701,7 +701,7 @@ class MOD_DOMAIN(IntEnumOverride):
     CHEST = 4
     AREA = 5
     UNKNOWN1 = 6
-    UNKNOWN2 = 7
+    TEMPLAR_RELIC = 7
     UNKNOWN3 = 8
     CRAFTED = 9
     # Corruptions, item limits, jewel mods, other stuff?
