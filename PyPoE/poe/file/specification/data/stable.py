@@ -1451,10 +1451,6 @@ specification = Specification({
                 key='Mods.dat',
             ),
             Field(
-                name='Unknown0',
-                type='int',
-            ),
-            Field(
                 name='Name',
                 type='ref|string',
             ),
@@ -2179,8 +2175,9 @@ specification = Specification({
                 type='float',
             ),
             Field(
-                name='Unknown3',
-                type='int',
+                name='Key1',
+                type='ref|out',
+                key='QuestFlags.dat',
             ),
         ),
     ),
@@ -2232,6 +2229,10 @@ specification = Specification({
                 name='Name',
                 type='ref|string',
             ),
+            Field(
+                name='MapDeviceTrackerFill',
+                type='ref|string',
+            ),
         ),
     ),
     'AtlasPrimordialBosses.dat': File(
@@ -2272,8 +2273,9 @@ specification = Specification({
                 key='BaseItemTypes.dat',
             ),
             Field(
-                name='Unknown4',
-                type='int',
+                name='PickUpKey',
+                type='ref|out',
+                key='QuestFlags.dat',
             ),
             Field(
                 name='Key0',
@@ -2465,8 +2467,9 @@ specification = Specification({
                 type='ref|string',
             ),
             Field(
-                name='Unknown2',
-                type='int',
+                name='GrantAtlasUpgrade',
+                type='ref|out',
+                key='QuestFlags.dat',
             ),
             Field(
                 name='Key0',
@@ -2520,11 +2523,11 @@ specification = Specification({
                 file_ext='.ogg',
             ),
             Field(
-                name='Unknown5',
-                type='int',
+                name='Key0',
+                type='ref|out',
             ),
             Field(
-                name='Unknown6',
+                name='Unknown5',
                 type='int',
             ),
         ),
@@ -2938,6 +2941,18 @@ specification = Specification({
             ),
         ),
     ),
+    'BestiaryRecipeCategories.dat': File(
+        fields=(
+            Field(
+                name='Id',
+                type='ref|string',
+            ),
+            Field(
+                name='Text',
+                type='ref|string',
+            ),
+        ),
+    ),
     'BestiaryRecipeComponent.dat': File(
         fields=(
             Field(
@@ -3002,15 +3017,16 @@ specification = Specification({
                 type='ref|string',
             ),
             Field(
-                name='HintText',
-                type='ref|string',
+                name='Category',
+                type='ref|out',
+                key='BestiaryRecipeCategories.dat',
             ),
             Field(
                 name='Flag0',
                 type='bool',
             ),
             Field(
-                name='AchievementItemsKeys',
+                name='Achievements',
                 type='ref|list|ref|out',
                 key='AchievementItems.dat',
             ),
@@ -3023,8 +3039,17 @@ specification = Specification({
                 type='int',
             ),
             Field(
-                name='RedBeastsRequired',
+                name='Unknown1',
                 type='int',
+            ),
+            Field(
+                name='Unknown2',
+                type='int',
+            ),
+            Field(
+                name='FlaskMod',
+                type='ref|out',
+                key='Mods.dat',
             ),
         ),
     ),
@@ -3059,6 +3084,11 @@ specification = Specification({
             Field(
                 name='Unknown0',
                 type='int',
+            ),
+            Field(
+                name='Achievements',
+                type='ref|list|ref|out',
+                key='AchievementItems.dat',
             ),
         ),
     ),
@@ -3463,6 +3493,19 @@ specification = Specification({
             Field(
                 name='Flag1',
                 type='bool',
+            ),
+        ),
+    ),
+    'BeyondFactions.dat': File(
+        fields=(
+            Field(
+                name='Id',
+                type='ref|string',
+            ),
+            Field(
+                name='Boss',
+                type='ref|out',
+                key='MonsterVarieties.dat',
             ),
         ),
     ),
@@ -4157,6 +4200,11 @@ specification = Specification({
                 type='ref|out',
                 key='Stats.dat',
             ),
+            Field(
+                name='DuplicateBoss',
+                type='ref|out',
+                key='Stats.dat',
+            ),
         ),
     ),
     'BreachstoneUpgrades.dat': File(
@@ -4716,8 +4764,9 @@ specification = Specification({
                 unique=True,
             ),
             Field(
-                name='QuestState',
-                type='int',
+                name='Event',
+                type='ref|out',
+                key='QuestFlags.dat',
             ),
             Field(
                 name='Unknown0',
@@ -5489,6 +5538,19 @@ specification = Specification({
                 name='Flag9',
                 type='bool',
             ),
+            Field(
+                name='Keys1',
+                type='ref|list|ref|out',
+            ),
+            Field(
+                name='IsHardmode',
+                type='bool',
+            ),
+            Field(
+                name='StatsHardmode',
+                type='ref|list|ref|out',
+                key='Stats.dat',
+            ),
         ),
     ),
     'ClientLakeDifficulty.dat': File(
@@ -6149,6 +6211,14 @@ specification = Specification({
                 name='ShopTag',
                 type='ref|out',
                 key='ShopTag.dat',
+            ),
+            Field(
+                name='IsHardmode',
+                type='bool',
+            ),
+            Field(
+                name='DescriptionHardmode',
+                type='ref|string',
             ),
         ),
     ),
@@ -7484,11 +7554,12 @@ specification = Specification({
                 type='ref|string',
             ),
             Field(
-                name='Unknown0',
-                type='int',
+                name='Key0',
+                type='ref|out',
+                key='QuestFlags.dat',
             ),
             Field(
-                name='Key0',
+                name='Key1',
                 type='ref|out',
                 key='MonsterVarieties.dat',
             ),
@@ -7497,7 +7568,7 @@ specification = Specification({
                 type='ref|string',
             ),
             Field(
-                name='Unknown1',
+                name='Unknown0',
                 type='ref|string',
             ),
             Field(
@@ -8830,6 +8901,14 @@ specification = Specification({
                 type='ref|out',
                 key='NPCTextAudio.dat',
             ),
+            Field(
+                name='Unknown2',
+                type='int',
+            ),
+            Field(
+                name='Unknown3',
+                type='int',
+            ),
         ),
     ),
     'ExpeditionRelicMods.dat': File(
@@ -9161,6 +9240,7 @@ specification = Specification({
             Field(
                 name='Key0',
                 type='ref|out',
+                key='QuestAchievements.dat',
             ),
             Field(
                 name='Key1',
@@ -9168,7 +9248,15 @@ specification = Specification({
             ),
             Field(
                 name='Data0',
-                type='ref|list|byte',
+                type='ref|list|int',
+            ),
+            Field(
+                name='Key2',
+                type='ref|out',
+            ),
+            Field(
+                name='Key3',
+                type='ref|out',
             ),
             Field(
                 name='Unknown0',
@@ -9180,10 +9268,6 @@ specification = Specification({
             ),
             Field(
                 name='Unknown2',
-                type='int',
-            ),
-            Field(
-                name='Unknown3',
                 type='int',
             ),
         ),
@@ -9367,6 +9451,18 @@ specification = Specification({
             ),
             Field(
                 name='Unknown0',
+                type='int',
+            ),
+        ),
+    ),
+    'GameObjectTasks.dat': File(
+        fields=(
+            Field(
+                name='Id',
+                type='ref|string',
+            ),
+            Field(
+                name='HASH16',
                 type='int',
             ),
         ),
@@ -10644,6 +10740,23 @@ specification = Specification({
             ),
         ),
     ),
+    'HarvestCraftFilters.dat': File(
+        fields=(
+            Field(
+                name='Id',
+                type='ref|string',
+            ),
+            Field(
+                name='BaseItem',
+                type='ref|out',
+                key='BaseItemTypes.dat',
+            ),
+            Field(
+                name='Name',
+                type='ref|string',
+            ),
+        ),
+    ),
     'HarvestCraftOptionIcons.dat': File(
         fields=(
             Field(
@@ -10683,40 +10796,45 @@ specification = Specification({
                 type='ref|string',
             ),
             Field(
-                name='AchievementItemsKeys',
-                type='ref|list|ref|out',
-                key='AchievementItems.dat',
-            ),
-            Field(
-                name='Flag0',
-                type='bool',
+                name='Data0',
+                type='ref|list|byte',
             ),
             Field(
                 name='Unknown0',
                 type='int',
             ),
             Field(
-                name='HarvestCraftOptionIconsKeys',
-                type='ref|list|ref|out',
-                key='HarvestCraftOptionIcons.dat',
-            ),
-            Field(
                 name='Description',
                 type='ref|string',
             ),
             Field(
-                name='DDSFile',
-                type='ref|string',
-                file_path=True,
-                file_ext='.dds',
+                name='Flag0',
+                type='bool',
+            ),
+            Field(
+                name='LifeforceType',
+                type='int',
+            ),
+            Field(
+                name='LifeforceCost',
+                type='int',
+            ),
+            Field(
+                name='SacredCost',
+                type='int',
             ),
             Field(
                 name='Flag1',
                 type='bool',
             ),
             Field(
-                name='Flag2',
-                type='bool',
+                name='Achievements',
+                type='ref|list|ref|out',
+                key='AchievementItems.dat',
+            ),
+            Field(
+                name='Unknown1',
+                type='int',
             ),
         ),
     ),
@@ -10789,6 +10907,18 @@ specification = Specification({
             ),
         ),
     ),
+    'HarvestLifeScalingPerLevel.dat': File(
+        fields=(
+            Field(
+                name='Level',
+                type='int',
+            ),
+            Field(
+                name='Life',
+                type='int',
+            ),
+        ),
+    ),
     'HarvestObjects.dat': File(
         fields=(
             Field(
@@ -10836,6 +10966,18 @@ specification = Specification({
                 name='Unknown4',
                 type='int',
             ),
+            Field(
+                name='Unknown5',
+                type='int',
+            ),
+            Field(
+                name='Unknown6',
+                type='int',
+            ),
+            Field(
+                name='Unknown7',
+                type='int',
+            ),
         ),
     ),
     'HarvestPlantBoosters.dat': File(
@@ -10869,6 +11011,24 @@ specification = Specification({
             Field(
                 name='HarvestPlantBoosterFamilies',
                 type='int',
+            ),
+        ),
+    ),
+    'HarvestSeedItems.dat': File(
+        fields=(
+            Field(
+                name='Id',
+                type='int',
+            ),
+            Field(
+                name='BaseItem',
+                type='ref|out',
+                key='BaseItemTypes.dat',
+            ),
+            Field(
+                name='DropStat',
+                type='ref|out',
+                key='Stats.dat',
             ),
         ),
     ),
@@ -10970,14 +11130,6 @@ specification = Specification({
                 type='int',
             ),
             Field(
-                name='Description',
-                type='ref|string',
-            ),
-            Field(
-                name='Keys0',
-                type='ref|list|ref|out',
-            ),
-            Field(
                 name='Unknown0',
                 type='int',
             ),
@@ -10986,12 +11138,9 @@ specification = Specification({
                 type='ref|list|int',
             ),
             Field(
-                name='Data1',
-                type='ref|list|int',
-            ),
-            Field(
-                name='Unknown1',
-                type='int',
+                name='Achievements',
+                type='ref|list|ref|out',
+                key='AchievementItems.dat',
             ),
             Field(
                 name='SeedAnimation',
@@ -11000,7 +11149,7 @@ specification = Specification({
                 file_ext='.ao',
             ),
             Field(
-                name='Unknown2',
+                name='Unknown1',
                 type='int',
             ),
             Field(
@@ -11231,17 +11380,27 @@ specification = Specification({
                 file_ext='.dds',
             ),
             Field(
-                name='AchievementItemsKeys',
+                name='Achievements1',
                 type='ref|list|ref|out',
                 key='AchievementItems.dat',
             ),
             Field(
-                name='AchievementItemsKeys2',
+                name='Achievements2',
                 type='ref|list|ref|out',
                 key='AchievementItems.dat',
             ),
             Field(
-                name='ClientStringsKey',
+                name='Reward',
+                type='ref|out',
+                key='ClientStrings.dat',
+            ),
+            Field(
+                name='Achievements3',
+                type='ref|list|ref|out',
+                key='AchievementItems.dat',
+            ),
+            Field(
+                name='RewardHardmode',
                 type='ref|out',
                 key='ClientStrings.dat',
             ),
@@ -13241,8 +13400,18 @@ specification = Specification({
                 key='IncursionRooms.dat',
             ),
             Field(
-                name='Key0',
+                name='ItemisedFlavourText',
                 type='ref|out',
+                key='FlavourText.dat',
+            ),
+            Field(
+                name='Unknown2',
+                type='ref|string',
+            ),
+            Field(
+                name='Keys0',
+                type='ref|list|ref|out',
+                key='Mods.dat',
             ),
         ),
     ),
@@ -14978,6 +15147,18 @@ specification = Specification({
                 name='Key1',
                 type='ref|out',
             ),
+            Field(
+                name='Unknown3',
+                type='int',
+            ),
+            Field(
+                name='Unknown4',
+                type='int',
+            ),
+            Field(
+                name='Flag0',
+                type='bool',
+            ),
         ),
     ),
     'LegionBalancePerLevel.dat': File(
@@ -15074,6 +15255,34 @@ specification = Specification({
             ),
         ),
     ),
+    'LegionChestTypes.dat': File(
+        fields=(
+            Field(
+                name='Key0',
+                type='ref|out',
+                key='MonsterVarieties.dat',
+            ),
+            Field(
+                name='Chest',
+                type='ref|out',
+                key='Chests.dat',
+            ),
+            Field(
+                name='HardmodeChest',
+                type='ref|out',
+                key='Chests.dat',
+            ),
+            Field(
+                name='Unknown0',
+                type='int',
+            ),
+            Field(
+                name='Faction',
+                type='ref|out',
+                key='LegionFactions.dat',
+            ),
+        ),
+    ),
     'LegionChests.dat': File(
         fields=(
             Field(
@@ -15110,7 +15319,7 @@ specification = Specification({
                 unique=True,
             ),
             Field(
-                name='Unknown0',
+                name='SpawnWeight',
                 type='int',
             ),
             Field(
@@ -15119,11 +15328,11 @@ specification = Specification({
                 key='LegionBalancePerLevel.dat',
             ),
             Field(
-                name='Unknown1',
+                name='Unknown0',
                 type='float',
             ),
             Field(
-                name='Unknown2',
+                name='Unknown1',
                 type='float',
             ),
             Field(
@@ -15162,11 +15371,11 @@ specification = Specification({
                 key='MiscAnimated.dat',
             ),
             Field(
-                name='Unknown3',
+                name='Unknown2',
                 type='float',
             ),
             Field(
-                name='Unknown4',
+                name='Unknown3',
                 type='float',
             ),
             Field(
@@ -15181,6 +15390,10 @@ specification = Specification({
             ),
             Field(
                 name='Shard',
+                type='ref|string',
+            ),
+            Field(
+                name='RewardJewelArt',
                 type='ref|string',
             ),
         ),
@@ -15883,6 +16096,14 @@ specification = Specification({
                 name='SentinelTier',
                 type='int',
             ),
+            Field(
+                name='KalandraTier',
+                type='int',
+            ),
+            Field(
+                name='SanctumTier',
+                type='int',
+            ),
         ),
     ),
     'MapStashSpecialTypeEntries.dat': File(
@@ -16222,7 +16443,12 @@ specification = Specification({
                 type='ref|list|byte',
             ),
             Field(
-                name='CompletionAchievements',
+                name='Achievements1',
+                type='ref|list|ref|out',
+                key='AchievementItems.dat',
+            ),
+            Field(
+                name='Achievements2',
                 type='ref|list|ref|out',
                 key='AchievementItems.dat',
             ),
@@ -16611,20 +16837,24 @@ specification = Specification({
                 type='float',
             ),
             Field(
-                name='Scaling_StatsKeys',
+                name='ScalingStats',
                 type='ref|list|ref|out',
                 key='Stats.dat',
             ),
             Field(
-                name='Scaling_Values',
+                name='ScalingValues',
                 type='ref|list|int',
             ),
             Field(
-                name='Unknown0',
-                type='int',
+                name='ScalingValues2',
+                type='ref|list|int',
             ),
             Field(
-                name='Data0',
+                name='ScalingValuesHardmode',
+                type='ref|list|int',
+            ),
+            Field(
+                name='ScalingValuesHardmode2',
                 type='ref|list|int',
             ),
         ),
@@ -18160,6 +18390,10 @@ specification = Specification({
                 name='Unknown4',
                 type='int',
             ),
+            Field(
+                name='Unknown5',
+                type='float',
+            ),
         ),
     ),
     'MonsterHeights.dat': File(
@@ -19506,6 +19740,14 @@ specification = Specification({
                 type='ref|list|ref|out',
                 key='MusicCategories.dat',
             ),
+            Field(
+                name='Flag0',
+                type='bool',
+            ),
+            Field(
+                name='Unknown1',
+                type='int',
+            ),
         ),
     ),
     'MusicCategories.dat': File(
@@ -19763,10 +20005,6 @@ specification = Specification({
                 type='int',
             ),
             Field(
-                name='Unknown4',
-                type='int',
-            ),
-            Field(
                 name='Flag2',
                 type='bool',
             ),
@@ -19776,14 +20014,14 @@ specification = Specification({
             ),
             Field(
                 name='Data0',
-                type='ref|list|int',
+                type='ref|list|byte',
             ),
             Field(
                 name='Data1',
-                type='ref|list|int',
+                type='ref|list|byte',
             ),
             Field(
-                name='Unknown5',
+                name='Unknown4',
                 type='int',
             ),
             Field(
@@ -19793,6 +20031,10 @@ specification = Specification({
             Field(
                 name='Flag5',
                 type='bool',
+            ),
+            Field(
+                name='Unknown5',
+                type='int',
             ),
         ),
     ),
@@ -20000,8 +20242,9 @@ specification = Specification({
                 key='Quest.dat',
             ),
             Field(
-                name='Unknown1',
-                type='int',
+                name='QuestFlag',
+                type='ref|out',
+                key='QuestFlags.dat',
             ),
             Field(
                 name='NPCTextAudioKeys',
@@ -20029,7 +20272,7 @@ specification = Specification({
                 type='ref|list|int',
             ),
             Field(
-                name='Unknown2',
+                name='Unknown1',
                 type='int',
             ),
             Field(
@@ -20037,7 +20280,7 @@ specification = Specification({
                 type='ref|list|int',
             ),
             Field(
-                name='Unknown3',
+                name='Unknown2',
                 type='int',
             ),
             Field(
@@ -20069,7 +20312,7 @@ specification = Specification({
                 type='ref|out',
             ),
             Field(
-                name='Unknown4',
+                name='Unknown3',
                 type='int',
             ),
             Field(
@@ -20077,7 +20320,7 @@ specification = Specification({
                 type='ref|list|int',
             ),
             Field(
-                name='Unknown5',
+                name='Unknown4',
                 type='int',
             ),
         ),
@@ -21886,6 +22129,10 @@ specification = Specification({
                 name='Script',
                 type='ref|string',
             ),
+            Field(
+                name='Key5',
+                type='ref|out',
+            ),
         ),
     ),
     'QuestRewardOffers.dat': File(
@@ -22089,8 +22336,9 @@ specification = Specification({
     'QuestStaticRewards.dat': File(
         fields=(
             Field(
-                name='Key0',
+                name='QuestFlag',
                 type='ref|out',
+                key='QuestFlags.dat',
             ),
             Field(
                 name='Unknown0',
@@ -22121,6 +22369,19 @@ specification = Specification({
             ),
             Field(
                 name='Unknown2',
+                type='int',
+            ),
+            Field(
+                name='StatValuesHardmode',
+                type='ref|list|int',
+            ),
+            Field(
+                name='ClientStringHardmode',
+                type='ref|out',
+                key='ClientStrings.dat',
+            ),
+            Field(
+                name='Unknown3',
                 type='int',
             ),
         ),
@@ -22577,6 +22838,18 @@ specification = Specification({
             Field(
                 name='Flag0',
                 type='bool',
+            ),
+        ),
+    ),
+    'RogueExileLifeScalingPerLevel.dat': File(
+        fields=(
+            Field(
+                name='Level',
+                type='int',
+            ),
+            Field(
+                name='AdditionalLife',
+                type='int',
             ),
         ),
     ),
@@ -24173,6 +24446,19 @@ specification = Specification({
             ),
         ),
     ),
+    'StatsAffectingGeneration.dat': File(
+        fields=(
+            Field(
+                name='Stat',
+                type='ref|out',
+                key='Stats.dat',
+            ),
+            Field(
+                name='StatValue',
+                type='int',
+            ),
+        ),
+    ),
     'StrDexIntMissionExtraRequirement.dat': File(
         fields=(
             Field(
@@ -24359,6 +24645,10 @@ specification = Specification({
                 name='SpawnWeightIncrease',
                 type='ref|out',
                 key='Stats.dat',
+            ),
+            Field(
+                name='SpawnWeightHardmode',
+                type='int',
             ),
         ),
     ),
@@ -25520,6 +25810,18 @@ specification = Specification({
             ),
         ),
     ),
+    'TradeMarketIndexItemAs.dat': File(
+        fields=(
+            Field(
+                name='Item',
+                type='ref|out',
+            ),
+            Field(
+                name='IndexAs',
+                type='ref|out',
+            ),
+        ),
+    ),
     'TreasureHunterMissions.dat': File(
         fields=(
             Field(
@@ -25884,6 +26186,20 @@ specification = Specification({
             ),
         ),
     ),
+    'UltimatumMapModifiers.dat': File(
+        fields=(
+            Field(
+                name='Stat',
+                type='ref|out',
+                key='Stats.dat',
+            ),
+            Field(
+                name='Mods',
+                type='ref|list|ref|out',
+                key='UltimatumModifiers.dat',
+            ),
+        ),
+    ),
     'UltimatumModifierTypes.dat': File(
         fields=(
             Field(
@@ -26002,6 +26318,11 @@ specification = Specification({
                 name='TextAudio',
                 type='ref|out',
                 key='NPCTextAudio.dat',
+            ),
+            Field(
+                name='UniqueMapMod',
+                type='ref|out',
+                key='Mods.dat',
             ),
         ),
     ),
@@ -27168,6 +27489,26 @@ specification = Specification({
             Field(
                 name='Unknown2',
                 type='int',
+            ),
+            Field(
+                name='Flag0',
+                type='bool',
+            ),
+            Field(
+                name='Unknown3',
+                type='float',
+            ),
+            Field(
+                name='Unknown4',
+                type='float',
+            ),
+            Field(
+                name='Unknown5',
+                type='float',
+            ),
+            Field(
+                name='Unknown6',
+                type='ref|string',
             ),
         ),
     ),
