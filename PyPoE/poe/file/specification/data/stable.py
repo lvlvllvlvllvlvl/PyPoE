@@ -13042,7 +13042,7 @@ specification = Specification({
                 unique=True,
             ),
             Field(
-                name='SmallWorldAreasKey',
+                name='HideoutArea',
                 type='ref|out',
                 key='WorldAreas.dat',
             ),
@@ -13057,11 +13057,12 @@ specification = Specification({
                 file_ext='.hideout',
             ),
             Field(
-                name='Keys0',
+                name='SpawnAreas',
                 type='ref|list|ref|out',
+                key='WorldAreas.dat',
             ),
             Field(
-                name='LargeWorldAreasKey',
+                name='ClaimSideArea',
                 type='ref|out',
                 key='WorldAreas.dat',
             ),
@@ -13078,12 +13079,12 @@ specification = Specification({
                 type='int',
             ),
             Field(
-                name='Key0',
+                name='Rarity',
                 type='ref|out',
                 key='HideoutRarity.dat',
             ),
             Field(
-                name='Flag0',
+                name='NotActsArea',
                 type='bool',
             ),
             Field(
@@ -13095,6 +13096,10 @@ specification = Specification({
                 type='ref|list|int',
             ),
             Field(
+                name='Flag0',
+                type='bool',
+            ),
+            Field(
                 name='Flag1',
                 type='bool',
             ),
@@ -13104,10 +13109,6 @@ specification = Specification({
             ),
             Field(
                 name='Flag3',
-                type='bool',
-            ),
-            Field(
-                name='Flag4',
                 type='bool',
             ),
         ),
