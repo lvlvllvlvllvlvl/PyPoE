@@ -17,8 +17,8 @@ from PyPoE.poe.file.specification.generation.virtual_fields import virtual_field
 
 
 def main():
-    if len(sys.argv) > 1 and sys.argv[1] == 'local':
-        schema_json = _read_dat_schema_local()
+    if len(sys.argv) > 1:
+        schema_json = _read_dat_schema_local(sys.argv[1])
     else:
         schema_json = _read_latest_dat_schema_release()
     input_spec = _load_dat_schema_tables(schema_json)
@@ -32,8 +32,7 @@ def _read_latest_dat_schema_release() -> str:
     return response.read().decode()
 
 
-def _read_dat_schema_local() -> str:
-    path = os.path.join(DIR, '..', '..', 'dat-schema', 'schema.min.json')
+def _read_dat_schema_local(path: str) -> str:
     with open(path, 'r', encoding='utf-8') as f:
         return f.read()
 

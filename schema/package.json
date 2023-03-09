@@ -1,0 +1,13 @@
+{
+  "type": "module",
+  "dependencies": {
+    "pathofexile-dat": "^7.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.14.6"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "bracketSameLine": true
+  }
+}

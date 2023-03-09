@@ -12,6 +12,19 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v3
+    - name: install node
+      uses: actions/setup-node@v1
+    - name: npm install
+      run: npm i
+      working-directory: schema
+    - name: tsc
+      uses: icrawl/action-tsc@v1
+      working-directory: schema
+    - name: validate schema
+      run: node dist/validate.js
+      working-directory: schema
+    - name: copy schema
+      run: cp schema/schema.json PyPoE/poe/file/specification/generation
     - name: setup python
       uses: actions/setup-python@v4
       with:
@@ -19,7 +32,7 @@ jobs:
     - name: install minimal
       run: pip install -e .
     - name: import schema
-      run: python import_dat_schema.py
+      run: python import_dat_schema.py schema.json
       working-directory: PyPoE/poe/file/specification/generation
     - name: commit changes
       uses: stefanzweifel/git-auto-commit-action@v4

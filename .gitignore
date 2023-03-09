@@ -10,3 +10,6 @@ __pycache__
 /docs/source/_autosummary
 /docs/source/autosummary.rst
 .vscode/launch.json
+/schema/Data/
+/schema/dist/
+/schema/node_modules/
