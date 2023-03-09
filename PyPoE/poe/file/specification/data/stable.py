@@ -4373,7 +4373,7 @@ specification = Specification({
                 key='Stats.dat',
             ),
             Field(
-                name='Binary_StatsKeys',
+                name='Keys2',
                 type='ref|list|ref|out',
                 key='Stats.dat',
             ),
