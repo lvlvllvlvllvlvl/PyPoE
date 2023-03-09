@@ -19,10 +19,12 @@ jobs:
     - name: npm install
       run: npm i
       working-directory: schema
-    - name: tsc
-      uses: icrawl/action-tsc@v1
-      with:
-        project: schema
+    - name: npm install typescript
+      run: npm i -g typescript
+      working-directory: schema
+    - name: ts compile
+      run: tsc
+      working-directory: schema
     - name: validate schema
       run: node dist/validate.js
       working-directory: schema
