@@ -1891,22 +1891,6 @@ specification = Specification({
                 name='Unknown0',
                 type='int',
             ),
-            Field(
-                name='Data0',
-                type='ref|list|int',
-            ),
-            Field(
-                name='Data1',
-                type='ref|list|int',
-            ),
-            Field(
-                name='Unknown1',
-                type='int',
-            ),
-            Field(
-                name='Unknown2',
-                type='int',
-            ),
         ),
     ),
     'AtlasInfluenceOutcomes.dat': File(
@@ -2769,17 +2753,6 @@ specification = Specification({
                 name='MonsterPacksKey',
                 type='ref|out',
                 key='MonsterPacks.dat',
-            ),
-            Field(
-                name='MonsterVarietiesKey',
-                type='ref|out',
-                key='MonsterVarieties.dat',
-            ),
-            Field(
-                name='MonsterSpawnerId',
-                type='ref|string',
-                file_path=True,
-                file_ext='.ot, .otc',
             ),
         ),
     ),
@@ -4785,51 +4758,6 @@ specification = Specification({
                 name='Ranger_CharacterTextAudioKeys',
                 type='ref|list|ref|out',
                 key='CharacterTextAudio.dat',
-            ),
-            Field(
-                name='Witch_CharacterTextAudioKeys',
-                type='ref|list|ref|out',
-                key='CharacterTextAudio.dat',
-            ),
-            Field(
-                name='Duelist_CharacterTextAudioKeys',
-                type='ref|list|ref|out',
-                key='CharacterTextAudio.dat',
-            ),
-            Field(
-                name='Shadow_CharacterTextAudioKeys',
-                type='ref|list|ref|out',
-                key='CharacterTextAudio.dat',
-            ),
-            Field(
-                name='Templar_CharacterTextAudioKeys',
-                type='ref|list|ref|out',
-                key='CharacterTextAudio.dat',
-            ),
-            Field(
-                name='Scion_CharacterTextAudioKeys',
-                type='ref|list|ref|out',
-                key='CharacterTextAudio.dat',
-            ),
-            Field(
-                name='Goddess_CharacterTextAudioKeys',
-                type='ref|list|ref|out',
-                key='CharacterTextAudio.dat',
-                description='For the Goddess Bound/Scorned/Unleashed unique',
-            ),
-            Field(
-                name='JackTheAxe_CharacterTextAudioKeys',
-                type='ref|list|ref|out',
-                key='CharacterTextAudio.dat',
-                description='For Jack the Axe unique',
-            ),
-            Field(
-                name='Flag0',
-                type='bool',
-            ),
-            Field(
-                name='Flag1',
-                type='bool',
             ),
         ),
     ),
@@ -10109,30 +10037,6 @@ specification = Specification({
                 name='Unknown24',
                 type='int',
             ),
-            Field(
-                name='Keys1',
-                type='ref|list|ref|out',
-            ),
-            Field(
-                name='Data0',
-                type='ref|list|int',
-            ),
-            Field(
-                name='Unknown25',
-                type='int',
-            ),
-            Field(
-                name='Unknown26',
-                type='int',
-            ),
-            Field(
-                name='Unknown27',
-                type='int',
-            ),
-            Field(
-                name='Flag11',
-                type='bool',
-            ),
         ),
     ),
     'GiftWrapArtVariations.dat': File(
@@ -11683,21 +11587,6 @@ specification = Specification({
             Field(
                 name='Unknown4',
                 type='int',
-            ),
-            Field(
-                name='AOFile',
-                type='ref|string',
-                file_path=True,
-                file_ext='.ao',
-            ),
-            Field(
-                name='Stance',
-                type='ref|string',
-            ),
-            Field(
-                name='BetrayalTargetsKey',
-                type='ref|out',
-                key='BetrayalTargets.dat',
             ),
         ),
     ),
@@ -17106,26 +16995,6 @@ specification = Specification({
                 file_path=True,
                 file_ext='.ao',
             ),
-            Field(
-                name='Unknown3',
-                type='ref|string',
-            ),
-            Field(
-                name='Unknown4',
-                type='ref|string',
-            ),
-            Field(
-                name='Unknown5',
-                type='ref|string',
-            ),
-            Field(
-                name='Unknown6',
-                type='int',
-            ),
-            Field(
-                name='Unknown7',
-                type='int',
-            ),
         ),
     ),
     'MicrotransactionRarityDisplay.dat': File(
@@ -20175,26 +20044,6 @@ specification = Specification({
                 name='Unknown1',
                 type='int',
             ),
-            Field(
-                name='Keys1',
-                type='ref|list|ref|out',
-            ),
-            Field(
-                name='Data1',
-                type='ref|list|int',
-            ),
-            Field(
-                name='Unknown2',
-                type='int',
-            ),
-            Field(
-                name='Unknown3',
-                type='int',
-            ),
-            Field(
-                name='Unknown4',
-                type='int',
-            ),
         ),
     ),
     'NPCTalk.dat': File(
@@ -20449,48 +20298,6 @@ specification = Specification({
             Field(
                 name='Unknown0',
                 type='int',
-            ),
-            Field(
-                name='NPCShop',
-                type='ref|out',
-                key='NPCShop.dat',
-            ),
-            Field(
-                name='NPCAudios1',
-                type='ref|list|ref|out',
-                key='NPCAudio.dat',
-            ),
-            Field(
-                name='NPCAudios2',
-                type='ref|list|ref|out',
-                key='NPCAudio.dat',
-            ),
-            Field(
-                name='Unknown1',
-                type='int',
-            ),
-            Field(
-                name='Unknown2',
-                type='ref|generic',
-                key='NPCs.dat',
-            ),
-            Field(
-                name='Portrait',
-                type='ref|out',
-                key='NPCPortraits.dat',
-            ),
-            Field(
-                name='DialogueStyle',
-                type='ref|out',
-                key='NPCDialogueStyles.dat',
-            ),
-            Field(
-                name='Key1',
-                type='ref|out',
-            ),
-            Field(
-                name='Flag0',
-                type='bool',
             ),
         ),
     ),
@@ -24231,10 +24038,6 @@ specification = Specification({
                 name='Unknown11',
                 type='int',
             ),
-            Field(
-                name='Unknown12',
-                type='int',
-            ),
         ),
     ),
     'SpecialRooms.dat': File(
@@ -27035,126 +26838,6 @@ specification = Specification({
             ),
             Field(
                 name='Unknown12',
-                type='int',
-            ),
-            Field(
-                name='Data0',
-                type='ref|list|int',
-            ),
-            Field(
-                name='Unknown13',
-                type='int',
-            ),
-            Field(
-                name='Unknown14',
-                type='int',
-            ),
-            Field(
-                name='Unknown15',
-                type='int',
-            ),
-            Field(
-                name='Unknown16',
-                type='int',
-            ),
-            Field(
-                name='Unknown17',
-                type='int',
-            ),
-            Field(
-                name='Unknown18',
-                type='int',
-            ),
-            Field(
-                name='Unknown19',
-                type='int',
-            ),
-            Field(
-                name='Unknown20',
-                type='int',
-            ),
-            Field(
-                name='Unknown21',
-                type='int',
-            ),
-            Field(
-                name='Unknown22',
-                type='int',
-            ),
-            Field(
-                name='Unknown23',
-                type='int',
-            ),
-            Field(
-                name='Unknown24',
-                type='int',
-            ),
-            Field(
-                name='Unknown25',
-                type='int',
-            ),
-            Field(
-                name='Unknown26',
-                type='int',
-            ),
-            Field(
-                name='Unknown27',
-                type='int',
-            ),
-            Field(
-                name='Unknown28',
-                type='int',
-            ),
-            Field(
-                name='Unknown29',
-                type='int',
-            ),
-            Field(
-                name='Unknown30',
-                type='int',
-            ),
-            Field(
-                name='Unknown31',
-                type='int',
-            ),
-            Field(
-                name='Unknown32',
-                type='int',
-            ),
-            Field(
-                name='Unknown33',
-                type='int',
-            ),
-            Field(
-                name='Unknown34',
-                type='int',
-            ),
-            Field(
-                name='Unknown35',
-                type='int',
-            ),
-            Field(
-                name='Unknown36',
-                type='int',
-            ),
-            Field(
-                name='Unknown37',
-                type='int',
-            ),
-            Field(
-                name='Unknown38',
-                type='int',
-            ),
-            Field(
-                name='Unknown39',
-                type='int',
-            ),
-            Field(
-                name='Unknown40',
-                type='int',
-            ),
-            Field(
-                name='Unknown41',
                 type='int',
             ),
         ),
