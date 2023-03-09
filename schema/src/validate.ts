@@ -172,7 +172,7 @@ for (const tr of includeTranslations) {
               )} not valid at offset ${header.offset}`
             );
           } else {
-            return true;
+            return table.columns[i].type !== "array";
           }
         } catch (e) {
           console.error("Validation error", header, e);
