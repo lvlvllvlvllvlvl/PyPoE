@@ -2,6 +2,8 @@ name: Import schema
 
 on:
   workflow_dispatch:
+  push:
+    branches: ["dev"]
   schedule:
     - cron: "0 0 * * *"
 
@@ -19,7 +21,8 @@ jobs:
       working-directory: schema
     - name: tsc
       uses: icrawl/action-tsc@v1
-      working-directory: schema
+      with:
+        project: schema
     - name: validate schema
       run: node dist/validate.js
       working-directory: schema
