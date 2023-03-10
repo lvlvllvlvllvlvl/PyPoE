@@ -21,11 +21,6 @@ MicrotransactionPortalVariations.dat64 column 11 <unknown>: string not valid at 
 MicrotransactionPortalVariations.dat64 column 12 <unknown>: string not valid at offset 100
 MicrotransactionPortalVariations.dat64 column 13 <unknown>: integer not valid at offset 108
 MicrotransactionPortalVariations.dat64 column 14 <unknown>: integer not valid at offset 112
-NPCs.dat64 column 7 NPCShop: key not valid at offset 68
-NPCs.dat64 column 9 NPCAudios2: array/key not valid at offset 100
-NPCs.dat64 column 13 DialogueStyle: key not valid at offset 144
-NPCs.dat64 column 14 <unknown>: key not valid at offset 160
-NPCs.dat64 column 15 <unknown>: boolean not valid at offset 176
 NPCShop.dat64 column 7 <unknown>: array/key not valid at offset 80
 NPCShop.dat64 column 8 <unknown>: array/integer not valid at offset 96
 SpawnObject.dat64 column 16 <unknown>: integer not valid at offset 86

@@ -20299,6 +20299,43 @@ specification = Specification({
                 name='Unknown0',
                 type='int',
             ),
+            Field(
+                name='NPCAudios1',
+                type='ref|list|ref|out',
+                key='NPCAudio.dat',
+            ),
+            Field(
+                name='NPCAudios2',
+                type='ref|list|ref|out',
+                key='NPCAudio.dat',
+            ),
+            Field(
+                name='Unknown1',
+                type='int',
+            ),
+            Field(
+                name='Unknown2',
+                type='ref|generic',
+                key='NPCs.dat',
+            ),
+            Field(
+                name='Portrait',
+                type='ref|out',
+                key='NPCPortraits.dat',
+            ),
+            Field(
+                name='DialogueStyle',
+                type='ref|out',
+                key='NPCDialogueStyles.dat',
+            ),
+            Field(
+                name='Flag0',
+                type='bool',
+            ),
+            Field(
+                name='Key1',
+                type='ref|out',
+            ),
         ),
     ),
     'NearbyMonsterConditions.dat': File(
