@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "createdAt": 1678410279,
+  "createdAt": 1678416055,
   "tables": [
     {
       "name": "AbyssObjects",
@@ -7241,42 +7241,6 @@
           "files": null
         },
         {
-          "name": "MinLevel",
-          "description": null,
-          "array": false,
-          "type": "i32",
-          "unique": false,
-          "localized": false,
-          "references": null,
-          "until": null,
-          "file": null,
-          "files": null
-        },
-        {
-          "name": "MaxLevel",
-          "description": null,
-          "array": false,
-          "type": "i32",
-          "unique": false,
-          "localized": false,
-          "references": null,
-          "until": null,
-          "file": null,
-          "files": null
-        },
-        {
-          "name": "SpawnWeight",
-          "description": null,
-          "array": false,
-          "type": "i32",
-          "unique": false,
-          "localized": false,
-          "references": null,
-          "until": null,
-          "file": null,
-          "files": null
-        },
-        {
           "name": "MonsterPacksKey",
           "description": null,
           "array": false,
@@ -7289,6 +7253,35 @@
           "until": null,
           "file": null,
           "files": null
+        },
+        {
+          "name": "MonsterVarietiesKey",
+          "description": null,
+          "array": false,
+          "type": "foreignrow",
+          "unique": false,
+          "localized": false,
+          "references": {
+            "table": "MonsterVarieties"
+          },
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": "MonsterSpawnerId",
+          "description": null,
+          "array": false,
+          "type": "string",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": [
+            ".ot",
+            ".otc"
+          ]
         }
       ]
     },
@@ -12666,8 +12659,8 @@
           "files": null
         },
         {
-          "name": "Marauder_CharacterTextAudioKeys",
-          "description": null,
+          "name": "Goddess_CharacterTextAudioKeys",
+          "description": "For the Goddess Bound/Scorned/Unleashed unique",
           "array": true,
           "type": "foreignrow",
           "unique": false,
@@ -12680,7 +12673,78 @@
           "files": null
         },
         {
-          "name": "Ranger_CharacterTextAudioKeys",
+          "name": "JackTheAxe_CharacterTextAudioKeys",
+          "description": "For Jack the Axe unique",
+          "array": true,
+          "type": "foreignrow",
+          "unique": false,
+          "localized": false,
+          "references": {
+            "table": "CharacterTextAudio"
+          },
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": null,
+          "description": null,
+          "array": false,
+          "type": "bool",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": null,
+          "description": null,
+          "array": false,
+          "type": "bool",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        }
+      ]
+    },
+    {
+      "name": "CharacterEventTextAudio",
+      "columns": [
+        {
+          "name": "Event",
+          "description": null,
+          "array": false,
+          "type": "foreignrow",
+          "unique": false,
+          "localized": false,
+          "references": {
+            "table": "CharacterAudioEvents"
+          },
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": "Character",
+          "description": null,
+          "array": false,
+          "type": "foreignrow",
+          "unique": false,
+          "localized": false,
+          "references": {
+            "table": "Characters"
+          },
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": "TextAudio",
           "description": null,
           "array": true,
           "type": "foreignrow",
@@ -54142,11 +54206,152 @@
         {
           "name": null,
           "description": null,
+          "array": true,
+          "type": "foreignrow",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": null,
+          "description": null,
+          "array": true,
+          "type": "i32",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": null,
+          "description": null,
           "array": false,
           "type": "i32",
           "unique": false,
           "localized": false,
           "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": null,
+          "description": null,
+          "array": false,
+          "type": "i32",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": null,
+          "description": null,
+          "array": false,
+          "type": "i32",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": null,
+          "description": null,
+          "array": true,
+          "type": "array",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": null,
+          "description": null,
+          "array": false,
+          "type": "i32",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": null,
+          "description": null,
+          "array": false,
+          "type": "i32",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        }
+      ]
+    },
+    {
+      "name": "NPCShops",
+      "columns": [
+        {
+          "name": "Id",
+          "description": null,
+          "array": false,
+          "type": "string",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": null,
+          "description": null,
+          "array": false,
+          "type": "i32",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": "Shop",
+          "description": null,
+          "array": false,
+          "type": "foreignrow",
+          "unique": false,
+          "localized": false,
+          "references": {
+            "table": "NPCShop"
+          },
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": "ShopHardmode",
+          "description": null,
+          "array": false,
+          "type": "foreignrow",
+          "unique": false,
+          "localized": false,
+          "references": {
+            "table": "NPCShop"
+          },
           "until": null,
           "file": null,
           "files": null
@@ -58744,6 +58949,20 @@
           "until": null,
           "file": null,
           "files": null
+        },
+        {
+          "name": null,
+          "description": null,
+          "array": true,
+          "type": "row",
+          "unique": false,
+          "localized": false,
+          "references": {
+            "table": "QuestFlags"
+          },
+          "until": null,
+          "file": null,
+          "files": null
         }
       ]
     },
@@ -61074,87 +61293,6 @@
       ]
     },
     {
-      "name": "SafehouseCraftingSpree",
-      "columns": [
-        {
-          "name": "BetrayalJobsKey",
-          "description": null,
-          "array": false,
-          "type": "foreignrow",
-          "unique": false,
-          "localized": false,
-          "references": {
-            "table": "BetrayalJobs"
-          },
-          "until": null,
-          "file": null,
-          "files": null
-        },
-        {
-          "name": "Rank",
-          "description": null,
-          "array": false,
-          "type": "i32",
-          "unique": false,
-          "localized": false,
-          "references": null,
-          "until": null,
-          "file": null,
-          "files": null
-        },
-        {
-          "name": "CurrencyCount",
-          "description": null,
-          "array": true,
-          "type": "i32",
-          "unique": false,
-          "localized": false,
-          "references": null,
-          "until": null,
-          "file": null,
-          "files": null
-        },
-        {
-          "name": "Chance",
-          "description": null,
-          "array": false,
-          "type": "i32",
-          "unique": false,
-          "localized": false,
-          "references": null,
-          "until": null,
-          "file": null,
-          "files": null
-        },
-        {
-          "name": "Currency_SafehouseCraftingSpreeCurrenciesKeys",
-          "description": null,
-          "array": true,
-          "type": "foreignrow",
-          "unique": false,
-          "localized": false,
-          "references": {
-            "table": "SafehouseCraftingSpreeCurrencies"
-          },
-          "until": null,
-          "file": null,
-          "files": null
-        },
-        {
-          "name": null,
-          "description": null,
-          "array": true,
-          "type": "foreignrow",
-          "unique": false,
-          "localized": false,
-          "references": null,
-          "until": null,
-          "file": null,
-          "files": null
-        }
-      ]
-    },
-    {
       "name": "SafehouseCraftingSpreeCurrencies",
       "columns": [
         {
@@ -61188,6 +61326,85 @@
           "description": null,
           "array": false,
           "type": "bool",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        }
+      ]
+    },
+    {
+      "name": "SafehouseCraftingSpreeType",
+      "columns": [
+        {
+          "name": "Id",
+          "description": null,
+          "array": false,
+          "type": "string",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": "Currencies",
+          "description": null,
+          "array": true,
+          "type": "foreignrow",
+          "unique": false,
+          "localized": false,
+          "references": {
+            "table": "SafehouseCraftingSpreeCurrencies"
+          },
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": "CurrencyCount",
+          "description": null,
+          "array": true,
+          "type": "i32",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": null,
+          "description": null,
+          "array": true,
+          "type": "foreignrow",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": "Disabled",
+          "description": null,
+          "array": false,
+          "type": "bool",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": "ItemClassText",
+          "description": null,
+          "array": false,
+          "type": "string",
           "unique": false,
           "localized": false,
           "references": null,

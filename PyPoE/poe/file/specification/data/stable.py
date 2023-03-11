@@ -2738,21 +2738,20 @@ specification = Specification({
                 unique=True,
             ),
             Field(
-                name='MinLevel',
-                type='int',
-            ),
-            Field(
-                name='MaxLevel',
-                type='int',
-            ),
-            Field(
-                name='SpawnWeight',
-                type='int',
-            ),
-            Field(
                 name='MonsterPacksKey',
                 type='ref|out',
                 key='MonsterPacks.dat',
+            ),
+            Field(
+                name='MonsterVarietiesKey',
+                type='ref|out',
+                key='MonsterVarieties.dat',
+            ),
+            Field(
+                name='MonsterSpawnerId',
+                type='ref|string',
+                file_path=True,
+                file_ext='.ot, .otc',
             ),
         ),
     ),
@@ -4750,12 +4749,41 @@ specification = Specification({
                 type='int',
             ),
             Field(
-                name='Marauder_CharacterTextAudioKeys',
+                name='Goddess_CharacterTextAudioKeys',
                 type='ref|list|ref|out',
                 key='CharacterTextAudio.dat',
+                description='For the Goddess Bound/Scorned/Unleashed unique',
             ),
             Field(
-                name='Ranger_CharacterTextAudioKeys',
+                name='JackTheAxe_CharacterTextAudioKeys',
+                type='ref|list|ref|out',
+                key='CharacterTextAudio.dat',
+                description='For Jack the Axe unique',
+            ),
+            Field(
+                name='Flag0',
+                type='bool',
+            ),
+            Field(
+                name='Flag1',
+                type='bool',
+            ),
+        ),
+    ),
+    'CharacterEventTextAudio.dat': File(
+        fields=(
+            Field(
+                name='Event',
+                type='ref|out',
+                key='CharacterAudioEvents.dat',
+            ),
+            Field(
+                name='Character',
+                type='ref|out',
+                key='Characters.dat',
+            ),
+            Field(
+                name='TextAudio',
                 type='ref|list|ref|out',
                 key='CharacterTextAudio.dat',
             ),
@@ -20041,8 +20069,58 @@ specification = Specification({
                 type='ref|list|int',
             ),
             Field(
+                name='Keys1',
+                type='ref|list|ref|out',
+            ),
+            Field(
+                name='Data1',
+                type='ref|list|int',
+            ),
+            Field(
                 name='Unknown1',
                 type='int',
+            ),
+            Field(
+                name='Unknown2',
+                type='int',
+            ),
+            Field(
+                name='Unknown3',
+                type='int',
+            ),
+            Field(
+                name='Data2',
+                type='ref|list|byte',
+            ),
+            Field(
+                name='Unknown4',
+                type='int',
+            ),
+            Field(
+                name='Unknown5',
+                type='int',
+            ),
+        ),
+    ),
+    'NPCShops.dat': File(
+        fields=(
+            Field(
+                name='Id',
+                type='ref|string',
+            ),
+            Field(
+                name='Unknown0',
+                type='int',
+            ),
+            Field(
+                name='Shop',
+                type='ref|out',
+                key='NPCShop.dat',
+            ),
+            Field(
+                name='ShopHardmode',
+                type='ref|out',
+                key='NPCShop.dat',
             ),
         ),
     ),
@@ -21921,6 +21999,11 @@ specification = Specification({
                 name='HASH32',
                 type='int',
             ),
+            Field(
+                name='Data0',
+                type='ref|list|ref|generic',
+                key='QuestFlags.dat',
+            ),
         ),
     ),
     'QuestItems.dat': File(
@@ -22778,36 +22861,6 @@ specification = Specification({
             ),
         ),
     ),
-    'SafehouseCraftingSpree.dat': File(
-        fields=(
-            Field(
-                name='BetrayalJobsKey',
-                type='ref|out',
-                key='BetrayalJobs.dat',
-            ),
-            Field(
-                name='Rank',
-                type='int',
-            ),
-            Field(
-                name='CurrencyCount',
-                type='ref|list|int',
-            ),
-            Field(
-                name='Chance',
-                type='int',
-            ),
-            Field(
-                name='Currency_SafehouseCraftingSpreeCurrenciesKeys',
-                type='ref|list|ref|out',
-                key='SafehouseCraftingSpreeCurrencies.dat',
-            ),
-            Field(
-                name='Keys0',
-                type='ref|list|ref|out',
-            ),
-        ),
-    ),
     'SafehouseCraftingSpreeCurrencies.dat': File(
         fields=(
             Field(
@@ -22823,6 +22876,35 @@ specification = Specification({
             Field(
                 name='HasSpecificBaseItem',
                 type='bool',
+            ),
+        ),
+    ),
+    'SafehouseCraftingSpreeType.dat': File(
+        fields=(
+            Field(
+                name='Id',
+                type='ref|string',
+            ),
+            Field(
+                name='Currencies',
+                type='ref|list|ref|out',
+                key='SafehouseCraftingSpreeCurrencies.dat',
+            ),
+            Field(
+                name='CurrencyCount',
+                type='ref|list|int',
+            ),
+            Field(
+                name='Keys0',
+                type='ref|list|ref|out',
+            ),
+            Field(
+                name='Disabled',
+                type='bool',
+            ),
+            Field(
+                name='ItemClassText',
+                type='ref|string',
             ),
         ),
     ),

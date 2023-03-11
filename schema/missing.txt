@@ -33,7 +33,6 @@ missing file ProjectileVariations.dat64
 missing file Prophecies.dat64
 missing file ProphecyChain.dat64
 missing file ProphecyType.dat64
-missing file SafehouseCraftingSpree.dat64
 missing file ShopCategory.dat64
 missing file ShopCountry.dat64
 missing file ShopCurrency.dat64
