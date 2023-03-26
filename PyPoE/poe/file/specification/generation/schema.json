@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "createdAt": 1678416055,
+  "createdAt": 1679742408,
   "tables": [
     {
       "name": "AbyssObjects",
@@ -54448,19 +54448,21 @@
           "files": null
         },
         {
-          "name": null,
+          "name": "TextAudio",
           "description": null,
           "array": false,
           "type": "foreignrow",
           "unique": false,
           "localized": false,
-          "references": null,
+          "references": {
+            "table": "NPCTextAudio"
+          },
           "until": null,
           "file": null,
           "files": null
         },
         {
-          "name": null,
+          "name": "Category",
           "description": null,
           "array": false,
           "type": "foreignrow",
@@ -54474,14 +54476,14 @@
           "files": null
         },
         {
-          "name": "QuestKey",
+          "name": "QuestRewardOffersKey",
           "description": null,
           "array": false,
           "type": "foreignrow",
           "unique": false,
           "localized": false,
           "references": {
-            "table": "Quest"
+            "table": "QuestRewardOffers"
           },
           "until": null,
           "file": null,
@@ -54737,7 +54739,7 @@
       "name": "NPCTalkCategory",
       "columns": [
         {
-          "name": null,
+          "name": "Id",
           "description": null,
           "array": false,
           "type": "string",

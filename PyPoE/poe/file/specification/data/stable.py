@@ -20156,18 +20156,19 @@ specification = Specification({
                 type='ref|string',
             ),
             Field(
-                name='Key0',
+                name='TextAudio',
                 type='ref|out',
+                key='NPCTextAudio.dat',
             ),
             Field(
-                name='Key1',
+                name='Category',
                 type='ref|out',
                 key='NPCTalkCategory.dat',
             ),
             Field(
-                name='QuestKey',
+                name='QuestRewardOffersKey',
                 type='ref|out',
-                key='Quest.dat',
+                key='QuestRewardOffers.dat',
             ),
             Field(
                 name='QuestFlag',
@@ -20216,7 +20217,7 @@ specification = Specification({
                 type='bool',
             ),
             Field(
-                name='Key2',
+                name='Key0',
                 type='ref|out',
             ),
             Field(
@@ -20232,11 +20233,11 @@ specification = Specification({
                 type='ref|string',
             ),
             Field(
-                name='Key3',
+                name='Key1',
                 type='ref|out',
             ),
             Field(
-                name='Key4',
+                name='Key2',
                 type='ref|out',
             ),
             Field(
@@ -20256,7 +20257,7 @@ specification = Specification({
     'NPCTalkCategory.dat': File(
         fields=(
             Field(
-                name='Unknown0',
+                name='Id',
                 type='ref|string',
             ),
             Field(
