@@ -13740,6 +13740,64 @@ specification = Specification({
             ),
         ),
     ),
+    'ItemFrameType.dat': File(
+        fields=(
+            Field(
+                name='Id',
+                type='ref|string',
+            ),
+            Field(
+                name='Flag0',
+                type='bool',
+            ),
+            Field(
+                name='DoubleLine',
+                type='bool',
+            ),
+            Field(
+                name='HeaderSingle',
+                type='ref|string',
+            ),
+            Field(
+                name='HeaderDouble',
+                type='ref|string',
+            ),
+            Field(
+                name='HardmodeHeaderSingle',
+                type='ref|string',
+            ),
+            Field(
+                name='HardmodeHeaderDouble',
+                type='ref|string',
+            ),
+            Field(
+                name='Color',
+                type='ref|list|int',
+            ),
+            Field(
+                name='Separator',
+                type='ref|string',
+            ),
+            Field(
+                name='Flag1',
+                type='bool',
+            ),
+            Field(
+                name='Rarity',
+                type='ref|out',
+                key='Rarity.dat',
+            ),
+            Field(
+                name='DisplayString',
+                type='ref|out',
+                key='ClientStrings.dat',
+            ),
+            Field(
+                name='ColorMarkup',
+                type='ref|string',
+            ),
+        ),
+    ),
     'ItemNoteCode.dat': File(
         fields=(
             Field(
@@ -22427,7 +22485,19 @@ specification = Specification({
                 type='ref|string',
             ),
             Field(
+                name='MinMods',
+                type='int',
+            ),
+            Field(
+                name='MaxMods',
+                type='int',
+            ),
+            Field(
                 name='Unknown0',
+                type='int',
+            ),
+            Field(
+                name='MaxPrefix',
                 type='int',
             ),
             Field(
@@ -22435,23 +22505,11 @@ specification = Specification({
                 type='int',
             ),
             Field(
-                name='Unknown2',
+                name='MaxSuffix',
                 type='int',
             ),
             Field(
-                name='Unknown3',
-                type='int',
-            ),
-            Field(
-                name='Unknown4',
-                type='int',
-            ),
-            Field(
-                name='Unknown5',
-                type='int',
-            ),
-            Field(
-                name='Unknown6',
+                name='Color',
                 type='ref|string',
             ),
         ),
