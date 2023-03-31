@@ -59116,20 +59116,6 @@
           "until": null,
           "file": null,
           "files": null
-        },
-        {
-          "name": null,
-          "description": null,
-          "array": true,
-          "type": "row",
-          "unique": false,
-          "localized": false,
-          "references": {
-            "table": "QuestFlags"
-          },
-          "until": null,
-          "file": null,
-          "files": null
         }
       ]
     },

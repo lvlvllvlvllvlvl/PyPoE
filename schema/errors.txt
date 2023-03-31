@@ -6,10 +6,10 @@ HeistDoodadNPCs.dat64 column 6 AOFile: string not valid at offset 36
 HeistDoodadNPCs.dat64 column 7 Stance: string not valid at offset 44
 HeistDoodadNPCs.dat64 column 8 BetrayalTargetsKey: key not valid at offset 52
 MicrotransactionPortalVariations.dat64 column 10 <unknown>: string not valid at offset 84
-MicrotransactionPortalVariations.dat64 column 11 <unknown>: string not valid at offset 92
 MicrotransactionPortalVariations.dat64 column 12 <unknown>: string not valid at offset 100
 MicrotransactionPortalVariations.dat64 column 13 <unknown>: integer not valid at offset 108
 MicrotransactionPortalVariations.dat64 column 14 <unknown>: integer not valid at offset 112
+QuestFlags.dat64 column 2 <unknown>: array/self not valid at offset 12
 SpawnObject.dat64 column 16 <unknown>: integer not valid at offset 86
 WorldAreaLeagueChances.dat64 column 14 <unknown>: array/integer not valid at offset 60
 WorldAreaLeagueChances.dat64 column 25 <unknown>: integer not valid at offset 116

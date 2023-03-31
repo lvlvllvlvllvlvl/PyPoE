@@ -22058,11 +22058,6 @@ specification = Specification({
                 name='HASH32',
                 type='int',
             ),
-            Field(
-                name='Data0',
-                type='ref|list|ref|generic',
-                key='QuestFlags.dat',
-            ),
         ),
     ),
     'QuestItems.dat': File(
