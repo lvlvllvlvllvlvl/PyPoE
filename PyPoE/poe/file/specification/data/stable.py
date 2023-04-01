@@ -6176,6 +6176,10 @@ specification = Specification({
                 name='DescriptionHardmode',
                 type='ref|string',
             ),
+            Field(
+                name='IsGold',
+                type='bool',
+            ),
         ),
     ),
     'CurrencyStashTabLayout.dat': File(
@@ -20472,6 +20476,10 @@ specification = Specification({
             Field(
                 name='Key1',
                 type='ref|out',
+            ),
+            Field(
+                name='Gender',
+                type='ref|string',
             ),
         ),
     ),
