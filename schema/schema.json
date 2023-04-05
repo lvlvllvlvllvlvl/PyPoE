@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "createdAt": 1680309284,
+  "createdAt": 1680605806,
   "tables": [
     {
       "name": "AbyssObjects",
@@ -71154,7 +71154,7 @@
           "files": null
         },
         {
-          "name": null,
+          "name": "ShowIfEmptyChallengeLeague",
           "description": null,
           "array": false,
           "type": "bool",
@@ -71166,7 +71166,7 @@
           "files": null
         },
         {
-          "name": "ShowIfEmpty",
+          "name": "ShowIfEmptyStandard",
           "description": null,
           "array": false,
           "type": "bool",
@@ -71307,7 +71307,7 @@
           "files": null
         },
         {
-          "name": null,
+          "name": "StandardCount",
           "description": null,
           "array": false,
           "type": "i32",
@@ -71331,7 +71331,7 @@
           "files": null
         },
         {
-          "name": null,
+          "name": "ChallengeLeagueCount",
           "description": null,
           "array": false,
           "type": "i32",

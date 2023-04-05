@@ -26524,11 +26524,11 @@ specification = Specification({
                 type='int',
             ),
             Field(
-                name='Flag0',
+                name='ShowIfEmptyChallengeLeague',
                 type='bool',
             ),
             Field(
-                name='ShowIfEmpty',
+                name='ShowIfEmptyStandard',
                 type='bool',
             ),
             Field(
@@ -26578,7 +26578,7 @@ specification = Specification({
                 type='ref|string',
             ),
             Field(
-                name='Unknown2',
+                name='StandardCount',
                 type='int',
             ),
             Field(
@@ -26586,7 +26586,7 @@ specification = Specification({
                 type='ref|string',
             ),
             Field(
-                name='Unknown3',
+                name='ChallengeLeagueCount',
                 type='int',
             ),
             Field(
