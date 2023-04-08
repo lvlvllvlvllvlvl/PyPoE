@@ -8,6 +8,7 @@ missing file AtlasSector.dat64
 missing file AtlasSkillGraphs.dat64
 missing file BeyondDemons.dat64
 missing file Bloodlines.dat64
+missing file BreachstoneUpgrades.dat64
 missing file CustomLeagueMods.dat64
 missing file EventSeason.dat64
 missing file EventSeasonRewards.dat64
