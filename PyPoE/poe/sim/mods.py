@@ -382,21 +382,7 @@ def generate_spawnable_mod_list(
     list[DatRecord]
         Returns a list of applicable mod rows that have a spawn weighting
         above 0.
-
-
-    Raises
-    ------
-    TypeError
-        if domain is not a valid MOD_DOMAIN constant
-        if generation_type is not a valid MOD_GENERATION_TYPE constant
     """
-    if not isinstance(domain, MOD_DOMAIN):
-        raise TypeError('domain must be a MOD_DOMAIN instance.')
-
-    if not isinstance(generation_type, MOD_GENERATION_TYPE):
-        raise TypeError(
-            'generation_type must be a MOD_GENERATION_TYPE instance.'
-        )
 
     mods = []
     for mod in mod_dat_file:
@@ -416,6 +402,3 @@ def generate_spawnable_mod_list(
         mods.append(mod)
 
     return mods
-
-
-
