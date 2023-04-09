@@ -1071,8 +1071,7 @@ class TranslationQuantifierHandler(TranslationReprMixin):
                 elif handler.type == TranslationQuantifier.QuantifierTypes.STRING:
                     self.string_handlers[handler.id] = args
             else:
-                raise TypeError(
-                    f"Uncaptured quantifier {partial}, add in PyPoE/poe/translations.py")
+                print(f"Uncaptured quantifier {partial}, add in PyPoE/poe/translations.py")
 
     def handle(self,
                values: Union[List[int], List[Tuple[int, int]]],

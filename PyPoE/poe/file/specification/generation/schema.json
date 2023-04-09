@@ -27587,7 +27587,7 @@
           "name": "PlayerLevelReq",
           "description": null,
           "array": false,
-          "type": "i32",
+          "type": "f32",
           "unique": false,
           "localized": false,
           "references": null,
@@ -27943,7 +27943,7 @@
           "name": "PlayerLevelReq",
           "description": null,
           "array": false,
-          "type": "i32",
+          "type": "f32",
           "unique": false,
           "localized": false,
           "references": null,
@@ -36737,17 +36737,34 @@
       ]
     },
     {
+      "name": "ItemExperienceTypes",
+      "columns": [
+        {
+          "name": "Id",
+          "description": null,
+          "array": false,
+          "type": "string",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        }
+      ]
+    },
+    {
       "name": "ItemExperiencePerLevel",
       "columns": [
         {
-          "name": "BaseItemTypesKey",
+          "name": "ItemExperienceType",
           "description": null,
           "array": false,
           "type": "foreignrow",
           "unique": false,
           "localized": false,
           "references": {
-            "table": "BaseItemTypes"
+            "table": "ItemExperienceTypes"
           },
           "until": null,
           "file": null,
@@ -63837,13 +63854,15 @@
           "files": null
         },
         {
-          "name": null,
+          "name": "ItemExperienceType",
           "description": null,
           "array": false,
           "type": "foreignrow",
           "unique": false,
           "localized": false,
-          "references": null,
+          "references": {
+            "table": "ItemExperienceTypes"
+          },
           "until": null,
           "file": null,
           "files": null

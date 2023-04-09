@@ -10177,7 +10177,7 @@ specification = Specification({
             ),
             Field(
                 name='PlayerLevelReq',
-                type='int',
+                type='float',
             ),
             Field(
                 name='SpellCritChance',
@@ -10382,7 +10382,7 @@ specification = Specification({
             ),
             Field(
                 name='PlayerLevelReq',
-                type='int',
+                type='float',
             ),
             Field(
                 name='CostMultiplier',
@@ -13678,9 +13678,9 @@ specification = Specification({
     'ItemExperiencePerLevel.dat': File(
         fields=(
             Field(
-                name='BaseItemTypesKey',
+                name='ItemExperienceType',
                 type='ref|out',
-                key='BaseItemTypes.dat',
+                key='ItemExperienceTypes.dat',
             ),
             Field(
                 name='ItemCurrentLevel',
@@ -13689,6 +13689,14 @@ specification = Specification({
             Field(
                 name='Experience',
                 type='int',
+            ),
+        ),
+    ),
+    'ItemExperienceTypes.dat': File(
+        fields=(
+            Field(
+                name='Id',
+                type='ref|string',
             ),
         ),
     ),
@@ -23824,8 +23832,9 @@ specification = Specification({
                 type='int',
             ),
             Field(
-                name='Key1',
+                name='ItemExperienceType',
                 type='ref|out',
+                key='ItemExperienceTypes.dat',
             ),
         ),
     ),

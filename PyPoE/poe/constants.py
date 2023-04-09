@@ -229,10 +229,14 @@ MOD_SELL_PRICES = {
 
 class IntEnumMetaOverride(EnumMeta):
     def __getitem__(self, item):
-        if isinstance(item, int):
-            return self(item)
-        else:
-            return IntEnum.__getitem__(self, item)
+        try:
+            if isinstance(item, int):
+                return self(item)
+            else:
+                return IntEnum.__getitem__(self, item)
+        except ValueError as e:
+            print("error in constants.py IntEnumMetaOverride", e)
+            return None
 
 
 class IntEnumOverride(IntEnum, metaclass=IntEnumMetaOverride):
