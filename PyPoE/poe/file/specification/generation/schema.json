@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "createdAt": 1680907388,
+  "createdAt": 1681000079,
   "tables": [
     {
       "name": "AbyssObjects",
@@ -36737,23 +36737,6 @@
       ]
     },
     {
-      "name": "ItemExperienceTypes",
-      "columns": [
-        {
-          "name": "Id",
-          "description": null,
-          "array": false,
-          "type": "string",
-          "unique": false,
-          "localized": false,
-          "references": null,
-          "until": null,
-          "file": null,
-          "files": null
-        }
-      ]
-    },
-    {
       "name": "ItemExperiencePerLevel",
       "columns": [
         {
@@ -36787,6 +36770,23 @@
           "description": null,
           "array": false,
           "type": "i32",
+          "unique": false,
+          "localized": false,
+          "references": null,
+          "until": null,
+          "file": null,
+          "files": null
+        }
+      ]
+    },
+    {
+      "name": "ItemExperienceTypes",
+      "columns": [
+        {
+          "name": "Id",
+          "description": null,
+          "array": false,
+          "type": "string",
           "unique": false,
           "localized": false,
           "references": null,
