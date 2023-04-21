@@ -13284,11 +13284,12 @@ specification = Specification({
     'IncursionUniqueUpgradeComponents.dat': File(
         fields=(
             Field(
-                name='Key0',
+                name='BaseUnique',
                 type='ref|out',
+                key='Words.dat',
             ),
             Field(
-                name='BaseItemType',
+                name='UpgradeCurrency',
                 type='ref|out',
                 key='BaseItemTypes.dat',
             ),

@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "createdAt": 1681000079,
+  "createdAt": 1681982124,
   "tables": [
     {
       "name": "AbyssObjects",
@@ -35674,19 +35674,21 @@
       "name": "IncursionUniqueUpgradeComponents",
       "columns": [
         {
-          "name": null,
+          "name": "BaseUnique",
           "description": null,
           "array": false,
           "type": "foreignrow",
           "unique": false,
           "localized": false,
-          "references": null,
+          "references": {
+            "table": "Words"
+          },
           "until": null,
           "file": null,
           "files": null
         },
         {
-          "name": "BaseItemType",
+          "name": "UpgradeCurrency",
           "description": null,
           "array": false,
           "type": "foreignrow",
