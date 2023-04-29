@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "createdAt": 1681982124,
+  "createdAt": 1682707609,
   "tables": [
     {
       "name": "AbyssObjects",
@@ -30697,6 +30697,18 @@
           "references": {
             "table": "HeistJobs"
           },
+          "until": null,
+          "file": null,
+          "files": null
+        },
+        {
+          "name": null,
+          "description": null,
+          "array": false,
+          "type": "i32",
+          "unique": false,
+          "localized": false,
+          "references": null,
           "until": null,
           "file": null,
           "files": null

@@ -11426,6 +11426,10 @@ specification = Specification({
                 name='Unknown1',
                 type='int',
             ),
+            Field(
+                name='Unknown2',
+                type='int',
+            ),
         ),
     ),
     'HeistChests.dat': File(
