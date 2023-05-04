@@ -20672,16 +20672,6 @@ specification = Specification({
                 type='ref|out',
                 key='QuestFlags.dat',
             ),
-            Field(
-                name='CapturedMonster',
-                type='ref|out',
-                key='MonsterVarieties.dat',
-            ),
-            Field(
-                name='PanelLayout',
-                type='ref|out',
-                key='PantheonPanelLayout.dat',
-            ),
         ),
     ),
     'PassiveJewelRadii.dat': File(

@@ -38,6 +38,7 @@ MicrotransactionPortalVariations.dat64 column 10 <unknown>: string not valid at 
 MicrotransactionPortalVariations.dat64 column 12 <unknown>: string not valid at offset 100
 MicrotransactionPortalVariations.dat64 column 13 <unknown>: integer not valid at offset 108
 MicrotransactionPortalVariations.dat64 column 14 <unknown>: integer not valid at offset 112
+PantheonSouls.dat64 column 3 CapturedMonster: key not valid at offset 48
 SpawnObject.dat64 column 16 <unknown>: integer not valid at offset 86
 WorldAreaLeagueChances.dat64 column 14 <unknown>: array/integer not valid at offset 60
 WorldAreaLeagueChances.dat64 column 26 <unknown>: integer not valid at offset 120
