@@ -7005,11 +7005,11 @@ specification = Specification({
                 type='int',
             ),
             Field(
-                name='MoreMonsterLife',
+                name='MoreMonsterDamage',
                 type='int',
             ),
             Field(
-                name='MoreMonsterDamage',
+                name='MoreMonsterLife',
                 type='int',
             ),
             Field(

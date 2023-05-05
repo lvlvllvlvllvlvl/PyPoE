@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "createdAt": 1682707609,
+  "createdAt": 1683218408,
   "tables": [
     {
       "name": "AbyssObjects",
@@ -18742,7 +18742,7 @@
           "files": null
         },
         {
-          "name": "MoreMonsterLife",
+          "name": "MoreMonsterDamage",
           "description": null,
           "array": false,
           "type": "i32",
@@ -18754,7 +18754,7 @@
           "files": null
         },
         {
-          "name": "MoreMonsterDamage",
+          "name": "MoreMonsterLife",
           "description": null,
           "array": false,
           "type": "i32",
