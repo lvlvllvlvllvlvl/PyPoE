@@ -16000,6 +16000,10 @@ specification = Specification({
                 name='SanctumTier',
                 type='int',
             ),
+            Field(
+                name='CrucibleTier',
+                type='int',
+            ),
         ),
     ),
     'MapStashSpecialTypeEntries.dat': File(
