@@ -1891,6 +1891,22 @@ specification = Specification({
                 name='Unknown0',
                 type='int',
             ),
+            Field(
+                name='Data0',
+                type='ref|list|int',
+            ),
+            Field(
+                name='Data1',
+                type='ref|list|int',
+            ),
+            Field(
+                name='Unknown1',
+                type='int',
+            ),
+            Field(
+                name='Unknown2',
+                type='int',
+            ),
         ),
     ),
     'AtlasInfluenceOutcomes.dat': File(
@@ -6406,6 +6422,14 @@ specification = Specification({
                 name='Unknown1',
                 type='int',
             ),
+            Field(
+                name='Key0',
+                type='ref|out',
+            ),
+            Field(
+                name='Key1',
+                type='ref|out',
+            ),
         ),
     ),
     'DamageParticleEffects.dat': File(
@@ -8443,6 +8467,161 @@ specification = Specification({
                 name='Unknown0',
                 type='int',
             ),
+            Field(
+                name='MiscAnimated',
+                type='ref|list|ref|out',
+                key='MiscAnimated.dat',
+            ),
+            Field(
+                name='Unknown1',
+                type='int',
+            ),
+            Field(
+                name='Unknown2',
+                type='int',
+            ),
+            Field(
+                name='Unknown3',
+                type='int',
+            ),
+            Field(
+                name='Unknown4',
+                type='int',
+            ),
+            Field(
+                name='Unknown5',
+                type='int',
+            ),
+            Field(
+                name='Unknown6',
+                type='int',
+            ),
+            Field(
+                name='Unknown7',
+                type='int',
+            ),
+            Field(
+                name='Flag0',
+                type='bool',
+            ),
+            Field(
+                name='Unknown8',
+                type='int',
+            ),
+            Field(
+                name='Flag1',
+                type='bool',
+            ),
+            Field(
+                name='Flag2',
+                type='bool',
+            ),
+            Field(
+                name='Data0',
+                type='ref|list|byte',
+            ),
+            Field(
+                name='Unknown9',
+                type='int',
+            ),
+            Field(
+                name='Unknown10',
+                type='int',
+            ),
+            Field(
+                name='Unknown11',
+                type='int',
+            ),
+            Field(
+                name='Unknown12',
+                type='int',
+            ),
+            Field(
+                name='Unknown13',
+                type='int',
+            ),
+            Field(
+                name='Flag3',
+                type='bool',
+            ),
+            Field(
+                name='Unknown14',
+                type='ref|string',
+            ),
+            Field(
+                name='Flag4',
+                type='bool',
+            ),
+            Field(
+                name='Unknown15',
+                type='int',
+            ),
+            Field(
+                name='Flag5',
+                type='bool',
+            ),
+            Field(
+                name='Unknown16',
+                type='int',
+            ),
+            Field(
+                name='Unknown17',
+                type='int',
+            ),
+            Field(
+                name='Flag6',
+                type='bool',
+            ),
+            Field(
+                name='Unknown18',
+                type='int',
+            ),
+            Field(
+                name='MetadataIDs',
+                type='ref|list|ref|string',
+                file_path=True,
+                file_ext='.ot, .otc',
+            ),
+            Field(
+                name='ScriptCommand',
+                type='ref|string',
+            ),
+            Field(
+                name='Unknown19',
+                type='ref|string',
+            ),
+            Field(
+                name='Unknown20',
+                type='ref|string',
+            ),
+            Field(
+                name='Unknown21',
+                type='ref|string',
+            ),
+            Field(
+                name='Unknown22',
+                type='ref|string',
+            ),
+            Field(
+                name='Unknown23',
+                type='int',
+            ),
+            Field(
+                name='Flag7',
+                type='bool',
+            ),
+            Field(
+                name='Flag8',
+                type='bool',
+            ),
+            Field(
+                name='Data1',
+                type='ref|list|byte',
+            ),
+            Field(
+                name='Unknown24',
+                type='int',
+            ),
         ),
     ),
     'ExpandingPulse.dat': File(
@@ -10005,6 +10184,30 @@ specification = Specification({
                 name='Unknown24',
                 type='int',
             ),
+            Field(
+                name='Keys1',
+                type='ref|list|ref|out',
+            ),
+            Field(
+                name='Data0',
+                type='ref|list|int',
+            ),
+            Field(
+                name='Unknown25',
+                type='int',
+            ),
+            Field(
+                name='Unknown26',
+                type='int',
+            ),
+            Field(
+                name='Unknown27',
+                type='int',
+            ),
+            Field(
+                name='Flag11',
+                type='bool',
+            ),
         ),
     ),
     'GiftWrapArtVariations.dat': File(
@@ -11563,6 +11766,21 @@ specification = Specification({
             Field(
                 name='Unknown4',
                 type='int',
+            ),
+            Field(
+                name='AOFile',
+                type='ref|string',
+                file_path=True,
+                file_ext='.ao',
+            ),
+            Field(
+                name='Stance',
+                type='ref|string',
+            ),
+            Field(
+                name='BetrayalTargetsKey',
+                type='ref|out',
+                key='BetrayalTargets.dat',
             ),
         ),
     ),
@@ -14997,6 +15215,55 @@ specification = Specification({
     ),
     'LeagueInfo.dat': File(
         fields=(
+            Field(
+                name='Id',
+                type='ref|string',
+                unique=True,
+            ),
+            Field(
+                name='PanelImage',
+                type='ref|string',
+            ),
+            Field(
+                name='HeaderImage',
+                type='ref|string',
+            ),
+            Field(
+                name='Screenshots',
+                type='ref|list|ref|string',
+            ),
+            Field(
+                name='Description',
+                type='ref|string',
+            ),
+            Field(
+                name='League',
+                type='ref|string',
+            ),
+            Field(
+                name='Flag0',
+                type='bool',
+            ),
+            Field(
+                name='TrailerVideoLink',
+                type='ref|string',
+            ),
+            Field(
+                name='BackgroundImage',
+                type='ref|string',
+            ),
+            Field(
+                name='Flag1',
+                type='bool',
+            ),
+            Field(
+                name='Flag2',
+                type='bool',
+            ),
+            Field(
+                name='PanelItems',
+                type='ref|list|ref|string',
+            ),
         ),
     ),
     'LeagueProgressQuestFlags.dat': File(
@@ -16442,6 +16709,38 @@ specification = Specification({
                 file_path=True,
                 file_ext='.epk',
             ),
+            Field(
+                name='EPKFile2',
+                type='ref|string',
+                file_path=True,
+                file_ext='.epk',
+            ),
+            Field(
+                name='Unknown0',
+                type='int',
+            ),
+            Field(
+                name='Unknown1',
+                type='int',
+            ),
+            Field(
+                name='Unknown2',
+                type='int',
+            ),
+            Field(
+                name='Flag0',
+                type='bool',
+            ),
+            Field(
+                name='AOFile',
+                type='ref|string',
+                file_path=True,
+                file_ext='.ao',
+            ),
+            Field(
+                name='Flag1',
+                type='bool',
+            ),
         ),
     ),
     'MetamorphLifeScalingPerLevel.dat': File(
@@ -16972,6 +17271,26 @@ specification = Specification({
                 type='ref|string',
                 file_path=True,
                 file_ext='.ao',
+            ),
+            Field(
+                name='Unknown3',
+                type='ref|string',
+            ),
+            Field(
+                name='Unknown4',
+                type='ref|string',
+            ),
+            Field(
+                name='Unknown5',
+                type='ref|string',
+            ),
+            Field(
+                name='Unknown6',
+                type='int',
+            ),
+            Field(
+                name='Unknown7',
+                type='int',
             ),
         ),
     ),
@@ -20676,6 +20995,16 @@ specification = Specification({
                 type='ref|out',
                 key='QuestFlags.dat',
             ),
+            Field(
+                name='CapturedMonster',
+                type='ref|out',
+                key='MonsterVarieties.dat',
+            ),
+            Field(
+                name='PanelLayout',
+                type='ref|out',
+                key='PantheonPanelLayout.dat',
+            ),
         ),
     ),
     'PassiveJewelRadii.dat': File(
@@ -24126,6 +24455,10 @@ specification = Specification({
                 name='Unknown11',
                 type='int',
             ),
+            Field(
+                name='Unknown12',
+                type='int',
+            ),
         ),
     ),
     'SpecialRooms.dat': File(
@@ -27018,6 +27351,126 @@ specification = Specification({
             ),
             Field(
                 name='Unknown12',
+                type='int',
+            ),
+            Field(
+                name='Data0',
+                type='ref|list|int',
+            ),
+            Field(
+                name='Unknown13',
+                type='int',
+            ),
+            Field(
+                name='Unknown14',
+                type='int',
+            ),
+            Field(
+                name='Unknown15',
+                type='int',
+            ),
+            Field(
+                name='Unknown16',
+                type='int',
+            ),
+            Field(
+                name='Unknown17',
+                type='int',
+            ),
+            Field(
+                name='Unknown18',
+                type='int',
+            ),
+            Field(
+                name='Unknown19',
+                type='int',
+            ),
+            Field(
+                name='Unknown20',
+                type='int',
+            ),
+            Field(
+                name='Unknown21',
+                type='int',
+            ),
+            Field(
+                name='Unknown22',
+                type='int',
+            ),
+            Field(
+                name='Unknown23',
+                type='int',
+            ),
+            Field(
+                name='Unknown24',
+                type='int',
+            ),
+            Field(
+                name='Unknown25',
+                type='int',
+            ),
+            Field(
+                name='Unknown26',
+                type='int',
+            ),
+            Field(
+                name='Unknown27',
+                type='int',
+            ),
+            Field(
+                name='Unknown28',
+                type='int',
+            ),
+            Field(
+                name='Unknown29',
+                type='int',
+            ),
+            Field(
+                name='Unknown30',
+                type='int',
+            ),
+            Field(
+                name='Unknown31',
+                type='int',
+            ),
+            Field(
+                name='Unknown32',
+                type='int',
+            ),
+            Field(
+                name='Unknown33',
+                type='int',
+            ),
+            Field(
+                name='Unknown34',
+                type='int',
+            ),
+            Field(
+                name='Unknown35',
+                type='int',
+            ),
+            Field(
+                name='Unknown36',
+                type='int',
+            ),
+            Field(
+                name='Unknown37',
+                type='int',
+            ),
+            Field(
+                name='Unknown38',
+                type='int',
+            ),
+            Field(
+                name='Unknown39',
+                type='int',
+            ),
+            Field(
+                name='Unknown40',
+                type='int',
+            ),
+            Field(
+                name='Unknown41',
                 type='int',
             ),
         ),
