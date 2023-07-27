@@ -15216,9 +15216,13 @@ specification = Specification({
     'LeagueInfo.dat': File(
         fields=(
             Field(
-                name='Id',
+                name='PanelVersion',
+                type='ref|out',
+                key='LeagueInfoPanelVersions.dat',
+            ),
+            Field(
+                name='PanelId',
                 type='ref|string',
-                unique=True,
             ),
             Field(
                 name='PanelImage',
@@ -15234,10 +15238,6 @@ specification = Specification({
             ),
             Field(
                 name='Description',
-                type='ref|string',
-            ),
-            Field(
-                name='League',
                 type='ref|string',
             ),
             Field(
@@ -15263,6 +15263,14 @@ specification = Specification({
             Field(
                 name='PanelItems',
                 type='ref|list|ref|string',
+            ),
+        ),
+    ),
+    'LeagueInfoPanelVersions.dat': File(
+        fields=(
+            Field(
+                name='Id',
+                type='ref|string',
             ),
         ),
     ),

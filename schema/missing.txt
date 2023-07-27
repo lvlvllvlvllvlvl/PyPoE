@@ -379,6 +379,7 @@ missing file LakeRoomCompletion.dat64
 missing file LakeRooms.dat64
 missing file LeagueFlag.dat64
 missing file LeagueInfo.dat64
+missing file LeagueInfoPanelVersions.dat64
 missing file LeagueProgressQuestFlags.dat64
 missing file LeagueStaticRewards.dat64
 missing file LegionBalancePerLevel.dat64
