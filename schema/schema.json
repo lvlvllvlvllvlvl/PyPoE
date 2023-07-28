@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "createdAt": 1690397467,
+  "createdAt": 1690453614,
   "tables": [
     {
       "name": "AbyssObjects",
@@ -323,7 +323,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "mtx:reward"
+      ]
     },
     {
       "name": "AchievementItems",
@@ -759,7 +761,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "mtx:reward"
+      ]
     },
     {
       "name": "AchievementSetsDisplay",
@@ -2881,7 +2885,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "AlternateSkillTargetingBehaviours",
@@ -3347,13 +3353,15 @@
           "files": null
         },
         {
-          "name": null,
+          "name": "Gem",
           "description": null,
           "array": false,
           "type": "foreignrow",
           "unique": false,
           "localized": false,
-          "references": null,
+          "references": {
+            "table": "BaseItemTypes"
+          },
           "until": null,
           "file": null,
           "files": null
@@ -3371,7 +3379,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:reward"
+      ]
     },
     {
       "name": "Archetypes",
@@ -4431,7 +4441,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "Ascendancy",
@@ -7186,7 +7198,10 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def",
+        "item:droptable"
+      ]
     },
     {
       "name": "BestiaryCapturableMonsters",
@@ -7372,7 +7387,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:itemized"
+      ]
     },
     {
       "name": "BestiaryEncounters",
@@ -8169,7 +8186,10 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:recipe",
+        "crafting"
+      ]
     },
     {
       "name": "BetrayalChoiceActions",
@@ -9135,7 +9155,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:droptable"
+      ]
     },
     {
       "name": "BetrayalUpgrades",
@@ -9677,7 +9699,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "BlightCraftingRecipes",
@@ -9737,7 +9761,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "crafting"
+      ]
     },
     {
       "name": "BlightCraftingResults",
@@ -9845,7 +9871,10 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "crafting",
+        "item:unique"
+      ]
     },
     {
       "name": "BlightedSporeAuras",
@@ -15543,7 +15572,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "ComponentCharges",
@@ -15612,7 +15643,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "CoreLeagues",
@@ -16387,7 +16420,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "crafting"
+      ]
     },
     {
       "name": "CraftingBenchSortCategories",
@@ -16913,7 +16948,10 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def",
+        "item:recipe"
+      ]
     },
     {
       "name": "CurrencyStashTabLayout",
@@ -18469,7 +18507,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "crafting"
+      ]
     },
     {
       "name": "DelveCraftingTags",
@@ -20343,7 +20383,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "DivinationCardStashTabLayout",
@@ -22572,7 +22614,10 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def",
+        "crafting"
+      ]
     },
     {
       "name": "EssenceStashTabLayout",
@@ -23797,7 +23842,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "ExpeditionDeals",
@@ -25407,7 +25454,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "FlavourText",
@@ -26095,7 +26144,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:droptable"
+      ]
     },
     {
       "name": "GenericLeagueRewardTypeVisuals",
@@ -28005,7 +28056,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:droptable"
+      ]
     },
     {
       "name": "GrantedEffectQualityTypes",
@@ -28049,7 +28102,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "GrantedEffects",
@@ -29663,7 +29718,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "crafting"
+      ]
     },
     {
       "name": "HarvestCraftTiers",
@@ -30163,7 +30220,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "HarvestSeeds",
@@ -31187,7 +31246,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:droptable"
+      ]
     },
     {
       "name": "HeistBalancePerLevel",
@@ -32177,7 +32238,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "HeistGeneration",
@@ -36000,7 +36063,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "IncursionArchitect",
@@ -36199,7 +36264,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:droptable"
+      ]
     },
     {
       "name": "IncursionChests",
@@ -36657,7 +36724,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:itemized"
+      ]
     },
     {
       "name": "IncursionUniqueUpgradeComponents",
@@ -36691,7 +36760,10 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:recipe",
+        "item:unique"
+      ]
     },
     {
       "name": "IndexableSupportGems",
@@ -36735,7 +36807,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "crafting"
+      ]
     },
     {
       "name": "InfluenceExalts",
@@ -36767,7 +36841,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "InfluenceModUpgrades",
@@ -36813,7 +36889,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "crafting"
+      ]
     },
     {
       "name": "InfluenceTags",
@@ -37555,7 +37633,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "crafting"
+      ]
     },
     {
       "name": "ItemCostPerLevel",
@@ -40011,7 +40091,10 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:droptable",
+        "item:unique"
+      ]
     },
     {
       "name": "LabyrinthSecretEffects",
@@ -41147,7 +41230,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:itemized"
+      ]
     },
     {
       "name": "LeagueFlag",
@@ -43241,7 +43326,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:recipe"
+      ]
     },
     {
       "name": "MapDevices",
@@ -43963,7 +44050,10 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def",
+        "item:recipe"
+      ]
     },
     {
       "name": "MapSeries",
@@ -49040,7 +49130,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "crafting"
+      ]
     },
     {
       "name": "ModSellPriceTypes",
@@ -56819,7 +56911,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:itemized"
+      ]
     },
     {
       "name": "PassiveJewelRadii",
@@ -58523,7 +58617,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "PassiveTreeExpansionJewelSizes",
@@ -58603,7 +58699,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "crafting"
+      ]
     },
     {
       "name": "PassiveTreeExpansionSpecialSkills",
@@ -60564,13 +60662,15 @@
           "files": null
         },
         {
-          "name": null,
+          "name": "QuestFlag",
           "description": null,
           "array": false,
           "type": "foreignrow",
           "unique": false,
           "localized": false,
-          "references": null,
+          "references": {
+            "table": "QuestFlags"
+          },
           "until": null,
           "file": null,
           "files": null
@@ -60880,7 +60980,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:reward"
+      ]
     },
     {
       "name": "QuestStates",
@@ -62719,7 +62821,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "crafting"
+      ]
     },
     {
       "name": "SafehouseCraftingSpreeCurrencies",
@@ -62975,7 +63079,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "SentinelCraftingCurrency",
@@ -63679,7 +63785,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "ShopCategory",
@@ -65449,7 +65557,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "SkillMineVariations",
@@ -66792,7 +66902,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "crafting"
+      ]
     },
     {
       "name": "StatsAffectingGeneration",
@@ -69862,7 +69974,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "TalkingPetAudioEvents",
@@ -72256,7 +72370,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:unique"
+      ]
     },
     {
       "name": "UniqueMapInfo",
@@ -72440,7 +72556,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:unique"
+      ]
     },
     {
       "name": "UniqueStashLayout",
@@ -72600,7 +72718,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:unique"
+      ]
     },
     {
       "name": "UniqueStashTypes",
@@ -73758,7 +73878,9 @@
           "files": null
         }
       ],
-      "tags": []
+      "tags": [
+        "item:def"
+      ]
     },
     {
       "name": "WindowCursors",

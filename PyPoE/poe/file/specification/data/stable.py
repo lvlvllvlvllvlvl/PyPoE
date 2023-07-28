@@ -1267,8 +1267,9 @@ specification = Specification({
                 type='ref|list|ref|out',
             ),
             Field(
-                name='Key1',
+                name='Gem',
                 type='ref|out',
+                key='BaseItemTypes.dat',
             ),
             Field(
                 name='BK2File',
@@ -22376,8 +22377,9 @@ specification = Specification({
                 key='Quest.dat',
             ),
             Field(
-                name='Key0',
+                name='QuestFlag',
                 type='ref|out',
+                key='QuestFlags.dat',
             ),
             Field(
                 name='Unknown0',
