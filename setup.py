@@ -5,10 +5,11 @@ https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
 
-# Always prefer setuptools over distutils
-from setuptools import setup, find_packages
 # To use a consistent encoding
 from os import path
+
+# Always prefer setuptools over distutils
+from setuptools import find_packages, setup
 
 here = path.abspath(path.dirname(__file__))
 
@@ -91,7 +92,7 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/discussions/install-requires-vs-requirements/
-    install_requires=['configobj', 'brotli', 'fnvhash', 'pyooz'],
+    install_requires=['configobj', 'brotli', 'pyooz'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,

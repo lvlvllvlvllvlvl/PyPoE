@@ -12,4 +12,3 @@ PyOpenGL
 pytest-cov
 python-coveralls
 pyooz
-fnvhash

@@ -57,22 +57,21 @@ Index Records
 # Imports
 # =============================================================================
 
+import os
 # python
 import struct
-import os
 from enum import IntEnum
 from io import BytesIO
 from tempfile import TemporaryDirectory
-from typing import List, Union, Dict, Tuple
+from typing import Dict, List, Tuple, Union
 
-# 3rd party
-from fnvhash import fnv1a_64
 import ooz
 
+from PyPoE.poe.file.shared import AbstractFileReadOnly
+from PyPoE.shared.decorators import doc
 # self
 from PyPoE.shared.mixins import ReprMixin
-from PyPoE.shared.decorators import doc
-from PyPoE.poe.file.shared import AbstractFileReadOnly
+from PyPoE.shared.murmur2 import murmur2_64
 
 # =============================================================================
 # Setup
@@ -449,7 +448,7 @@ class Index(Bundle):
 
         Returns
         -------
-        Calculated 64bit FNV1a hash value
+        Calculated 64bit murmur2 hash value
         """
         if isinstance(path, str):
             path = path.encode('utf-8')
@@ -463,9 +462,8 @@ class Index(Bundle):
         # If type wasn't set before, assume this is a file
         if type == PATH_TYPES.FILE or type is None:
             path = path.lower()
-        path += b'++'
 
-        return fnv1a_64(path)
+        return murmur2_64(path)
 
     def _read(self, buffer: BytesIO):
         if self.bundles:

@@ -72,10 +72,10 @@ Exceptions & Warnings
 import abc
 import os
 import re
-from urllib import request, parse
 from enum import IntEnum
 from io import BytesIO
-from typing import Union, List, Dict, Callable, Any
+from typing import Any, Callable, Dict, List, Union
+from urllib import parse, request
 
 # self
 from PyPoE.shared.mixins import ReprMixin
@@ -382,7 +382,7 @@ class AbstractFileSystemNode(ReprMixin):
                 return obj
 
             for child in obj.children.values():
-                if child.name == partial:
+                if child.name.lower() == partial.lower():
                     obj = child
                     break
             else:
