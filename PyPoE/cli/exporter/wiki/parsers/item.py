@@ -96,6 +96,16 @@ def _apply_column_map(infobox, column_map: tuple[tuple[str, dict], ...], list_ob
         infobox[data["template"]] = value
 
 
+def _markup_to_wiki(markup: str):
+    return "<br>".join(
+        re.sub(
+            r"<([^>]+)>{([^}]+)}",
+            lambda match: "{{c|%s|%s}}" % (match.group(1), match.group(2)),
+            markup,
+        ).splitlines()
+    )
+
+
 def _type_factory(
     data_file: str,
     data_mapping: tuple[tuple[str, dict], ...],
@@ -3239,7 +3249,28 @@ class ItemsParser(SkillParserShared):
                 "Description",
                 {
                     "template": "description",
-                    "format": lambda v: "<br>".join(str(v).splitlines()),
+                    "format": lambda v: "<br>".join(v.splitlines()),
+                },
+            ),
+            (
+                "Pack",
+                {
+                    "template": "pack_description",
+                    "format": lambda v: _markup_to_wiki(v["Description"]),
+                },
+            ),
+            (
+                "Pack",
+                {
+                    "template": "pack_leader_name",
+                    "format": lambda v: _markup_to_wiki(v["PackLeader1"]),
+                },
+            ),
+            (
+                "Pack",
+                {
+                    "template": "pack_leader_description",
+                    "format": lambda v: _markup_to_wiki(v["PackLeader2"]),
                 },
             ),
         ),
