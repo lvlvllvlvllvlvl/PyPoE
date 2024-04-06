@@ -2,7 +2,7 @@
 
 Collection of Python Tools for [Path of Exile](https://www.pathofexile.com/).
 
-As of Aug 2021, the PoE Wiki project had forked from [RePoE](https://github.com/brather1ng/RePoE) which itself was a fork of the discontinued [OmegaK2/PyPoE](https://github.com/OmegaK2/PyPoE) repo and exists solely to keep the [Community Wiki](https://poewiki.net) updated. The tooling in here serves to help with datamining efforts for Path of Exile and as a result any development and contributions are welcome and encouraged. Please chat to us on [Discord](https://discord.gg/9vzYujrD) `#tools-dev` channel or leave us a issue here on the repository.
+As of Aug 2021, the PoE Wiki project had forked from [RePoE](https://github.com/brather1ng/RePoE) which itself was a fork of the discontinued [OmegaK2/PyPoE](https://github.com/OmegaK2/PyPoE) repo and exists solely to keep the [Community Wiki](https://poewiki.net) updated. The tooling in here serves to help with datamining efforts for Path of Exile and as a result any development and contributions are welcome and encouraged. Please chat to us on [Discord](https://discord.gg/nbfFuznJGk) `#tools-dev` channel or leave us a issue here on the repository.
 
 
 ## How does this work?
