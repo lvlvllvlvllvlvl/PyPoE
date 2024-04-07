@@ -85,6 +85,22 @@ def gemshade_constants_from_hex(hex_text: str):
     return GemShadeConstants(*struct.unpack("<ffff", buf))
 
 
+def _srgb_to_linear(img):
+    return np.piecewise(
+        img,
+        [img < 0.04045, img >= 0.04045],
+        [lambda v: v / 12.92, lambda v: ((v + 0.055) / 1.055) ** 2.4],
+    )
+
+
+def _linear_to_srgb(img):
+    return np.piecewise(
+        img,
+        [img < 0.0031308, img >= 0.0031308],
+        [lambda v: v * 12.92, lambda v: 1.055 * v ** (1.0 / 2.4) - 0.055],
+    )
+
+
 def _apply_column_map(infobox, column_map: tuple[tuple[str, dict], ...], list_object):
     for k, data in column_map:
         value = list_object[k]
@@ -450,14 +466,10 @@ class ItemsParser(SkillParserShared):
     )
 
     _MAP_COLORS = {
-        "mid tier": "255,210,100",
-        "high tier": "240,30,10",
-    }
-
-    # Midpoint values are the luminosities of _MAP_COLORS entries
-    _MAP_COLOR_MIDPOINTS = {
-        "mid tier": 211,
-        "high tier": 91,
+        "low tier": (248, 248, 248),
+        "mid tier": (252, 159, 14),
+        "high tier": (235, 3, 0),
+        "purple tier": (131, 54, 231),
     }
 
     _MAP_RELEASE_VERSION = {
@@ -3902,20 +3914,6 @@ class ItemsParser(SkillParserShared):
         attr = max(attrs, key=attrs.get)
         var = infobox.pop("gem_shader")
 
-        def _srgb_to_linear(img):
-            return np.piecewise(
-                img,
-                [img < 0.04045, img >= 0.04045],
-                [lambda v: v / 12.92, lambda v: ((v + 0.055) / 1.055) ** 2.4],
-            )
-
-        def _linear_to_srgb(img):
-            return np.piecewise(
-                img,
-                [img < 0.0031308, img >= 0.0031308],
-                [lambda v: v * 12.92, lambda v: 1.055 * v ** (1.0 / 2.4) - 0.055],
-            )
-
         def process(img: Image):
             adorn = img.crop((0, 0, 78, 78))
             base = img.crop((2 * 78, 0, 3 * 78, 78))
@@ -4056,11 +4054,19 @@ class ItemsParser(SkillParserShared):
 
         # output base icon (without map symbol) to .../Base.dds
         base_ico = os.path.join(self._img_path, "Base.dds")
+        purple_ico = os.path.join(self._img_path, "Tier17.dds")
 
         # read from the file path in the BaseIcon_DDSFile field from MapSeries.dat.
         self._write_dds(
             data=self.file_system.get_file(map_series["BaseIcon_DDSFile"]),
             out_path=base_ico,
+            parsed_args=parsed_args,
+        )
+
+        # read from the file path in the Purple_DDSFile field from MapSeries.dat.
+        self._write_dds(
+            data=self.file_system.get_file(map_series["Purple_DDSFile"]),
+            out_path=purple_ico,
             parsed_args=parsed_args,
         )
 
@@ -4090,16 +4096,19 @@ class ItemsParser(SkillParserShared):
                     if not os.path.isfile(ico_path):
                         continue
 
-                    # Tint with tier color, this historically differs from the colorization
-                    # used for composing map glyphs onto on the itemized map base.
                     img = Image.open(ico_path)
-                    midpoint = self._MAP_COLOR_MIDPOINTS[name]
-                    img = _colorize_rgba(
-                        img, "black", "white", mid=f"rgb({color})", midpoint=midpoint
-                    )
+                    img = self._shade_sigil(img, color)
                     img.save(out_path)
 
         return r
+
+    def _shade_sigil(self, tex, color):
+        color = np.reshape(np.array(color + (255,)), (1, 1, 4)) / 255.0
+        samples = np.asarray(tex, np.float32) / 255.0
+        tex_colour = np.dstack((_srgb_to_linear(samples[:, :, :3]), samples[:, :, 3]))
+        final = color * tex_colour
+        final[:, :, :3] = _linear_to_srgb(final[:, :, :3])
+        return Image.fromarray(np.uint8(final * 255.0), "RGBA")
 
     def export_map(self, parsed_args):
         r = ExporterResult()
@@ -4160,8 +4169,18 @@ class ItemsParser(SkillParserShared):
                 parsed_args=parsed_args,
             )
 
+            purple_ico = os.path.join(self._img_path, "Map purple icon.dds")
+
+            self._write_dds(
+                data=self.file_system.get_file(map_series["Purple_DDSFile"]),
+                out_path=purple_ico,
+                parsed_args=parsed_args,
+            )
+
             base_ico = base_ico.replace(".dds", ".png")
             base_img = Image.open(base_ico)
+            purple_ico = purple_ico.replace(".dds", ".png")
+            purple_img = Image.open(purple_ico)
 
         self.rr["MapSeriesTiers.dat64"].build_index("MapsKey")
         self.rr["MapPurchaseCosts.dat64"].build_index("Tier")
@@ -4318,6 +4337,8 @@ class ItemsParser(SkillParserShared):
                 img = Image.open(ico)
                 img.save(ico)
 
+                plate_img = purple_img if 16 < starting_tier else base_img
+
                 # Recolor the map icon if appropriate and layer the map icon with the base icon.
                 if base_item_type["Id"] not in MAPS_TO_SKIP_COLORING:
                     color = None
@@ -4325,21 +4346,23 @@ class ItemsParser(SkillParserShared):
                         color = self._MAP_COLORS["mid tier"]
                     if 10 < starting_tier:
                         color = self._MAP_COLORS["high tier"]
+                    if 16 < starting_tier:
+                        color = self._MAP_COLORS["purple tier"]
 
                     # This isn't quite how the game actually makes these map icons,
                     # so it isn't ideal, but it works.
                     if color:
-                        img = _colorize_rgba(img, "black", f"rgb({color})")
+                        img = self._shade_sigil(img, color)
                         img.save(ico)
 
                 if base_item_type["Id"] not in MAPS_TO_SKIP_COMPOSITING:
-                    canvas = Image.new(base_img.mode, base_img.size, (0, 0, 0, 0))
+                    canvas = Image.new(plate_img.mode, plate_img.size, (0, 0, 0, 0))
                     paste_origin = (
-                        (base_img.size[0] - img.size[0]) // 2,
-                        (base_img.size[1] - img.size[1]) // 2,
+                        (plate_img.size[0] - img.size[0]) // 2,
+                        (plate_img.size[1] - img.size[1]) // 2,
                     )
                     canvas.paste(img, paste_origin)
-                    Image.alpha_composite(base_img, canvas).save(ico)
+                    Image.alpha_composite(plate_img, canvas).save(ico)
 
         return r
 

@@ -18523,6 +18523,12 @@ specification = Specification(
                     file_path=True,
                     file_ext=".dds",
                 ),
+                Field(
+                    name="Purple_DDSFile",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".dds",
+                ),
             ),
         ),
         "MapSeriesTiers.dat": File(
