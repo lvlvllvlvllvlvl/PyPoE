@@ -2008,7 +2008,7 @@ class ItemsParser(SkillParserShared):
                 boss_chance = boss_chance + weight * pack["BossMonsterSpawnChance"]
 
             infobox["description"] = "<br>".join(data["Description"].splitlines())
-            infobox["pack_id"] = pack["Id"]
+            infobox["pack_id"] = data["Pack"]["Id"]
             if not math.isinf(min_packsize):
                 infobox["pack_min_size"] = min_packsize
             if not math.isinf(max_packsize):
