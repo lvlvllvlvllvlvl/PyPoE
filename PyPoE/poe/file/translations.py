@@ -510,7 +510,7 @@ class TranslationString(TranslationReprMixin):
     _REPR_EXTRA_ATTRIBUTES = OrderedDict((("string", None),))
 
     # replacement tags used in translations
-    _re_split = re.compile(r"(?:\{(?P<id>[0-9]*)(?:[\:]*)(?P<type>[^\}]*)\})", re.UNICODE)
+    _re_split = re.compile(r"(?<!>|\{)(?:\{(?P<id>[0-9]*)(?:[\:]*)(?P<type>[^\}]*)\})", re.UNICODE)
 
     def __init__(self, parent: TranslationLanguage):
         parent.strings.append(self)
@@ -1268,7 +1268,7 @@ class TQRelationalData(TranslationQuantifier):
         table: str,
         index_column: str = None,
         value_column: str = "Name",
-        predicate: (str, Any) = None,
+        predicate: tuple[str, Any] = None,
         placeholder: str = None,
         convert_type: str = None,
     ):
@@ -2611,6 +2611,12 @@ TQNumberFormat(
 
 TranslationQuantifier(
     id="canonical_line",
+    type=TranslationQuantifier.QuantifierTypes.STRING,
+    arg_size=0,
+)
+
+TranslationQuantifier(
+    id="markup",
     type=TranslationQuantifier.QuantifierTypes.STRING,
     arg_size=0,
 )

@@ -33,6 +33,7 @@ Kishara's Star (item)
 # =============================================================================
 
 import codecs
+import math
 import os
 
 # Python
@@ -1983,6 +1984,41 @@ class ItemsParser(SkillParserShared):
             return False
         return True
 
+    def _allflame_ember(self, infobox: OrderedDict, base_item_type):
+        if "Item" not in self.rr["ItemisedNecropolisPacks.dat64"].index:
+            self.rr["ItemisedNecropolisPacks.dat64"].build_index("Item")
+        if "NecropolisPack" not in self.rr["MonsterPacks.dat64"].index:
+            self.rr["MonsterPacks.dat64"].build_index("NecropolisPack")
+        data = self.rr["ItemisedNecropolisPacks.dat64"].index["Item"][base_item_type.rowid]
+        monster_packs = self.rr["MonsterPacks.dat64"].index["NecropolisPack"][data["Pack"]]
+        if not data:
+            return True
+        try:
+            min_packsize = math.inf
+            max_packsize = -math.inf
+            boss_chance = 0
+            total_weight = 0
+            for pack in monster_packs:
+                weight = pack["Data0"][0]
+                max_boss = pack["BossMonsterCount"]
+                min_boss = max_boss if pack["BossMonsterSpawnChance"] == 100 else 0
+                min_packsize = min(min_packsize, pack["Unknown0"] + pack["Unknown1"] + min_boss)
+                max_packsize = max(max_packsize, pack["Unknown0"] + pack["Unknown2"] + max_boss)
+                total_weight = total_weight + weight
+                boss_chance = boss_chance + weight * pack["BossMonsterSpawnChance"]
+
+            infobox["description"] = "<br>".join(data["Description"].splitlines())
+            infobox["pack_id"] = pack["Id"]
+            if not math.isinf(min_packsize):
+                infobox["pack_min_size"] = min_packsize
+            if not math.isinf(max_packsize):
+                infobox["pack_max_size"] = max_packsize
+            infobox["pack_leader_chance"] = boss_chance = boss_chance / total_weight
+
+        except KeyError:
+            return False
+        return True
+
     def _skill_gem(self, infobox: OrderedDict, base_item_type):
         try:
             skill_gem = self.rr["SkillGems.dat64"].index["BaseItemTypesKey"][base_item_type.rowid]
@@ -3243,21 +3279,6 @@ class ItemsParser(SkillParserShared):
         row_index=True,
     )
 
-    _type_allflame_ember = _type_factory(
-        data_file="ItemisedNecropolisPacks.dat64",
-        index_column="Item",
-        data_mapping=(
-            (
-                "Description",
-                {
-                    "template": "description",
-                    "format": lambda v: "<br>".join(str(v).splitlines()),
-                },
-            ),
-        ),
-        row_index=True,
-    )
-
     _cls_map = dict()
     """
     This defines the expected data elements for an item class.
@@ -3414,7 +3435,7 @@ class ItemsParser(SkillParserShared):
         "HeistObjective": (),
         "Breachstone": (_type_currency,),
         "ItemisedCorpse": (_type_corpse,),
-        "NecropolisPack": (_type_allflame_ember,),
+        "NecropolisPack": (_allflame_ember,),
     }
 
     _conflict_active_skill_gems_map = {

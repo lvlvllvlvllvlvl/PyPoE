@@ -31,6 +31,8 @@ See PyPoE/LICENSE
 # Imports
 # =============================================================================
 
+import re
+
 # Python
 from collections import OrderedDict, defaultdict
 from functools import partial
@@ -60,14 +62,24 @@ def lua_format_value(key, value):
     return f % (key, value)
 
 
+def markup_to_wiki(text: str):
+    return re.sub(
+        r"<([^>]+)>{([^}]+)}",
+        lambda match: "{{c|%s|%s}}" % (match.group(1).lower(), match.group(2)),
+        text,
+    )
+
+
 class LuaFormatter:
     def __init__(self):
         pass
 
     @classmethod
-    def format_module(self, data, indent=0, newline=True):
+    def format_module(self, data, indent=0, newline=True, br=True):
         out = []
-        out.append("local data = %s" % self.format_value(data, indent=indent + 1, newline=newline))
+        out.append(
+            "local data = %s" % self.format_value(data, indent=indent + 1, newline=newline, br=br)
+        )
         out.append("\n")
         out.append("return data")
 
@@ -78,13 +90,13 @@ class LuaFormatter:
         if not isinstance(key, str):
             key = str(key)
 
-        if " " in key:
-            key = "[%s]" % key
+        if not key.isidentifier():
+            return '["%s"]' % key
 
         return key
 
     @classmethod
-    def format_value(self, value, indent=2, newline=True):
+    def format_value(self, value, indent=2, newline=True, br=True):
         if isinstance(value, (int, float)):
             if isinstance(value, bool):
                 return str(value).lower()
@@ -92,7 +104,7 @@ class LuaFormatter:
         elif isinstance(value, (tuple, set, list)):
             values = []
             for v in value:
-                values.append(self.format_value(v, indent=indent + 1, newline=newline))
+                values.append(self.format_value(v, indent=indent + 1, newline=newline, br=br))
             if newline:
                 join = ",\n"
             else:
@@ -107,7 +119,10 @@ class LuaFormatter:
             for k, v in value.items():
                 values.append(
                     fmt
-                    % (self.format_key(k), self.format_value(v, indent=indent + 1, newline=newline))
+                    % (
+                        self.format_key(k),
+                        self.format_value(v, indent=indent + 1, newline=newline, br=br),
+                    )
                 )
 
             if newline:
@@ -121,7 +136,9 @@ class LuaFormatter:
 
             return fmt % join.join(values)
         elif isinstance(value, str):
-            return '"%s"' % value.replace('"', '\\"').replace("\n", "<br>").replace("\r", "")
+            return '"%s"' % value.replace('"', '\\"').replace(
+                "\n", "<br>" if br else "\\n"
+            ).replace("\r", "")
         else:
             return '"%s"' % value
 
@@ -242,6 +259,16 @@ class LuaHandler(ExporterHandler):
             parser=parser,
             cls=MonsterParser,
             func=MonsterParser.main,
+        )
+
+        parser = lua_sub.add_parser(
+            "packs",
+            help="Extract monster pack information",
+        )
+        self.add_default_parsers(
+            parser=parser,
+            cls=MonsterPackParser,
+            func=MonsterPackParser.main,
         )
 
         parser = lua_sub.add_parser(
@@ -1749,9 +1776,11 @@ class CraftingBenchParser(GenericLuaParser):
                 # 3.15
                 # This should be accessed by keys not values
                 # TODO: fix this.
-                "value": lambda v: v["Hideout_NPCsKey"]["NPCMasterKey"]["Id"]
-                if v["Hideout_NPCsKey"]["NPCMasterKey"]
-                else None,
+                "value": lambda v: (
+                    v["Hideout_NPCsKey"]["NPCMasterKey"]["Id"]
+                    if v["Hideout_NPCsKey"]["NPCMasterKey"]
+                    else None
+                ),
             },
         ),
         (
@@ -1901,6 +1930,108 @@ class CraftingBenchParser(GenericLuaParser):
                 wiki_page=[
                     {
                         "page": "Module:Crafting bench/%s" % key,
+                        "condition": None,
+                    }
+                ],
+            )
+
+        return r
+
+
+class MonsterPackParser(GenericLuaParser):
+    _files = [
+        "MonsterPacks.dat64",
+        "MonsterPackEntries.dat64",
+        "NecropolisPacks.dat64",
+        "ItemisedNecropolisPacks.dat64",
+    ]
+
+    _DATA = (
+        ("Id", {"key": "id"}),
+        ("Unknown1", {"key": "min_count"}),
+        ("Unknown2", {"key": "max_count"}),
+        ("Unknown0", {"key": "additional_count"}),
+        ("BossMonsterCount", {"key": "boss_count"}),
+        ("BossMonsterSpawnChance", {"key": "boss_chance"}),
+    )
+
+    def main(self, parsed_args):
+        if "MonsterPacksKey" not in self.rr["MonsterPackEntries.dat64"].index:
+            self.rr["MonsterPackEntries.dat64"].build_index("MonsterPacksKey")
+        monsterpack_data = {}
+        for pack in self.rr["MonsterPacks.dat64"]:
+            data = self._copy_from_keys(pack, self._DATA, rtr=True)
+            data["weight_by_area"] = dict(
+                zip([area["Id"] for area in pack["WorldAreasKeys"]], pack["Data0"])
+            )
+            monster_types = []
+            for entry in self.rr["MonsterPackEntries.dat64"].index["MonsterPacksKey"][pack]:
+                if entry["MonsterVarietiesKey"]:
+                    monster_types.append({"monster_id": entry["MonsterVarietiesKey"]["Id"]})
+            data["monster_ids"] = monster_types
+            boss_types = []
+            for boss in pack["BossMonster_MonsterVarietiesKeys"]:
+                boss_types.append({"monster_id": boss["Id"]})
+            monsterpack_data[data["id"]] = data
+
+        if "NecropolisPack" not in self.rr["MonsterPacks.dat64"].index:
+            self.rr["MonsterPacks.dat64"].build_index("NecropolisPack")
+        necro_data = {}
+        for pack in self.rr["NecropolisPacks.dat64"]:
+            data = {"id": pack["Id"], "name": pack["Name"]}
+
+            description = markup_to_wiki(pack["Description"]).splitlines()
+            for type_tag in self.rr["CorpseTypeTags.dat64"]:
+                if type_tag["Name"] in description[0]:
+                    description[0] = "{{moncat|%s}}%s" % (
+                        type_tag["Tag"]["Id"],
+                        description[0],
+                    )
+            data["description"] = "\n* ".join(description)
+
+            if pack["PackLeader2"]:
+                leader: list[str] = markup_to_wiki(pack["PackLeader2"]).splitlines()
+
+                first = True
+                for i, line in enumerate(leader):
+                    if first:
+                        first = False
+                    elif "Pack Leader" in line:
+                        pass
+                    elif line.startswith("{{c|white|"):
+                        leader[i] = f"* {line}"
+                    elif line:
+                        leader[i] = f"** {line}"
+                    data["leader"] = "\n".join(leader)
+
+            if pack["Mod"]:
+                data["mod_id"] = pack["Mod"]["Id"]
+
+            monster_packs = self.rr["MonsterPacks.dat64"].index["NecropolisPack"][pack]
+            if monster_packs:
+                data["monster_pack_ids"] = [m["Id"] for m in monster_packs]
+
+            necro_data[pack["Id"]] = data
+
+        ember_data = {}
+        for ember in self.rr["ItemisedNecropolisPacks.dat64"]:
+            ember_data[ember["Item"]["Name"]] = {
+                "item_id": ember["Item"]["Id"],
+                "pack_id": ember["Pack"]["Id"],
+            }
+
+        r = ExporterResult()
+        for key, data in [
+            ("Monster_packs", monsterpack_data),
+            ("Necropolis_packs", necro_data),
+            ("Necropolis_pack_lookup", ember_data),
+        ]:
+            r.add_result(
+                text=LuaFormatter.format_module(data, br=False),
+                out_file=f"{key.lower()}.lua",
+                wiki_page=[
+                    {
+                        "page": f"Module:{key}/data",
                         "condition": None,
                     }
                 ],

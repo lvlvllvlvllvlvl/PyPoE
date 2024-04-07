@@ -184,6 +184,7 @@ exporting modules && {
   pypoe_exporter $QUIET wiki lua synthesis "${ARGS[@]}" "$@"
   pypoe_exporter $QUIET wiki lua ot "${ARGS[@]}" "$@"
   pypoe_exporter $QUIET wiki lua minimap "${ARGS[@]}" "$@"
+  pypoe_exporter $QUIET wiki lua packs "${ARGS[@]}" "$@"
 }
 exporting atlas-icons &&
 pypoe_exporter $QUIET wiki items atlas_icons "${ARGS[@]}" "$@" --store-images --convert-images
