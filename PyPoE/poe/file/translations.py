@@ -1268,7 +1268,7 @@ class TQRelationalData(TranslationQuantifier):
         table: str,
         index_column: str = None,
         value_column: str = "Name",
-        predicate: (str, Any) = None,
+        predicate: tuple[str, Any] = None,
         placeholder: str = None,
         convert_type: str = None,
     ):
@@ -2611,6 +2611,12 @@ TQNumberFormat(
 
 TranslationQuantifier(
     id="canonical_line",
+    type=TranslationQuantifier.QuantifierTypes.STRING,
+    arg_size=0,
+)
+
+TranslationQuantifier(
+    id="markup",
     type=TranslationQuantifier.QuantifierTypes.STRING,
     arg_size=0,
 )

@@ -1859,15 +1859,13 @@ specification = Specification(
                 ),
                 Field(
                     name="Mainhand_AnimationKey",
-                    type="ref|string",
+                    type="ref|generic",
                     key="Animation.dat",
-                    key_id="Id",
                 ),
                 Field(
                     name="Offhand_AnimationKey",
-                    type="ref|string",
+                    type="ref|generic",
                     key="Animation.dat",
-                    key_id="Id",
                 ),
                 Field(
                     name="Flag3",
@@ -1876,6 +1874,24 @@ specification = Specification(
                 Field(
                     name="Key0",
                     type="ref|out",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="ref|generic",
+                    key="Animation.dat",
+                ),
+                Field(
+                    name="Flag4",
+                    type="bool",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="ref|generic",
+                    key="Animation.dat",
+                ),
+                Field(
+                    name="Data0",
+                    type="ref|list|ref|string",
                 ),
             ),
         ),
@@ -5682,6 +5698,10 @@ specification = Specification(
                 Field(
                     name="Key0",
                     type="ref|out",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="ref|string",
                 ),
             ),
         ),
@@ -9557,6 +9577,10 @@ specification = Specification(
                     name="WordsKey",
                     type="ref|out",
                     key="Words.dat",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
                 ),
             ),
         ),
@@ -15824,6 +15848,10 @@ specification = Specification(
                     name="Flag3",
                     type="bool",
                 ),
+                Field(
+                    name="Flag4",
+                    type="bool",
+                ),
             ),
         ),
         "ItemCostPerLevel.dat": File(
@@ -18519,6 +18547,12 @@ specification = Specification(
                 ),
                 Field(
                     name="UberBlight_DDSFile",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".dds",
+                ),
+                Field(
+                    name="Purple_DDSFile",
                     type="ref|string",
                     file_path=True,
                     file_ext=".dds",
@@ -21777,6 +21811,11 @@ specification = Specification(
                     name="Data3",
                     type="ref|list|ref|string",
                 ),
+                Field(
+                    name="NecropolisPack",
+                    type="ref|out",
+                    key="NecropolisPacks.dat",
+                ),
             ),
         ),
         "MonsterProjectileAttack.dat": File(
@@ -23165,8 +23204,12 @@ specification = Specification(
                     type="ref|out",
                 ),
                 Field(
-                    name="Data2",
-                    type="ref|list|byte",
+                    name="Keys2",
+                    type="ref|list|ref|out",
+                ),
+                Field(
+                    name="Key4",
+                    type="ref|out",
                 ),
             ),
         ),
@@ -23643,6 +23686,50 @@ specification = Specification(
                 ),
             ),
         ),
+        "NecropolisCraftBases.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                ),
+                Field(
+                    name="BaseItem",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="UniqueCraft",
+                    type="ref|out",
+                    key="NecropolisUniqueCrafts.dat",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="CraftItemType",
+                    type="ref|out",
+                    key="NecropolisCraftItemTypes.dat",
+                ),
+                Field(
+                    name="Name",
+                    type="ref|string",
+                ),
+                Field(
+                    name="CraftTag",
+                    type="ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="Flag1",
+                    type="bool",
+                ),
+            ),
+        ),
         "NecropolisCraftItemTypes.dat": File(
             fields=(
                 Field(
@@ -23662,35 +23749,13 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Keys0",
-                    type="ref|list|ref|out",
-                ),
-                Field(
                     name="IllustratuionIcon",
                     type="ref|string",
-                ),
-                Field(
-                    name="UniqueCraft",
-                    type="ref|out",
-                    key="NecropolisUniqueCrafts.dat",
-                ),
-                Field(
-                    name="BaseItem",
-                    type="ref|out",
-                    key="BaseItemTypes.dat",
                 ),
                 Field(
                     name="TextAudioLong",
                     type="ref|out",
                     key="NPCTextAudio.dat",
-                ),
-                Field(
-                    name="Flag0",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag1",
-                    type="bool",
                 ),
                 Field(
                     name="Achievements",
@@ -23701,6 +23766,10 @@ specification = Specification(
                     name="TextAudioShort",
                     type="ref|out",
                     key="NPCTextAudio.dat",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
                 ),
             ),
         ),
