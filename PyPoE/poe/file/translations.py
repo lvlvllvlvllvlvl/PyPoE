@@ -510,7 +510,7 @@ class TranslationString(TranslationReprMixin):
     _REPR_EXTRA_ATTRIBUTES = OrderedDict((("string", None),))
 
     # replacement tags used in translations
-    _re_split = re.compile(r"(?:\{(?P<id>[0-9]*)(?:[\:]*)(?P<type>[^\}]*)\})", re.UNICODE)
+    _re_split = re.compile(r"(?<!>|\{)(?:\{(?P<id>[0-9]*)(?:[\:]*)(?P<type>[^\}]*)\})", re.UNICODE)
 
     def __init__(self, parent: TranslationLanguage):
         parent.strings.append(self)
