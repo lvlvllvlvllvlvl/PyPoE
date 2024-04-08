@@ -65,7 +65,9 @@ def lua_format_value(key, value):
 def markup_to_wiki(text: str):
     return re.sub(
         r"<([^>]+)>{([^}]+)}",
-        lambda match: "{{c|%s|%s}}" % (match.group(1).lower(), match.group(2)),
+        lambda match: "\n".join(
+            "{{c|%s|%s}}" % (match.group(1).lower(), line) for line in match.group(2).splitlines()
+        ),
         text,
     )
 
@@ -1959,19 +1961,24 @@ class MonsterPackParser(GenericLuaParser):
         if "MonsterPacksKey" not in self.rr["MonsterPackEntries.dat64"].index:
             self.rr["MonsterPackEntries.dat64"].build_index("MonsterPacksKey")
         monsterpack_data = {}
+
+        def monster(m):
+            return {"monster_id": m["Id"], "name": m["Name"]}
+
         for pack in self.rr["MonsterPacks.dat64"]:
             data = self._copy_from_keys(pack, self._DATA, rtr=True)
-            data["weight_by_area"] = dict(
-                zip([area["Id"] for area in pack["WorldAreasKeys"]], pack["Data0"])
-            )
-            monster_types = []
-            for entry in self.rr["MonsterPackEntries.dat64"].index["MonsterPacksKey"][pack]:
-                if entry["MonsterVarietiesKey"]:
-                    monster_types.append({"monster_id": entry["MonsterVarietiesKey"]["Id"]})
-            data["monster_ids"] = monster_types
-            boss_types = []
-            for boss in pack["BossMonster_MonsterVarietiesKeys"]:
-                boss_types.append({"monster_id": boss["Id"]})
+            data["areas"] = [
+                {"area_id": area["Id"], "name": area["Name"], "weight": weight}
+                for area, weight in zip(pack["WorldAreasKeys"], pack["Data0"])
+            ]
+            data["monsters"] = [
+                monster(entry["MonsterVarietiesKey"])
+                for entry in self.rr["MonsterPackEntries.dat64"].index["MonsterPacksKey"][pack]
+                if entry["MonsterVarietiesKey"]
+            ]
+            data["boss_monsters"] = [
+                monster(boss) for boss in pack["BossMonster_MonsterVarietiesKeys"]
+            ]
             monsterpack_data[data["id"]] = data
 
         if "NecropolisPack" not in self.rr["MonsterPacks.dat64"].index:
