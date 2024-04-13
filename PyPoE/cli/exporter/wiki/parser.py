@@ -1667,6 +1667,7 @@ class TagHandler:
     UNIQ_FORMATS = {
         "Lightpoacher": "[[%s]]",
         "Precursor's Emblem": "[[%s]]",
+        "Shroud of the Lightless": "[[%s]]",
         "Thread of Hope": "{{il|page=%s}}",
     }
 
