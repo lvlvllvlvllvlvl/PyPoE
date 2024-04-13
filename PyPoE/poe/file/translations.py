@@ -1379,6 +1379,7 @@ class TranslationResult(TranslationReprMixin):
         "extra_strings",
         "string_instances",
         "tf_indices",
+        "client_string_formats",
     ]
 
     def __init__(
@@ -1397,6 +1398,7 @@ class TranslationResult(TranslationReprMixin):
         extra_strings,
         string_instances,
         tf_indices,
+        client_string_formats,
     ):
         self.found: List[Translation] = found
         self.found_lines: List[str] = found_lines
@@ -1412,6 +1414,7 @@ class TranslationResult(TranslationReprMixin):
         self.extra_strings: List[Dict[str, str]] = extra_strings
         self.string_instances: List[TranslationString] = string_instances
         self.tf_indices: List[Union[int, None]] = tf_indices
+        self.client_string_formats: List[str] = client_string_formats
 
     def _get_found_ids(self) -> List[List[str]]:
         """
@@ -1484,6 +1487,12 @@ class TranslationFile(AbstractFileReadOnly):
 
     _VIRTUAL_STAT_LOOKUP = {
         "corrosive_shroud_maximum_stored_poison_damage": "virtual_plague_bearer_maximum_stored_poison_damage"  # noqa
+    }
+
+    _CLIENT_STRINGS_LOOKUP = {
+        "map_is_uber_map": "ItemPopupUnmodifiableExceptChaosOrbs",
+        "local_influence_mod_requires_celestial_boss_presence": "InfluenceStatConditionPresenceCelestialBoss",
+        "local_influence_mod_requires_unique_monster_presence": "InfluenceStatConditionPresenceUniqueMonster",
     }
 
     def __init__(
@@ -1971,6 +1980,11 @@ class TranslationFile(AbstractFileReadOnly):
                 extra_strings=extra_strings,
                 string_instances=string_instances,
                 tf_indices=tf_indices,
+                client_string_formats=[
+                    self._CLIENT_STRINGS_LOOKUP[tag]
+                    for tag in tags
+                    if tag in self._CLIENT_STRINGS_LOOKUP
+                ],
             )
         if only_values:
             return formatted_values

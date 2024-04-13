@@ -270,7 +270,7 @@ _inter_wiki_map = {
         # Buffs
         #
         # Charges
-        ("Power, Frenzy or Endurance Charge(?:|s)", {"link": "Charge"}),
+        ("Power, Frenzy (?:and|or) Endurance Charge(?:|s)", {"link": "Charge"}),
         ("Endurance Charge(?:|s)", {"link": "Endurance Charge"}),
         ("Frenzy Charge(?:|s)", {"link": "Frenzy Charge"}),
         ("Power Charge(?:|s)", {"link": "Power Charge"}),
@@ -631,6 +631,7 @@ _inter_wiki_map = {
         ("Curse(?:|s|ed)", {"link": "Curse"}),
         ("Socket(?:|s|ed)", {"link": "Item socket"}),
         ("Recently", {"link": "Recently"}),
+        ("Passive Skill(?:|s)", {"link": "Passive skill"}),
         ("Skill(?:|s)", {"link": "Skill"}),
         ("Spell(?:|s)", {"link": "Spell"}),
         ("Attack(?:|s)", {"link": "Attack"}),
@@ -649,6 +650,7 @@ _inter_wiki_map = {
         ("Unlucky", {"link": "Unlucky"}),
         ("Stationary", {"link": "Stationary"}),
         ("Nearby", {"link": "Nearby"}),
+        ("in your Presence", {"link": "In your presence"}),
         ("Shatter", {"link": "Shatter"}),
         ("Critical Strike(?:|s)", {"link": "Critical strike"}),
         ("Crush(?:|ed)", {"link": "Crushed"}),
@@ -1358,7 +1360,7 @@ def _make_inter_wiki_re():
                     r"(?![^\[]*\]\])"
                     r"(?: |^)"
                     r"(?P<text>%s)"
-                    r"(?= |$)"
+                    r"(?=\W|$)"
                     % "|".join(
                         ["(%s)" % item[0] for item in _inter_wiki_mapping[id : id + _MAX_RE]]
                     ),
@@ -1600,7 +1602,15 @@ class BaseParser:
 
             out = temp_trans
         else:
-            out = [make_inter_wiki_links(line) for line in result.lines]
+            result_lines = result.lines
+            for client_string in result.client_string_formats:
+                format: str = self.rr["ClientStrings.dat64"].index["Id"][client_string]["Text"]
+                # works for now, may need to revisit if different formats are added to _CLIENT_STRINGS_LOOKUP
+                result_lines = (
+                    [format.format(line) for line in result_lines] if result_lines else [format]
+                )
+
+            out = [make_inter_wiki_links(line) for line in result_lines]
 
         if result.missing_ids:
             # Check for a hardcoded result first, using result's missing values.
