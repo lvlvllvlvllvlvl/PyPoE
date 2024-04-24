@@ -155,7 +155,7 @@ regex_translation_string = re.compile(
     r"^"
     r"[\s]*"
     r"(?P<minmax>(?:[0-9\-\|#!]+[ \t]+)+)"
-    r'"(?P<description>.*\s*)"'
+    r'"(?P<description>[^"]*)"'
     r"(?P<quantifier>(?:[ \t]*[\w%]+)*)"
     r"[ \t]*[\r\n]*"
     r"$",
@@ -1662,7 +1662,11 @@ class TranslationFile(AbstractFileReadOnly):
                                     TranslationWarning,
                                 )
 
-                        ts._set_string(ts_match.group("description"))
+                        # assuming that line breaks within the description are just for dev legibility,
+                        # as they seem to be preceded by escaped newlines (literal \n) anyway
+                        ts._set_string(
+                            "".join(s.strip() for s in ts_match.group("description").splitlines())
+                        )
 
                         ts.quantifier.register_from_string(
                             ts_match.group("quantifier"),
