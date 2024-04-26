@@ -605,6 +605,8 @@ class ItemsParser(SkillParserShared):
             # =================================================================
             "Metadata/Items/Gems/SkillGemArcaneCloak": "",
             "Metadata/Items/Gems/SkillGemPortal": " (skill gem)",
+            "Metadata/Items/Gems/SkillGemConvocationNew": "",
+            "Metadata/Items/Gems/SkillGemConvocation": " (legacy)",
             # =================================================================
             # Support Gems
             # =================================================================
