@@ -1872,6 +1872,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Weapons/TwoHandWeapons/Bows/EtherealBow1",
         "Metadata/Items/ItemEffects/SekhemasBanner",
         "Metadata/Items/Armours/BodyArmours/BodyStrTemp",
+        "Metadata/Items/Armours/Boots/BootsStrTemp",
         "Metadata/Items/Classic/MysteryLeaguestone",
         "Metadata/Items/Relics/Relic1x3",
         "Metadata/Items/Relics/Relic1x4",
@@ -1905,6 +1906,9 @@ class ItemsParser(SkillParserShared):
             r"Convert.*Scroll",
             r"Premium.*Pet",
             r"UnifiedAuraEffect",
+        },
+        "InstanceLocalItem": {
+            r".*",
         },
     }
 
