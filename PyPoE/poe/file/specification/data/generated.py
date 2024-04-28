@@ -23554,8 +23554,9 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Keys0",
+                    name="NPCs",
                     type="ref|list|ref|out",
+                    key="NPCs.dat",
                 ),
                 Field(
                     name="Key0",
