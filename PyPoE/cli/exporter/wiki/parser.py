@@ -1676,6 +1676,7 @@ class TagHandler:
     # while the translated name is in Text2
     UNIQ_FORMATS = {
         "Lightpoacher": "[[%s]]",
+        "Grand Spectrum": "[[%s]]",
         "Precursor's Emblem": "[[%s]]",
         "Shroud of the Lightless": "[[%s]]",
         "Thread of Hope": "{{il|page=%s}}",
