@@ -1909,9 +1909,6 @@ class ItemsParser(SkillParserShared):
             r"Premium.*Pet",
             r"UnifiedAuraEffect",
         },
-        "InstanceLocalItem": {
-            r".*",
-        },
     }
 
     _PLACEHOLDER_IMAGES = {"Art/2DItems/Hideout/HideoutPlaceholder.dds"}
@@ -3438,6 +3435,7 @@ class ItemsParser(SkillParserShared):
         "Breachstone": (_type_currency,),
         "ItemisedCorpse": (_type_corpse,),
         "NecropolisPack": (_allflame_ember,),
+        "InstanceLocalItem": (_type_currency,),
     }
 
     _conflict_active_skill_gems_map = {
