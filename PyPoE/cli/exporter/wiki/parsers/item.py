@@ -1408,9 +1408,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Pets/Taotie",
         "Metadata/Items/Pets/Qiongqi",
         "Metadata/Items/Pets/DaughterOfSinPet",
-        "Metadata/Items/Pets/SkadiPet",
         "Metadata/Items/Pets/SpectralGryffonPet",
-        "Metadata/Items/Pets/SkadiWolfPet",
         "Metadata/Items/Pets/BladeSoulPet",
         "Metadata/Items/Pets/LunarRabbitPet",
         "Metadata/Items/Pets/GhostriderCompanionPet",
@@ -1431,7 +1429,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/MicrotransactionCurrency/MysteryBoxRadiant",
         "Metadata/Items/MicrotransactionCurrency/MysteryBoxGoddess",
         "Metadata/Items/MicrotransactionCurrency/MysteryBoxLunar",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBoxSkadiPetBowl",
         "Metadata/Items/MicrotransactionCurrency/MysteryBoxBladeSoul",
         "Metadata/Items/MicrotransactionCurrency/ProxyArcticAurora10",
         "Metadata/Items/MicrotransactionCurrency/ProxyFireworksClassic20",
@@ -1904,13 +1901,11 @@ class ItemsParser(SkillParserShared):
             r"AltDeicide",
             r"Freya",
             r"Hasina",
+            r"Skadi",
             r"Upgrade.*Scroll",
             r"Convert.*Scroll",
             r"Premium.*Pet",
             r"UnifiedAuraEffect",
-        },
-        "InstanceLocalItem": {
-            r".*",
         },
     }
 
@@ -3438,6 +3433,7 @@ class ItemsParser(SkillParserShared):
         "Breachstone": (_type_currency,),
         "ItemisedCorpse": (_type_corpse,),
         "NecropolisPack": (_allflame_ember,),
+        "InstanceLocalItem": (_type_currency,),
     }
 
     _conflict_active_skill_gems_map = {
