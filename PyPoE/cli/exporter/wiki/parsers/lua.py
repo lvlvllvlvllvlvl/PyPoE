@@ -588,7 +588,7 @@ class BestiaryParser(GenericLuaParser):
 
         for row in self.rr["BestiaryRecipeComponent.dat64"]:
             self._copy_from_keys(row, self._COPY_KEYS_BESTIARY_COMPONENTS, components)
-            if row["BeastRarity"]:
+            if row["BeastRarity"] and row["BeastRarity"]["Id"] != "Unique":
                 display_string = "ItemDisplayString" + row["BeastRarity"]["Id"]
                 client_strings = self.rr["ClientStrings.dat64"].index["Id"]
                 components[-1]["rarity"] = client_strings[display_string]["Text"]
