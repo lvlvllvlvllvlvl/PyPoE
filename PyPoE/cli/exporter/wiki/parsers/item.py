@@ -281,26 +281,22 @@ class WikiCondition(parser.WikiCondition):
         r"^(recipe|sell_price|implicit[0-9]+_(?:text|random_list)).*", re.UNICODE
     )
 
-    NAME = "Base item"
+    NAME = "Item"
     INDENT = 40
     ADD_INCLUDE = False
 
 
 class ItemWikiCondition(WikiCondition):
-    NAME = "Base item"
+    NAME = "Item"
 
 
 class MapItemWikiCondition(WikiCondition):
-    NAME = "Base item"
+    NAME = "Item"
 
 
 class UniqueMapItemWikiCondition(MapItemWikiCondition):
     NAME = "Item"
     COPY_MATCH = re.compile(r"^(recipe|(ex|im)plicit[0-9]+_(?:text|random_list)).*", re.UNICODE)
-
-
-class ProphecyWikiCondition(WikiCondition):
-    NAME = "Item"
 
 
 class ItemsHandler(ExporterHandler):
