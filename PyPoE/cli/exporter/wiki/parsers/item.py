@@ -775,6 +775,16 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCrusaderBoots": " (boots skin)",
             "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCrusaderGloves": " (gloves skin)",
             "Metadata/Items/MicrotransactionCurrency/StashTab": " (consumable item)",
+            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsAuthority": " (weapon skin)",
+            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsBeacon": " (shield skin)",
+            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsBounty": " (belt skin)",
+            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsDominance": " (armour skin)",
+            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsEye": " (ring skin)",
+            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsImmortality": " (helmet skin)",
+            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsPresence": " (amulet skin)",
+            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsStride": " (boots skin)",
+            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsTouch": " (gloves skin)",
+            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsTriumph": " (helmet skin)",
             # =================================================================
             # Quest items
             # =================================================================
