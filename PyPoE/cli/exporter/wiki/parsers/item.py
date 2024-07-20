@@ -2890,9 +2890,16 @@ class ItemsParser(SkillParserShared):
                 infobox["map_fragment_bonus%s" % i] = mod["Id"]
                 i += 1
 
-    _type_map_fragment_mods = _type_factory(
+    _type_map_fragment = _type_factory(
         data_file="MapFragmentMods.dat64",
-        data_mapping=(),
+        data_mapping=(
+            (
+                "MapFragmentLimit",
+                {
+                    "template": "map_fragment_limit",
+                },
+            ),
+        ),
         row_index=True,
         function=_map_fragment_extra,
         fail_condition=True,
@@ -3423,7 +3430,7 @@ class ItemsParser(SkillParserShared):
         # 'LabyrinthMapItem': (),
         # Misc
         "Map": (_type_map,),
-        "MapFragment": (_type_currency, _type_map_fragment_mods),
+        "MapFragment": (_type_currency, _type_map_fragment),
         "QuestItem": (_skip_quest_contracts,),
         "AtlasRegionUpgradeItem": (),
         "MetamorphosisDNA": (),

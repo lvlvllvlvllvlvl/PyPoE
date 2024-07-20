@@ -18357,6 +18357,22 @@ specification = Specification(
                     name="Flag5",
                     type="bool",
                 ),
+                Field(
+                    name="MinAreaLevel",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="MapFragmentLimit",
+                    type="int",
+                ),
+                Field(
+                    name="Flag6",
+                    type="bool",
+                ),
             ),
         ),
         "MapInhabitants.dat": File(
