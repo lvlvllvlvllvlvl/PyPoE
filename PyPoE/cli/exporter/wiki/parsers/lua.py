@@ -571,7 +571,7 @@ class BestiaryParser(GenericLuaParser):
             "BestiaryCapturableMonstersKey",
             {
                 "key": "monster",
-                "value": lambda x: x["Name"],
+                "value": lambda x: x["MonsterVarietiesKey"]["Name"],
             },
         ),
     )

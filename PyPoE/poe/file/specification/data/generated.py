@@ -3627,10 +3627,6 @@ specification = Specification(
                     key="BestiaryGroups.dat",
                 ),
                 Field(
-                    name="Name",
-                    type="ref|string",
-                ),
-                Field(
                     name="BestiaryEncountersKey",
                     type="ref|out",
                     key="BestiaryEncounters.dat",
@@ -9491,18 +9487,18 @@ specification = Specification(
                     file_ext=".env",
                 ),
                 Field(
-                    name="Corrupted_ENVFile",
-                    type="ref|string",
+                    name="Corrupted_ENVFiles",
+                    type="ref|list|ref|string",
                     file_path=True,
                     file_ext=".env",
                 ),
                 Field(
-                    name="Key0",
-                    type="ref|out",
+                    name="Keys0",
+                    type="ref|list|ref|out",
                 ),
                 Field(
-                    name="Key1",
-                    type="ref|out",
+                    name="Keys1",
+                    type="ref|list|ref|out",
                 ),
                 Field(
                     name="Data0",
@@ -12712,7 +12708,7 @@ specification = Specification(
                 ),
                 Field(
                     name="Data0",
-                    type="ref|list|ref|string",
+                    type="ref|list|byte",
                 ),
                 Field(
                     name="HASH16",
@@ -16148,7 +16144,7 @@ specification = Specification(
                 ),
                 Field(
                     name="Shield",
-                    type="ref|string",
+                    type="ref|list|ref|string",
                     file_path=True,
                     file_ext=".epk",
                 ),
@@ -18997,10 +18993,6 @@ specification = Specification(
                     name="WitnessAreas",
                     type="ref|list|ref|out",
                     key="WorldAreas.dat",
-                ),
-                Field(
-                    name="Unknown4",
-                    type="int",
                 ),
                 Field(
                     name="Key1",
@@ -25791,11 +25783,6 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Key1",
-                    type="ref|out",
-                    key="QuestFlags.dat",
-                ),
-                Field(
                     name="Data0",
                     type="ref|list|byte",
                 ),
@@ -25808,15 +25795,11 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Key2",
+                    name="Key1",
                     type="ref|out",
                 ),
                 Field(
-                    name="Unknown1",
-                    type="int",
-                ),
-                Field(
-                    name="Key3",
+                    name="Key2",
                     type="ref|out",
                 ),
                 Field(
@@ -25824,7 +25807,7 @@ specification = Specification(
                     type="ref|string",
                 ),
                 Field(
-                    name="Key4",
+                    name="Key3",
                     type="ref|out",
                 ),
             ),
