@@ -490,6 +490,7 @@ class ItemsParser(SkillParserShared):
         "Ancestral": "3.22.0",  # AKA Trial of the Ancestors
         "Azmeri": "3.23.0",  # AKA Affliction
         "Necropolis": "3.24.0",
+        "Settlers": "3.25.0",
     }
 
     _IGNORE_DROP_LEVEL_CLASSES = (
@@ -527,7 +528,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Rings/RingDemigods1",
     }
 
-    _EXCLUDE_CLASSES = {"Maps"}
+    _EXCLUDE_CLASSES = {"Map", "NecropolisPack"}
 
     _NAME_OVERRIDE_BY_ID = {
         "English": {
@@ -3270,6 +3271,14 @@ class ItemsParser(SkillParserShared):
         index_column="BaseItem",
         data_mapping=(
             (
+                "MonsterVariety",
+                {
+                    "template": "monster_id",
+                    "format": lambda v: v["Id"],
+                    "condition": lambda v: v,
+                },
+            ),
+            (
                 "MonsterAbilities",
                 {
                     "template": "monster_abilities",
@@ -3784,9 +3793,7 @@ class ItemsParser(SkillParserShared):
             items = [item for item in items if item["ItemClassesKey"]["Name"] in classes]
         else:
             items = [
-                item
-                for item in items
-                if item["ItemClassesKey"]["Name"] not in self._EXCLUDE_CLASSES
+                item for item in items if item["ItemClassesKey"]["Id"] not in self._EXCLUDE_CLASSES
             ]
 
         self._parsed_args = parsed_args

@@ -571,7 +571,7 @@ class BestiaryParser(GenericLuaParser):
             "BestiaryCapturableMonstersKey",
             {
                 "key": "monster",
-                "value": lambda x: x["Name"],
+                "value": lambda x: x["MonsterVarietiesKey"]["Name"],
             },
         ),
     )
@@ -1753,6 +1753,8 @@ class CraftingBenchParser(GenericLuaParser):
         text_descriptions = []
         areas = []
         for key in val:
+            if not key:
+                continue
             if len(key["UnlockDescription"]) > 0:
                 text_descriptions.append(key["UnlockDescription"])
             # Default to the text description instead of the more ambiguous zone name.
