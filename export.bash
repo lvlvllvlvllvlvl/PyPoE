@@ -150,6 +150,8 @@ set -e
 
 pypoe_exporter $QUIET setup perform
 
+exporting mods &&
+pypoe_exporter $QUIET wiki mods mods rowid "${ARGS[@]}" "$@"
 exporting gem-skills &&
 pypoe_exporter $QUIET wiki skill by_gem "${IMG[@]}" "${ARGS[@]}" "$@"
 exporting items &&
@@ -162,8 +164,6 @@ exporting mastery-effects &&
 pypoe_exporter $QUIET wiki mastery effects rowid "${ARGS[@]}" "$@"
 exporting mastery-groups &&
 pypoe_exporter $QUIET wiki mastery groups rowid "${ARGS[@]}" "$@"
-exporting mods &&
-pypoe_exporter $QUIET wiki mods mods rowid "${ARGS[@]}" "$@"
 exporting monsters &&
 pypoe_exporter $QUIET wiki monster rowid "${ARGS[@]}" "$@"
 exporting areas &&
