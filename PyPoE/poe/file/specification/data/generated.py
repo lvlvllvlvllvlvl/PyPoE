@@ -29957,6 +29957,7 @@ specification = Specification(
                     name="BaseItem",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="DebuffInterval",

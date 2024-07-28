@@ -3314,7 +3314,7 @@ class ItemsParser(SkillParserShared):
                 "Cooldown",
                 {
                     "template": "tincture_cooldown",
-                    "format": lambda v: v / 1000,
+                    "format": lambda v: f"{v / 1000:g}",
                     "condition": lambda v: v,
                 },
             ),
@@ -3620,6 +3620,10 @@ class ItemsParser(SkillParserShared):
     def _conflict_breachstone(self, infobox, base_item_type, rr, language):
         return base_item_type["Name"]
 
+    def _conflict_tincture(self, infobox, base_item_type, rr, language):
+        if base_item_type.rowid in rr["Tinctures.dat64"].index["BaseItem"]:
+            return base_item_type["Name"]
+
     _conflict_resolver_map = {
         "Active Skill Gem": _conflict_active_skill_gems,
         "QuestItem": _conflict_quest_items,
@@ -3636,6 +3640,7 @@ class ItemsParser(SkillParserShared):
         "Incubator": _conflict_incubator,
         "IncubatorStackable": _conflict_incubator_stackable,
         "Breachstone": _conflict_breachstone,
+        "Tincture": _conflict_tincture,
     }
 
     def _parse_class_filter(self, parsed_args):
@@ -3977,6 +3982,7 @@ class ItemsParser(SkillParserShared):
                 return img.resize(
                     (int(img.size[0] * scale), int(img.size[1] * scale)), Image.Resampling.LANCZOS
                 )
+            return img
 
         return resize
 
