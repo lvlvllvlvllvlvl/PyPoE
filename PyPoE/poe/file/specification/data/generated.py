@@ -29959,11 +29959,12 @@ specification = Specification(
                     key="BaseItemTypes.dat",
                 ),
                 Field(
-                    name="Unknown0",
+                    name="DebuffInterval",
                     type="int",
+                    description="1 stack of Mana Burn is applied every x milliseconds",
                 ),
                 Field(
-                    name="Unknown1",
+                    name="Cooldown",
                     type="int",
                 ),
             ),

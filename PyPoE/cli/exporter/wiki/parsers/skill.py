@@ -735,7 +735,7 @@ class SkillParserShared(parser.BaseParser):
 
         # From ActiveSkills.dat64
         if act_skill:
-            infobox["gem_description"] = act_skill["Description"]
+            infobox["gem_description"] = act_skill["Description"].replace("\n", "<br>")
             infobox["active_skill_name"] = act_skill["DisplayedName"]
             if act_skill["WeaponRestriction_ItemClassesKeys"]:
                 infobox["item_class_id_restriction"] = ", ".join(

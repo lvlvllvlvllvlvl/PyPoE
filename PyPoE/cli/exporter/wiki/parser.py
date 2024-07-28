@@ -281,6 +281,8 @@ _inter_wiki_map = {
         ("Adrenaline", {"link": "Adrenaline"}),
         ("Gale Force", {"link": "Gale Force"}),
         ("Alchemist's Genius", {"link": "Alchemist's Genius"}),
+        ("Horned Scarab", {"link": "Horned Scarab"}),
+        ("Scarab", {"link": "Scarab"}),
         # Hostile
         ("Corrupted Blood", {"link": "Corrupted Blood"}),
         #
@@ -1680,6 +1682,7 @@ class TagHandler:
         "Precursor's Emblem": "[[%s]]",
         "Shroud of the Lightless": "[[%s]]",
         "Thread of Hope": "{{il|page=%s}}",
+        "Aul's Uprising": "[[%s]]",
     }
 
     def __init__(self, rr):

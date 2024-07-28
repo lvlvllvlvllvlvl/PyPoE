@@ -3298,6 +3298,30 @@ class ItemsParser(SkillParserShared):
         row_index=True,
     )
 
+    _type_tincture = _type_factory(
+        data_file="Tinctures.dat64",
+        index_column="BaseItem",
+        data_mapping=(
+            (
+                "DebuffInterval",
+                {
+                    "template": "tincture_mana_burn",
+                    "format": lambda v: v / 1000,
+                    "condition": lambda v: v,
+                },
+            ),
+            (
+                "Cooldown",
+                {
+                    "template": "tincture_cooldown",
+                    "format": lambda v: v / 1000,
+                    "condition": lambda v: v,
+                },
+            ),
+        ),
+        row_index=True,
+    )
+
     _cls_map = dict()
     """
     This defines the expected data elements for an item class.
@@ -3456,6 +3480,10 @@ class ItemsParser(SkillParserShared):
         "ItemisedCorpse": (_type_corpse,),
         "NecropolisPack": (_allflame_ember,),
         "InstanceLocalItem": (_type_currency,),
+        "Tincture": (
+            _type_level,
+            _type_tincture,
+        ),
     }
 
     _conflict_active_skill_gems_map = {
@@ -3941,7 +3969,16 @@ class ItemsParser(SkillParserShared):
             return flask_icon_process
         if comp == 3:  # Gem
             return self._get_gem_icon_process(infobox)
-        return None
+
+        def resize(img: Image):
+            max_dimension = max(img.size)
+            if max_dimension > 156:
+                scale = 156 / max_dimension
+                return img.resize(
+                    (int(img.size[0] * scale), int(img.size[1] * scale)), Image.Resampling.LANCZOS
+                )
+
+        return resize
 
     def _get_gem_icon_process(self, infobox: dict[str, str]):
         if "gem_shader" not in infobox:
