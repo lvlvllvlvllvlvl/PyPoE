@@ -282,7 +282,7 @@ _inter_wiki_map = {
         ("Gale Force", {"link": "Gale Force"}),
         ("Alchemist's Genius", {"link": "Alchemist's Genius"}),
         ("Horned Scarab", {"link": "Horned Scarab"}),
-        ("Scarap", {"link": "Scarab"}),
+        ("Scarab", {"link": "Scarab"}),
         # Hostile
         ("Corrupted Blood", {"link": "Corrupted Blood"}),
         #
