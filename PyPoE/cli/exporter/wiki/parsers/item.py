@@ -3969,7 +3969,16 @@ class ItemsParser(SkillParserShared):
             return flask_icon_process
         if comp == 3:  # Gem
             return self._get_gem_icon_process(infobox)
-        return None
+
+        def resize(img: Image):
+            max_dimension = max(img.size)
+            if max_dimension > 156:
+                scale = 156 / max_dimension
+                return img.resize(
+                    (int(img.size[0] * scale), int(img.size[1] * scale)), Image.Resampling.LANCZOS
+                )
+
+        return resize
 
     def _get_gem_icon_process(self, infobox: dict[str, str]):
         if "gem_shader" not in infobox:
