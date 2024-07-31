@@ -617,6 +617,7 @@ class ItemsParser(SkillParserShared):
             # Helmets
             # =================================================================
             "Metadata/Items/Armours/Helmets/HelmetStrInt4": "",  # Crusader Helmet
+            "Metadata/Items/Armours/Helmets/HelmetStrDex12": "",  # Conquest Helmet
             # =================================================================
             # One Hand Axes
             # =================================================================
@@ -638,11 +639,13 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/Armours/Boots/BootsAtlas2": " (Fire and Cold Resistance)",
             "Metadata/Items/Armours/Boots/BootsAtlas3": " (Fire and Lightning Resistance)",
             "Metadata/Items/Armours/Boots/BootsStrInt8": "",  # Crusader Boots
+            "Metadata/Items/Armours/Boots/BootsInt11": "",  # Warlock Boots
             # =================================================================
             # Gloves
             # =================================================================
             "Metadata/Items/Armours/Gloves/GlovesStrInt7": "",  # Legion Gloves
             "Metadata/Items/Armours/Gloves/GlovesStrInt8": "",  # Crusader Gloves
+            "Metadata/Items/Armours/Gloves/GlovesInt11": "",  # Warlock Gloves
             # =================================================================
             # Quivers
             # =================================================================
@@ -790,6 +793,9 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsStride": " (boots skin)",
             "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsTouch": " (gloves skin)",
             "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsTriumph": " (helmet skin)",
+            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionWarlockGloves": " (gloves skin)",
+            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionWarlockBoots": " (boots skin)",
+            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionConquestHelmet": " (helmet skin)",
             # =================================================================
             # Quest items
             # =================================================================
