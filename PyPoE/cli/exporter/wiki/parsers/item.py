@@ -528,7 +528,11 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Rings/RingDemigods1",
     }
 
-    _EXCLUDE_CLASSES = {"Map", "NecropolisPack"}
+    _EXCLUDE_CLASSES = {
+        "Map",
+        "NecropolisPack",
+        "HiddenItem",
+    }
 
     _NAME_OVERRIDE_BY_ID = {
         "English": {
