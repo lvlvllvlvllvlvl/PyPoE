@@ -1687,11 +1687,11 @@ class TagHandler:
     }
 
     CUSTOM_LINKS = {
-        "Cartography Scarab": "[[Cartography Scarab (disambiguation)]]",
-        "Divination Scarab": "[[Divination Scarab (disambiguation)]]",
-        "Bestiary Scarab": "[[Bestiary Scarab (disambiguation)]]",
-        "Sulphite Scarab": "[[Sulphite Scarab (disambiguation)]]",
-        "Einhar's Memory of Harvest Beasts": "{{il|Einhar's Memory}}",
+        "Cartography Scarab": "[[Cartography Scarab (disambiguation)|Cartography Scarab]]",
+        "Divination Scarab": "[[Divination Scarab (disambiguation)|Divination Scarab]]",
+        "Bestiary Scarab": "[[Bestiary Scarab (disambiguation)|Bestiary Scarab]]",
+        "Sulphite Scarab": "[[Sulphite Scarab (disambiguation)|Sulphite Scarab]]",
+        "Einhar's Memory of Harvest Beasts": "{{il|html=|Einhar's Memory|Einhar's Memory of Harvest Beasts}}",
     }
 
     def __init__(self, rr):
