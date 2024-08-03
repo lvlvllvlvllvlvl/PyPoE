@@ -3494,6 +3494,7 @@ class ItemsParser(SkillParserShared):
             _type_level,
             _type_tincture,
         ),
+        "Gold": (_type_currency,),
     }
 
     _conflict_active_skill_gems_map = {
