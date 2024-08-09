@@ -7436,6 +7436,53 @@ specification = Specification(
                 ),
             ),
         ),
+        "CurrencyExchange.dat": File(
+            fields=(
+                Field(
+                    name="Item",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="Category",
+                    type="ref|out",
+                    key="CurrencyExchangeCategories.dat",
+                ),
+                Field(
+                    name="SubCategory",
+                    type="ref|out",
+                    key="CurrencyExchangeCategories.dat",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="EnabledInChallengeLeague",
+                    type="bool",
+                ),
+                Field(
+                    name="GoldPurchaseFee",
+                    type="int",
+                ),
+                Field(
+                    name="Flag1",
+                    type="bool",
+                ),
+            ),
+        ),
+        "CurrencyExchangeCategories.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Name",
+                    type="ref|string",
+                ),
+            ),
+        ),
         "CurrencyItems.dat": File(
             fields=(
                 Field(
@@ -9048,6 +9095,7 @@ specification = Specification(
                     name="BaseType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="Type",
@@ -16546,6 +16594,18 @@ specification = Specification(
                 Field(
                     name="Key3",
                     type="ref|out",
+                ),
+                Field(
+                    name="Keys1",
+                    type="ref|list|ref|out",
+                ),
+                Field(
+                    name="Keys2",
+                    type="ref|list|ref|out",
+                ),
+                Field(
+                    name="Flag2",
+                    type="bool",
                 ),
             ),
         ),
@@ -24582,6 +24642,10 @@ specification = Specification(
                     name="AchievementItem",
                     type="ref|out",
                     key="AchievementItems.dat",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
                 ),
             ),
             virtual_fields=(

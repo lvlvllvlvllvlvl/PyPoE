@@ -267,12 +267,8 @@ class WikiCondition(parser.WikiCondition):
         "quest_reward4_class_ids",
         "quest_reward4_npc",
         # Sentinels
-        "sentinel_duration",
-        "sentinel_empowers",
-        "sentinel_empowerment",
         "sentinel_monster",
         "sentinel_monster_level",
-        "sentinel_charge",
     )
     COPY_MATCH = re.compile(
         r"^(recipe|sell_price|implicit[0-9]+_(?:text|random_list)).*", re.UNICODE
@@ -496,22 +492,8 @@ class ItemsParser(SkillParserShared):
     _IGNORE_DROP_LEVEL_CLASSES = (
         "HideoutDoodad",
         "Microtransaction",
-        "LabyrinthItem",
-        "LabyrinthTrinket",
-        "LabyrinthMapItem",
+        "InstanceLocalItem",
     )
-
-    _IGNORE_DROP_LEVEL_ITEMS_BY_ID = {
-        # Alchemy Shard
-        "Metadata/Items/Currency/CurrencyUpgradeToRareShard",
-        # Alteration Shard
-        "Metadata/Items/Currency/CurrencyRerollMagicShard",
-        "Metadata/Items/Currency/CurrencyLabyrinthEnchant",
-        "Metadata/Items/Currency/CurrencyImprint",
-        # Transmute Shard
-        "Metadata/Items/Currency/CurrencyUpgradeToMagicShard",
-        "Metadata/Items/Currency/CurrencyIdentificationShard",
-    }
 
     _DROP_DISABLED_ITEMS_BY_ID = {
         "Metadata/Items/Quivers/Quiver1",
@@ -1633,6 +1615,7 @@ class ItemsParser(SkillParserShared):
         # Currency items
         # =================================================================
         "Metadata/Items/Currency/CurrencySilverCoin",
+        "Metadata/Items/Currency/CurrencyLabyrinthEnchant",
         # =================================================================
         # Non-stackable resonators from before 3.8.0
         # =================================================================
@@ -3332,6 +3315,42 @@ class ItemsParser(SkillParserShared):
         row_index=True,
     )
 
+    _type_sentinel = _type_factory(
+        data_file="DroneBaseTypes.dat64",
+        index_column="BaseType",
+        data_mapping=(
+            (
+                "Charges",
+                {
+                    "template": "sentinel_charge",
+                    "condition": lambda v: v,
+                },
+            ),
+            (
+                "Duration",
+                {
+                    "template": "sentinel_duration",
+                    "condition": lambda v: v,
+                },
+            ),
+            (
+                "EnemyLimit",
+                {
+                    "template": "sentinel_empowers",
+                    "condition": lambda v: v,
+                },
+            ),
+            (
+                "Empowerment",
+                {
+                    "template": "sentinel_empowerment",
+                    "condition": lambda v: v,
+                },
+            ),
+        ),
+        row_index=True,
+    )
+
     _cls_map = dict()
     """
     This defines the expected data elements for an item class.
@@ -3495,6 +3514,7 @@ class ItemsParser(SkillParserShared):
             _type_tincture,
         ),
         "Gold": (_type_currency,),
+        "SentinelDrone": (_type_sentinel,),
     }
 
     _conflict_active_skill_gems_map = {
@@ -3744,10 +3764,7 @@ class ItemsParser(SkillParserShared):
                 text=base_item_type["FlavourTextKey"]["Text"],
             )
 
-        if (
-            base_item_type["ItemClassesKey"]["Id"] not in self._IGNORE_DROP_LEVEL_CLASSES
-            and m_id not in self._IGNORE_DROP_LEVEL_ITEMS_BY_ID
-        ):
+        if base_item_type["ItemClassesKey"]["Id"] not in self._IGNORE_DROP_LEVEL_CLASSES:
             infobox["drop_level"] = base_item_type["DropLevel"]
 
         base_ot = ITFile(parent_or_file_system=self.file_system)
