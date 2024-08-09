@@ -3319,6 +3319,42 @@ class ItemsParser(SkillParserShared):
         row_index=True,
     )
 
+    _type_sentinel = _type_factory(
+        data_file="DroneBaseTypes.dat64",
+        index_column="BaseType",
+        data_mapping=(
+            (
+                "Charges",
+                {
+                    "template": "sentinel_charge",
+                    "condition": lambda v: v,
+                },
+            ),
+            (
+                "Duration",
+                {
+                    "template": "sentinel_duration",
+                    "condition": lambda v: v,
+                },
+            ),
+            (
+                "EnemyLimit",
+                {
+                    "template": "sentinel_empowers",
+                    "condition": lambda v: v,
+                },
+            ),
+            (
+                "Empowerment",
+                {
+                    "template": "sentinel_empowerment",
+                    "condition": lambda v: v,
+                },
+            ),
+        ),
+        row_index=True,
+    )
+
     _cls_map = dict()
     """
     This defines the expected data elements for an item class.
@@ -3482,6 +3518,7 @@ class ItemsParser(SkillParserShared):
             _type_tincture,
         ),
         "Gold": (_type_currency,),
+        "SentinelDrone": (_type_sentinel,),
     }
 
     _conflict_active_skill_gems_map = {
