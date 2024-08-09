@@ -267,12 +267,8 @@ class WikiCondition(parser.WikiCondition):
         "quest_reward4_class_ids",
         "quest_reward4_npc",
         # Sentinels
-        "sentinel_duration",
-        "sentinel_empowers",
-        "sentinel_empowerment",
         "sentinel_monster",
         "sentinel_monster_level",
-        "sentinel_charge",
     )
     COPY_MATCH = re.compile(
         r"^(recipe|sell_price|implicit[0-9]+_(?:text|random_list)).*", re.UNICODE
