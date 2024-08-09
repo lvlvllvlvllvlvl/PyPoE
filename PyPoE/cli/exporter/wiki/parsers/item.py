@@ -496,22 +496,8 @@ class ItemsParser(SkillParserShared):
     _IGNORE_DROP_LEVEL_CLASSES = (
         "HideoutDoodad",
         "Microtransaction",
-        "LabyrinthItem",
-        "LabyrinthTrinket",
-        "LabyrinthMapItem",
+        "InstanceLocalItem",
     )
-
-    _IGNORE_DROP_LEVEL_ITEMS_BY_ID = {
-        # Alchemy Shard
-        "Metadata/Items/Currency/CurrencyUpgradeToRareShard",
-        # Alteration Shard
-        "Metadata/Items/Currency/CurrencyRerollMagicShard",
-        "Metadata/Items/Currency/CurrencyLabyrinthEnchant",
-        "Metadata/Items/Currency/CurrencyImprint",
-        # Transmute Shard
-        "Metadata/Items/Currency/CurrencyUpgradeToMagicShard",
-        "Metadata/Items/Currency/CurrencyIdentificationShard",
-    }
 
     _DROP_DISABLED_ITEMS_BY_ID = {
         "Metadata/Items/Quivers/Quiver1",
@@ -1633,6 +1619,7 @@ class ItemsParser(SkillParserShared):
         # Currency items
         # =================================================================
         "Metadata/Items/Currency/CurrencySilverCoin",
+        "Metadata/Items/Currency/CurrencyLabyrinthEnchant",
         # =================================================================
         # Non-stackable resonators from before 3.8.0
         # =================================================================
@@ -3744,10 +3731,7 @@ class ItemsParser(SkillParserShared):
                 text=base_item_type["FlavourTextKey"]["Text"],
             )
 
-        if (
-            base_item_type["ItemClassesKey"]["Id"] not in self._IGNORE_DROP_LEVEL_CLASSES
-            and m_id not in self._IGNORE_DROP_LEVEL_ITEMS_BY_ID
-        ):
+        if base_item_type["ItemClassesKey"]["Id"] not in self._IGNORE_DROP_LEVEL_CLASSES:
             infobox["drop_level"] = base_item_type["DropLevel"]
 
         base_ot = ITFile(parent_or_file_system=self.file_system)
