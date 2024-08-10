@@ -260,7 +260,7 @@ _inter_wiki_map = {
         ("Low Mana", {"link": "Low Mana"}),
         ("Full Mana", {"link": "Full Mana"}),
         ("Mana", {"link": "Mana"}),
-        ("Ward", {"link": "Ward"}),
+        ("(?<!stical |during |werful |Wicked )Ward", {"link": "Ward"}),
         #
         ("Chaos Resistance(?:|s)", {"link": "Chaos Resistance"}),
         ("Cold Resistance(?:|s)", {"link": "Cold Resistance"}),
