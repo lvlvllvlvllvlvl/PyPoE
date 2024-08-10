@@ -260,6 +260,7 @@ _inter_wiki_map = {
         ("Low Mana", {"link": "Low Mana"}),
         ("Full Mana", {"link": "Full Mana"}),
         ("Mana", {"link": "Mana"}),
+        ("(?<!stical |during |werful |Wicked )Ward", {"link": "Ward"}),
         #
         ("Chaos Resistance(?:|s)", {"link": "Chaos Resistance"}),
         ("Cold Resistance(?:|s)", {"link": "Cold Resistance"}),
@@ -1685,6 +1686,14 @@ class TagHandler:
         "Aul's Uprising": "[[%s]]",
     }
 
+    CUSTOM_LINKS = {
+        "Cartography Scarab": "[[Cartography Scarab (disambiguation)|Cartography Scarab]]",
+        "Divination Scarab": "[[Divination Scarab (disambiguation)|Divination Scarab]]",
+        "Bestiary Scarab": "[[Bestiary Scarab (disambiguation)|Bestiary Scarab]]",
+        "Sulphite Scarab": "[[Sulphite Scarab (disambiguation)|Sulphite Scarab]]",
+        "Einhar's Memory of Harvest Beasts": "{{il|html=|Einhar's Memory|Einhar's Memory of Harvest Beasts}}",
+    }
+
     def __init__(self, rr):
         """
         Parameters
@@ -1702,6 +1711,8 @@ class TagHandler:
             self.tag_handlers[key] = partial(func, self)
 
     def _check_link(self, string):
+        if string in self.CUSTOM_LINKS:
+            return self.CUSTOM_LINKS[string]
         if any(category["Text"] == string for category in self.rr["ItemClassCategories.dat64"]):
             return "[[%s]]" % string
         items = self.rr["BaseItemTypes.dat64"].index["Name"][string]
