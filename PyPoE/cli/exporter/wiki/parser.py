@@ -1687,6 +1687,8 @@ class TagHandler:
     }
 
     CUSTOM_LINKS = {
+        "4x Scarab": "4x [[Scarab]]",
+        "Horned Scarab": "[[Horned Scarab]]",
         "Cartography Scarab": "[[Cartography Scarab (disambiguation)|Cartography Scarab]]",
         "Divination Scarab": "[[Divination Scarab (disambiguation)|Divination Scarab]]",
         "Bestiary Scarab": "[[Bestiary Scarab (disambiguation)|Bestiary Scarab]]",
