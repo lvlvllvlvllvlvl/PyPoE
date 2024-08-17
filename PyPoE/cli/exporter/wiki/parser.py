@@ -60,6 +60,7 @@ from functools import partial
 
 # Python
 from hashlib import md5
+from math import copysign
 from typing import Callable
 
 import PIL
@@ -1541,6 +1542,10 @@ class BaseParser:
 
                     stats.append(stat)
                     values.append(value)
+        if mod is not None:
+            values = dict(
+                (stat, self._fix_sign(value, mod["Id"], stat)) for stat, value in zip(stats, values)
+            )
 
         result = self.tc[translation_file].get_translation(
             stats, values, full_result=True, lang=self.lang
@@ -1659,6 +1664,27 @@ class BaseParser:
                 finalout.append(line)
 
         return finalout
+
+    _INVERTED_STAT_SIGNS = {
+        "base_maximum_life": -1,
+        "base_maximum_mana": -1,
+        "base_maximum_energy_shield": -1,
+        "base_cold_damage_resistance_%": -1,
+        "base_fire_damage_resistance_%": -1,
+        "base_lightning_damage_resistance_%": -1,
+        "base_mana_cost_+_with_non_channelling_skills": +1,
+        "base_mana_cost_+_with_channelling_skills": +1,
+        "base_minimum_endurance_charges": -1,
+        "base_minimum_frenzy_charges": -1,
+        "base_minimum_power_charges": -1,
+    }
+
+    def _fix_sign(self, values: tuple[int, int], mod_id: str, stat: str):
+        if "Inverted" in mod_id and stat in self._INVERTED_STAT_SIGNS:
+            sign = self._INVERTED_STAT_SIGNS[stat]
+            return int(copysign(values[0], sign)), int(copysign(values[1], sign))
+        else:
+            return values
 
 
 class TagHandler:
