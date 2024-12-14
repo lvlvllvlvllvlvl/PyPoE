@@ -40,7 +40,7 @@ __all__ = [
 ]
 
 specification = Specification(
-    1,
+    2,
     {
         "AbyssBossLifeScalingPerLevel.dat": File(
             fields=(
@@ -556,47 +556,6 @@ specification = Specification(
                     name="Id",
                     type="ref|string",
                     unique=True,
-                ),
-                Field(
-                    name="Part",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown0",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Unknown1",
-                    type="int",
-                ),
-                Field(
-                    name="ActNumber",
-                    type="int",
-                ),
-                Field(
-                    name="WorldPanelImage",
-                    type="ref|string",
-                ),
-                Field(
-                    name="WorldPanelImageEpilogue",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Unknown2",
-                    type="int",
-                ),
-                Field(
-                    name="IsPostGame",
-                    type="bool",
-                ),
-                Field(
-                    name="Unknown3",
-                    type="int",
-                ),
-                Field(
-                    name="Keys0",
-                    type="ref|list|ref|out",
-                    key="QuestFlags.dat",
                 ),
             ),
         ),
@@ -10310,20 +10269,6 @@ specification = Specification(
                     name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
-                ),
-                Field(
-                    name="Tier",
-                    type="int",
-                ),
-                Field(
-                    name="NPC",
-                    type="ref|out",
-                    key="ExpeditionNPCs.dat",
-                ),
-                Field(
-                    name="LootSound",
-                    type="ref|out",
-                    key="SoundEffects.dat",
                 ),
             ),
         ),
