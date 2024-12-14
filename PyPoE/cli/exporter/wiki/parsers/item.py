@@ -441,7 +441,7 @@ class ItemsParser(SkillParserShared):
 
     # Core files we need to load
     _files = [
-        "BaseItemTypes.dat64",
+        "BaseItemTypes.datc64",
     ]
 
     # Core translations we need

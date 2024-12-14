@@ -140,7 +140,7 @@ class MasteryCommandHandler(ExporterHandler):
 
 
 class MasteryEffectParser(parser.BaseParser):
-    _MASTERY_FILE_NAME = "PassiveSkillMasteryEffects.dat64"
+    _MASTERY_FILE_NAME = "PassiveSkillMasteryEffects.datc64"
     _files = [
         _MASTERY_FILE_NAME,
     ]
@@ -269,8 +269,8 @@ class MasteryEffectParser(parser.BaseParser):
 
 
 class MasteryGroupParser(parser.BaseParser):
-    _MASTERY_FILE_NAME = "PassiveSkillMasteryGroups.dat64"
-    _PASSIVES_FILE_NAME = "PassiveSkills.dat64"
+    _MASTERY_FILE_NAME = "PassiveSkillMasteryGroups.datc64"
+    _PASSIVES_FILE_NAME = "PassiveSkills.datc64"
     _files = [
         _MASTERY_FILE_NAME,
         _PASSIVES_FILE_NAME,

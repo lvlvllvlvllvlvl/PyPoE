@@ -1089,10 +1089,11 @@ class RelationalReader(AbstractFileCache[DatFile]):
 
         * self['DF.dat'] <==> read_file('Data/{language}DF.dat').reader
         * self['Data/DF.dat'] <==> read_file('Data/{language}DF.dat').reader
+        * self['DF.dat64'] <==> self['DF.datc64']
         """
         if item.startswith("Data/"):
             item = item[len("Data/") :]
-        item = "Data/" + self._language + item
+        item = "Data/" + self._language + item.replace(".dat64", ".datc64")
 
         return self.get_file(item).reader
 

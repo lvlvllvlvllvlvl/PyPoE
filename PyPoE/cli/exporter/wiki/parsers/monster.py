@@ -150,12 +150,12 @@ class MonsterCommandHandler(ExporterHandler):
 
 class MonsterParser(parser.BaseParser):
     _files = [
-        "MonsterVarieties.dat64",
+        "MonsterVarieties.datc64",
     ]
 
     _area_column_index_filter = partialmethod(
         parser.BaseParser._column_index_filter,
-        dat_file_name="MonsterVarieties.dat64",
+        dat_file_name="MonsterVarieties.datc64",
         error_msg="Several monsters have not been found:\n%s",
     )
 

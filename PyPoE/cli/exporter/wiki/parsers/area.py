@@ -164,9 +164,9 @@ class AreaCommandHandler(ExporterHandler):
 
 class AreaParser(parser.BaseParser):
     _files = [
-        "WorldAreas.dat64",
-        "MapPins.dat64",
-        "AtlasNode.dat64",
+        "WorldAreas.datc64",
+        "MapPins.datc64",
+        "AtlasNode.datc64",
     ]
 
     _area_column_index_filter = partialmethod(

@@ -175,12 +175,12 @@ class WikiCondition(parser.WikiCondition):
 class SkillParserShared(parser.BaseParser):
     _files = [
         # pretty much chain loads everything we need
-        "ActiveSkills.dat64",
-        "GrantedEffects.dat64",
-        "GrantedEffectsPerLevel.dat64",
-        "GrantedEffectQualityStats.dat64",
-        "GrantedEffectStatSetsPerLevel.dat64",
-        "GrantedEffectStatSets.dat64",
+        "ActiveSkills.datc64",
+        "GrantedEffects.datc64",
+        "GrantedEffectsPerLevel.datc64",
+        "GrantedEffectQualityStats.datc64",
+        "GrantedEffectStatSetsPerLevel.datc64",
+        "GrantedEffectStatSets.datc64",
     ]
 
     # Fields to copy from GrantedEffectsPerLevel.dat64

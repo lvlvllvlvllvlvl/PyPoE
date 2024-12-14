@@ -129,7 +129,7 @@ CLASS_PASSIVES = [f"AscendancySpecialEldritch{i}" for i in range(1, 6)] + ["Asce
 
 class PassiveSkillParser(parser.BaseParser):
     _files = [
-        "PassiveSkills.dat64",
+        "PassiveSkills.datc64",
     ]
 
     _passive_column_index_filter = partialmethod(

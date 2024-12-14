@@ -99,7 +99,7 @@ class IncursionCommandHandler(ExporterHandler):
 
 class IncursionRoomParser(parser.BaseParser):
     _files = [
-        "IncursionRooms.dat64",
+        "IncursionRooms.datc64",
     ]
 
     _incursion_column_index_filter = partialmethod(

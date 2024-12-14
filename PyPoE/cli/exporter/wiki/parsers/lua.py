@@ -316,7 +316,7 @@ class LuaHandler(ExporterHandler):
 
 class MinimapIconsParser(GenericLuaParser):
     _files = [
-        "MinimapIcons.dat64",
+        "MinimapIcons.datc64",
     ]
 
     _COPY_KEYS_MINIMAP_ICONS = (
@@ -422,8 +422,8 @@ class OTStatsParser(GenericLuaParser):
 
 class AtlasParser(GenericLuaParser):
     _files = [
-        "AtlasBaseTypeDrops.dat64",
-        "AtlasRegions.dat64",
+        "AtlasBaseTypeDrops.datc64",
+        "AtlasRegions.datc64",
     ]
 
     _COPY_KEYS_ATLAS_REGIONS = (
@@ -488,8 +488,8 @@ class AtlasParser(GenericLuaParser):
 class BestiaryParser(GenericLuaParser):
     _files = [
         # pretty much chain loads everything we need
-        "BestiaryRecipes.dat64",
-        "ClientStrings.dat64",
+        "BestiaryRecipes.datc64",
+        "ClientStrings.datc64",
     ]
 
     _COPY_KEYS_BESTIARY = (
@@ -624,8 +624,8 @@ class BestiaryParser(GenericLuaParser):
 
 class BlightParser(GenericLuaParser):
     _files = [
-        "BlightCraftingRecipes.dat64",
-        "BlightTowers.dat64",
+        "BlightCraftingRecipes.datc64",
+        "BlightTowers.datc64",
     ]
 
     _COPY_KEYS_CRAFTING_RECIPES = (
@@ -747,10 +747,10 @@ class BlightParser(GenericLuaParser):
 
 class DelveParser(GenericLuaParser):
     _files = [
-        "DelveCraftingModifiers.dat64",
-        "DelveLevelScaling.dat64",
-        "DelveResourcePerLevel.dat64",
-        "DelveUpgrades.dat64",
+        "DelveCraftingModifiers.datc64",
+        "DelveLevelScaling.datc64",
+        "DelveResourcePerLevel.datc64",
+        "DelveUpgrades.datc64",
     ]
 
     _COPY_KEYS_DELVE_LEVEL_SCALING = (
@@ -1000,7 +1000,7 @@ class HarvestTagHandler(TagHandler):
 
 class HarvestParser(GenericLuaParser):
     _files = [
-        "HarvestCraftOptions.dat64",
+        "HarvestCraftOptions.datc64",
     ]
 
     _COPY_KEYS_HARVEST_CRAFT_OPTIONS = (
@@ -1065,9 +1065,9 @@ class HarvestParser(GenericLuaParser):
 
 class HeistParser(GenericLuaParser):
     _files = [
-        "HeistAreas.dat64",
-        "HeistJobs.dat64",
-        "HeistNPCs.dat64",
+        "HeistAreas.datc64",
+        "HeistJobs.datc64",
+        "HeistNPCs.datc64",
     ]
 
     _COPY_KEYS_HEIST_AREAS = (
@@ -1210,8 +1210,8 @@ class HeistParser(GenericLuaParser):
 
 class PantheonParser(GenericLuaParser):
     _files = [
-        "PantheonPanelLayout.dat64",
-        "PantheonSouls.dat64",
+        "PantheonPanelLayout.datc64",
+        "PantheonSouls.datc64",
     ]
 
     _COPY_KEYS_PANTHEON = (
@@ -1412,7 +1412,7 @@ class SynthesisParser(GenericLuaParser):
         },
     )
 
-    _files = [row["file"] for row in _DATA]
+    _files = [row["file"].replace(".dat64", ".datc64") for row in _DATA]
 
     def main(self, parsed_args):
         data = {}
@@ -1714,8 +1714,6 @@ class MonsterParser(GenericLuaParser):
         },
     }
 
-    # _files = [row['files'].keys() in _DATA]
-
     def main(self, parsed_args):
         data = {}
         for definition in self._DATA:
@@ -1903,7 +1901,7 @@ class CraftingBenchParser(GenericLuaParser):
         ),
     )
 
-    _files = ["CraftingBenchOptions.dat64"]
+    _files = ["CraftingBenchOptions.datc64"]
 
     def main(self, parsed_args):
         data = {
@@ -1943,10 +1941,10 @@ class CraftingBenchParser(GenericLuaParser):
 
 class MonsterPackParser(GenericLuaParser):
     _files = [
-        "MonsterPacks.dat64",
-        "MonsterPackEntries.dat64",
-        "NecropolisPacks.dat64",
-        "ItemisedNecropolisPacks.dat64",
+        "MonsterPacks.datc64",
+        "MonsterPackEntries.datc64",
+        "NecropolisPacks.datc64",
+        "ItemisedNecropolisPacks.datc64",
     ]
 
     _DATA = (

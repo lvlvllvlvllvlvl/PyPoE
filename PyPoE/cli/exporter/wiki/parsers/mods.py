@@ -135,8 +135,8 @@ class ModsHandler(ExporterHandler):
 class ModParser(BaseParser):
     # Load files in advance
     _files = [
-        "Mods.dat64",
-        "Stats.dat64",
+        "Mods.datc64",
+        "Stats.datc64",
     ]
 
     # Load translations in advance
