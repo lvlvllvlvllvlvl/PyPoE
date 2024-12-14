@@ -2742,23 +2742,7 @@ class ItemsParser(SkillParserShared):
 
     _type_microtransaction = _type_factory(
         data_file="CurrencyItems.dat64",
-        data_mapping=(
-            (
-                "CosmeticTypeName",
-                {
-                    "template": "cosmetic_type",
-                    "condition": lambda v: v,
-                },
-            ),
-            (
-                "ShopTagKey",
-                {
-                    "template": "cosmetic_theme",
-                    "format": lambda v: v["Name"],
-                    "condition": lambda v: v,
-                },
-            ),
-        ),
+        data_mapping=(),
         function=_cosmetics_extra,
     )
 

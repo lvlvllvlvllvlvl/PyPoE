@@ -164,6 +164,7 @@ _TYPE_MAP = {
     "bool": "bool",
     "string": "ref|string",
     "i32": "int",
+    "i16": "short",
     "f32": "float",
     "foreignrow": "ref|out",
     "row": "ref|generic",

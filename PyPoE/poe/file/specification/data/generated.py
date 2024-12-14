@@ -290,9 +290,8 @@ specification = Specification(
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown0",
-                    type="int",
-                    unique=True,
+                    name="HASH16",
+                    type="short",
                 ),
                 Field(
                     name="Flag0",
@@ -319,7 +318,7 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Unknown1",
+                    name="Unknown0",
                     type="ref|string",
                 ),
                 Field(
@@ -335,15 +334,15 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
+                    name="Unknown1",
+                    type="ref|string",
+                ),
+                Field(
                     name="Unknown2",
                     type="ref|string",
                 ),
                 Field(
                     name="Unknown3",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Unknown4",
                     type="ref|string",
                 ),
             ),
@@ -358,14 +357,6 @@ specification = Specification(
                 Field(
                     name="Unknown0",
                     type="int",
-                ),
-                Field(
-                    name="Flag0",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag1",
-                    type="bool",
                 ),
             ),
         ),
@@ -605,6 +596,15 @@ specification = Specification(
                     name="Keys0",
                     type="ref|list|ref|out",
                     key="QuestFlags.dat",
+                ),
+            ),
+        ),
+        "Acts.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
                 ),
             ),
         ),
@@ -1225,7 +1225,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH16",
-                    type="int",
+                    type="short",
                 ),
                 Field(
                     name="CatalystMod",
@@ -4972,7 +4972,7 @@ specification = Specification(
                     key="BuffDefinitions.dat",
                 ),
                 Field(
-                    name="Data0",
+                    name="BuffStatValues",
                     type="ref|list|int",
                 ),
                 Field(
@@ -4980,7 +4980,7 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Data1",
+                    name="Data0",
                     type="ref|list|int",
                 ),
                 Field(
@@ -5242,7 +5242,7 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Unknown2",
+                    name="BuffCategory",
                     type="int",
                 ),
                 Field(
@@ -5290,7 +5290,7 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Unknown3",
+                    name="Unknown2",
                     type="int",
                 ),
                 Field(
@@ -5302,7 +5302,7 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Unknown4",
+                    name="Unknown3",
                     type="int",
                 ),
                 Field(
@@ -5375,7 +5375,7 @@ specification = Specification(
                     type="ref|list|int",
                 ),
                 Field(
-                    name="Unknown5",
+                    name="Unknown4",
                     type="ref|string",
                 ),
                 Field(
@@ -7527,10 +7527,6 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="CosmeticTypeName",
-                    type="ref|string",
-                ),
-                Field(
                     name="Possession_AchievementItemsKey",
                     type="ref|out",
                     key="AchievementItems.dat",
@@ -7556,14 +7552,6 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Key0",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Key1",
-                    type="ref|out",
-                ),
-                Field(
                     name="ModifyMapsAchievements",
                     type="ref|list|ref|out",
                     key="AchievementItems.dat",
@@ -7577,19 +7565,6 @@ specification = Specification(
                     name="CombineAchievements",
                     type="ref|list|ref|out",
                     key="AchievementItems.dat",
-                ),
-                Field(
-                    name="Unknown1",
-                    type="int",
-                ),
-                Field(
-                    name="Data1",
-                    type="ref|list|int",
-                ),
-                Field(
-                    name="ShopTag",
-                    type="ref|out",
-                    key="ShopTag.dat",
                 ),
                 Field(
                     name="ChangedForHardmode",
@@ -7612,11 +7587,6 @@ specification = Specification(
                 VirtualField(
                     name="Stacks",
                     fields=("StackSize",),
-                    alias=True,
-                ),
-                VirtualField(
-                    name="ShopTagKey",
-                    fields=("ShopTag",),
                     alias=True,
                 ),
             ),
@@ -10365,6 +10335,15 @@ specification = Specification(
                 ),
             ),
         ),
+        "ExpeditionCurrency.dat": File(
+            fields=(
+                Field(
+                    name="BaseItemType",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+            ),
+        ),
         "ExpeditionDeals.dat": File(
             fields=(
                 Field(
@@ -12834,7 +12813,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH16",
-                    type="int",
+                    type="short",
                 ),
                 Field(
                     name="Description",
@@ -14956,18 +14935,13 @@ specification = Specification(
         "Hideouts.dat": File(
             fields=(
                 Field(
-                    name="Id",
-                    type="ref|string",
-                    unique=True,
-                ),
-                Field(
                     name="HideoutArea",
                     type="ref|out",
                     key="WorldAreas.dat",
                 ),
                 Field(
                     name="HASH16",
-                    type="int",
+                    type="short",
                 ),
                 Field(
                     name="HideoutFile",
@@ -15210,7 +15184,7 @@ specification = Specification(
                     type="ref|string",
                 ),
                 Field(
-                    name="Hash",
+                    name="HASH16",
                     type="int",
                 ),
                 Field(
@@ -16235,7 +16209,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH16",
-                    type="int",
+                    type="short",
                     unique=True,
                 ),
                 Field(
@@ -16370,8 +16344,8 @@ specification = Specification(
                     key="SoundEffects.dat",
                 ),
                 Field(
-                    name="Unknown0",
-                    type="int",
+                    name="HASH16",
+                    type="short",
                     unique=True,
                 ),
                 Field(
@@ -16451,11 +16425,11 @@ specification = Specification(
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown1",
+                    name="Unknown0",
                     type="int",
                 ),
                 Field(
-                    name="Unknown2",
+                    name="Unknown1",
                     type="int",
                 ),
                 Field(
@@ -16503,6 +16477,10 @@ specification = Specification(
                     type="ref|string",
                 ),
                 Field(
+                    name="Unknown2",
+                    type="ref|string",
+                ),
+                Field(
                     name="Unknown3",
                     type="ref|string",
                 ),
@@ -16547,10 +16525,6 @@ specification = Specification(
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown14",
-                    type="ref|string",
-                ),
-                Field(
                     name="IsAtlasOfWorldsMapIcon",
                     type="bool",
                 ),
@@ -16571,7 +16545,7 @@ specification = Specification(
                     type="ref|list|ref|out",
                 ),
                 Field(
-                    name="Unknown15",
+                    name="Unknown14",
                     type="ref|string",
                 ),
                 Field(
@@ -16930,7 +16904,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH16",
-                    type="int",
+                    type="short",
                 ),
                 Field(
                     name="Flag0",
@@ -20681,7 +20655,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH16",
-                    type="int",
+                    type="short",
                 ),
                 Field(
                     name="ModTypeKey",
@@ -22505,15 +22479,15 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Unknown20",
-                    type="int",
+                    name="HASH16",
+                    type="short",
                 ),
                 Field(
                     name="Flag1",
                     type="bool",
                 ),
                 Field(
-                    name="Unknown21",
+                    name="Unknown20",
                     type="ref|string",
                 ),
                 Field(
@@ -22556,11 +22530,11 @@ specification = Specification(
                     type="ref|out",
                 ),
                 Field(
-                    name="Unknown22",
+                    name="Unknown21",
                     type="int",
                 ),
                 Field(
-                    name="Unknown23",
+                    name="Unknown22",
                     type="int",
                 ),
                 Field(
@@ -22572,7 +22546,7 @@ specification = Specification(
                     type="ref|list|ref|out",
                 ),
                 Field(
-                    name="Unknown24",
+                    name="Unknown23",
                     type="int",
                 ),
                 Field(
@@ -22602,19 +22576,19 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
+                    name="Unknown24",
+                    type="int",
+                ),
+                Field(
                     name="Unknown25",
                     type="int",
                 ),
                 Field(
                     name="Unknown26",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown27",
                     type="float",
                 ),
                 Field(
-                    name="Unknown28",
+                    name="Unknown27",
                     type="int",
                 ),
                 Field(
@@ -22622,7 +22596,7 @@ specification = Specification(
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown29",
+                    name="Unknown28",
                     type="int",
                 ),
                 Field(
@@ -22639,12 +22613,16 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Unknown30",
+                    name="Unknown29",
                     type="int",
                 ),
                 Field(
                     name="Flag8",
                     type="bool",
+                ),
+                Field(
+                    name="Unknown30",
+                    type="int",
                 ),
                 Field(
                     name="Unknown31",
@@ -22667,14 +22645,14 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Unknown36",
-                    type="int",
-                ),
-                Field(
                     name="AddonMonsterTypeIndex",
                     type="ref|list|ref|string",
                     file_path=True,
                     file_ext=".ot, .otc",
+                ),
+                Field(
+                    name="Unknown36",
+                    type="int",
                 ),
                 Field(
                     name="Unknown37",
@@ -22690,10 +22668,6 @@ specification = Specification(
                 ),
                 Field(
                     name="Unknown40",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown41",
                     type="int",
                 ),
                 Field(
@@ -23751,11 +23725,11 @@ specification = Specification(
                     key="NPCAudio.dat",
                 ),
                 Field(
-                    name="Unknown1",
-                    type="int",
+                    name="HASH16",
+                    type="short",
                 ),
                 Field(
-                    name="Unknown2",
+                    name="Unknown1",
                     type="ref|generic",
                     key="NPCs.dat",
                 ),
@@ -24619,7 +24593,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH16",
-                    type="int",
+                    type="short",
                 ),
                 Field(
                     name="Stats",
@@ -25121,7 +25095,7 @@ specification = Specification(
                 ),
                 Field(
                     name="PassiveSkillGraphId",
-                    type="int",
+                    type="short",
                     unique=True,
                     description="Id used by PassiveSkillGraph.psg",
                 ),
@@ -26672,7 +26646,7 @@ specification = Specification(
                     key="BuffDefinitions.dat",
                 ),
                 Field(
-                    name="Data0",
+                    name="BuffStatValues",
                     type="ref|list|int",
                 ),
                 Field(
@@ -26686,11 +26660,11 @@ specification = Specification(
                     key="Mods.dat",
                 ),
                 Field(
-                    name="Data1",
+                    name="Data0",
                     type="ref|list|int",
                 ),
                 Field(
-                    name="Data2",
+                    name="Data1",
                     type="ref|list|int",
                 ),
                 Field(
@@ -31938,7 +31912,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH16",
-                    type="int",
+                    type="short",
                 ),
                 Field(
                     name="Unknown0",
