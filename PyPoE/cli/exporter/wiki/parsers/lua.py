@@ -726,9 +726,8 @@ class BlightParser(GenericLuaParser):
 
         for row in self.rr["BlightTowers.dat64"]:
             self._copy_from_keys(row, self._COPY_KEYS_BLIGHT_TOWERS, blight_towers)
-            blight_towers[-1]["cost"] = self.rr["BlightTowersPerLevel.dat64"].index[
-                "BlightTowersKey"
-            ][row][0]["Cost"]
+            per_level = self.rr["BlightTowersPerLevel.dat64"].index["BlightTowersKey"][row]
+            blight_towers[-1]["cost"] = per_level[0]["Cost"]
 
         r = ExporterResult()
         for k in ("crafting_recipes", "crafting_recipes_items", "towers"):

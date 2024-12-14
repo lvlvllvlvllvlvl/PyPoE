@@ -537,7 +537,7 @@ class DatReader(ReprMixin):
             Whether to automatically build the index for unique columns after
             reading.
         x64 : bool
-            Whether the reader should run in 64 bit mode for dat64 files.
+            Whether the reader should run in 64 bit mode for datc64 files.
 
         Raises
         ------
@@ -556,11 +556,13 @@ class DatReader(ReprMixin):
         self.table_length = 0
         self.table_record_length = 0
         self.table_rows = 0
+
+        file_name = file_name.replace(".datc64", ".dat64")
         self.file_name = file_name
 
         # Fix for the look up
         if x64:
-            _file_name = file_name.replace(".dat64", ".dat").replace(".datc64", ".dat")
+            _file_name = file_name.replace(".dat64", ".dat")
         else:
             _file_name = file_name
 
@@ -669,7 +671,7 @@ class DatReader(ReprMixin):
 
             def get_idx(column):
                 idx = row[column]
-                if as_unsigned and idx < 0:
+                if as_unsigned and (idx < 0):
                     bits = self._cast_table[self.specification.fields[column].type][1] * 8
                     idx = 2**bits + idx
                 return idx
