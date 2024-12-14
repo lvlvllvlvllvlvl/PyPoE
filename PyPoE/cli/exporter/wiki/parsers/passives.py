@@ -75,6 +75,10 @@ class WikiCondition(parser.WikiCondition):
     INDENT = 36
 
 
+def normalize(id):
+    return (2**16 + id) % 2**16
+
+
 class PassiveSkillCommandHandler(ExporterHandler):
     def __init__(self, sub_parser):
         self.parser = sub_parser.add_parser(
@@ -147,6 +151,7 @@ class PassiveSkillParser(parser.BaseParser):
             "PassiveSkillGraphId",
             {
                 "template": "int_id",
+                "format": normalize,
             },
         ),
         (
@@ -313,11 +318,11 @@ class PassiveSkillParser(parser.BaseParser):
         node_index = {}
         for group in psg.groups:
             for node in group.nodes:
-                node_index[node.passive_skill] = node
+                node_index[normalize(node.passive_skill)] = node
         # Connections are one-way, make them two way
         for psg_id, node in node_index.items():
             for other_psg_id in node.connections:
-                node_index[other_psg_id].connections.append(psg_id)
+                node_index[normalize(other_psg_id)].connections.append(psg_id)
 
         self.rr["PassiveSkills.dat64"].build_index("PassiveSkillGraphId", as_unsigned=True)
 
@@ -429,11 +434,13 @@ class PassiveSkillParser(parser.BaseParser):
                 else:
                     data["stat_text"] = text
 
-            node = node_index.get(passive["PassiveSkillGraphId"])
+            node = node_index.get(normalize(passive["PassiveSkillGraphId"]))
             if node and node.connections:
                 data["connections"] = ",".join(
                     [
-                        self.rr["PassiveSkills.dat64"].index["PassiveSkillGraphId"][psg_id]["Id"]
+                        self.rr["PassiveSkills.dat64"].index["PassiveSkillGraphId"][
+                            normalize(psg_id)
+                        ]["Id"]
                         for psg_id in node.connections
                     ]
                 )
