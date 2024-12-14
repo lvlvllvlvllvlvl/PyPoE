@@ -560,7 +560,7 @@ class DatReader(ReprMixin):
 
         # Fix for the look up
         if x64:
-            _file_name = file_name.replace(".dat64", ".dat")
+            _file_name = file_name.replace(".dat64", ".dat").replace(".datc64", ".dat")
         else:
             _file_name = file_name
 
@@ -606,7 +606,7 @@ class DatReader(ReprMixin):
     def __getitem__(self, item):
         return self.table_data[item]
 
-    def build_index(self, column=None):
+    def build_index(self, column=None, as_unsigned=False):
         """
         Builds or rebuilds the index for the specified column.
 
@@ -666,10 +666,18 @@ class DatReader(ReprMixin):
 
         # Second loop
         for row in self:
+
+            def get_idx(column):
+                idx = row[column]
+                if as_unsigned and idx < 0:
+                    bits = self._cast_table[self.specification.fields[column].type][1] * 8
+                    idx = 2**bits + idx
+                return idx
+
             for column in columns_1to1:
-                self.index[column][row[column]] = row
+                self.index[column][get_idx(column)] = row
             for column in columns_1toN:
-                self.index[column][row[column]].append(row)
+                self.index[column][get_idx(column)].append(row)
             for column in columns_NtoN:
                 for value in row[column]:
                     self.index[column][value].append(row)
@@ -1183,7 +1191,7 @@ class RelationalReader(AbstractFileCache[DatFile]):
         for key, spec_row in df.reader.specification.fields.items():
             if spec_row.key:
                 if df.reader.x64:
-                    spec_row_key = spec_row.key.replace(".dat", ".dat64")
+                    spec_row_key = spec_row.key.replace(".dat", ".datc64")
                 else:
                     spec_row_key = spec_row.key
 

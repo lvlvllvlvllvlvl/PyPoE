@@ -258,7 +258,7 @@ class PSGFile(AbstractFileReadOnly):
             )
 
         if self._passive_skills:
-            self._passive_skills.build_index("PassiveSkillGraphId")
+            self._passive_skills.build_index("PassiveSkillGraphId", as_unsigned=True)
 
     def _read(self, buffer, *args, **kwargs):
         console("Parsing the .psg file...")

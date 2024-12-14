@@ -319,7 +319,7 @@ class PassiveSkillParser(parser.BaseParser):
             for other_psg_id in node.connections:
                 node_index[other_psg_id].connections.append(psg_id)
 
-        self.rr["PassiveSkills.dat64"].build_index("PassiveSkillGraphId")
+        self.rr["PassiveSkills.dat64"].build_index("PassiveSkillGraphId", as_unsigned=True)
 
         self._image_init(parsed_args)
 
