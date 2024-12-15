@@ -32,8 +32,8 @@ See PyPoE/LICENSE
 # Python
 
 # self
-from PyPoE.cli.exporter.wiki.admin import ADMIN_HANDLERS
-from PyPoE.cli.exporter.wiki.parsers import WIKI_HANDLERS
+from PyPoE.cli.exporter.poe2wiki.admin import ADMIN_HANDLERS
+from PyPoE.cli.exporter.poe2wiki.parsers import WIKI_HANDLERS
 from PyPoE.cli.handler import BaseHandler
 
 # =============================================================================

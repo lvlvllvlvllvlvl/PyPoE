@@ -46,8 +46,12 @@ import mwparserfromhell
 from rapidfuzz import fuzz
 
 from PyPoE.cli.core import console
-from PyPoE.cli.exporter.wiki.handler import WIKIS, ExporterHandler, add_parser_arguments
-from PyPoE.cli.exporter.wiki.parser import BaseParser
+from PyPoE.cli.exporter.poe2wiki.handler import (
+    WIKIS,
+    ExporterHandler,
+    add_parser_arguments,
+)
+from PyPoE.cli.exporter.poe2wiki.parser import BaseParser
 
 # self
 from PyPoE.poe.constants import WORDLISTS

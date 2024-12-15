@@ -27,7 +27,7 @@ See PyPoE/LICENSE
 # Imports
 # =============================================================================
 
-from PyPoE.cli.exporter.wiki.admin.unique import UniqueCommandHandler
+from PyPoE.cli.exporter.poe2wiki.admin.unique import UniqueCommandHandler
 
 # =============================================================================
 # Globals

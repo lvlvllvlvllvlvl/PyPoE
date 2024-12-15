@@ -37,7 +37,7 @@ import os
 from importlib import import_module
 
 # self
-from PyPoE.cli.exporter.wiki.handler import ExporterHandler
+from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler
 
 # =============================================================================
 # Globals

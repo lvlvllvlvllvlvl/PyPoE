@@ -53,14 +53,14 @@ from PIL import Image, ImageOps
 
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
-from PyPoE.cli.exporter.wiki import parser
-from PyPoE.cli.exporter.wiki.handler import ExporterHandler, ExporterResult
-from PyPoE.cli.exporter.wiki.parsers.itemconstants import (
+from PyPoE.cli.exporter.poe2wiki import parser
+from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
+from PyPoE.cli.exporter.poe2wiki.parsers.itemconstants import (
     MAPS_IN_SERIES_BUT_NOT_ON_ATLAS,
     MAPS_TO_SKIP_COLORING,
     MAPS_TO_SKIP_COMPOSITING,
 )
-from PyPoE.cli.exporter.wiki.parsers.skill import SkillParserShared
+from PyPoE.cli.exporter.poe2wiki.parsers.skill import SkillParserShared
 
 # Self
 from PyPoE.poe.constants import RARITY
@@ -2773,13 +2773,6 @@ class ItemsParser(SkillParserShared):
         else:
             infobox["map_area_level"] = maps["Regular_WorldAreasKey"]["AreaLevel"]
 
-        """# Regular items are handled in the main function
-        if maps['Tier'] < 17:
-            self._process_purchase_costs(
-                self.rr['MapPurchaseCosts.dat64'].index['Tier'][maps['Tier']],
-                infobox
-            )"""
-
     # 3.15
     # This is a hack and should be done better.
     # TODO: properly parse map series
@@ -3851,7 +3844,6 @@ class ItemsParser(SkillParserShared):
 
         r = ExporterResult()
         self.rr["BaseItemTypes.dat64"].build_index("Name")
-        self.rr["MapPurchaseCosts.dat64"].build_index("Tier")
 
         if self._language != "English" and parsed_args.english_file_link:
             self.rr2["BaseItemTypes.dat64"].build_index("Name")
@@ -4276,8 +4268,6 @@ class ItemsParser(SkillParserShared):
             purple_ico = purple_ico.replace(".dds", ".png")
             purple_img = Image.open(purple_ico)
 
-        self.rr["MapSeriesTiers.dat64"].build_index("MapsKey")
-        self.rr["MapPurchaseCosts.dat64"].build_index("Tier")
         # self.rr['UniqueMaps.dat64'].build_index('WorldAreasKey')
 
         for row, atlas_node in map_series_tiers.items():
@@ -4353,11 +4343,6 @@ class ItemsParser(SkillParserShared):
 
                 infobox["flavour_text"] = (
                     atlas_node["FlavourTextKey"]["Text"].replace("\n", "<br>").replace("\r", "")
-                )
-
-            if 0 < tier < 17:
-                self._process_purchase_costs(
-                    self.rr["MapPurchaseCosts.dat64"].index["Tier"][tier], infobox
                 )
 
             # Skip maps that aren't in the rotation this map series.
