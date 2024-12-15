@@ -48,6 +48,7 @@ import argparse
 from PyPoE.cli.core import run
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.dat import DatHandler
+from PyPoE.cli.exporter.poe2wiki.core import WikiHandler as WikiHandler2
 from PyPoE.cli.exporter.wiki.core import WikiHandler
 from PyPoE.cli.handler import ConfigHandler, SetupHandler
 from PyPoE.poe.constants import DISTRIBUTOR, VERSION
@@ -105,6 +106,7 @@ def main():
 
     DatHandler(main_sub)
     WikiHandler(main_sub)
+    WikiHandler2(main_sub)
     # In that order..
     SetupHandler(main_sub, config)
     ConfigHandler(main_sub, config)
