@@ -112,6 +112,7 @@ def main():
     ConfigHandler(main_sub, config)
 
     main_parser.add_argument("--quiet", action="store_true")
+    main_parser.add_argument("--mem", type=int, help="Memory limit in bytes (linux only)")
 
     # Execute
     run(main_parser, config)
