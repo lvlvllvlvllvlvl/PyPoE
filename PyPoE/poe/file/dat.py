@@ -1074,6 +1074,7 @@ class RelationalReader(AbstractFileCache[DatFile]):
         **kwargs,
     ):
         self.raise_error_on_missing_relation = raise_error_on_missing_relation
+        self.specification = specification
         if language == "English" or language is None:
             self._language = ""
         else:
