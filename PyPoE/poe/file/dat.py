@@ -608,7 +608,7 @@ class DatReader(ReprMixin):
     def __getitem__(self, item):
         return self.table_data[item]
 
-    def build_index(self, column=None, as_unsigned=False):
+    def build_index(self, column=None):
         """
         Builds or rebuilds the index for the specified column.
 
@@ -671,9 +671,6 @@ class DatReader(ReprMixin):
 
             def get_idx(column):
                 idx = row[column]
-                if as_unsigned and (idx < 0):
-                    bits = self._cast_table[self.specification.fields[column].type][1] * 8
-                    idx = 2**bits + idx
                 return idx
 
             for column in columns_1to1:
