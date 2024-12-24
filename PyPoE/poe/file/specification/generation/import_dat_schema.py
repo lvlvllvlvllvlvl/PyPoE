@@ -163,13 +163,19 @@ def _convert_column_type(column) -> str:
     else:
         return _TYPE_MAP[column.type]
 
-
 _TYPE_MAP = {
     "bool": "bool",
     "string": "ref|string",
-    "i32": "int",
+    "i8": "byte",
     "i16": "short",
+    "i32": "int",
+    "i64": "long",
+    "u8": "ubyte",
+    "u16": "ushort",
+    "u32": "uint",
+    "u64": "ulong",
     "f32": "float",
+    "f64": "double",
     "foreignrow": "ref|out",
     "row": "ref|generic",
     "enumrow": "int",

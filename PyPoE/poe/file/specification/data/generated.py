@@ -10662,7 +10662,7 @@ specification = Specification(
         "ExperienceLevels.dat": File(
             fields=(
                 Field(
-                    name="Unknown0",
+                    name="Id",
                     type="ref|string",
                 ),
                 Field(
@@ -10671,7 +10671,7 @@ specification = Specification(
                 ),
                 Field(
                     name="Experience",
-                    type="int",
+                    type="uint",
                 ),
             ),
         ),
@@ -24418,20 +24418,21 @@ specification = Specification(
         "PassiveJewelArt.dat": File(
             fields=(
                 Field(
-                    name="Key0",
+                    name="BaseItemTypesKey",
                     type="ref|out",
+                    key="BaseItemTypes.dat",
                     unique=True,
                 ),
                 Field(
-                    name="Unknown0",
+                    name="SocketedImage",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown1",
+                    name="SocketedImageLarge",
                     type="ref|string",
                 ),
                 Field(
-                    name="Key1",
+                    name="Key0",
                     type="ref|out",
                 ),
             ),
@@ -25078,7 +25079,7 @@ specification = Specification(
                 ),
                 Field(
                     name="PassiveSkillGraphId",
-                    type="short",
+                    type="ushort",
                     unique=True,
                     description="Id used by PassiveSkillGraph.psg",
                 ),
@@ -32225,5 +32226,5 @@ specification = Specification(
                 ),
             ),
         ),
-    },
+    }
 )
