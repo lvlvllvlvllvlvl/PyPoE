@@ -962,6 +962,21 @@ class PASSIVE_TYPES(IntEnumOverride):
     KEYSTONE = 4
 
 
+class ITEM_CLASS_FLAGS(IntEnumOverride):
+    # doesn't include unarmed
+    MARTIAL_WEAPON = 0
+    # 1h weapons, wand, sceptre, and unarmed
+    ONE_HAND = 1
+    # does include unarmed
+    MELEE = 2
+    # doesn't include sceptres
+    OFF_HAND = 3
+    FLASKS_CHARMS = 4
+    ARMOUR = 5
+    ACCESSORY = 6
+    CURRENCY = 7
+
+
 # =============================================================================
 # Functions
 # =============================================================================

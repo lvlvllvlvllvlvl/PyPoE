@@ -24,10 +24,7 @@ Agreement
 
 See PyPoE/LICENSE
 """
-
-# =============================================================================
-# Imports
-# =============================================================================
+import json
 
 # Python
 import re
@@ -39,6 +36,11 @@ from PyPoE.cli.exporter import config
 from PyPoE.poe.path import PoEPath
 
 # =============================================================================
+# Imports
+# =============================================================================
+
+
+# =============================================================================
 # Globals
 # =============================================================================
 
@@ -47,12 +49,13 @@ __all__ = [
     "fix_path",
 ]
 
+
 # =============================================================================
 # Functions
 # =============================================================================
 
 
-def get_content_path():
+def get_content_path(sequel=1):
     """
     Returns the path to the current content.ggpk based on the specified
     config variables for the version & distributor.
@@ -69,9 +72,9 @@ def get_content_path():
 
         if not paths:
             with request.urlopen(
-                "https://raw.githubusercontent.com/poe-tool-dev/latest-patch-version/main/latest.txt"  # noqa
-            ) as latest:
-                return f"https://patch.poecdn.com/{latest.read().decode('utf-8')}/"
+                f"https://lvlvllvlvllvlvl.github.io/poecdn-bundle-index/poe{sequel}/urls.json"
+            ) as cdn_url:
+                paths = json.loads(cdn_url.read().decode("utf-8"))["urls"]
 
         return paths[0]
     else:

@@ -1415,7 +1415,7 @@ class BaseParser:
         self.specification = load(version=config.get_option("version"))
 
         self.base_path = base_path
-        self.file_system = FileSystem(root_path=get_content_path())
+        self.file_system = FileSystem(root_path=get_content_path(self.specification.sequel))
 
         opt = {
             "use_dat_value": False,

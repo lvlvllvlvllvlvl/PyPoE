@@ -1974,6 +1974,10 @@ def make_inter_wiki_links(string):
     return string
 
 
+def process_keywords(text: str, newline_to_br=True):
+    text.replace("[", "[[").replace("]", "]]").replace("\n", "<br>")
+
+
 def find_template(wikitext, template_name):
     """
     Finds a template within wikitext and parses the arguments.
