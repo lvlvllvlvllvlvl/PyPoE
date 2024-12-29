@@ -42,6 +42,44 @@ __all__ = [
 specification = Specification(
     2,
     {
+        "SkillGemsForUniqueStat.dat": File(
+            fields=(
+                Field(
+                    name="Index",
+                    type="int",
+                ),
+                Field(
+                    name="SkillGem",
+                    type="ref|out",
+                    key="SkillGems.dat",
+                ),
+            ),
+        ),
+        "UltimatumWagerTypes.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                ),
+                Field(
+                    name="HASH16",
+                    type="ushort",
+                ),
+                Field(
+                    name="CurrencyItem",
+                    type="ref|out",
+                    key="CurrencyItems.dat",
+                ),
+                Field(
+                    name="Count",
+                    type="int",
+                ),
+                Field(
+                    name="Description",
+                    type="ref|string",
+                ),
+            ),
+        ),
         "AbyssBossLifeScalingPerLevel.dat": File(
             fields=(
                 Field(
