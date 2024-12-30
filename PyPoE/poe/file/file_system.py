@@ -174,7 +174,7 @@ class FileSystem:
                 return f.read()
         except FileNotFoundError:
             raise FileNotFoundError(
-                "Specified file can not be found in the Index, content.ggpk or disk"
+                f"Specified file '{path}' can not be found in the Index, content.ggpk or disk"
             )
 
     def extract_dds(self, data: bytes) -> bytes:
