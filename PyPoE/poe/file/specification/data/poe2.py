@@ -561,9 +561,51 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="TransfigureBase",
-                    type="ref|generic",
-                    key="ActiveSkills.dat",
+                    name="ShapeShiftForm",
+                    type="ref|out",
+                    key="ShapeShiftForms.dat",
+                ),
+                Field(
+                    name="VideoClip",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".bk2",
+                ),
+                Field(
+                    name="CharacterAudioEvent",
+                    type="ref|out",
+                    key="CharacterAudioEvents.dat",
+                ),
+                Field(
+                    name="AiScript",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".ais",
+                ),
+                Field(
+                    name="MinionType",
+                    type="ref|out",
+                    key="MinionType.dat",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Flag6",
+                    type="bool",
+                ),
+                Field(
+                    name="StatDescriptionType",
+                    type="int",
+                ),
+                Field(
+                    name="StatDescription",
+                    type="ref|string",
                 ),
             ),
             virtual_fields=(
@@ -1053,15 +1095,35 @@ specification = Specification(
                     key="Stats.dat",
                 ),
                 Field(
-                    name="Stat1",
+                    name="Stat1Min",
                     type="int",
                 ),
                 Field(
-                    name="Stat2",
+                    name="Stat1Max",
                     type="int",
                 ),
                 Field(
-                    name="Stat3",
+                    name="Stat2Min",
+                    type="int",
+                ),
+                Field(
+                    name="Stat2Max",
+                    type="int",
+                ),
+                Field(
+                    name="Stat3Min",
+                    type="int",
+                ),
+                Field(
+                    name="Stat3Max",
+                    type="int",
+                ),
+                Field(
+                    name="PassiveType",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="Unknown0",
                     type="int",
                 ),
             ),
@@ -1104,27 +1166,51 @@ specification = Specification(
                     key="Stats.dat",
                 ),
                 Field(
-                    name="Stat1",
+                    name="Stat1Min",
                     type="int",
                 ),
                 Field(
-                    name="Stat2",
+                    name="Stat1Max",
                     type="int",
                 ),
                 Field(
-                    name="Stat3",
+                    name="Stat2Min",
                     type="int",
                 ),
                 Field(
-                    name="Stat4",
+                    name="Stat2Max",
                     type="int",
                 ),
                 Field(
-                    name="Stat5",
+                    name="Stat3Min",
                     type="int",
                 ),
                 Field(
-                    name="Stat6",
+                    name="Stat3Max",
+                    type="int",
+                ),
+                Field(
+                    name="Stat4Min",
+                    type="int",
+                ),
+                Field(
+                    name="Stat4Max",
+                    type="int",
+                ),
+                Field(
+                    name="Stat5Min",
+                    type="int",
+                ),
+                Field(
+                    name="Stat5Max",
+                    type="int",
+                ),
+                Field(
+                    name="Stat6Min",
+                    type="int",
+                ),
+                Field(
+                    name="Stat6Max",
                     type="int",
                 ),
                 Field(
@@ -1136,7 +1222,34 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Random",
+                    name="RandomMin",
+                    type="int",
+                ),
+                Field(
+                    name="RandomMax",
+                    type="int",
+                ),
+                Field(
+                    name="FlavourText",
+                    type="ref|string",
+                ),
+                Field(
+                    name="DDSIcon",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".dds",
+                ),
+                Field(
+                    name="AchievementItems",
+                    type="ref|list|ref|out",
+                    key="AchievementItems.dat",
+                ),
+                Field(
+                    name="ConquerorVersion",
+                    type="int",
+                ),
+                Field(
+                    name="ConquerorSpawnWeight",
                     type="int",
                 ),
             ),
@@ -1149,6 +1262,11 @@ specification = Specification(
                 VirtualField(
                     name="StatsKeys",
                     fields=("Stats",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="AchievementItemsKeys",
+                    fields=("AchievementItems",),
                     alias=True,
                 ),
             ),
@@ -1249,15 +1367,27 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="SmallAttributePassiveSkillAdditions",
+                    name="SmallAttributePassiveSkillAdditionsMin",
                     type="int",
                 ),
                 Field(
-                    name="NotableAdditions",
+                    name="SmallAttributePassiveSkillAdditionsMax",
                     type="int",
                 ),
                 Field(
-                    name="SmallNormalPassiveSkillAdditions",
+                    name="NotableAdditionsMin",
+                    type="int",
+                ),
+                Field(
+                    name="NotableAdditionsMax",
+                    type="int",
+                ),
+                Field(
+                    name="SmallNormalPassiveSkillAdditionsMin",
+                    type="int",
+                ),
+                Field(
+                    name="SmallNormalPassiveSkillAdditionsMax",
                     type="int",
                 ),
                 Field(
@@ -3401,11 +3531,12 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Key0",
+                    name="UncutGemSoundEffect",
                     type="ref|out",
+                    key="SoundEffects.dat",
                 ),
                 Field(
-                    name="Key1",
+                    name="Key0",
                     type="ref|out",
                 ),
                 Field(
@@ -3427,15 +3558,21 @@ specification = Specification(
                     key="AchievementItems.dat",
                 ),
                 Field(
-                    name="Key2",
+                    name="ShopTag",
                     type="ref|out",
+                    key="ShopTag.dat",
                 ),
                 Field(
-                    name="Key3",
+                    name="Key1",
                     type="ref|out",
                 ),
             ),
             virtual_fields=(
+                VirtualField(
+                    name="ItemClassesKey",
+                    fields=("ItemClass",),
+                    alias=True,
+                ),
                 VirtualField(
                     name="FlavourTextKey",
                     fields=("FlavourText",),
@@ -15840,6 +15977,13 @@ specification = Specification(
                     type="bool",
                 ),
             ),
+            virtual_fields=(
+                VirtualField(
+                    name="EquipAchievements",
+                    fields=("EquipAchievement",),
+                    alias=True,
+                ),
+            ),
         ),
         "ItemCostPerLevel.dat": File(
             fields=(
@@ -20375,19 +20519,286 @@ specification = Specification(
                     key="ModFamily.dat",
                 ),
                 Field(
-                    name="Stat1Value",
+                    name="Stat1Min",
                     type="int",
                 ),
                 Field(
-                    name="Stat2Value",
+                    name="Stat1Max",
                     type="int",
                 ),
                 Field(
-                    name="Stat3Value",
+                    name="Stat2Min",
                     type="int",
                 ),
                 Field(
-                    name="Stat4Value",
+                    name="Stat2Max",
+                    type="int",
+                ),
+                Field(
+                    name="Stat3Min",
+                    type="int",
+                ),
+                Field(
+                    name="Stat3Max",
+                    type="int",
+                ),
+                Field(
+                    name="Stat4Min",
+                    type="int",
+                ),
+                Field(
+                    name="Stat4Max",
+                    type="int",
+                ),
+                Field(
+                    name="SpawnWeight_Tags",
+                    type="ref|list|ref|out",
+                    key="Tags.dat",
+                ),
+                Field(
+                    name="SpawnWeight_Values",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="Tags",
+                    type="ref|list|ref|out",
+                    key="Tags.dat",
+                ),
+                Field(
+                    name="GrantedEffectsPerLevel",
+                    type="ref|list|ref|out",
+                    key="GrantedEffectsPerLevel.dat",
+                ),
+                Field(
+                    name="AuraFlags",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="MonsterMetadata",
+                    type="ref|string",
+                ),
+                Field(
+                    name="MonsterKillAchievements",
+                    type="ref|list|ref|out",
+                    key="AchievementItems.dat",
+                ),
+                Field(
+                    name="ChestModType",
+                    type="ref|list|ref|out",
+                    key="ModType.dat",
+                ),
+                Field(
+                    name="Stat5Min",
+                    type="int",
+                ),
+                Field(
+                    name="Stat5Max",
+                    type="int",
+                ),
+                Field(
+                    name="Stat5",
+                    type="ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="FullAreaClear_AchievementItems",
+                    type="ref|list|ref|out",
+                    key="AchievementItems.dat",
+                ),
+                Field(
+                    name="AchievementItems",
+                    type="ref|list|ref|out",
+                    key="AchievementItems.dat",
+                ),
+                Field(
+                    name="GenerationWeight_Tags",
+                    type="ref|list|ref|out",
+                    key="Tags.dat",
+                ),
+                Field(
+                    name="GenerationWeight_Values",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="ModifyMapsAchievements",
+                    type="ref|list|ref|out",
+                    key="AchievementItems.dat",
+                ),
+                Field(
+                    name="IsEssenceOnlyModifier",
+                    type="bool",
+                ),
+                Field(
+                    name="Stat6Min",
+                    type="int",
+                ),
+                Field(
+                    name="Stat6Max",
+                    type="int",
+                ),
+                Field(
+                    name="Stat6",
+                    type="ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="MaxLevel",
+                    type="int",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="CraftingItemClassRestrictions",
+                    type="ref|list|ref|out",
+                    key="ItemClasses.dat",
+                ),
+                Field(
+                    name="MonsterOnDeath",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="HeistAchievements",
+                    type="ref|list|ref|out",
+                    key="AchievementItems.dat",
+                ),
+                Field(
+                    name="Heist_SubStatValue1",
+                    type="int",
+                ),
+                Field(
+                    name="Heist_SubStatValue2",
+                    type="int",
+                ),
+                Field(
+                    name="Heist_Stat0",
+                    type="ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="Heist_Stat1",
+                    type="ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="Heist_AddStatValue1",
+                    type="int",
+                ),
+                Field(
+                    name="Heist_AddStatValue2",
+                    type="int",
+                ),
+                Field(
+                    name="InfluenceType",
+                    type="int",
+                ),
+                Field(
+                    name="ImplicitTags",
+                    type="ref|list|ref|out",
+                    key="Tags.dat",
+                ),
+                Field(
+                    name="Flag1",
+                    type="bool",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown2",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown3",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown4",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown5",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown6",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown7",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown8",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown9",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown10",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown11",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown12",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown13",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown14",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown15",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown16",
+                    type="int",
+                ),
+                Field(
+                    name="BuffTemplate",
+                    type="ref|out",
+                    key="BuffTemplates.dat",
+                ),
+                Field(
+                    name="ArchnemesisMinionMod",
+                    type="ref|generic",
+                    key="Mods.dat",
+                ),
+                Field(
+                    name="HASH32",
+                    type="uint",
+                ),
+                Field(
+                    name="Keys0",
+                    type="ref|list|ref|out",
+                ),
+                Field(
+                    name="Unknown17",
+                    type="int",
+                ),
+                Field(
+                    name="Keys1",
+                    type="ref|list|ref|out",
+                    key="GrantedEffectsPerLevel.dat",
+                ),
+                Field(
+                    name="RadiusJewelType",
                     type="int",
                 ),
             ),
@@ -20401,7 +20812,7 @@ specification = Specification(
                     zip=True,
                 ),
                 VirtualField(
-                    name="Stat1",
+                    name="Stat1Zip",
                     fields=(
                         "StatsKey1",
                         "Stat1Min",
@@ -20409,7 +20820,7 @@ specification = Specification(
                     ),
                 ),
                 VirtualField(
-                    name="Stat2",
+                    name="Stat2Zip",
                     fields=(
                         "StatsKey2",
                         "Stat2Min",
@@ -20417,7 +20828,7 @@ specification = Specification(
                     ),
                 ),
                 VirtualField(
-                    name="Stat3",
+                    name="Stat3Zip",
                     fields=(
                         "StatsKey3",
                         "Stat3Min",
@@ -20425,7 +20836,7 @@ specification = Specification(
                     ),
                 ),
                 VirtualField(
-                    name="Stat4",
+                    name="Stat4Zip",
                     fields=(
                         "StatsKey4",
                         "Stat4Min",
@@ -20433,7 +20844,7 @@ specification = Specification(
                     ),
                 ),
                 VirtualField(
-                    name="Stat5",
+                    name="Stat5Zip",
                     fields=(
                         "StatsKey5",
                         "Stat5Min",
@@ -20441,7 +20852,7 @@ specification = Specification(
                     ),
                 ),
                 VirtualField(
-                    name="Stat6",
+                    name="Stat6Zip",
                     fields=(
                         "StatsKey6",
                         "Stat6Min",
@@ -20462,12 +20873,12 @@ specification = Specification(
                 VirtualField(
                     name="Stats",
                     fields=(
-                        "Stat1",
-                        "Stat2",
-                        "Stat3",
-                        "Stat4",
-                        "Stat5",
-                        "Stat6",
+                        "Stat1Zip",
+                        "Stat2Zip",
+                        "Stat3Zip",
+                        "Stat4Zip",
+                        "Stat5Zip",
+                        "Stat6Zip",
                     ),
                 ),
                 VirtualField(
@@ -20481,6 +20892,86 @@ specification = Specification(
                 VirtualField(
                     name="ModTypeKey",
                     fields=("ModType",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="StatsKey1",
+                    fields=("Stat1",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="StatsKey2",
+                    fields=("Stat2",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="StatsKey3",
+                    fields=("Stat3",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="StatsKey4",
+                    fields=("Stat4",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="SpawnWeight_TagsKeys",
+                    fields=("SpawnWeight_Tags",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="TagsKeys",
+                    fields=("Tags",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="GrantedEffectsPerLevelKeys",
+                    fields=("GrantedEffectsPerLevel",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="StatsKey5",
+                    fields=("Stat5",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="FullAreaClear_AchievementItemsKey",
+                    fields=("FullAreaClear_AchievementItems",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="AchievementItemsKey",
+                    fields=("AchievementItems",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="GenerationWeight_TagsKeys",
+                    fields=("GenerationWeight_Tags",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="StatsKey6",
+                    fields=("Stat6",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="Heist_StatsKey0",
+                    fields=("Heist_Stat0",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="Heist_StatsKey1",
+                    fields=("Heist_Stat1",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="InfluenceTypes",
+                    fields=("InfluenceType",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="ImplicitTagsKeys",
+                    fields=("ImplicitTags",),
                     alias=True,
                 ),
             ),
@@ -20900,39 +21391,29 @@ specification = Specification(
             ),
             virtual_fields=(
                 VirtualField(
-                    name="Stat1",
-                    fields=(
-                        "StatsKey1",
-                        "Stat1Value",
-                    ),
+                    name="StatsKey1",
+                    fields=("Stat1",),
+                    alias=True,
                 ),
                 VirtualField(
-                    name="Stat2",
-                    fields=(
-                        "StatsKey2",
-                        "Stat2Value",
-                    ),
+                    name="StatsKey2",
+                    fields=("Stat2",),
+                    alias=True,
                 ),
                 VirtualField(
-                    name="Stat3",
-                    fields=(
-                        "StatsKey3",
-                        "Stat3Value",
-                    ),
+                    name="StatsKey3",
+                    fields=("Stat3",),
+                    alias=True,
                 ),
                 VirtualField(
-                    name="Stat4",
-                    fields=(
-                        "StatsKey4",
-                        "Stat4Value",
-                    ),
+                    name="StatsKey4",
+                    fields=("Stat4",),
+                    alias=True,
                 ),
                 VirtualField(
-                    name="Stat5",
-                    fields=(
-                        "StatsKey5",
-                        "Stat5Value",
-                    ),
+                    name="StatsKey5",
+                    fields=("Stat5",),
+                    alias=True,
                 ),
                 VirtualField(
                     name="Stats",
@@ -20991,32 +21472,24 @@ specification = Specification(
             ),
             virtual_fields=(
                 VirtualField(
-                    name="Stat1",
-                    fields=(
-                        "StatsKey1",
-                        "Stat1Value",
-                    ),
+                    name="StatsKey1",
+                    fields=("Stat1",),
+                    alias=True,
                 ),
                 VirtualField(
-                    name="Stat2",
-                    fields=(
-                        "StatsKey2",
-                        "Stat2Value",
-                    ),
+                    name="StatsKey2",
+                    fields=("Stat2",),
+                    alias=True,
                 ),
                 VirtualField(
-                    name="Stat3",
-                    fields=(
-                        "StatsKey3",
-                        "Stat3Value",
-                    ),
+                    name="StatsKey3",
+                    fields=("Stat3",),
+                    alias=True,
                 ),
                 VirtualField(
-                    name="Stat4",
-                    fields=(
-                        "StatsKey4",
-                        "Stat4Value",
-                    ),
+                    name="StatsKey4",
+                    fields=("Stat4",),
+                    alias=True,
                 ),
                 VirtualField(
                     name="Stats",
@@ -21973,6 +22446,11 @@ specification = Specification(
                     alias=True,
                 ),
                 VirtualField(
+                    name="ModsKeys2",
+                    fields=("Mods2",),
+                    alias=True,
+                ),
+                VirtualField(
                     name="Weapon1_ItemVisualIdentityKeys",
                     fields=("Weapon1_ItemVisualIdentity",),
                     alias=True,
@@ -21985,6 +22463,16 @@ specification = Specification(
                 VirtualField(
                     name="Back_ItemVisualIdentityKey",
                     fields=("Back_ItemVisualIdentity",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="MainHand_ItemClassesKey",
+                    fields=("MainHand_ItemClass",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="OffHand_ItemClassesKey",
+                    fields=("OffHand_ItemClass",),
                     alias=True,
                 ),
                 VirtualField(
@@ -26459,6 +26947,91 @@ specification = Specification(
                 ),
             ),
         ),
+        "ShapeShiftForms.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="AOFile",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".ao",
+                ),
+                Field(
+                    name="ACTFile",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".act",
+                ),
+                Field(
+                    name="Source",
+                    type="ref|out",
+                    key="MiscEffectPacks.dat",
+                ),
+                Field(
+                    name="Destination",
+                    type="ref|out",
+                    key="MiscEffectPacks.dat",
+                ),
+                Field(
+                    name="StatsKeys",
+                    type="ref|list|ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="StatsValues",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown2",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown3",
+                    type="float",
+                ),
+                Field(
+                    name="Unknown4",
+                    type="float",
+                ),
+                Field(
+                    name="Unknown5",
+                    type="float",
+                ),
+                Field(
+                    name="SkillStat",
+                    type="ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="Unknown6",
+                    type="int",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="Status",
+                    type="ref|string",
+                ),
+            ),
+        ),
         "ShaperGuardians.dat": File(
             fields=(
                 Field(
@@ -26515,6 +27088,27 @@ specification = Specification(
                     name="Category",
                     type="ref|generic",
                     key="ShopTag.dat",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="SubFlagArt",
+                    type="ref|string",
+                ),
+                Field(
+                    name="IsGuild",
+                    type="bool",
+                ),
+                Field(
+                    name="Parent",
+                    type="ref|generic",
+                    key="ShopTag.dat",
+                ),
+                Field(
+                    name="CategoryArt",
+                    type="ref|string",
                 ),
             ),
         ),
@@ -27747,6 +28341,11 @@ specification = Specification(
                 ),
             ),
             virtual_fields=(
+                VirtualField(
+                    name="Semantics",
+                    fields=("Semantic",),
+                    alias=True,
+                ),
                 VirtualField(
                     name="MainHandAlias_StatsKey",
                     fields=("MainHandAlias_Stat",),

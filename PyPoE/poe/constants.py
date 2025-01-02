@@ -438,6 +438,7 @@ class VERSION(IntEnumOverride):
     ALPHA = 4
     GENERATED = 8
     POE2 = 16
+    POE2_STABLE = 32
 
     ALL = STABLE | BETA | ALPHA | GENERATED
 
