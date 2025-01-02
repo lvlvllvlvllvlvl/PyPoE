@@ -561,51 +561,9 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="ShapeShiftForm",
-                    type="ref|out",
-                    key="ShapeShiftForms.dat",
-                ),
-                Field(
-                    name="VideoClip",
-                    type="ref|string",
-                    file_path=True,
-                    file_ext=".bk2",
-                ),
-                Field(
-                    name="CharacterAudioEvent",
-                    type="ref|out",
-                    key="CharacterAudioEvents.dat",
-                ),
-                Field(
-                    name="AiScript",
-                    type="ref|string",
-                    file_path=True,
-                    file_ext=".ais",
-                ),
-                Field(
-                    name="MinionType",
-                    type="ref|out",
-                    key="MinionType.dat",
-                ),
-                Field(
-                    name="Key0",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Unknown0",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Flag6",
-                    type="bool",
-                ),
-                Field(
-                    name="StatDescriptionType",
-                    type="int",
-                ),
-                Field(
-                    name="StatDescription",
-                    type="ref|string",
+                    name="TransfigureBase",
+                    type="ref|generic",
+                    key="ActiveSkills.dat",
                 ),
             ),
             virtual_fields=(
@@ -3531,12 +3489,11 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="UncutGemSoundEffect",
+                    name="Key0",
                     type="ref|out",
-                    key="SoundEffects.dat",
                 ),
                 Field(
-                    name="Key0",
+                    name="Key1",
                     type="ref|out",
                 ),
                 Field(
@@ -3558,12 +3515,11 @@ specification = Specification(
                     key="AchievementItems.dat",
                 ),
                 Field(
-                    name="ShopTag",
+                    name="Key2",
                     type="ref|out",
-                    key="ShopTag.dat",
                 ),
                 Field(
-                    name="Key1",
+                    name="Key3",
                     type="ref|out",
                 ),
             ),
@@ -26946,91 +26902,6 @@ specification = Specification(
                 ),
             ),
         ),
-        "ShapeShiftForms.dat": File(
-            fields=(
-                Field(
-                    name="Id",
-                    type="ref|string",
-                    unique=True,
-                ),
-                Field(
-                    name="AOFile",
-                    type="ref|string",
-                    file_path=True,
-                    file_ext=".ao",
-                ),
-                Field(
-                    name="ACTFile",
-                    type="ref|string",
-                    file_path=True,
-                    file_ext=".act",
-                ),
-                Field(
-                    name="Source",
-                    type="ref|out",
-                    key="MiscEffectPacks.dat",
-                ),
-                Field(
-                    name="Destination",
-                    type="ref|out",
-                    key="MiscEffectPacks.dat",
-                ),
-                Field(
-                    name="StatsKeys",
-                    type="ref|list|ref|out",
-                    key="Stats.dat",
-                ),
-                Field(
-                    name="StatsValues",
-                    type="ref|list|int",
-                ),
-                Field(
-                    name="Key0",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Unknown0",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown1",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Unknown2",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown3",
-                    type="float",
-                ),
-                Field(
-                    name="Unknown4",
-                    type="float",
-                ),
-                Field(
-                    name="Unknown5",
-                    type="float",
-                ),
-                Field(
-                    name="SkillStat",
-                    type="ref|out",
-                    key="Stats.dat",
-                ),
-                Field(
-                    name="Unknown6",
-                    type="int",
-                ),
-                Field(
-                    name="Flag0",
-                    type="bool",
-                ),
-                Field(
-                    name="Status",
-                    type="ref|string",
-                ),
-            ),
-        ),
         "ShaperGuardians.dat": File(
             fields=(
                 Field(
@@ -27087,27 +26958,6 @@ specification = Specification(
                     name="Category",
                     type="ref|generic",
                     key="ShopTag.dat",
-                ),
-                Field(
-                    name="Flag0",
-                    type="bool",
-                ),
-                Field(
-                    name="SubFlagArt",
-                    type="ref|string",
-                ),
-                Field(
-                    name="IsGuild",
-                    type="bool",
-                ),
-                Field(
-                    name="Parent",
-                    type="ref|generic",
-                    key="ShopTag.dat",
-                ),
-                Field(
-                    name="CategoryArt",
-                    type="ref|string",
                 ),
             ),
         ),
@@ -30118,7 +29968,6 @@ specification = Specification(
                 Field(
                     name="Id",
                     type="ref|string",
-                    unique=True,
                 ),
                 Field(
                     name="Types",
@@ -30134,6 +29983,82 @@ specification = Specification(
                     name="TypesFiltered",
                     type="ref|list|ref|out",
                     key="UltimatumModifierTypes.dat",
+                ),
+                Field(
+                    name="PreviousTier",
+                    type="ref|list|ref|generic",
+                    key="UltimatumModifiers.dat",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="Name",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Icon",
+                    type="ref|string",
+                ),
+                Field(
+                    name="HASH16",
+                    type="ushort",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="short",
+                ),
+                Field(
+                    name="Data0",
+                    type="ref|list|ref|string",
+                ),
+                Field(
+                    name="BuffTemplates",
+                    type="ref|list|ref|out",
+                    key="BuffTemplates.dat",
+                ),
+                Field(
+                    name="Tier",
+                    type="int",
+                ),
+                Field(
+                    name="Description",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Data1",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="TextAudio",
+                    type="ref|out",
+                    key="NPCTextAudio.dat",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="MapStats",
+                    type="ref|list|ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="MapStatValues",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="MapMods",
+                    type="ref|list|ref|out",
+                    key="Mods.dat",
+                ),
+            ),
+            virtual_fields=(
+                VirtualField(
+                    name="PreviousTiers",
+                    fields=("PreviousTier",),
+                    alias=True,
                 ),
             ),
         ),

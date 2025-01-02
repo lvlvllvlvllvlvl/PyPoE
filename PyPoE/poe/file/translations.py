@@ -1694,7 +1694,10 @@ class TranslationFile(AbstractFileReadOnly):
                 pass
             elif match.group("include"):
                 if self._parent:
-                    other_tf = self._parent.get_file(match.group("include"))
+                    # Not sure if \ instead of / in include file path is valid - only seen in unused files
+                    # Normalizing all path separators to / seems safe though
+                    include_file = match.group("include").replace("\\", "/")
+                    other_tf = self._parent.get_file(include_file)
                     self.merge(other_tf)
                     translation_index += len(other_tf.translations)
                 elif self._base_dir:
@@ -1811,8 +1814,7 @@ class TranslationFile(AbstractFileReadOnly):
         full_result: Literal[True],
         lang: str | None = "English",
         use_placeholder: Union[bool, Callable, None] = False,
-    ) -> TranslationResult:
-        ...
+    ) -> TranslationResult: ...
 
     @overload
     def get_translation(
@@ -1822,8 +1824,7 @@ class TranslationFile(AbstractFileReadOnly):
         only_values: Literal[True],
         lang: str | None = "English",
         use_placeholder: Union[bool, Callable, None] = False,
-    ) -> Dict[str, Tuple[str, str]]:
-        ...
+    ) -> Dict[str, Tuple[str, str]]: ...
 
     @overload
     def get_translation(
@@ -1832,8 +1833,7 @@ class TranslationFile(AbstractFileReadOnly):
         values: Union[Dict, List],
         lang: str | None = "English",
         use_placeholder: Union[bool, Callable, None] = False,
-    ) -> List[str]:
-        ...
+    ) -> List[str]: ...
 
     def get_translation(
         self,
@@ -2348,7 +2348,7 @@ def install_data_dependant_quantifiers(relational_reader: RelationalReader):
             relational_reader=relational_reader,
             table="UltimatumWagerTypes.dat64",
             index_column="HASH16",
-            value_column="Description",
+            value_column="DisplayText",
         )
 
     if relational_reader.specification.sequel == 2:
@@ -2357,8 +2357,8 @@ def install_data_dependant_quantifiers(relational_reader: RelationalReader):
             relational_reader=relational_reader,
             table="SkillGemsForUniqueStat.dat64",
             index_column="Index",
-            value_column="SkillGem",
-            format_value=lambda r: r["BaseItemType"]["Name"],
+            value_column="SkillGems",
+            format_value=lambda r: " and ".join(skill["BaseItemType"]["Name"] for skill in r),
         )
 
     TQRelationalData(
