@@ -83,7 +83,10 @@ def _read_dat_schema_local(path) -> str:
 
 def _load_dat_schema_tables(schema_json: str, sequel: int):
     data = json.loads(schema_json, object_hook=lambda d: SimpleNamespace(**d))
-    return sorted(filter(lambda v: v.validFor & sequel, data.tables), key=lambda table: table.name)
+    return sorted(
+        filter(lambda v: v.columns and v.validFor & sequel, data.tables),
+        key=lambda table: table.name,
+    )
 
 
 def _convert_tables(
@@ -97,7 +100,7 @@ def _convert_tables(
             if line == "        # <specification>\n":
                 spec += "".join(converted_tables)
             else:
-                spec += line.replace("# <version>", f"{sequel},")
+                spec += line.replace("0,  # <version>", f"{sequel},")
     return spec
 
 

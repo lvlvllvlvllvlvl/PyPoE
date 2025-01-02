@@ -12308,8 +12308,10 @@ specification = Specification(
                     type="float",
                 ),
                 Field(
-                    name="Keys0",
+                    name="CopiedStats",
                     type="ref|list|ref|out",
+                    key="Stats.dat",
+                    description="Values for these stats are copied from the base StatSet of the GrantedEffect",
                 ),
                 Field(
                     name="Flag0",
@@ -26692,9 +26694,6 @@ specification = Specification(
                 ),
             ),
         ),
-        "Scarabs.dat": File(
-            fields=(),
-        ),
         "ScoutingReports.dat": File(
             fields=(
                 Field(
@@ -27752,9 +27751,6 @@ specification = Specification(
                     type="bool",
                 ),
             ),
-        ),
-        "SkillSurgeEffects.dat": File(
-            fields=(),
         ),
         "SkillTotemVariations.dat": File(
             fields=(
