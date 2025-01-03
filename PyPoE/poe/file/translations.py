@@ -184,6 +184,7 @@ StatValue = TypeVar("StatValue", int, Tuple)
 """Numeric value to interpolate into a stat string. If a tuple is supplied,
  a range will be displayed instead"""
 
+
 # =============================================================================
 # Warnings
 # =============================================================================
@@ -400,12 +401,15 @@ class TranslationLanguage(TranslationReprMixin):
             # if len(values) != len(ts.range):
             #   raise Exception('mismatch %s' % ts.range)
 
+            if ts.restrictions:
+                # only known restriction is 'table_only' which is not currently needed
+                continue
+
             match = ts.match_range(test_values)
             temp.append((match, ts))
 
         # Only the highest scoring/matching translation...
-        temp.sort(key=lambda x: -x[0])
-        rating, ts = temp[0]
+        rating, ts = max(temp, key=lambda x: x[0], default=(0, None))
 
         if rating <= 0:
             return None, None, None
@@ -522,6 +526,7 @@ class TranslationString(TranslationReprMixin):
         self.tags: List[int] = []
         self.tags_types: List[str] = []
         self.strings: List[str] = []
+        self.restrictions: List[str] = []
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, TranslationString):
@@ -1493,7 +1498,8 @@ class TranslationFile(AbstractFileReadOnly):
     __slots__ = ["translations", "translations_hash", "_base_dir", "_parent"]
 
     _VIRTUAL_STAT_LOOKUP = {
-        "corrosive_shroud_maximum_stored_poison_damage": "virtual_plague_bearer_maximum_stored_poison_damage"  # noqa
+        "corrosive_shroud_maximum_stored_poison_damage": "virtual_plague_bearer_maximum_stored_poison_damage"
+        # noqa
     }
 
     _CLIENT_STRINGS_LOOKUP = {
@@ -1642,6 +1648,9 @@ class TranslationFile(AbstractFileReadOnly):
                         offset = ts_match.end()
 
                         ts = TranslationString(parent=tl)
+
+                        if ts_match.group("restriction"):
+                            ts.restrictions = ts_match.group("restriction").strip().split()
 
                         # Min/Max limiter
                         limiter = ts_match.group("minmax").strip().split()
@@ -2455,7 +2464,6 @@ TQNumberFormat(
     dp=2,
 )
 
-
 TQNumberFormat(
     id="divide_by_two_0dp",
     divisor=2,
@@ -2479,7 +2487,6 @@ TQNumberFormat(
     dp=1,
     fixed=True,
 )
-
 
 TQNumberFormat(
     id="divide_by_twelve",
