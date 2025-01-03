@@ -1095,7 +1095,7 @@ class RelationalReader(AbstractFileCache[DatFile]):
 
         if self._language:
             try:
-                self.get_file("Data/" + self._language + item).reader
+                return self.get_file("Data/" + self._language + item).reader
             except (KeyError, FileNotFoundError):
                 # Not all dat files have/need translations
                 pass
