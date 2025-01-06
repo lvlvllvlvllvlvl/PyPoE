@@ -245,11 +245,12 @@ class Translation(TranslationReprMixin):
 
     _REPR_EXTRA_ATTRIBUTES = OrderedDict((("ids", None),))
 
-    def __init__(self, identifier: Union[str, None] = None, tf_index: Union[int, None] = None):
+    def __init__(self, identifier: Union[str, None], tf_index: int, parent: "TranslationFile"):
         self.languages: List[TranslationLanguage] = []
         self.ids: List[str] = []
         self.identifier: Union[str, None] = identifier
         self.tf_index: Union[int, None] = tf_index
+        self.parent = parent
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Translation):
@@ -1584,7 +1585,7 @@ class TranslationFile(AbstractFileReadOnly):
             offset_max = match_next.start() if match_next else len(data)
             if match.group("description"):
                 translation = Translation(
-                    identifier=match.group("identifier"), tf_index=translation_index
+                    identifier=match.group("identifier"), tf_index=translation_index, parent=self
                 )
 
                 # Parse the IDs for the translations
