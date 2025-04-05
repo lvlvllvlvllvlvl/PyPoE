@@ -2692,7 +2692,9 @@ TQNumberFormat(
 
 TQNumberFormat(
     id="one_hundred_divide_by_value",
-    divisor=100,
+    multiplier=100,
+    exponent=-1,
+    dp=2,
 )
 
 TranslationQuantifier(
