@@ -2496,11 +2496,6 @@ class ItemsParser(SkillParserShared):
     """
     _cls_map = {
         # Armour types
-        "Armour": (
-            _type_level,
-            _type_attribute,
-            _type_armour,
-        ),
         "Gloves": (
             _type_level,
             _type_attribute,
@@ -2522,6 +2517,8 @@ class ItemsParser(SkillParserShared):
             _type_armour,
         ),
         "Shield": (_type_level, _type_attribute, _type_armour, _type_shield),
+        "Buckler": (_type_level, _type_attribute, _type_armour, _type_shield),
+        "Focus": (_type_level, _type_attribute, _type_armour,),
         # Weapons
         "Claw": (
             _type_level,
@@ -2543,11 +2540,6 @@ class ItemsParser(SkillParserShared):
             _type_attribute,
             _type_weapon,
         ),
-        "Thrusting One Hand Sword": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
         "One Hand Axe": (
             _type_level,
             _type_attribute,
@@ -2558,7 +2550,7 @@ class ItemsParser(SkillParserShared):
             _type_attribute,
             _type_weapon,
         ),
-        "Sceptre": (
+        "Sceptre": (#TODO: Add function to get spirit from ItemSpirit.json
             _type_level,
             _type_attribute,
             _type_weapon,
@@ -2593,17 +2585,31 @@ class ItemsParser(SkillParserShared):
             _type_attribute,
             _type_weapon,
         ),
+        "Spear": (
+            _type_level,
+            _type_attribute,
+            _type_weapon,
+        ),
+        "Crossbow": (
+            _type_level,
+            _type_attribute,
+            _type_weapon,
+        ),
+        "Flail": (
+            _type_level,
+            _type_attribute,
+            _type_weapon,
+        ),
         "FishingRod": (
             _type_level,
             _type_attribute,
             _type_weapon,
         ),
+        "Quiver": (_type_level,),
         # Flasks
         "LifeFlask": (_type_level, _type_flask, _type_flask_charges),
         "ManaFlask": (_type_level, _type_flask, _type_flask_charges),
-        "HybridFlask": (_type_level, _type_flask, _type_flask_charges),
-        "UtilityFlask": (_type_level, _type_flask, _type_flask_charges),
-        "UtilityFlaskCritical": (_type_level, _type_flask, _type_flask_charges),
+        "UtilityFlask": (_type_level, _type_flask, _type_flask_charges),#Aka charm
         # Gems
         "Active Skill Gem": (_skill_gem,),
         "Support Skill Gem": (_skill_gem,),
@@ -2611,24 +2617,17 @@ class ItemsParser(SkillParserShared):
         # Currency-like items
         "Currency": (_type_currency,),
         "StackableCurrency": (_type_currency, _type_essence, _type_blight_item),
-        "DelveSocketableCurrency": (_type_currency,),
-        "DelveStackableSocketableCurrency": (_type_currency,),
+        "SoulCore": (_type_currency,),#TODO: Add function to extract data from SoulCores.json and SoulCoresPerClass.json
+        "DelveSocketableCurrency": (_skip,),#Not in game, was _type_currency
+        "DelveStackableSocketableCurrency": (_skip,),#Not in game, was _type_currency
         "HideoutDoodad": (_type_currency, _type_hideout_doodad),
         "Microtransaction": (_type_currency, _type_microtransaction),
         "DivinationCard": (_type_currency,),
         "IncubatorStackable": (_type_currency,),
-        "HarvestSeed": (_skip,),
-        "HarvestPlantBooster": (_skip,),
-        # Labyrinth stuff
-        # 'LabyrinthItem': (),
-        "LabyrinthTrinket": (_skip,),
-        # 'LabyrinthMapItem': (),
         # Misc
         "Map": (_type_map,),
         "MapFragment": (_type_currency,),
         "QuestItem": (),
-        "AtlasRegionUpgradeItem": (_skip,),
-        "MetamorphosisDNA": (_skip,),
         # heist league
         "HeistContract": (_skip,),
         "HeistEquipmentWeapon": (_skip,),
@@ -2639,11 +2638,7 @@ class ItemsParser(SkillParserShared):
         "Trinket": (_skip,),
         "HeistObjective": (_skip,),
         "Breachstone": (_type_currency,),
-        "ItemisedCorpse": (_skip,),
-        "NecropolisPack": (_skip,),
         "InstanceLocalItem": (_type_currency,),
-        "Tincture": (_skip,),
-        "Gold": (_type_currency,),
         "SentinelDrone": (_skip,),
     }
 
