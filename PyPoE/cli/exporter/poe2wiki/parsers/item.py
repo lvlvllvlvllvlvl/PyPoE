@@ -547,66 +547,9 @@ class ItemsParser(SkillParserShared):
 
     _NAME_OVERRIDE_BY_ID = {
         "English": {
-            "Metadata/Items/PantheonSouls/PantheonSoulBrineKingUpgrade1": (
-                "Captured Soul (The Brine King upgrade 1 of 3)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulBrineKingUpgrade2": (
-                "Captured Soul (The Brine King upgrade 2 of 3)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulBrineKingUpgrade3": (
-                "Captured Soul (The Brine King upgrade 3 of 3)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulArakaaliUpgrade1": (
-                "Captured Soul (Arakaali upgrade 1 of 3)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulArakaaliUpgrade2": (
-                "Captured Soul (Arakaali upgrade 2 of 3)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulArakaaliUpgrade3": (
-                "Captured Soul (Arakaali upgrade 3 of 3)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulSolarisUpgrade1": (
-                "Captured Soul (Solaris upgrade 1 of 3)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulSolarisUpgrade2": (
-                "Captured Soul (Solaris upgrade 2 of 3)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulSolarisUpgrade3": (
-                "Captured Soul (Solaris upgrade 3 of 3)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulLunarisUpgrade1": (
-                "Captured Soul (Lunaris upgrade 1 of 3)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulLunarisUpgrade2": (
-                "Captured Soul (Lunaris upgrade 2 of 3)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulLunarisUpgrade3": (
-                "Captured Soul (Lunaris upgrade 3 of 3)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulAbberathUpgrade1": (
-                "Captured Soul (Abberath upgrade)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulGruthkulUpgrade1": (
-                "Captured Soul (Gruthkul upgrade)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulYugulUpgrade1": (
-                "Captured Soul (Yugul upgrade)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulShakariUpgrade1": (
-                "Captured Soul (Shakari upgrade)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulTukohamaUpgrade1": (
-                "Captured Soul (Tukohama upgrade)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulRalakeshUpgrade1": (
-                "Captured Soul (Ralakesh upgrade)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulGarukhanUpgrade1": (
-                "Captured Soul (Garukhan upgrade)"
-            ),
-            "Metadata/Items/PantheonSouls/PantheonSoulRyslathaUpgrade1": (
-                "Captured Soul (Ryslatha upgrade)"
-            ),
+            #"Metadata/Items/PantheonSouls/PantheonSoulBrineKingUpgrade1": (
+            #    "Captured Soul (The Brine King upgrade 1 of 3)"
+            #),
         }
     }
 
@@ -615,105 +558,50 @@ class ItemsParser(SkillParserShared):
             # =================================================================
             # Skill Gems
             # =================================================================
-            "Metadata/Items/Gems/SkillGemArcaneCloak": "",
-            "Metadata/Items/Gems/SkillGemPortal": " (skill gem)",
-            "Metadata/Items/Gems/SkillGemConvocationNew": "",
-            "Metadata/Items/Gems/SkillGemConvocation": " (legacy)",
+            "Metadata/Items/Gem/SkillGemAscendancyUnleash": " (skill)",
             # =================================================================
             # Support Gems
             # =================================================================
-            "Metadata/Items/Gems/SkillGemEnergyBlade": "",
-            "Metadata/Items/Gems/SkillGemChannelledSnipe": "",
+            "Metadata/Items/Gems/SupportGemAftershock": " (support gem)",
+            "Metadata/Items/Gems/SupportGemArcaneSurge": " (support gem)",
+            "Metadata/Items/Gems/SupportGemBlind": " (support gem)",
+            "Metadata/Items/Gems/SupportGemChain": " (support gem)",
+            "Metadata/Items/Gem/SupportGemCullingStrike": " (support gem)",
+            "Metadata/Items/Gems/SupportGemElectrocute": " (support gem)",
+            "Metadata/Items/Gems/SupportGemFork": " (support gem)",
+            "Metadata/Items/Gem/SupportGemHinder": " (support gem)",
+            "Metadata/Items/Gem/SupportGemImpale": " (support gem)",
+            "Metadata/Items/Gems/SupportGemIngenuity": " (support gem)",
+            "Metadata/Items/Gems/SupportGemJaggedGround": " (support gem)",
+            "Metadata/Items/Gems/SupportGemMaim": " (support gem)",
+            "Metadata/Items/Gems/SupportGemPierce": " (support gem)",
+            "Metadata/Items/Gems/SupportGemRage": " (support gem)",
+            "Metadata/Items/Gem/SupportGemVolatility": " (support gem)",
             # =================================================================
-            # Helmets
+            # Body armours
             # =================================================================
-            "Metadata/Items/Armours/Helmets/HelmetStrInt4": "",  # Crusader Helmet
-            "Metadata/Items/Armours/Helmets/HelmetStrDex12": "",  # Conquest Helmet
+            "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4aEndgame": " (Fire)",
+            "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4bEndgame": " (Cold)",
+            "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4cEndgame": " (Lightning)",
             # =================================================================
-            # One Hand Axes
+            # Sceptres
             # =================================================================
-            "Metadata/Items/Weapons/OneHandWeapons/OneHandAxes/OneHandAxe22": "",  # Infernal Axe
-            # =================================================================
-            # One Hand Swords
-            # =================================================================
-            "Metadata/Items/Weapons/OneHandWeapons/OneHandSwords/StormBladeOneHand": " (One Handed Sword)",
-            # =================================================================
-            # Two Hand Swords
-            # =================================================================
-            "Metadata/Items/Weapons/TwoHandWeapons/TwoHandSwords/StormBladeTwoHand": " (Two Handed Sword)",
-            # =================================================================
-            # Boots
-            # =================================================================
-            "Metadata/Items/Armours/Boots/BootsInt4": "",  # Scholar Boots
-            "Metadata/Items/Armours/Boots/BootsStrInt7": "",  # Legion Boots
-            "Metadata/Items/Armours/Boots/BootsAtlas1": " (Cold and Lightning Resistance)",
-            "Metadata/Items/Armours/Boots/BootsAtlas2": " (Fire and Cold Resistance)",
-            "Metadata/Items/Armours/Boots/BootsAtlas3": " (Fire and Lightning Resistance)",
-            "Metadata/Items/Armours/Boots/BootsStrInt8": "",  # Crusader Boots
-            "Metadata/Items/Armours/Boots/BootsInt11": "",  # Warlock Boots
-            # =================================================================
-            # Gloves
-            # =================================================================
-            "Metadata/Items/Armours/Gloves/GlovesStrInt7": "",  # Legion Gloves
-            "Metadata/Items/Armours/Gloves/GlovesStrInt8": "",  # Crusader Gloves
-            "Metadata/Items/Armours/Gloves/GlovesInt11": "",  # Warlock Gloves
-            # =================================================================
-            # Quivers
-            # =================================================================
-            # Serrated Arrow Quiver
-            "Metadata/Items/Quivers/QuiverNew1": "",
-            "Metadata/Items/Quivers/Quiver6": " (legacy)",
-            "Metadata/Items/Quivers/QuiverDescent": " (Descent)",
-            # Two-Point Arrow Quiver
-            "Metadata/Items/Quivers/QuiverNew7": "",
-            "Metadata/Items/Quivers/Quiver7": " (legacy)",
-            # Sharktooth Arrow Quiver
-            "Metadata/Items/Quivers/QuiverNew3": "",
-            "Metadata/Items/Quivers/Quiver8": " (legacy)",
-            # Blunt Arrow Quiver
-            "Metadata/Items/Quivers/QuiverNew6": "",
-            "Metadata/Items/Quivers/Quiver9": " (legacy)",
-            # Fire Arrow Quiver
-            "Metadata/Items/Quivers/QuiverNew2": "",
-            "Metadata/Items/Quivers/Quiver10": " (legacy)",
-            # Broadhead Arrow Quiver
-            "Metadata/Items/Quivers/QuiverNew10": "",
-            "Metadata/Items/Quivers/Quiver11": " (legacy)",
-            # Penetrating Arrow Quiver
-            "Metadata/Items/Quivers/QuiverNew5": "",
-            "Metadata/Items/Quivers/Quiver12": " (legacy)",
-            # Spike-Point Arrow Quiver
-            "Metadata/Items/Quivers/QuiverNew8": "",
-            "Metadata/Items/Quivers/Quiver13": " (legacy)",
+            "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre6a": " (Fire)",
+            "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre6b": " (Cold)",
+            "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre6c": " (Lightning)",
             # =================================================================
             # Rings
             # =================================================================
-            # Two-Stone Ring
-            "Metadata/Items/Rings/Ring12": " (ruby and topaz)",
-            "Metadata/Items/Rings/Ring13": " (sapphire and topaz)",
-            "Metadata/Items/Rings/Ring14": " (ruby and sapphire)",
-            # Shadowed Ring
-            "Metadata/Items/Rings/RingK5a": " (fire and cold)",
-            "Metadata/Items/Rings/RingK5b": " (fire and lightning)",
-            "Metadata/Items/Rings/RingK5c": " (cold and lightning)",
-            # Ring (Kalandra's Touch base type)
-            "Metadata/Items/Rings/MirrorRing": " (base type)",
+            "Metadata/Items/Rings/FourRingBase": " (base type)",
             # =================================================================
-            # Amulets
+            # Tablets
             # =================================================================
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_1": " (Fire Damage taken as Cold Damage)",
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_2": " (Fire Damage taken as Lightning Damage)",
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_3": " (Cold Damage taken as Fire Damage)",
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_4": " (Cold Damage taken as Lightning Damage)",
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_5": " (Lightning Damage taken as Cold Damage)",
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_6": " (Lightning Damage taken as Fire Damage)",
-            "Metadata/Items/Amulets/Talismans/Talisman3_6_1": " (Power Charge on Kill)",
-            "Metadata/Items/Amulets/Talismans/Talisman3_6_2": " (Frenzy Charge on Kill)",
-            "Metadata/Items/Amulets/Talismans/Talisman3_6_3": " (Endurance Charge on Kill)",
+            "Metadata/Items/TowerAugment/GenericAugment": " (generic)",
             # =================================================================
-            # Currency items
+            # Quest items
             # =================================================================
-            "Metadata/Items/Currency/CurrencyAncestralSilverCoin": "",
+            "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": " (Cruel)",
+            "Metadata/Items/Gems/SkillGemUncutQuest": " (quest item)",
             # =================================================================
             # Hideout decorations
             # =================================================================
@@ -732,42 +620,6 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/Hideout/HideoutLionStatueKneeling": "",  # Sitting Lion Statue
             "Metadata/Items/Hideout/HideoutChurchRuins": " (hideout decoration)",
             "Metadata/Items/Hideout/HideoutIncaLetter": " (hideout decoration)",
-            # =================================================================
-            # Invitations
-            # =================================================================
-            "Metadata/Items/MapFragments/Primordial/QuestTangleKey": " (quest item)",
-            "Metadata/Items/MapFragments/Primordial/QuestTangleBossKey": " (quest item)",
-            "Metadata/Items/MapFragments/Primordial/QuestCleansingFireKey": " (quest item)",
-            "Metadata/Items/MapFragments/Primordial/QuestCleansingFireBossKey": " (quest item)",
-            # =================================================================
-            # Item pieces
-            # =================================================================
-            "Metadata/Items/UniqueFragments/FragmentUniqueShield1_1": " (1 of 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueShield1_2": " (2 of 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueShield1_3": " (3 of 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueShield1_4": " (4 of 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueSword1_1": " (1 of 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueSword1_2": " (2 of 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueSword1_3": " (3 of 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueStaff1_1": " (1 of 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueStaff1_2": " (2 of 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueStaff1_3": " (3 of 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueBelt1_1": " (1 of 2)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueBelt1_2": " (2 of 2)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueQuiver1_1": " (1 of 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueQuiver1_2": " (2 of 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueQuiver1_3": " (3 of 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueHelmet1_1": " (1 of 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueHelmet1_2": " (2 of 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueHelmet1_3": " (3 of 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueMap26_1": " (1 of 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueMap26_2": " (2 of 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueMap26_3": " (3 of 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueMap26_4": " (4 of 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueAmulet1_1": " (1 of 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueAmulet1_2": " (2 of 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueAmulet1_3": " (3 of 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueAmulet1_4": " (4 of 4)",
             # =================================================================
             # Cosmetic items
             # =================================================================
@@ -807,28 +659,6 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/MicrotransactionItemEffects/MicrotransactionWarlockGloves": " (gloves skin)",
             "Metadata/Items/MicrotransactionItemEffects/MicrotransactionWarlockBoots": " (boots skin)",
             "Metadata/Items/MicrotransactionItemEffects/MicrotransactionConquestHelmet": " (helmet skin)",
-            # =================================================================
-            # Quest items
-            # =================================================================
-            "Metadata/Items/QuestItems/GoldenPages/Page1": " (1 of 4)",
-            "Metadata/Items/QuestItems/GoldenPages/Page2": " (2 of 4)",
-            "Metadata/Items/QuestItems/GoldenPages/Page3": " (3 of 4)",
-            "Metadata/Items/QuestItems/GoldenPages/Page4": " (4 of 4)",
-            # =================================================================
-            # Heist equipment
-            # =================================================================
-            "Metadata/Items/Heist/HeistEquipmentCloak3": "",  # Hooded Cloak
-            # =================================================================
-            # Sanctified relics
-            # =================================================================
-            "Metadata/Items/Relics/SanctumSpecialRelic1": " (strength)",
-            "Metadata/Items/Relics/SanctumSpecialRelic2": " (dexterity)",
-            "Metadata/Items/Relics/SanctumSpecialRelic3": " (intelligence)",
-            # =================================================================
-            # Corpse items
-            # =================================================================
-            "Metadata/Items/ItemisedCorpses/HydraMid": " (corpse item)",
-            "Metadata/Items/ItemisedCorpses/OakMid": " (corpse item)",
         },
         "Russian": {
             # =================================================================
