@@ -2037,6 +2037,8 @@ class ItemsParser(SkillParserShared):
 
         infobox["gem_tags"] = ", ".join([gt["Tag"] for gt in gem_type["GemTags"] if gt["Tag"]])
 
+        infobox["gem_tier"] = skill_gem["CraftingLevel"]
+
         ge = gem_type["GrantedEffect"]
 
         infobox["skill_id"] = ge["Id"]
@@ -2086,42 +2088,42 @@ class ItemsParser(SkillParserShared):
         data_file="ArmourTypes.dat64",
         data_mapping=(
             (
-                "ArmourMin",
+                "Armour",
                 {
                     "template": "armour_min",
                     "condition": lambda v: v > 0,
                 },
             ),
             (
-                "ArmourMax",
+                "Armour",
                 {
                     "template": "armour_max",
                     "condition": lambda v: v > 0,
                 },
             ),
             (
-                "EvasionMin",
+                "Evasion",
                 {
                     "template": "evasion_min",
                     "condition": lambda v: v > 0,
                 },
             ),
             (
-                "EvasionMax",
+                "Evasion",
                 {
                     "template": "evasion_max",
                     "condition": lambda v: v > 0,
                 },
             ),
             (
-                "EnergyShieldMin",
+                "EnergyShield",
                 {
                     "template": "energy_shield_min",
                     "condition": lambda v: v > 0,
                 },
             ),
             (
-                "EnergyShieldMax",
+                "EnergyShield",
                 {
                     "template": "energy_shield_max",
                     "condition": lambda v: v > 0,
@@ -2132,20 +2134,7 @@ class ItemsParser(SkillParserShared):
                 {
                     "template": "movement_speed",
                     "condition": lambda v: v != 0,
-                },
-            ),
-            (
-                "WardMin",
-                {
-                    "template": "ward_min",
-                    "condition": lambda v: v != 0,
-                },
-            ),
-            (
-                "WardMax",
-                {
-                    "template": "ward_max",
-                    "condition": lambda v: v != 0,
+                    "format": lambda v: "{0:n}".format(v / 100),
                 },
             ),
         ),
@@ -2788,6 +2777,7 @@ class ItemsParser(SkillParserShared):
         # Gems
         "Active Skill Gem": (_skill_gem,),
         "Support Skill Gem": (_skill_gem,),
+        "Meta Skill Gem": (_skill_gem,),
         # Currency-like items
         "Currency": (_type_currency,),
         "StackableCurrency": (_type_currency, _type_essence, _type_blight_item),
