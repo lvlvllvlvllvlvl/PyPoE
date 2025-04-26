@@ -464,11 +464,6 @@ specification = Specification(
                     key="ActiveSkillType.dat",
                 ),
                 Field(
-                    name="WeaponRestriction_ItemClasses",
-                    type="ref|list|ref|out",
-                    key="ItemClasses.dat",
-                ),
-                Field(
                     name="WebsiteDescription",
                     type="ref|string",
                 ),
@@ -592,12 +587,12 @@ specification = Specification(
                     type="ref|out",
                 ),
                 Field(
-                    name="Unknown0",
-                    type="ref|string",
-                ),
-                Field(
                     name="Flag6",
                     type="bool",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="ref|string",
                 ),
                 Field(
                     name="StatDescriptionType",
@@ -607,17 +602,29 @@ specification = Specification(
                     name="StatDescription",
                     type="ref|string",
                 ),
-            ),
-            virtual_fields=(
-                VirtualField(
-                    name="WeaponRestriction_ItemClassesKeys",
-                    fields=("WeaponRestriction_ItemClasses",),
-                    alias=True,
+                Field(
+                    name="WeaponRequirements",
+                    type="ref|out",
+                    key="ActiveSkillWeaponRequirement.dat",
                 ),
-                VirtualField(
-                    name="AlternateSkillTargetingBehavioursKey",
-                    fields=("AlternateSkillTargetingBehaviour",),
-                    alias=True,
+            ),
+        ),
+        "ActiveSkillWeaponRequirement.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="WieldableClasses",
+                    type="ref|list|ref|out",
+                    key="WieldableClasses.dat",
+                ),
+                Field(
+                    name="String",
+                    type="ref|string",
+                    key="ClientStrings.dat",
                 ),
             ),
         ),
@@ -2450,11 +2457,11 @@ specification = Specification(
                     file_ext=".dds",
                 ),
                 Field(
-                    name="Unknown0",
+                    name="TreeRegionVector",
                     type="int",
                 ),
                 Field(
-                    name="Unknown1",
+                    name="TreeRegionAngle",
                     type="int",
                 ),
                 Field(
@@ -3788,19 +3795,6 @@ specification = Specification(
                     name="Id2",
                     type="ref|string",
                     unique=True,
-                ),
-            ),
-        ),
-        "BeltTypes.dat": File(
-            fields=(
-                Field(
-                    name="BaseItem",
-                    type="ref|out",
-                    key="BaseItemTypes.dat",
-                ),
-                Field(
-                    name="CharmSlots",
-                    type="int",
                 ),
             ),
         ),
@@ -10221,6 +10215,33 @@ specification = Specification(
                     type="ref|out",
                     key="Tags.dat",
                 ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                    key="Essences.dat",
+                ),
+                Field(
+                    name="Unknown3",
+                    type="int",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                ),
+                Field(
+                    name="CraftedMod",
+                    type="ref|out",
+                    key="Mods.dat",
+                ),
+                Field(
+                    name="ItemClasses",
+                    type="ref|list|ref|out",
+                    key="ItemClasses.dat",
+                ),
+                Field(
+                    name="Unknown4",
+                    type="int",
+                ),
             ),
             virtual_fields=(
                 VirtualField(
@@ -12646,7 +12667,7 @@ specification = Specification(
                     type="ref|list|int",
                 ),
                 Field(
-                    name="Unknown6",
+                    name="ActorLevel",
                     type="float",
                 ),
                 Field(
@@ -20707,10 +20728,6 @@ specification = Specification(
                     key="AchievementItems.dat",
                 ),
                 Field(
-                    name="IsEssenceOnlyModifier",
-                    type="bool",
-                ),
-                Field(
                     name="Stat6Min",
                     type="int",
                 ),
@@ -20882,6 +20899,10 @@ specification = Specification(
                 Field(
                     name="RadiusJewelType",
                     type="int",
+                ),
+                Field(
+                    name="IsEssenceOnlyModifier",
+                    type="bool",
                 ),
             ),
             virtual_fields=(
@@ -25697,12 +25718,14 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Key1",
+                    name="HelpText",
                     type="ref|out",
+                    key="ClientStrings.dat",
                 ),
                 Field(
-                    name="Key2",
+                    name="Description",
                     type="ref|out",
+                    key="ClientStrings.dat",
                 ),
                 Field(
                     name="Script",
@@ -28109,12 +28132,12 @@ specification = Specification(
                     key="BaseItemTypes.dat",
                 ),
                 Field(
-                    name="StatsWeapon",
+                    name="StatsMartialWeapon",
                     type="ref|list|ref|out",
                     key="Stats.dat",
                 ),
                 Field(
-                    name="StatsValuesWeapon",
+                    name="StatsValuesMartialWeapon",
                     type="ref|list|int",
                 ),
                 Field(
@@ -28126,7 +28149,42 @@ specification = Specification(
                     name="StatsValuesArmour",
                     type="ref|list|int",
                 ),
+                Field(
+                    name="Rank",
+                    type="int",
+                ),
+                Field(
+                    name="StatsCasterWeapon",
+                    type="ref|list|ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="StatsValuesCasterWeapon",
+                    type="ref|list|int",
+                ),
             ),
+        ),
+        "SoulCoresPerClass.dat": File(
+            fields=(
+                Field(
+                    name="BaseItemType",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="ItemClass",
+                    type="ref|out",
+                    key="ItemClasses.dat",
+                ),
+                Field(
+                    name="Stats",
+                    type="ref|list|ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="StatsValues",
+                    type="ref|list|int",
+                ),
         ),
         "SoundEffects.dat": File(
             fields=(
@@ -31537,6 +31595,127 @@ specification = Specification(
                 ),
             ),
         ),
+        "WieldableClasses": File(
+            fields=(
+                Field(
+                    name="ItemClass",
+                    type="ref|out",
+                    key="ItemClasses.dat",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag1",
+                    type="bool",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key2",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key3",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key4",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key5",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key6",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key7",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key8",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key9",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key10",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key11",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key12",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key13",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key14",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key15",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key16",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key17",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key18",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key19",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key20",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key21",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key22",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key23",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
+            ),
+        ),
         "WindowCursors.dat": File(
             fields=(
                 Field(
@@ -31778,7 +31957,7 @@ specification = Specification(
                 ),
                 Field(
                     name="FlagOnEntered",
-                    type="ref|out",
+                    type="ref|list|ref|out",
                     key="QuestFlags.dat",
                 ),
                 Field(
