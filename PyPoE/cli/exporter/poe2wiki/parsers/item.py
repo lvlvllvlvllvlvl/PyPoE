@@ -2506,6 +2506,7 @@ class ItemsParser(SkillParserShared):
         # Jewellery
         "Amulet": (),
         "Ring": (),
+        "Belt": (),
         # Armour types
         "Gloves": (
             _type_level,
