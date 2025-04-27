@@ -2122,6 +2122,29 @@ class ItemsParser(SkillParserShared):
         row_index=True,
     )
 
+    _type_quest_item = _type_factory(
+        data_file="QuestItems.dat64",
+        data_mapping=(
+            (
+                "HelpText",
+                {
+                    "template": "help_text",
+                    "condition": lambda v: v,
+                    "format": lambda v: v["Text"],
+                },
+            ),
+            (
+                "Description",
+                {
+                    "template": "description",
+                    "condition": lambda v: v,
+                    "format": lambda v: process_keywords(v["Text"]),
+                },
+            ),
+        ),
+        row_index=True,
+    )
+
     def _currency_extra(self, infobox, base_item_type, currency):
         if infobox.get("description"):
             infobox["description"] = parser.parse_and_handle_description_tags(
@@ -2652,7 +2675,7 @@ class ItemsParser(SkillParserShared):
         "Breachstone": (_type_currency,),
         "ExpeditionLogbook": (),
         "PinnacleKey": (),
-        "QuestItem": (),
+        "QuestItem": (_type_quest_item),
         # Sanctum
         "Relic": (),
         "SanctumSpecialRelic": (_skip,),
