@@ -2108,6 +2108,20 @@ class ItemsParser(SkillParserShared):
         row_index=True,
     )
 
+    _type_spirit = _type_factory(
+        data_file="ItemSpirit.dat64",
+        data_mapping=(
+            (
+                "SpiritGranted",
+                {
+                    "template": "spirit",
+                    "condition": lambda v: v > 0,
+                },
+            ),
+        ),
+        row_index=True,
+    )
+
     def _currency_extra(self, infobox, base_item_type, currency):
         if infobox.get("description"):
             infobox["description"] = parser.parse_and_handle_description_tags(
@@ -2604,7 +2618,7 @@ class ItemsParser(SkillParserShared):
         ),
         "Quiver": (_type_level,),
         # Caster weapons
-        "Sceptre": (_type_level,),#TODO: Add function to get spirit from ItemSpirit.dat
+        "Sceptre": (_type_level, _type_spirit,),
         "Wand": (_type_level,),
         "Staff": (_type_level,),
         "TrapTool": (_type_level,),
