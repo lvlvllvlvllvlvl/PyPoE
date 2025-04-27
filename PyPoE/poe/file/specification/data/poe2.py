@@ -31583,7 +31583,7 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Unknown0",
+                    name="ReloadTime",
                     type="int",
                 ),
             ),

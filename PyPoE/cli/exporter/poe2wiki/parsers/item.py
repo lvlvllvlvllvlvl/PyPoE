@@ -2096,6 +2096,14 @@ class ItemsParser(SkillParserShared):
                     "format": lambda v: "{0:n}".format(v / 10),
                 },
             ),
+            (
+                "ReloadTime",
+                {
+                    "template": "reload_time",
+                    "condition": lambda v: v > 0,
+                    "format": lambda v: "{0:n}".format(v / 100),
+                },
+            ),
         ),
         row_index=True,
     )
