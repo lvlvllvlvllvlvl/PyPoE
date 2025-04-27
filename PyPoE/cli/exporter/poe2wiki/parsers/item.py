@@ -2503,6 +2503,9 @@ class ItemsParser(SkillParserShared):
     This defines the expected data elements for an item class.
     """
     _cls_map = {
+        # Jewellery
+        "Amulet": (),
+        "Ring": (),
         # Armour types
         "Gloves": (
             _type_level,
@@ -2527,18 +2530,13 @@ class ItemsParser(SkillParserShared):
         "Shield": (_type_level, _type_attribute, _type_armour, _type_shield),
         "Buckler": (_type_level, _type_attribute, _type_armour, _type_shield),
         "Focus": (_type_level, _type_attribute, _type_armour,),
-        # Weapons
+        # Martial weapons
         "Claw": (
             _type_level,
             _type_attribute,
             _type_weapon,
         ),
         "Dagger": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "Wand": (
             _type_level,
             _type_attribute,
             _type_weapon,
@@ -2558,17 +2556,7 @@ class ItemsParser(SkillParserShared):
             _type_attribute,
             _type_weapon,
         ),
-        "Sceptre": (#TODO: Add function to get spirit from ItemSpirit.json
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
         "Bow": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "Staff": (
             _type_level,
             _type_attribute,
             _type_weapon,
@@ -2584,6 +2572,11 @@ class ItemsParser(SkillParserShared):
             _type_weapon,
         ),
         "Two Hand Mace": (
+            _type_level,
+            _type_attribute,
+            _type_weapon,
+        ),
+        "FishingRod": (
             _type_level,
             _type_attribute,
             _type_weapon,
@@ -2608,12 +2601,12 @@ class ItemsParser(SkillParserShared):
             _type_attribute,
             _type_weapon,
         ),
-        "FishingRod": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
         "Quiver": (_type_level,),
+        # Caster weapons
+        "Sceptre": (_type_level,),#TODO: Add function to get spirit from ItemSpirit.dat
+        "Wand": (_type_level,),
+        "Staff": (_type_level,),
+        "TrapTool": (_type_level,),
         # Flasks
         "LifeFlask": (_type_level, _type_flask, _type_flask_charges),
         "ManaFlask": (_type_level, _type_flask, _type_flask_charges),
@@ -2622,21 +2615,33 @@ class ItemsParser(SkillParserShared):
         "Active Skill Gem": (_skill_gem,),
         "Support Skill Gem": (_skill_gem,),
         "Meta Skill Gem": (_skill_gem,),
+        # Uncut gems
+        "UncutSkillGem": (),
+        "UncutSupportGem": (),
+        "UncutReservationGem": (),
         # Currency-like items
         "Currency": (_type_currency,),
         "StackableCurrency": (_type_currency, _type_essence, _type_blight_item),
-        "SoulCore": (_type_currency,),#TODO: Add function to extract data from SoulCores.json and SoulCoresPerClass.json
-        "DelveSocketableCurrency": (_skip,),#Not in game, was _type_currency
-        "DelveStackableSocketableCurrency": (_skip,),#Not in game, was _type_currency
+        "SoulCore": (_type_currency,),#TODO: Add function to extract data from SoulCores.dat and SoulCoresPerClass.dat
+        "Omen": (_type_currency,),
+        "DelveSocketableCurrency": (_skip,),
+        "DelveStackableSocketableCurrency": (_skip,),
         "HideoutDoodad": (_type_currency, _type_hideout_doodad),
         "Microtransaction": (_type_currency, _type_microtransaction),
         "DivinationCard": (_type_currency,),
-        "IncubatorStackable": (_type_currency,),
+        "IncubatorStackable": (_skip,),
         # Misc
-        "Map": (_type_map,),
+        "Map": (),#Aka waystone
         "MapFragment": (_type_currency,),
+        "TowerAugmentation": (),
+        "Breachstone": (_type_currency,),
+        "ExpeditionLogbook": (),
+        "PinnacleKey": (),
         "QuestItem": (),
-        # heist league
+        # Sanctum
+        "Relic": (),
+        "SanctumSpecialRelic": (_skip,),
+        # Heist league
         "HeistContract": (_skip,),
         "HeistEquipmentWeapon": (_skip,),
         "HeistEquipmentTool": (_skip,),
@@ -2645,7 +2650,7 @@ class ItemsParser(SkillParserShared):
         "HeistBlueprint": (_skip,),
         "Trinket": (_skip,),
         "HeistObjective": (_skip,),
-        "Breachstone": (_type_currency,),
+        # Other
         "InstanceLocalItem": (_type_currency,),
         "SentinelDrone": (_skip,),
     }
