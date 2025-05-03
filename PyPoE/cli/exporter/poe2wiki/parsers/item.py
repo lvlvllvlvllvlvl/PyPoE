@@ -17,7 +17,7 @@ Overview
 Description
 ===============================================================================
 
-https://poewiki.net
+https://poe2wiki.net
 
 Agreement
 ===============================================================================
@@ -547,9 +547,9 @@ class ItemsParser(SkillParserShared):
 
     _NAME_OVERRIDE_BY_ID = {
         "English": {
-            #"Metadata/Items/PantheonSouls/PantheonSoulBrineKingUpgrade1": (
+            # "Metadata/Items/PantheonSouls/PantheonSoulBrineKingUpgrade1": (
             #    "Captured Soul (The Brine King upgrade 1 of 3)"
-            #),
+            # ),
         }
     }
 
@@ -2518,7 +2518,11 @@ class ItemsParser(SkillParserShared):
         ),
         "Shield": (_type_level, _type_attribute, _type_armour, _type_shield),
         "Buckler": (_type_level, _type_attribute, _type_armour, _type_shield),
-        "Focus": (_type_level, _type_attribute, _type_armour,),
+        "Focus": (
+            _type_level,
+            _type_attribute,
+            _type_armour,
+        ),
         # Weapons
         "Claw": (
             _type_level,
@@ -2550,7 +2554,7 @@ class ItemsParser(SkillParserShared):
             _type_attribute,
             _type_weapon,
         ),
-        "Sceptre": (#TODO: Add function to get spirit from ItemSpirit.json
+        "Sceptre": (  # TODO: Add function to get spirit from ItemSpirit.json
             _type_level,
             _type_attribute,
             _type_weapon,
@@ -2609,7 +2613,7 @@ class ItemsParser(SkillParserShared):
         # Flasks
         "LifeFlask": (_type_level, _type_flask, _type_flask_charges),
         "ManaFlask": (_type_level, _type_flask, _type_flask_charges),
-        "UtilityFlask": (_type_level, _type_flask, _type_flask_charges),#Aka charm
+        "UtilityFlask": (_type_level, _type_flask, _type_flask_charges),  # Aka charm
         # Gems
         "Active Skill Gem": (_skill_gem,),
         "Support Skill Gem": (_skill_gem,),
@@ -2617,9 +2621,11 @@ class ItemsParser(SkillParserShared):
         # Currency-like items
         "Currency": (_type_currency,),
         "StackableCurrency": (_type_currency, _type_essence, _type_blight_item),
-        "SoulCore": (_type_currency,),#TODO: Add function to extract data from SoulCores.json and SoulCoresPerClass.json
-        "DelveSocketableCurrency": (_skip,),#Not in game, was _type_currency
-        "DelveStackableSocketableCurrency": (_skip,),#Not in game, was _type_currency
+        "SoulCore": (
+            _type_currency,
+        ),  # TODO: Add function to extract data from SoulCores.json and SoulCoresPerClass.json
+        "DelveSocketableCurrency": (_skip,),  # Not in game, was _type_currency
+        "DelveStackableSocketableCurrency": (_skip,),  # Not in game, was _type_currency
         "HideoutDoodad": (_type_currency, _type_hideout_doodad),
         "Microtransaction": (_type_currency, _type_microtransaction),
         "DivinationCard": (_type_currency,),

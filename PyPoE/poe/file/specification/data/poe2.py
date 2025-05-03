@@ -2428,11 +2428,11 @@ specification = Specification(
                     file_ext=".dds",
                 ),
                 Field(
-                    name="Unknown0",
+                    name="TreeRegionVector",
                     type="int",
                 ),
                 Field(
-                    name="Unknown1",
+                    name="TreeRegionAngle",
                     type="int",
                 ),
                 Field(
@@ -2440,7 +2440,7 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Unknown2",
+                    name="Unknown0",
                     type="int",
                 ),
                 Field(
@@ -3725,19 +3725,6 @@ specification = Specification(
                 ),
             ),
         ),
-        "BeltTypes.dat": File(
-            fields=(
-                Field(
-                    name="BaseItem",
-                    type="ref|out",
-                    key="BaseItemTypes.dat",
-                ),
-                Field(
-                    name="CharmSlots",
-                    type="int",
-                ),
-            ),
-        ),
         "BestiaryCapturableMonsters.dat": File(
             fields=(
                 Field(
@@ -4644,8 +4631,9 @@ specification = Specification(
                     unique=True,
                 ),
                 Field(
-                    name="Key0",
+                    name="EnchantedMod",
                     type="ref|out",
+                    key="Mods.dat",
                 ),
             ),
             virtual_fields=(
@@ -12581,7 +12569,7 @@ specification = Specification(
                     type="ref|list|int",
                 ),
                 Field(
-                    name="Unknown6",
+                    name="ActorLevel",
                     type="float",
                 ),
                 Field(
@@ -25770,23 +25758,25 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Key1",
+                    name="HelpText",
                     type="ref|out",
+                    key="ClientStrings.dat",
                 ),
                 Field(
-                    name="Key2",
+                    name="Description",
                     type="ref|out",
+                    key="ClientStrings.dat",
                 ),
                 Field(
                     name="Script",
                     type="ref|string",
                 ),
                 Field(
-                    name="Key3",
+                    name="Key1",
                     type="ref|out",
                 ),
                 Field(
-                    name="Key4",
+                    name="Key2",
                     type="ref|out",
                 ),
                 Field(
@@ -28174,12 +28164,12 @@ specification = Specification(
                     key="BaseItemTypes.dat",
                 ),
                 Field(
-                    name="StatsWeapon",
+                    name="StatsMartialWeapon",
                     type="ref|list|ref|out",
                     key="Stats.dat",
                 ),
                 Field(
-                    name="StatsValuesWeapon",
+                    name="StatsValuesMartialWeapon",
                     type="ref|list|int",
                 ),
                 Field(
@@ -28192,8 +28182,40 @@ specification = Specification(
                     type="ref|list|int",
                 ),
                 Field(
-                    name="Unknown0",
+                    name="Rank",
                     type="int",
+                ),
+                Field(
+                    name="StatsCasterWeapon",
+                    type="ref|list|ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="StatsValuesCasterWeapon",
+                    type="ref|list|int",
+                ),
+            ),
+        ),
+        "SoulCoresPerClass.dat": File(
+            fields=(
+                Field(
+                    name="BaseItemType",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="ItemClass",
+                    type="ref|out",
+                    key="ItemClasses.dat",
+                ),
+                Field(
+                    name="Stats",
+                    type="ref|list|ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="StatsValues",
+                    type="ref|list|int",
                 ),
             ),
         ),
@@ -30505,6 +30527,18 @@ specification = Specification(
                 ),
             ),
         ),
+        "UltimatumTrialLength.dat": File(
+            fields=(
+                Field(
+                    name="MinAreaLevel",
+                    type="int",
+                ),
+                Field(
+                    name="Length",
+                    type="int",
+                ),
+            ),
+        ),
         "UltimatumTrialMasterAudio.dat": File(
             fields=(
                 Field(
@@ -31564,7 +31598,7 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Unknown0",
+                    name="ReloadTime",
                     type="int",
                 ),
             ),

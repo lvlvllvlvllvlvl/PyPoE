@@ -5,6 +5,7 @@ ARGS=()
 IMG=()
 export ALL_EXPORTERS=(gem-skills items passives skills mastery-effects mastery-groups mods monsters areas maps incursion-rooms modules atlas-icons)
 EXPORTERS=()
+WIKI=wiki
 
 # check if value is in array
 # https://stackoverflow.com/a/68702551/2063518
@@ -50,6 +51,7 @@ options:
   -t, --threads         number of threads that can read wiki pages simultaneously (equivalent to the -w-mt pypoe argument)
   -u, --username        wiki username (if not supplied pypoe will prompt several times during the export)
   -p, --password        wiki password (if not supplied pypoe will prompt several times during the export)
+  -2, --poe2            export poe2 data to poe2wiki.net (if the code is working yet)
 
   -w, --write           export to the file system
                       - alias for '$(basename $0)' -- --write
@@ -65,7 +67,7 @@ options:
   exit $1
 }
 
-VALID_ARGS=$(getopt -o hqi:t:u:p:wdec --long help,quiet,image:,threads:,username:,password:,write,dry-run,export,cache -- "$@")
+VALID_ARGS=$(getopt -o hqi:t:u:p:2wdec --long help,quiet,image:,threads:,username:,password:,poe2,write,dry-run,export,cache -- "$@")
 if [[ $? -ne 0 ]]; then
     usage $?;
 fi
@@ -100,6 +102,10 @@ while [[ $# -gt 0 ]]; do
     -p | --password)
         ARGS+=(-w-pw $2)
         shift 2
+        ;;
+    -2 | --poe2)
+        WIKI=poe2wiki
+        shift
         ;;
     -w | --write)
         ARGS+=(--write)
@@ -151,42 +157,42 @@ set -e
 pypoe_exporter $QUIET setup perform
 
 exporting mods &&
-pypoe_exporter $QUIET wiki mods mods rowid "${ARGS[@]}" "$@"
+pypoe_exporter $QUIET $WIKI mods mods rowid "${ARGS[@]}" "$@"
 exporting gem-skills &&
-pypoe_exporter $QUIET wiki skill by_gem "${IMG[@]}" "${ARGS[@]}" "$@"
+pypoe_exporter $QUIET $WIKI skill by_gem "${IMG[@]}" "${ARGS[@]}" "$@"
 exporting items &&
-pypoe_exporter $QUIET wiki items item rowid "${IMG[@]}" "${ARGS[@]}" "$@"
+pypoe_exporter $QUIET $WIKI items item rowid "${IMG[@]}" "${ARGS[@]}" "$@"
 exporting passives &&
-pypoe_exporter $QUIET wiki passive rowid "${IMG[@]}" "${ARGS[@]}" "$@"
+pypoe_exporter $QUIET $WIKI passive rowid "${IMG[@]}" "${ARGS[@]}" "$@"
 exporting skills &&
-pypoe_exporter $QUIET wiki skill by_name "${IMG[@]}" "${ARGS[@]}" "$@"
+pypoe_exporter $QUIET $WIKI skill by_name "${IMG[@]}" "${ARGS[@]}" "$@"
 exporting mastery-effects &&
-pypoe_exporter $QUIET wiki mastery effects rowid "${ARGS[@]}" "$@"
+pypoe_exporter $QUIET $WIKI mastery effects rowid "${ARGS[@]}" "$@"
 exporting mastery-groups &&
-pypoe_exporter $QUIET wiki mastery groups rowid "${ARGS[@]}" "$@"
+pypoe_exporter $QUIET $WIKI mastery groups rowid "${ARGS[@]}" "$@"
 exporting monsters &&
-pypoe_exporter $QUIET wiki monster rowid "${ARGS[@]}" "$@"
+pypoe_exporter $QUIET $WIKI monster rowid "${ARGS[@]}" "$@"
 exporting areas &&
-pypoe_exporter $QUIET wiki area rowid "${ARGS[@]}" "$@"
+pypoe_exporter $QUIET $WIKI area rowid "${ARGS[@]}" "$@"
 exporting maps &&
-pypoe_exporter $QUIET wiki items maps "${IMG[@]}" "${ARGS[@]}" "$@" --store-images --convert-images
+pypoe_exporter $QUIET $WIKI items maps "${IMG[@]}" "${ARGS[@]}" "$@" --store-images --convert-images
 exporting incursion-rooms &&
-pypoe_exporter $QUIET wiki incursion rooms rowid "${ARGS[@]}" "$@"
+pypoe_exporter $QUIET $WIKI incursion rooms rowid "${ARGS[@]}" "$@"
 exporting modules && {
-  pypoe_exporter $QUIET wiki lua bestiary "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET wiki lua blight "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET wiki lua crafting_bench "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET wiki lua delve "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET wiki lua harvest "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET wiki lua heist "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET wiki lua monster "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET wiki lua pantheon "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET wiki lua synthesis "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET wiki lua ot "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET wiki lua minimap "${ARGS[@]}" "$@"
-  # pypoe_exporter $QUIET wiki lua packs "${ARGS[@]}" "$@"
+  pypoe_exporter $QUIET $WIKI lua bestiary "${ARGS[@]}" "$@"
+  pypoe_exporter $QUIET $WIKI lua blight "${ARGS[@]}" "$@"
+  pypoe_exporter $QUIET $WIKI lua crafting_bench "${ARGS[@]}" "$@"
+  pypoe_exporter $QUIET $WIKI lua delve "${ARGS[@]}" "$@"
+  pypoe_exporter $QUIET $WIKI lua harvest "${ARGS[@]}" "$@"
+  pypoe_exporter $QUIET $WIKI lua heist "${ARGS[@]}" "$@"
+  pypoe_exporter $QUIET $WIKI lua monster "${ARGS[@]}" "$@"
+  pypoe_exporter $QUIET $WIKI lua pantheon "${ARGS[@]}" "$@"
+  pypoe_exporter $QUIET $WIKI lua synthesis "${ARGS[@]}" "$@"
+  pypoe_exporter $QUIET $WIKI lua ot "${ARGS[@]}" "$@"
+  pypoe_exporter $QUIET $WIKI lua minimap "${ARGS[@]}" "$@"
+  # pypoe_exporter $QUIET $WIKI lua packs "${ARGS[@]}" "$@"
 }
 exporting atlas-icons &&
-pypoe_exporter $QUIET wiki items atlas_icons "${ARGS[@]}" "$@" --store-images --convert-images
+pypoe_exporter $QUIET $WIKI items atlas_icons "${ARGS[@]}" "$@" --store-images --convert-images
 
 date -ud "@$SECONDS" "+Export completed in: %H:%M:%S"
