@@ -196,10 +196,7 @@ class SkillParserShared(parser.BaseParser):
         "Cooldown",
         "StoredUses",
         "AttackSpeedMultiplier",
-        "ManaReservationFlat",
-        "ManaReservationPercent",
-        "LifeReservationFlat",
-        "LifeReservationPercent",
+        "Reservation",
         "AttackTime",
     )
 
@@ -208,7 +205,6 @@ class SkillParserShared(parser.BaseParser):
         "SpellCritChance",
         "AttackCritChance",
         "BaseMultiplier",
-        "DamageEffectiveness",
     )
 
     # def CostTypeHelper(d):
@@ -311,13 +307,6 @@ class SkillParserShared(parser.BaseParser):
             },
         ),
         (
-            "DamageEffectiveness",
-            {
-                "template": "damage_effectiveness",
-                "format": lambda v: "{0:n}".format(v / 100 + 100),
-            },
-        ),
-        (
             "BaseMultiplier",
             {
                 "template": "damage_multiplier",
@@ -340,39 +329,12 @@ class SkillParserShared(parser.BaseParser):
             },
         ),
         (
-            "ManaReservationFlat",
+            "Reservation",
             {
-                "template": "mana_reservation_flat",
+                "template": "spirit_reservation_flat",
                 "default": 0,
                 "condition": lambda v: v,
                 "format": lambda v: "{0:n}".format(v),
-            },
-        ),
-        (
-            "ManaReservationPercent",
-            {
-                "template": "mana_reservation_percent",
-                "default": 0,
-                "condition": lambda v: v,
-                "format": lambda v: "{0:n}".format(v / 100),
-            },
-        ),
-        (
-            "LifeReservationFlat",
-            {
-                "template": "life_reservation_flat",
-                "default": 0,
-                "condition": lambda v: v,
-                "format": lambda v: "{0:n}".format(v),
-            },
-        ),
-        (
-            "LifeReservationPercent",
-            {
-                "template": "life_reservation_percent",
-                "default": 0,
-                "condition": lambda v: v,
-                "format": lambda v: "{0:n}".format(v / 100),
             },
         ),
         (
@@ -737,10 +699,8 @@ class SkillParserShared(parser.BaseParser):
         if act_skill:
             infobox["gem_description"] = act_skill["Description"].replace("\n", "<br>")
             infobox["active_skill_name"] = act_skill["DisplayedName"]
-            if act_skill["WeaponRestriction_ItemClassesKeys"]:
-                infobox["item_class_id_restriction"] = ", ".join(
-                    [c["Id"] for c in act_skill["WeaponRestriction_ItemClassesKeys"]]
-                )
+            #if act_skill["WeaponRequirements"]: #Need to get info from ActiveSkillWeaponRequirement.json and WieldableClasses.json
+            #    infobox["item_class_id_restriction"] = 
 
         # From Projectile.dat64 if available
         # TODO - remap
@@ -753,8 +713,6 @@ class SkillParserShared(parser.BaseParser):
         # From GrantedEffects.dat64
 
         infobox["skill_id"] = gra_eff["Id"]
-        if gra_eff["SupportGemLetter"]:
-            infobox["support_gem_letter"] = gra_eff["SupportGemLetter"]
 
         if not gra_eff["IsSupport"]:
             infobox["cast_time"] = gra_eff["CastTime"] / 1000
