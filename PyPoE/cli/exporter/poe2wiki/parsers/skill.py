@@ -19,7 +19,7 @@ Description
 
 This small script reads the data from quest rewards and exports it to a lua
 table for use on the unofficial Path of Exile wiki located at:
-https://poewiki.net
+https://poe2wiki.net
 
 Agreement
 ===============================================================================
@@ -699,8 +699,9 @@ class SkillParserShared(parser.BaseParser):
         if act_skill:
             infobox["gem_description"] = act_skill["Description"].replace("\n", "<br>")
             infobox["active_skill_name"] = act_skill["DisplayedName"]
-            #if act_skill["WeaponRequirements"]: #Need to get info from ActiveSkillWeaponRequirement.json and WieldableClasses.json
-            #    infobox["item_class_id_restriction"] = 
+            # Need to get info from ActiveSkillWeaponRequirement.json and WieldableClasses.json
+            # if act_skill["WeaponRequirements"]:
+            #    infobox["item_class_id_restriction"] =
 
         # From Projectile.dat64 if available
         # TODO - remap

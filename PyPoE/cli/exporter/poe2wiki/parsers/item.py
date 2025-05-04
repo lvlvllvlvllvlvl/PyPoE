@@ -5,11 +5,11 @@ Overview
 ===============================================================================
 
 +----------+------------------------------------------------------------------+
-| Path     | PyPoE/cli/exporter/wiki/parsers/item.py                          |
+| Path     | PyPoE/cli/exporter/poe2wiki/parsers/item.py                      |
 +----------+------------------------------------------------------------------+
 | Version  | 1.0.0a0                                                          |
 +----------+------------------------------------------------------------------+
-| Revision | $Id$                  |
+| Revision | $Id$                                                             |
 +----------+------------------------------------------------------------------+
 | Author   | Omega_K2 /   Project-Path-of-Exile-Wiki                          |
 +----------+------------------------------------------------------------------+
@@ -17,7 +17,7 @@ Overview
 Description
 ===============================================================================
 
-https://poewiki.net
+https://poe2wiki.net
 
 Agreement
 ===============================================================================
@@ -547,9 +547,9 @@ class ItemsParser(SkillParserShared):
 
     _NAME_OVERRIDE_BY_ID = {
         "English": {
-            #"Metadata/Items/PantheonSouls/PantheonSoulBrineKingUpgrade1": (
+            # "Metadata/Items/PantheonSouls/PantheonSoulBrineKingUpgrade1": (
             #    "Captured Soul (The Brine King upgrade 1 of 3)"
-            #),
+            # ),
         }
     }
 
@@ -2518,7 +2518,11 @@ class ItemsParser(SkillParserShared):
         ),
         "Shield": (_type_level, _type_attribute, _type_armour, _type_shield),
         "Buckler": (_type_level, _type_attribute, _type_armour, _type_shield),
-        "Focus": (_type_level, _type_attribute, _type_armour,),
+        "Focus": (
+            _type_level,
+            _type_attribute,
+            _type_armour,
+        ),
         # Martial weapons
         "Claw": (
             _type_level,
@@ -2592,14 +2596,17 @@ class ItemsParser(SkillParserShared):
         ),
         "Quiver": (_type_level,),
         # Caster weapons
-        "Sceptre": (_type_level, _type_spirit,),
+        "Sceptre": (
+            _type_level,
+            _type_spirit,
+        ),
         "Wand": (_type_level,),
         "Staff": (_type_level,),
         "TrapTool": (_type_level,),
         # Flasks
         "LifeFlask": (_type_level, _type_flask, _type_flask_charges),
         "ManaFlask": (_type_level, _type_flask, _type_flask_charges),
-        "UtilityFlask": (_type_level, _type_flask, _type_flask_charges),#Aka charm
+        "UtilityFlask": (_type_level, _type_flask, _type_flask_charges),  # Aka charm
         # Gems
         "Active Skill Gem": (_skill_gem,),
         "Support Skill Gem": (_skill_gem,),
@@ -2611,7 +2618,9 @@ class ItemsParser(SkillParserShared):
         # Currency-like items
         "Currency": (_type_currency,),
         "StackableCurrency": (_type_currency, _type_essence, _type_blight_item),
-        "SoulCore": (_type_currency,),#TODO: Add function to extract data from SoulCores.dat and SoulCoresPerClass.dat
+        "SoulCore": (
+            _type_currency,
+        ),  # TODO: Add function to extract data from SoulCores.json and SoulCoresPerClass.json
         "Omen": (_type_currency,),
         "DelveSocketableCurrency": (_skip,),
         "DelveStackableSocketableCurrency": (_skip,),
@@ -2620,7 +2629,7 @@ class ItemsParser(SkillParserShared):
         "DivinationCard": (_type_currency,),
         "IncubatorStackable": (_skip,),
         # Misc
-        "Map": (),#Aka waystone
+        "Map": (),  # Aka waystone
         "MapFragment": (_type_currency,),
         "TowerAugmentation": (),
         "Breachstone": (_type_currency,),
