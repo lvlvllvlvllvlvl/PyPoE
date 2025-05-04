@@ -1235,10 +1235,11 @@ class TQReminderString(TranslationQuantifier):
 
 
 class TQNumberFormat(TranslationQuantifier):
-    def __init__(self, id, multiplier=1, divisor=1, addend=0, dp=None, fixed=False):
+    def __init__(self, id, multiplier=1, divisor=1, addend=0, exponent=1, dp=None, fixed=False):
         self.multiplier = multiplier
         self.divisor = divisor
         self.addend = addend
+        self.exponent = exponent
         self.dp = dp
         self.fixed = fixed
         super().__init__(
@@ -1249,10 +1250,10 @@ class TQNumberFormat(TranslationQuantifier):
         )
 
     def handle(self, v):
-        return v * self.multiplier / self.divisor + self.addend
+        return v**self.exponent * self.multiplier / self.divisor + self.addend
 
     def reverse(self, v):
-        return (float(v) - self.addend) * self.divisor / self.multiplier
+        return ((float(v) - self.addend) * self.divisor / self.multiplier) ** (1 / self.exponent)
 
     def format(self, v):
         if self.dp is None:
@@ -2687,6 +2688,13 @@ TQNumberFormat(
     id="invert_chance",
     multiplier=-1,
     addend=100,
+)
+
+TQNumberFormat(
+    id="one_hundred_divide_by_value",
+    multiplier=100,
+    exponent=-1,
+    dp=2,
 )
 
 TranslationQuantifier(

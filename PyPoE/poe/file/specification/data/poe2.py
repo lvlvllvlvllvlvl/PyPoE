@@ -428,6 +428,25 @@ specification = Specification(
                 ),
             ),
         ),
+        "ActiveSkillWeaponRequirement.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="WieldableClasses",
+                    type="ref|list|ref|out",
+                    key="WieldableClasses.dat",
+                ),
+                Field(
+                    name="String",
+                    type="ref|out",
+                    key="ClientStrings.dat",
+                ),
+            ),
+        ),
         "ActiveSkills.dat": File(
             fields=(
                 Field(
@@ -608,23 +627,11 @@ specification = Specification(
                     key="ActiveSkillWeaponRequirement.dat",
                 ),
             ),
-        ),
-        "ActiveSkillWeaponRequirement.dat": File(
-            fields=(
-                Field(
-                    name="Id",
-                    type="ref|string",
-                    unique=True,
-                ),
-                Field(
-                    name="WieldableClasses",
-                    type="ref|list|ref|out",
-                    key="WieldableClasses.dat",
-                ),
-                Field(
-                    name="String",
-                    type="ref|string",
-                    key="ClientStrings.dat",
+            virtual_fields=(
+                VirtualField(
+                    name="AlternateSkillTargetingBehavioursKey",
+                    fields=("AlternateSkillTargetingBehaviour",),
+                    alias=True,
                 ),
             ),
         ),
@@ -1951,42 +1958,6 @@ specification = Specification(
                     name="Flag1",
                     type="bool",
                 ),
-                Field(
-                    name="Flag2",
-                    type="bool",
-                ),
-                Field(
-                    name="Mainhand_AnimationKey",
-                    type="ref|generic",
-                    key="Animation.dat",
-                ),
-                Field(
-                    name="Offhand_AnimationKey",
-                    type="ref|generic",
-                    key="Animation.dat",
-                ),
-                Field(
-                    name="Flag3",
-                    type="bool",
-                ),
-                Field(
-                    name="Key0",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Unknown0",
-                    type="ref|generic",
-                    key="Animation.dat",
-                ),
-                Field(
-                    name="Flag4",
-                    type="bool",
-                ),
-                Field(
-                    name="Unknown1",
-                    type="ref|generic",
-                    key="Animation.dat",
-                ),
             ),
         ),
         "ApplyDamageFunctions.dat": File(
@@ -2469,7 +2440,7 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Unknown2",
+                    name="Unknown0",
                     type="int",
                 ),
                 Field(
@@ -3363,50 +3334,6 @@ specification = Specification(
                     name="Unknown0",
                     type="ref|string",
                 ),
-                Field(
-                    name="Key0",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Unknown1",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Unknown2",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Key1",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Key2",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Key3",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Unknown3",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Unknown4",
-                    type="int",
-                ),
-                Field(
-                    name="Key4",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Unknown5",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown6",
-                    type="ref|string",
-                ),
             ),
         ),
         "BackendErrors.dat": File(
@@ -4147,7 +4074,8 @@ specification = Specification(
                 Field(
                     name="GameMode",
                     type="int",
-                    description="1: Normal, 2: Ruthless",
+                    enum="GAME_MODES",
+                    description="0: All, 1: Normal, 2: Ruthless",
                 ),
                 Field(
                     name="FlaskMod",
@@ -4703,8 +4631,9 @@ specification = Specification(
                     unique=True,
                 ),
                 Field(
-                    name="Key0",
+                    name="EnchantedMod",
                     type="ref|out",
+                    key="Mods.dat",
                 ),
             ),
             virtual_fields=(
@@ -6010,11 +5939,6 @@ specification = Specification(
                     name="Key1",
                     type="ref|out",
                 ),
-                Field(
-                    name="SkillGem",
-                    type="ref|out",
-                    key="SkillGems.dat",
-                ),
             ),
         ),
         "CharacterPanelDescriptionModes.dat": File(
@@ -6314,7 +6238,7 @@ specification = Specification(
                 Field(
                     name="StartSkillGem",
                     type="ref|out",
-                    key="SkillGems.dat",
+                    key="BaseItemTypes.dat",
                 ),
                 Field(
                     name="Key0",
@@ -6516,11 +6440,11 @@ specification = Specification(
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown14",
-                    type="int",
+                    name="Key6",
+                    type="ref|out",
                 ),
                 Field(
-                    name="Key6",
+                    name="Key7",
                     type="ref|out",
                 ),
                 Field(
@@ -6528,7 +6452,7 @@ specification = Specification(
                     type="ref|list|ref|out",
                 ),
                 Field(
-                    name="Unknown15",
+                    name="Unknown14",
                     type="float",
                 ),
                 Field(
@@ -7691,6 +7615,10 @@ specification = Specification(
                 ),
                 Field(
                     name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag1",
                     type="bool",
                 ),
             ),
@@ -10194,8 +10122,8 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Data0",
-                    type="ref|list|int",
+                    name="Keys0",
+                    type="ref|list|ref|out",
                 ),
                 Field(
                     name="Unknown2",
@@ -10216,16 +10144,16 @@ specification = Specification(
                     key="Tags.dat",
                 ),
                 Field(
-                    name="Key0",
-                    type="ref|out",
+                    name="Unknown3",
+                    type="ref|generic",
                     key="Essences.dat",
                 ),
                 Field(
-                    name="Unknown3",
+                    name="Unknown4",
                     type="int",
                 ),
                 Field(
-                    name="Key1",
+                    name="Key0",
                     type="ref|out",
                 ),
                 Field(
@@ -10239,7 +10167,7 @@ specification = Specification(
                     key="ItemClasses.dat",
                 ),
                 Field(
-                    name="Unknown4",
+                    name="Unknown5",
                     type="int",
                 ),
             ),
@@ -10928,32 +10856,6 @@ specification = Specification(
                 Field(
                     name="Flag0",
                     type="bool",
-                ),
-                Field(
-                    name="Data0",
-                    type="ref|list|ref|string",
-                ),
-                Field(
-                    name="Data1",
-                    type="ref|list|int",
-                ),
-                Field(
-                    name="Unknown0",
-                    type="ref|generic",
-                    key="ExtraTerrainFeatures.dat",
-                ),
-                Field(
-                    name="WorldAreasKey",
-                    type="ref|out",
-                    key="WorldAreas.dat",
-                ),
-                Field(
-                    name="Flag1",
-                    type="bool",
-                ),
-                Field(
-                    name="Unknown1",
-                    type="int",
                 ),
             ),
         ),
@@ -12341,10 +12243,10 @@ specification = Specification(
                     type="float",
                 ),
                 Field(
-                    name="CopiedStats",
+                    name="IgnoredStats",
                     type="ref|list|ref|out",
                     key="Stats.dat",
-                    description="Values for these stats are copied from the base StatSet of the GrantedEffect",
+                    description="Values for these stats are NOT copied from the base StatSet of the GrantedEffect",
                 ),
                 Field(
                     name="Flag0",
@@ -12517,11 +12419,6 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="SupportWeaponRestrictions",
-                    type="ref|list|ref|out",
-                    key="ItemClasses.dat",
-                ),
-                Field(
                     name="RegularVariant",
                     type="ref|generic",
                     key="GrantedEffects.dat",
@@ -12576,6 +12473,11 @@ specification = Specification(
                 Field(
                     name="Unknown3",
                     type="int",
+                ),
+                Field(
+                    name="SupportWeaponRestrictions",
+                    type="ref|list|ref|out",
+                    key="ItemClasses.dat",
                 ),
             ),
         ),
@@ -16011,6 +15913,10 @@ specification = Specification(
                     name="UsableInMapDevice",
                     type="bool",
                 ),
+                Field(
+                    name="Flag1",
+                    type="bool",
+                ),
             ),
             virtual_fields=(
                 VirtualField(
@@ -16826,6 +16732,14 @@ specification = Specification(
                 Field(
                     name="Unknown28",
                     type="ref|string",
+                ),
+                Field(
+                    name="Key6",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key7",
+                    type="ref|out",
                 ),
             ),
             virtual_fields=(
@@ -18735,6 +18649,26 @@ specification = Specification(
                 ),
             ),
         ),
+        "MapRelicInventoryLayout.dat": File(
+            fields=(
+                Field(
+                    name="XOffset",
+                    type="int",
+                ),
+                Field(
+                    name="YOffset",
+                    type="int",
+                ),
+                Field(
+                    name="UnlockQuest",
+                    type="int",
+                ),
+                Field(
+                    name="UnlockText",
+                    type="ref|string",
+                ),
+            ),
+        ),
         "MapSeries.dat": File(
             fields=(
                 Field(
@@ -19774,6 +19708,70 @@ specification = Specification(
                     type="ref|string",
                     unique=True,
                 ),
+                Field(
+                    name="Data0",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="Script",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Data1",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="Data2",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Data3",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown2",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown3",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown4",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown5",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown6",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown7",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown8",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown9",
+                    type="int",
+                ),
             ),
         ),
         "MicrotransactionOnKillBeams.dat": File(
@@ -19855,10 +19853,6 @@ specification = Specification(
                 Field(
                     name="Flag1",
                     type="bool",
-                ),
-                Field(
-                    name="Unknown4",
-                    type="ref|string",
                 ),
             ),
         ),
@@ -20532,6 +20526,20 @@ specification = Specification(
                     name="Id",
                     type="ref|string",
                     unique=True,
+                ),
+            ),
+        ),
+        "ModGrantedSkills.dat": File(
+            fields=(
+                Field(
+                    name="Mod",
+                    type="ref|out",
+                    key="Mods.dat",
+                ),
+                Field(
+                    name="Skill",
+                    type="ref|out",
+                    key="SkillGems.dat",
                 ),
             ),
         ),
@@ -23701,6 +23709,26 @@ specification = Specification(
                     type="ref|out",
                     key="NPCDialogueStyles.dat",
                 ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Gender",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="Unknown2",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Key2",
+                    type="ref|out",
+                ),
             ),
         ),
         "NearbyMonsterConditions.dat": File(
@@ -24462,6 +24490,10 @@ specification = Specification(
                     name="StartIndices",
                     type="ref|list|int",
                 ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
             ),
         ),
         "PassiveOverrideLimits.dat": File(
@@ -25185,6 +25217,14 @@ specification = Specification(
                     name="WeaponPointsGranted",
                     type="int",
                 ),
+                Field(
+                    name="Flag3",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag4",
+                    type="bool",
+                ),
             ),
             virtual_fields=(
                 VirtualField(
@@ -25732,11 +25772,11 @@ specification = Specification(
                     type="ref|string",
                 ),
                 Field(
-                    name="Key3",
+                    name="Key1",
                     type="ref|out",
                 ),
                 Field(
-                    name="Key4",
+                    name="Key2",
                     type="ref|out",
                 ),
                 Field(
@@ -26387,14 +26427,6 @@ specification = Specification(
                     name="MonsterVarietiesKey",
                     type="ref|out",
                     key="MonsterVarieties.dat",
-                ),
-                Field(
-                    name="Flag0",
-                    type="bool",
-                ),
-                Field(
-                    name="Key0",
-                    type="ref|out",
                 ),
             ),
         ),
@@ -27929,8 +27961,8 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Unknown2",
-                    type="ref|string",
+                    name="Keys0",
+                    type="ref|list|ref|out",
                 ),
             ),
             virtual_fields=(
@@ -28185,6 +28217,7 @@ specification = Specification(
                     name="StatsValues",
                     type="ref|list|int",
                 ),
+            ),
         ),
         "SoundEffects.dat": File(
             fields=(
@@ -28509,62 +28542,6 @@ specification = Specification(
                 ),
                 Field(
                     name="Flag2",
-                    type="bool",
-                ),
-            ),
-        ),
-        "StatisticTrackingMicrotransactionsStatistics.dat": File(
-            fields=(
-                Field(
-                    name="Flag0",
-                    type="bool",
-                ),
-                Field(
-                    name="Unknown0",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown1",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown2",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown3",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown4",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown5",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown6",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown7",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown8",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown9",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown10",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Flag1",
                     type="bool",
                 ),
             ),
@@ -29709,6 +29686,10 @@ specification = Specification(
                     name="Unknown0",
                     type="ref|string",
                 ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
             ),
         ),
         "TalkingPets.dat": File(
@@ -29924,6 +29905,14 @@ specification = Specification(
                 Field(
                     name="Unknown2",
                     type="int",
+                ),
+                Field(
+                    name="Data0",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="Data1",
+                    type="ref|list|byte",
                 ),
             ),
         ),
@@ -30538,6 +30527,18 @@ specification = Specification(
                 ),
             ),
         ),
+        "UltimatumTrialLength.dat": File(
+            fields=(
+                Field(
+                    name="MinAreaLevel",
+                    type="int",
+                ),
+                Field(
+                    name="Length",
+                    type="int",
+                ),
+            ),
+        ),
         "UltimatumTrialMasterAudio.dat": File(
             fields=(
                 Field(
@@ -30705,6 +30706,20 @@ specification = Specification(
                     name="JewelName",
                     type="ref|out",
                     key="Words.dat",
+                ),
+                Field(
+                    name="Limit",
+                    type="int",
+                ),
+            ),
+        ),
+        "UniqueMapRelicLimits.dat": File(
+            fields=(
+                Field(
+                    name="Idol",
+                    type="ref|out",
+                    key="Words.dat",
+                    unique=True,
                 ),
                 Field(
                     name="Limit",
@@ -31583,7 +31598,7 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Unknown0",
+                    name="ReloadTime",
                     type="int",
                 ),
             ),
@@ -31595,7 +31610,7 @@ specification = Specification(
                 ),
             ),
         ),
-        "WieldableClasses": File(
+        "WieldableClasses.dat": File(
             fields=(
                 Field(
                     name="ItemClass",
@@ -31708,10 +31723,6 @@ specification = Specification(
                 ),
                 Field(
                     name="Unknown0",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown1",
                     type="int",
                 ),
             ),

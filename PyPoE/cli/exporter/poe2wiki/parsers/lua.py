@@ -19,7 +19,7 @@ Description
 
 This small script reads the data from quest rewards and exports it to a lua
 table for use on the unofficial Path of Exile wiki located at:
-https://poewiki.net
+https://poe2wiki.net
 
 Agreement
 ===============================================================================
