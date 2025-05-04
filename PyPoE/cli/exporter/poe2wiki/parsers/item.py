@@ -9,7 +9,7 @@ Overview
 +----------+------------------------------------------------------------------+
 | Version  | 1.0.0a0                                                          |
 +----------+------------------------------------------------------------------+
-| Revision | $Id$                                                             |
+| Revision | $Id$                  |
 +----------+------------------------------------------------------------------+
 | Author   | Omega_K2 /   Project-Path-of-Exile-Wiki                          |
 +----------+------------------------------------------------------------------+
@@ -33,7 +33,6 @@ Kishara's Star (item)
 # =============================================================================
 
 import codecs
-import math
 import os
 
 # Python
@@ -55,13 +54,13 @@ from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
+from PyPoE.cli.exporter.poe2wiki.parser import process_keywords, strip_keywords
 from PyPoE.cli.exporter.poe2wiki.parsers.itemconstants import (
     MAPS_IN_SERIES_BUT_NOT_ON_ATLAS,
     MAPS_TO_SKIP_COLORING,
     MAPS_TO_SKIP_COMPOSITING,
 )
 from PyPoE.cli.exporter.poe2wiki.parsers.skill import SkillParserShared
-from PyPoE.cli.exporter.wiki.parser import process_keywords
 
 # Self
 from PyPoE.poe.constants import RARITY
@@ -140,7 +139,7 @@ def _type_factory(
     function=None,
     fail_condition=False,
     skip_warning=False,
-    index_column="BaseItemTypesKey",
+    index_column="BaseItemType",
 ):
     def func(self, infobox, base_item_type):
         if data_file == "BaseItemTypes.dat64":
@@ -519,6 +518,9 @@ class ItemsParser(SkillParserShared):
     }
 
     _IGNORE_DROP_LEVEL_CLASSES = (
+        "Active Skill Gem",
+        "Support Skill Gem",
+        "Meta Skill Gem",
         "HideoutDoodad",
         "Microtransaction",
         "InstanceLocalItem",
@@ -1798,7 +1800,7 @@ class ItemsParser(SkillParserShared):
 
     def _skill_gem(self, infobox: OrderedDict, base_item_type):
         try:
-            skill_gem = self.rr["SkillGems.dat64"].index["BaseItemTypesKey"][base_item_type.rowid]
+            skill_gem = self.rr["SkillGems.dat64"].index["BaseItemType"][base_item_type.rowid]
         except KeyError:
             return False
 
@@ -1818,8 +1820,8 @@ class ItemsParser(SkillParserShared):
             infobox["is_vaal_skill_gem"] = "true"
             if gem_type["ItemColor"] != 3:
                 return False
-        if skill_gem["VaalVariant_BaseItemTypesKey"]:
-            infobox["vaal_variant_id"] = skill_gem["VaalVariant_BaseItemTypesKey"]["Id"]
+        if skill_gem["VaalVariant_BaseItemType"]:
+            infobox["vaal_variant_id"] = skill_gem["VaalVariant_BaseItemType"]["Id"]
         if name:
             infobox["name"] = name
             infobox["base_item_id"] = infobox.pop("metadata_id")
@@ -1830,7 +1832,9 @@ class ItemsParser(SkillParserShared):
                 continue
             infobox[attr_long + "_percent"] = skill_gem[attr_short]
 
-        infobox["gem_tags"] = ", ".join([gt["Tag"] for gt in gem_type["GemTags"] if gt["Tag"]])
+        infobox["gem_tags"] = strip_keywords(
+            ", ".join([gt["Name"] for gt in gem_type["GemTags"] if gt["Name"]])
+        )
 
         infobox["gem_tier"] = skill_gem["CraftingLevel"]
 
@@ -1843,7 +1847,7 @@ class ItemsParser(SkillParserShared):
 
         # some descriptions come from active skills which are parsed in above function
         if ge["IsSupport"] and gem_type["SupportText"]:
-            infobox["support_text"] = process_keywords(gem_type["SupportText"])
+            infobox["description"] = process_keywords(gem_type["SupportText"])
 
         return True
 
@@ -1876,7 +1880,8 @@ class ItemsParser(SkillParserShared):
                 },
             ),
         ),
-        row_index=False,
+        row_index=True,
+        fail_condition=True,
     )
 
     _type_armour = _type_factory(
@@ -1951,12 +1956,10 @@ class ItemsParser(SkillParserShared):
 
     def _apply_flask_buffs(self, infobox, base_item_type, flasks):
         for buff in flasks["UtilityBuff"]:
-            stats = [s["Id"] for s in buff["BuffDefinitionsKey"]["StatsKeys"]] + [
-                s["Id"] for s in buff["BuffDefinitionsKey"]["Binary_StatsKeys"]
+            stats = [s["Id"] for s in buff["BuffDefinition"]["StatsKeys"]] + [
+                s["Id"] for s in buff["BuffDefinition"]["GrantedFlags"]
             ]
-            values = buff["StatValues"] + [
-                1 for _ in buff["BuffDefinitionsKey"]["Binary_StatsKeys"]
-            ]
+            values = buff["StatValues"] + [1 for _ in buff["BuffDefinition"]["GrantedFlags"]]
             tr = self.tc["stat_descriptions.txt"].get_translation(
                 stats,
                 values,
@@ -1994,7 +1997,7 @@ class ItemsParser(SkillParserShared):
                 },
             ),
             (
-                "BuffDefinitionsKey",
+                "BuffDefinition",
                 {
                     "template": "buff_id",
                     "condition": lambda v: v is not None,
@@ -2023,6 +2026,7 @@ class ItemsParser(SkillParserShared):
             ),
         ),
         row_index=False,
+        index_column="BaseItemTypesKey",
     )
 
     _type_weapon = _type_factory(
@@ -2085,6 +2089,7 @@ class ItemsParser(SkillParserShared):
             ),
         ),
         row_index=True,
+        fail_condition=True,
     )
 
     _type_quest_item = _type_factory(
@@ -2103,18 +2108,22 @@ class ItemsParser(SkillParserShared):
                 {
                     "template": "description",
                     "condition": lambda v: v,
-                    "format": lambda v: process_keywords(v["Text"]),
+                    "format": lambda v: v["Text"],
                 },
             ),
         ),
         row_index=True,
+        index_column="Item",
+        fail_condition=True,
     )
 
     def _currency_extra(self, infobox, base_item_type, currency):
         if infobox.get("description"):
-            infobox["description"] = parser.parse_and_handle_description_tags(
-                rr=self.rr,
-                text=infobox["description"],
+            infobox["description"] = process_keywords(
+                parser.parse_and_handle_description_tags(
+                    rr=self.rr,
+                    text=infobox["description"],
+                )
             )
 
         return True
@@ -2483,6 +2492,7 @@ class ItemsParser(SkillParserShared):
             ),
         ),
         row_index=True,
+        index_column="Oil",
         fail_condition=True,
         skip_warning=True,
     )
@@ -2635,7 +2645,7 @@ class ItemsParser(SkillParserShared):
         "Breachstone": (_type_currency,),
         "ExpeditionLogbook": (),
         "PinnacleKey": (),
-        "QuestItem": (_type_quest_item),
+        "QuestItem": (_type_quest_item,),
         # Sanctum
         "Relic": (),
         "SanctumSpecialRelic": (_skip,),
@@ -2916,12 +2926,16 @@ class ItemsParser(SkillParserShared):
 
         description = ot["Stack"].get("function_text")
         if description:
-            infobox["description"] = self.rr["ClientStrings.dat64"].index["Id"][description]["Text"]
+            infobox["description"] = process_keywords(
+                self.rr["ClientStrings.dat64"].index["Id"][description]["Text"]
+            )
 
         help_text = ot["Base"].get("description_text")
         if help_text:
-            infobox["help_text"] = infobox["help_text"] = "<br>".join(
-                self.rr["ClientStrings.dat64"].index["Id"][help_text]["Text"].splitlines()
+            infobox["help_text"] = infobox["help_text"] = process_keywords(
+                "<br>".join(
+                    self.rr["ClientStrings.dat64"].index["Id"][help_text]["Text"].splitlines()
+                )
             )
 
         for i, mod in enumerate(base_item_type["Implicit_ModsKeys"]):
@@ -3003,7 +3017,7 @@ class ItemsParser(SkillParserShared):
 
         for base_item_type in items:
             name = base_item_type["Name"]
-            cls_id = base_item_type["ItemClassesKey"]["Id"]
+            cls_id = base_item_type["ItemClass"]["Id"]
             m_id = base_item_type["Id"]
 
             self._print_item_rowid(len(items), base_item_type)
@@ -3384,7 +3398,7 @@ class ItemsParser(SkillParserShared):
 
             # Save off the atlas_node for each map in the series,
             # filtering to the maps from the names command argument if it was provided.
-            if (names and maps["BaseItemTypesKey"]["Name"] in names) or not names:
+            if (names and maps["BaseItemType"]["Name"] in names) or not names:
                 map_series_tiers[row] = atlas_node
 
         # Save off the base icon
@@ -3422,7 +3436,7 @@ class ItemsParser(SkillParserShared):
 
         for row, atlas_node in map_series_tiers.items():
             maps = row["MapsKey"]
-            base_item_type = maps["BaseItemTypesKey"]
+            base_item_type = maps["BaseItemType"]
             name = self._format_map_name(base_item_type, map_series)
             tier = row["%sTier" % map_series["Id"]]
 

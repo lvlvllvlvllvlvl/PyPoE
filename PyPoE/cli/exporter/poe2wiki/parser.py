@@ -5,7 +5,7 @@ Overview
 ===============================================================================
 
 +----------+------------------------------------------------------------------+
-| Path     | PyPoE/cli/exporter/wiki/parser.py                                |
+| Path     | PyPoE/cli/exporter/poe2wiki/parser.py                            |
 +----------+------------------------------------------------------------------+
 | Version  | 1.0.0a0                                                          |
 +----------+------------------------------------------------------------------+
@@ -1973,6 +1973,20 @@ def make_inter_wiki_links(string):
         string = "".join(out)
 
     return string
+
+
+def process_keywords(text: str):
+    return text.replace("[", "[[").replace("]", "]]").replace("\n", "<br>")
+
+
+def strip_keywords(text: str):
+    for match in re.finditer(r"\[(.+?)\]", text):
+        full_match = match.group(0)
+        key = match.group(1)
+        if "|" in key:
+            key = key[key.index("|") + 1 :]
+        text = text.replace(full_match, key)
+    return text
 
 
 def find_template(wikitext, template_name):

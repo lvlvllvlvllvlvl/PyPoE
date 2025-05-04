@@ -48,11 +48,11 @@ from PyPoE.cli.exporter.wiki.parser import BaseParser, WikiCondition
 # Self
 from PyPoE.poe import text
 from PyPoE.poe.constants import (
+    GAME_MODES,
     MOD_DOMAIN,
     MOD_GENERATION_TYPE,
     MOD_SELL_PRICES,
     MOD_STATS_RANGE,
-    GAME_MODES,
 )
 from PyPoE.shared.decorators import deprecated
 

@@ -979,6 +979,7 @@ class ITEM_CLASS_FLAGS(IntEnumOverride):
     ACCESSORY = 6
     CURRENCY = 7
 
+
 class GAME_MODES(IntEnumOverride):
     ALL = 0
     NORMAL = 1
