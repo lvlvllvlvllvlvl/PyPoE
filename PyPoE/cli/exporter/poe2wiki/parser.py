@@ -1747,9 +1747,7 @@ class TagHandler:
             return "[[%s]]" % string
         items = self.rr["BaseItemTypes.dat64"].index["Name"][string]
         if items:
-            if items[0]["ItemClassesKey"]["Name"] == "Maps":
-                string = self._IL_FORMAT % string
-            elif len(items) > 1:
+            if len(items) > 1:
                 return "[[%s]]" % string
             else:
                 string = self._IL_FORMAT % string

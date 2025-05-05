@@ -3194,6 +3194,7 @@ specification = Specification(
                     name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="ReqStr",
@@ -10108,6 +10109,7 @@ specification = Specification(
                     name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="HASH32",
@@ -10144,17 +10146,18 @@ specification = Specification(
                     key="Tags.dat",
                 ),
                 Field(
-                    name="Unknown3",
+                    name="UpgradeResult",
                     type="ref|generic",
                     key="Essences.dat",
                 ),
                 Field(
-                    name="Unknown4",
+                    name="Tier",
                     type="int",
                 ),
                 Field(
-                    name="Key0",
+                    name="Stats",
                     type="ref|out",
+                    key="Stats.dat",
                 ),
                 Field(
                     name="CraftedMod",
@@ -10167,7 +10170,7 @@ specification = Specification(
                     key="ItemClasses.dat",
                 ),
                 Field(
-                    name="Unknown5",
+                    name="Unknown3",
                     type="int",
                 ),
             ),
@@ -16091,6 +16094,7 @@ specification = Specification(
                     name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="SkillsGranted",
@@ -16155,6 +16159,7 @@ specification = Specification(
                     name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="SpiritGranted",
