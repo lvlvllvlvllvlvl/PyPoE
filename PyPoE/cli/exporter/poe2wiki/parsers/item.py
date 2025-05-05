@@ -2333,6 +2333,85 @@ class ItemsParser(SkillParserShared):
         skip_warning=True,
     )
 
+    def _type_soulcore(self, infobox, base_item_type):
+        # Base SoulCores
+        if "BaseItemType" not in self.rr["SoulCores.dat64"].index:
+            self.rr["SoulCores.dat64"].build_index("BaseItemType")
+
+        try:
+            soulCore = self.rr["SoulCores.dat64"].index["BaseItemType"][base_item_type]
+        except KeyError:
+            return False
+
+        infobox["soulcore_rank"] = soulCore[0]["Rank"]
+
+        socket_types = [
+            # stats, values, text
+            (
+                "StatsMartialWeapon",
+                "StatsValuesMartialWeapon",
+                "Martial Weapons",
+            ),
+            (
+                "StatsArmour",
+                "StatsValuesArmour",
+                "Armour",
+            ),
+            (
+                "StatsCasterWeapon",
+                "StatsValuesCasterWeapon",
+                "Wand or Staff",
+            ),
+        ]
+
+        for st in socket_types:
+            if soulCore[0][st[0]]:
+                stats = [s["Id"] for s in soulCore[0][st[0]]]
+                values = soulCore[0][st[1]]
+                tr = self.tc["stat_descriptions.txt"].get_translation(
+                    stats,
+                    values,
+                    full_result=True,
+                    lang=self._language,
+                )
+                desc = process_keywords(
+                    "<br>".join([parser.make_inter_wiki_links(line) for line in tr.lines])
+                )
+
+                if infobox.get("description"):
+                    infobox["description"] += "<br>" + st[2] + ": " + desc
+                else:
+                    infobox["description"] = st[2] + ": " + desc
+
+        # Per class SoulCores
+        if "BaseItemType" not in self.rr["SoulCoresPerClass.dat64"].index:
+            self.rr["SoulCoresPerClass.dat64"].build_index("BaseItemType")
+
+        try:
+            soulCorePC = self.rr["SoulCoresPerClass.dat64"].index["BaseItemType"][base_item_type]
+        except KeyError:
+            return True
+
+        for sc in soulCorePC:
+            stats = [s["Id"] for s in sc["Stats"]]
+            values = sc["StatsValues"]
+            tr = self.tc["stat_descriptions.txt"].get_translation(
+                stats,
+                values,
+                full_result=True,
+                lang=self._language,
+            )
+            desc = process_keywords(
+                "<br>".join([parser.make_inter_wiki_links(line) for line in tr.lines])
+            )
+
+            if infobox.get("description"):
+                infobox["description"] += "<br>" + sc["ItemClass"]["Name"] + ": " + desc
+            else:
+                infobox["description"] = sc["ItemClass"]["Name"] + ": " + desc
+
+        return True
+
     """
     This defines the expected data elements for an item class.
     """
@@ -2466,7 +2545,8 @@ class ItemsParser(SkillParserShared):
         "StackableCurrency": (_type_currency, _type_essence, _type_blight_item),
         "SoulCore": (
             _type_currency,
-        ),  # TODO: Add function to extract data from SoulCores.json and SoulCoresPerClass.json
+            _type_soulcore,
+        ),
         "Omen": (_type_currency,),
         "DelveSocketableCurrency": (_skip,),
         "DelveStackableSocketableCurrency": (_skip,),
@@ -2829,6 +2909,9 @@ class ItemsParser(SkillParserShared):
         self.num_processed = 0
 
         for base_item_type in items:
+            if "[DNT]" in base_item_type["Name"]:
+                continue
+
             name = base_item_type["Name"]
             cls_id = base_item_type["ItemClass"]["Id"]
             m_id = base_item_type["Id"]
