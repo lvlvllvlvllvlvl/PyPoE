@@ -260,9 +260,6 @@ class WikiCondition(parser.WikiCondition):
         # Version information
         "release_version",
         "removal_version",
-        # prophecies
-        "prophecy_objective",
-        "prophecy_reward",
         # Quest Rewards
         "quest_reward1_type",
         "quest_reward1_quest",
@@ -288,9 +285,6 @@ class WikiCondition(parser.WikiCondition):
         "quest_reward4_act",
         "quest_reward4_class_ids",
         "quest_reward4_npc",
-        # Sentinels
-        "sentinel_monster",
-        "sentinel_monster_level",
     )
     COPY_MATCH = re.compile(
         r"^(recipe|sell_price|implicit[0-9]+_(?:text|random_list)).*", re.UNICODE
@@ -442,8 +436,52 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Rings/RingDemigods1",
     }
 
+    _FORCE_INVENTORY_ICON_BY_ID = {
+        # =================================================================
+        # Skill Gems
+        # =================================================================
+        # Ascendancy granted
+        "Metadata/Items/Gem/SkillGemAscendancyUnleash": "Ascendancy",
+        # Weapon attacks
+        "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultAxeAxe": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefault1HSword": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefault2HSword": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultSwordSword": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefault1HMace": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefault2HMace": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultMaceMace": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultQuarterstaff": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultFlail": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultUnarmed": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultBow": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultCrossbow": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultSpear": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultSpearThrow": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultDagger": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultDaggerDagger": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultClaw": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultClawClaw": "Item",
+        # =================================================================
+        # Body armours
+        # =================================================================
+        "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4aEndgame": "Cloaked Mail",
+        "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4bEndgame": "Cloaked Mail",
+        "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4cEndgame": "Cloaked Mail",
+        # =================================================================
+        # Quest items
+        # =================================================================
+        "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": "Candlemass' Essence",
+        "Metadata/Items/QuestItems/Gallows/Act3/GoldIdol4": "Grand Idol",
+        "Metadata/Items/QuestItems/Gallows/Act3/GoldIdol5": "Golden Idol",
+        "Metadata/Items/QuestItems/Gallows/Act3/GoldIdol6": "Glorious Idol",
+        "Metadata/Items/QuestItems/Gallows/Act3/SnakeLadyPotionConsumable4": "Venom Draught of Stone",
+        "Metadata/Items/QuestItems/Gallows/Act3/SnakeLadyPotionConsumable5": "Venom Draught of the Veil",
+        "Metadata/Items/QuestItems/Gallows/Act3/SnakeLadyPotionConsumable6": "Venom Draught of Clarity",
+    }
+
     _EXCLUDE_CLASSES = {
-        "NecropolisPack",
         "HiddenItem",
     }
 
@@ -461,6 +499,21 @@ class ItemsParser(SkillParserShared):
             # Skill Gems
             # =================================================================
             "Metadata/Items/Gem/SkillGemAscendancyUnleash": " (skill)",
+            # Weapon attacks
+            "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe": "",
+            "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe": " (two handed)",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultAxeAxe": " (dual handed)",
+            "Metadata/Items/Gem/SkillGemPlayerDefault1HSword": "",
+            "Metadata/Items/Gem/SkillGemPlayerDefault2HSword": " (two handed)",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultSwordSword": " (dual handed)",
+            "Metadata/Items/Gem/SkillGemPlayerDefault1HMace": "",
+            "Metadata/Items/Gem/SkillGemPlayerDefault2HMace": " (two handed)",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultMaceMace": " (dual handed)",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultSpear": "",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultDagger": "",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultDaggerDagger": " (dual handed)",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultClaw": "",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultClawClaw": " (dual handed)",
             # =================================================================
             # Support Gems
             # =================================================================
@@ -1911,6 +1964,7 @@ class ItemsParser(SkillParserShared):
 
     _type_flask_charges = _type_factory(
         data_file="ComponentCharges.dat64",
+        index_column="BaseItemTypesKey",
         data_mapping=(
             (
                 "MaxCharges",
@@ -1926,7 +1980,6 @@ class ItemsParser(SkillParserShared):
             ),
         ),
         row_index=False,
-        index_column="BaseItemTypesKey",
     )
 
     _type_weapon = _type_factory(
@@ -1994,26 +2047,26 @@ class ItemsParser(SkillParserShared):
 
     _type_quest_item = _type_factory(
         data_file="QuestItems.dat64",
+        index_column="Item",
         data_mapping=(
             (
                 "HelpText",
                 {
                     "template": "help_text",
-                    "condition": lambda v: v,
-                    "format": lambda v: v["Text"],
+                    "condition": lambda v: v is not None,
+                    "format": lambda v: process_keywords(v["Text"]),
                 },
             ),
             (
                 "Description",
                 {
                     "template": "description",
-                    "condition": lambda v: v,
-                    "format": lambda v: v["Text"],
+                    "condition": lambda v: v is not None,
+                    "format": lambda v: process_keywords(v["Text"]),
                 },
             ),
         ),
         row_index=True,
-        index_column="Item",
         fail_condition=True,
     )
 
@@ -2319,6 +2372,7 @@ class ItemsParser(SkillParserShared):
 
     _type_blight_item = _type_factory(
         data_file="BlightCraftingItems.dat64",
+        index_column="Oil",
         data_mapping=(
             (
                 "Tier",
@@ -2328,7 +2382,6 @@ class ItemsParser(SkillParserShared):
             ),
         ),
         row_index=True,
-        index_column="Oil",
         fail_condition=True,
         skip_warning=True,
     )
@@ -2339,11 +2392,11 @@ class ItemsParser(SkillParserShared):
             self.rr["SoulCores.dat64"].build_index("BaseItemType")
 
         try:
-            soulCore = self.rr["SoulCores.dat64"].index["BaseItemType"][base_item_type]
+            soulCore = self.rr["SoulCores.dat64"].index["BaseItemType"][base_item_type.rowid]
         except KeyError:
             return False
 
-        infobox["soulcore_rank"] = soulCore[0]["Rank"]
+        infobox["soulcore_rank"] = soulCore["Rank"]
 
         socket_types = [
             # stats, values, text
@@ -2365,9 +2418,9 @@ class ItemsParser(SkillParserShared):
         ]
 
         for st in socket_types:
-            if soulCore[0][st[0]]:
-                stats = [s["Id"] for s in soulCore[0][st[0]]]
-                values = soulCore[0][st[1]]
+            if soulCore[st[0]]:
+                stats = [s["Id"] for s in soulCore[st[0]]]
+                values = soulCore[st[1]]
                 tr = self.tc["stat_descriptions.txt"].get_translation(
                     stats,
                     values,
@@ -2879,6 +2932,9 @@ class ItemsParser(SkillParserShared):
                         msg=Msg.warning,
                     )
                     return
+
+        if m_id in self._FORCE_INVENTORY_ICON_BY_ID:
+            infobox["inventory_icon"] = self._FORCE_INVENTORY_ICON_BY_ID.get(m_id)
 
         return name
 

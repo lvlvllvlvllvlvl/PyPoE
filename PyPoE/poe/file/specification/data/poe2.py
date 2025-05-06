@@ -25735,6 +25735,7 @@ specification = Specification(
                     name="Item",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="TriggeredQuestFlag",
@@ -28167,6 +28168,7 @@ specification = Specification(
                     name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="StatsMartialWeapon",
