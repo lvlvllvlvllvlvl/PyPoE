@@ -441,8 +441,60 @@ class ItemsParser(SkillParserShared):
         # Skill Gems
         # =================================================================
         # Ascendancy granted
+        "Metadata/Items/Gem/SkillGemAscendancyAncestralSpirits": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyBleedingConcoction": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyBloodBoil": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyDemonForm": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyElementalExpression": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyElementalStorm": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyEncasedInJade": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyExplosiveConcoction": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyFireSpellOnHit": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyFulminatingConcoction": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyInfuseWeapon": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyIntoTheBreach": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyLifeRemnants": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyManifestWeapon": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyMeditate": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyPoisonousConcoction": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyRitualSacrifice": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyShatteringConcoction": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancySorceryWard": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancySummonInfernalHound": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancySupportingFire": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyTemperWeapon": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyTemporalRift": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyTimeFreeze": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyTimeSnap": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyUnboundAvatar": "Ascendancy",
         "Metadata/Items/Gem/SkillGemAscendancyUnleash": "Ascendancy",
-        # Weapon attacks
+        # Item granted
+        "Metadata/Items/Gem/SkillGemBoneBlast": "Item",
+        "Metadata/Items/Gems/SkillGemCastOnBlock": "Item",
+        "Metadata/Items/Gems/SkillGemCastOnCharmUse": "Item",
+        "Metadata/Items/Gems/SkillGemChaosbolt": "Item",
+        "Metadata/Items/Gem/SkillGemChaoticInfusion": "Item",
+        "Metadata/Items/Gems/SkillGemCorpseCloud": "Item",
+        "Metadata/Items/Gems/SkillGemDiscipline": "Item",
+        "Metadata/Items/Gems/SkillGemFirebolt": "Item",
+        "Metadata/Items/Gems/SkillGemFreezingShards": "Item",
+        "Metadata/Items/Gems/SkillGemLightningBolt": "Item",
+        "Metadata/Items/Gems/SkillGemLightningSpellOnHit": "Item",
+        "Metadata/Items/Gem/SkillGemLivingBombPlayer": "Item",
+        "Metadata/Items/Gem/SkillGemMalice": "Item",
+        "Metadata/Items/Gem/SkillGemManaDrain": "Item",
+        "Metadata/Items/Gem/SkillGemParry": "Item",
+        "Metadata/Items/Gems/SkillGemPowerSiphon": "Item",
+        "Metadata/Items/Gems/SkillGemPurityOfFire": "Item",
+        "Metadata/Items/Gems/SkillGemPurityOfIce": "Item",
+        "Metadata/Items/Gems/SkillGemPurityOfLightning": "Item",
+        "Metadata/Items/Gem/SkillGemShieldBlock": "Item",
+        "Metadata/Items/Gem/SkillGemScavengedPlating": "Item",
+        "Metadata/Items/Gems/SkillGemSigilOfPower": "Item",
+        "Metadata/Items/Gems/SkillGemSkeletalWarriorWeaponSkill": "Item",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultSpearThrow": "Item",
+        "Metadata/Items/Gems/SkillGemVolatileDead": "Item",
+        # Weapon default attacks
         "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe": "Item",
         "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe": "Item",
         "Metadata/Items/Gem/SkillGemPlayerDefaultAxeAxe": "Item",
@@ -458,7 +510,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gem/SkillGemPlayerDefaultBow": "Item",
         "Metadata/Items/Gem/SkillGemPlayerDefaultCrossbow": "Item",
         "Metadata/Items/Gem/SkillGemPlayerDefaultSpear": "Item",
-        "Metadata/Items/Gem/SkillGemPlayerDefaultSpearThrow": "Item",
         "Metadata/Items/Gem/SkillGemPlayerDefaultDagger": "Item",
         "Metadata/Items/Gem/SkillGemPlayerDefaultDaggerDagger": "Item",
         "Metadata/Items/Gem/SkillGemPlayerDefaultClaw": "Item",
@@ -533,6 +584,10 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/Gems/SupportGemRage": " (support gem)",
             "Metadata/Items/Gem/SupportGemVolatility": " (support gem)",
             # =================================================================
+            # Uncut Gems
+            # =================================================================
+            "Metadata/Items/Gems/SkillGemUncut": "",  # Because of quest item
+            # =================================================================
             # Body armours
             # =================================================================
             "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4aEndgame": " (Fire)",
@@ -555,6 +610,7 @@ class ItemsParser(SkillParserShared):
             # =================================================================
             # Quest items
             # =================================================================
+            "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDrop": "",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": " (Cruel)",
             "Metadata/Items/Gems/SkillGemUncutQuest": " (quest item)",
             # =================================================================
