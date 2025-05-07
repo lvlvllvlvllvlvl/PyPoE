@@ -5,7 +5,7 @@ Overview
 ===============================================================================
 
 +----------+------------------------------------------------------------------+
-| Path     | PyPoE/cli/exporter/wiki/parser.py                                |
+| Path     | PyPoE/cli/exporter/poe2wiki/parser.py                            |
 +----------+------------------------------------------------------------------+
 | Version  | 1.0.0a0                                                          |
 +----------+------------------------------------------------------------------+
@@ -1747,9 +1747,7 @@ class TagHandler:
             return "[[%s]]" % string
         items = self.rr["BaseItemTypes.dat64"].index["Name"][string]
         if items:
-            if items[0]["ItemClassesKey"]["Name"] == "Maps":
-                string = self._IL_FORMAT % string
-            elif len(items) > 1:
+            if len(items) > 1:
                 return "[[%s]]" % string
             else:
                 string = self._IL_FORMAT % string
@@ -1950,29 +1948,44 @@ def make_inter_wiki_links(string):
     if _inter_wiki is None:
         return string
 
-    mapping = _inter_wiki_map.get(config.get_option("language"))
+    # Temporarily disabled as poe2 has its own keywords
+    # mapping = _inter_wiki_map.get(config.get_option("language"))
 
-    for i, regex in enumerate(_inter_wiki):
-        out = []
-        last_index = 0
-        for match in regex.finditer(string):
-            text = match.group("text")
-            # Offset by 1 to account for text group
-            index = match.groups().index(text, 1) - 1
-            data = mapping[i * _MAX_RE + index][1]
-
-            out.append(string[last_index : match.start("text")])
-            if text == data["link"]:
-                out.append("[[%s]]" % data["link"])
-            else:
-                out.append("[[%s|%s]]" % (data["link"], text))
-
-            last_index = match.end("text")
-
-        out.append(string[last_index:])
-        string = "".join(out)
+    # for i, regex in enumerate(_inter_wiki):
+    #    out = []
+    #    last_index = 0
+    #    for match in regex.finditer(string):
+    #        text = match.group("text")
+    #        # Offset by 1 to account for text group
+    #        index = match.groups().index(text, 1) - 1
+    #        data = mapping[i * _MAX_RE + index][1]
+    #
+    #        out.append(string[last_index : match.start("text")])
+    #        if text == data["link"]:
+    #            out.append("[[%s]]" % data["link"])
+    #        else:
+    #            out.append("[[%s|%s]]" % (data["link"], text))
+    #
+    #        last_index = match.end("text")
+    #
+    #    out.append(string[last_index:])
+    #    string = "".join(out)
 
     return string
+
+
+def process_keywords(text: str):
+    return text.replace("[", "[[").replace("]", "]]").replace("\n", "<br>")
+
+
+def strip_keywords(text: str):
+    for match in re.finditer(r"\[(.+?)\]", text):
+        full_match = match.group(0)
+        key = match.group(1)
+        if "|" in key:
+            key = key[key.index("|") + 1 :]
+        text = text.replace(full_match, key)
+    return text
 
 
 def find_template(wikitext, template_name):
