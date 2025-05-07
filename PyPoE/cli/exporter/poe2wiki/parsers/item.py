@@ -545,6 +545,28 @@ class ItemsParser(SkillParserShared):
 
     _EXCLUDE_CLASSES = {
         "HiddenItem",
+        "PantheonSoul",
+        "MiscMapItem",
+        "UniqueFragment",
+        "IncursionItem",
+        "DelveSocketableCurrency",
+        "DelveStackableSocketableCurrency",
+        "Incubator",
+        "IncubatorStackable",
+        "HeistContract",
+        "HeistEquipmentWeapon",
+        "HeistEquipmentTool",
+        "HeistEquipmentUtility",
+        "HeistEquipmentReward",
+        "HeistBlueprint",
+        "HeistObjective",
+        "ArchnemesisMod",
+        "SentinelDrone",
+        "MemoryLine",
+        "SanctumSpecialRelic",
+        "GiftBox",
+        "ConventionTreasure",
+        "SkillGemToken",
     }
 
     _NAME_OVERRIDE_BY_ID = {
@@ -630,7 +652,6 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDrop": "",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": " (Cruel)",
             "Metadata/Items/Gems/SkillGemUncutQuest": " (quest item)",
-            "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric3": "",
             # =================================================================
             # Hideout decorations
             # =================================================================
@@ -1578,6 +1599,13 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric13",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric14",
         # Old from PoE1
+        "Metadata/Items/QuestItems/SkillBooks/DelevelBook",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookElder",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookMaven",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookTangle",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookCleansingFire",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookInfiniteHunger",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBlackStar",
         "Metadata/Items/QuestItems/SkillBooks/Descent2_1",
         "Metadata/Items/QuestItems/SkillBooks/Descent2_2",
         "Metadata/Items/QuestItems/SkillBooks/Descent2_3",
@@ -1585,6 +1613,7 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Misc
         # =================================================================
+        "Metadata/Items/Ultimatum/UltimatumKeySpecial",
         "Metadata/Items/Heist/HeistEquipmentToolTest",
         "Metadata/Items/Heist/HeistEquipmentWeaponTest",
         "Metadata/Items/Heist/HeistEquipmentUtilityTest",
@@ -1594,18 +1623,38 @@ class ItemsParser(SkillParserShared):
     }
 
     _ITEM_SKIP_PATTERNS = {
+        "Active Skill Gem": {
+            r"SkillGemUnknown",
+        },
+        "Support Skill Gem": {
+            r"SupportGemUnknown",
+        },
+        "StackableCurrency": {
+            r"CurrencyHellscape",
+            r"HarvestSeed",
+            r"CurrencyLegion",
+            r"CurrencyIncursionVial",
+            r"RandomFossilOutcome",
+        },
         "MapFragment": {
             r"Scarabs",
+            r"CurrencyLegion",
             r"Maven/MavenMap",
         },
         "MiscMapItem": {
             r"Maven/MavenMap",
         },
+        "Breachstone": {
+            r"CurrencyBreachFragment.+",
+        },
         "QuestItem": {
+            r"SkillBooks/Book-a",
             r"Heist/QuestItems",
             r"Heist/QuestContracts",
             r"ShaperMemoryFragments",
             r"MapUpgrades",
+            r"Maven/MavenMap",
+            r"MapFragments/Primordial/Quest",
         },
         "Microtransaction": {
             r"Garena",
@@ -1625,6 +1674,7 @@ class ItemsParser(SkillParserShared):
             r"Convert.*Scroll",
             r"Premium.*Pet",
             r"UnifiedAuraEffect",
+            r"MicrotransactionWrapper",
         },
     }
 
@@ -1703,7 +1753,7 @@ class ItemsParser(SkillParserShared):
         if additional:
             infobox["additional_skill_ids"] = ", ".join(a["Id"] for a in additional)
 
-        # some descriptions come from active skills which are parsed in above function
+        # some descriptions come from active skills
         if ge["IsSupport"] and gem_type["SupportText"]:
             infobox["description"] = process_keywords(gem_type["SupportText"])
 
@@ -1828,7 +1878,6 @@ class ItemsParser(SkillParserShared):
                 [parser.make_inter_wiki_links(line) for line in tr.lines]
             )
 
-    # TODO: BuffDefinitionsKey, BuffStatValues
     _type_flask = _type_factory(
         data_file="Flasks.dat64",
         data_mapping=(
@@ -2506,35 +2555,23 @@ class ItemsParser(SkillParserShared):
             _type_soulcore,
         ),
         "Omen": (_type_currency,),
-        "DelveSocketableCurrency": (_skip,),
-        "DelveStackableSocketableCurrency": (_skip,),
         "HideoutDoodad": (_type_currency, _type_hideout_doodad),
         "Microtransaction": (_type_currency, _type_microtransaction),
         "DivinationCard": (_type_currency,),
-        "IncubatorStackable": (_skip,),
         # Misc
         "Map": (_type_map,),  # Aka waystone
         "MapFragment": (_type_currency,),
-        "TowerAugmentation": (),
+        "TowerAugmentation": (),  # Aka tablets
         "Breachstone": (_type_currency,),
         "ExpeditionLogbook": (),
         "PinnacleKey": (),
         "QuestItem": (_type_quest_item,),
+        "UltimatumKey": (),
         # Sanctum
+        "ItemisedSanctum": (),  # Aka trial coins
         "Relic": (),
-        "SanctumSpecialRelic": (_skip,),
-        # Heist league
-        "HeistContract": (_skip,),
-        "HeistEquipmentWeapon": (_skip,),
-        "HeistEquipmentTool": (_skip,),
-        "HeistEquipmentUtility": (_skip,),
-        "HeistEquipmentReward": (_skip,),
-        "HeistBlueprint": (_skip,),
-        "Trinket": (_skip,),
-        "HeistObjective": (_skip,),
         # Other
         "InstanceLocalItem": (_type_currency,),
-        "SentinelDrone": (_skip,),
     }
 
     _conflict_active_skill_gems_map = {
@@ -2588,24 +2625,6 @@ class ItemsParser(SkillParserShared):
     def _conflict_misc_map_item(self, infobox, base_item_type, rr, language):
         return base_item_type["Name"]
 
-    def _conflict_delve_socketable_currency(self, infobox, base_item_type, rr, language):
-        return
-
-    def _conflict_delve_stackable_socketable_currency(self, infobox, base_item_type, rr, language):
-        return base_item_type["Name"]
-
-    def _conflict_atlas_region_upgrade(self, infobox, base_item_type, rr, language):
-        return base_item_type["Name"]
-
-    def _conflict_incubator(self, infobox, base_item_type, rr, language):
-        return
-
-    def _conflict_incubator_stackable(self, infobox, base_item_type, rr, language):
-        return base_item_type["Name"]
-
-    def _conflict_breachstone(self, infobox, base_item_type, rr, language):
-        return base_item_type["Name"]
-
     _conflict_resolver_map = {
         "Active Skill Gem": _conflict_active_skill_gems,
         "QuestItem": _conflict_quest_items,
@@ -2614,12 +2633,6 @@ class ItemsParser(SkillParserShared):
         "MapFragment": _conflict_map_fragments,
         "DivinationCard": _conflict_divination_card,
         "MiscMapItem": _conflict_misc_map_item,
-        "DelveSocketableCurrency": _conflict_delve_socketable_currency,
-        "DelveStackableSocketableCurrency": _conflict_delve_stackable_socketable_currency,
-        "AtlasRegionUpgradeItem": _conflict_atlas_region_upgrade,
-        "Incubator": _conflict_incubator,
-        "IncubatorStackable": _conflict_incubator_stackable,
-        "Breachstone": _conflict_breachstone,
     }
 
     def _parse_class_filter(self, parsed_args):
@@ -2757,7 +2770,7 @@ class ItemsParser(SkillParserShared):
         base_item_type = rr["BaseItemTypes.dat64"][base_item_type.rowid]
 
         name = infobox.get("name", base_item_type["Name"])
-        cls_id = base_item_type["ItemClassesKey"]["Id"]
+        cls_id = base_item_type["ItemClass"]["Id"]
         m_id = base_item_type["Id"]
         override = self._NAME_OVERRIDE_BY_ID[language].get(m_id)
         appendix = self._NAME_APPENDIX_BY_ID[language].get(m_id)
@@ -2807,9 +2820,7 @@ class ItemsParser(SkillParserShared):
         if classes:
             items = [item for item in items if item["ItemClassesKey"]["Name"] in classes]
         else:
-            items = [
-                item for item in items if item["ItemClassesKey"]["Id"] not in self._EXCLUDE_CLASSES
-            ]
+            items = [item for item in items if item["ItemClass"]["Id"] not in self._EXCLUDE_CLASSES]
 
         self._parsed_args = parsed_args
         console("Found %s items. Removing disabled items..." % len(items))
@@ -2821,6 +2832,10 @@ class ItemsParser(SkillParserShared):
 
         r = ExporterResult()
         self.rr["BaseItemTypes.dat64"].build_index("Name")
+
+        for item in self.rr["BaseItemTypes.dat64"]:
+            if item["ItemClass"]["Id"] in self._EXCLUDE_CLASSES:
+                self._skipped_items.add(item["Id"])
 
         if self._language != "English" and parsed_args.english_file_link:
             self.rr2["BaseItemTypes.dat64"].build_index("Name")
