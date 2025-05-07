@@ -2419,6 +2419,36 @@ class ItemsParser(SkillParserShared):
 
         return True
 
+    def _type_uncutgem(self, infobox, base_item_type):
+        if base_item_type["ItemClass"]["Id"] == "UncutSkillGem" and "Quest" in base_item_type["Id"]:
+            desc = (
+                self.rr["ClientStrings.dat64"]
+                .index["Id"]["SkillGemBlueTextLevelOne"]["Text"]
+                .replace("{0}", "1")
+            )
+        elif base_item_type["ItemClass"]["Id"] == "UncutSkillGem":
+            desc = (
+                self.rr["ClientStrings.dat64"]
+                .index["Id"]["SkillGemBlueText"]["Text"]
+                .replace("{0}", "#")
+            )
+        elif base_item_type["ItemClass"]["Id"] == "UncutSupportGem":
+            desc = (
+                self.rr["ClientStrings.dat64"]
+                .index["Id"]["SupportGemBlueText"]["Text"]
+                .replace("{0}", "1")
+            )
+        elif base_item_type["ItemClass"]["Id"] == "UncutReservationGem":
+            desc = (
+                self.rr["ClientStrings.dat64"]
+                .index["Id"]["PersistentBuffSkillGemBlueText"]["Text"]
+                .replace("{0}", "#")
+            )
+
+        infobox["description"] = desc
+
+        return True
+
     """
     This defines the expected data elements for an item class.
     """
@@ -2544,9 +2574,9 @@ class ItemsParser(SkillParserShared):
         "Support Skill Gem": (_skill_gem,),
         "Meta Skill Gem": (_skill_gem,),
         # Uncut gems
-        "UncutSkillGem": (),
-        "UncutSupportGem": (),
-        "UncutReservationGem": (),
+        "UncutSkillGem": (_type_uncutgem,),
+        "UncutSupportGem": (_type_uncutgem,),
+        "UncutReservationGem": (_type_uncutgem,),
         # Currency-like items
         "Currency": (_type_currency,),
         "StackableCurrency": (_type_currency, _type_essence, _type_blight_item),
