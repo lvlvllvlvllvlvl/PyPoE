@@ -523,6 +523,12 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Quest items
         # =================================================================
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric1": "Crystalline Core of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric3": "Crystalline Core of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric6": "Crystalline Core of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric9": "Crystalline Core of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric12": "Crystalline Core of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric15": "Crystalline Core of Knowledge",
         "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": "Candlemass' Essence",
         "Metadata/Items/QuestItems/Gallows/Act3/GoldIdol4": "Grand Idol",
         "Metadata/Items/QuestItems/Gallows/Act3/GoldIdol5": "Golden Idol",
@@ -613,6 +619,7 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDrop": "",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": " (Cruel)",
             "Metadata/Items/Gems/SkillGemUncutQuest": " (quest item)",
+            "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric3": "",
             # =================================================================
             # Hideout decorations
             # =================================================================
@@ -1628,71 +1635,19 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/MapFragments/Maven/MavenMapInsideTopLeft5",
         "Metadata/Items/MapFragments/Maven/MavenMapInsideTopRight5",
         # =================================================================
-        # Invocations (only present for sanctum league)
-        # =================================================================
-        "Metadata/Items/Currency/SanctumCurrencyAcrobatics",
-        "Metadata/Items/Currency/SanctumCurrencyAncestralBond",
-        "Metadata/Items/Currency/SanctumCurrencyArrowDancing",
-        "Metadata/Items/Currency/SanctumCurrencyAvatarOfFire",
-        "Metadata/Items/Currency/SanctumCurrencyBloodMagic",
-        "Metadata/Items/Currency/SanctumCurrencyCallToArms",
-        "Metadata/Items/Currency/SanctumCurrencyConduit",
-        "Metadata/Items/Currency/SanctumCurrencyCrimsonDance",
-        "Metadata/Items/Currency/SanctumCurrencyDivineShield",
-        "Metadata/Items/Currency/SanctumCurrencyEldritchBattery",
-        "Metadata/Items/Currency/SanctumCurrencyElementalEquilibrium",
-        "Metadata/Items/Currency/SanctumCurrencyElementalOverload",
-        "Metadata/Items/Currency/SanctumCurrencyEternalYouth",
-        "Metadata/Items/Currency/SanctumCurrencyGhostDance",
-        "Metadata/Items/Currency/SanctumCurrencyGhostReaver",
-        "Metadata/Items/Currency/SanctumCurrencyGlancingBlows",
-        "Metadata/Items/Currency/SanctumCurrencyDoomsday",
-        "Metadata/Items/Currency/SanctumCurrencyImbalancedGuard",
-        "Metadata/Items/Currency/SanctumCurrencyIronGrip",
-        "Metadata/Items/Currency/SanctumCurrencyIronReflexes",
-        "Metadata/Items/Currency/SanctumCurrencyIronWill",
-        "Metadata/Items/Currency/SanctumCurrencyLetheShade",
-        "Metadata/Items/Currency/SanctumCurrencyMagebane",
-        "Metadata/Items/Currency/SanctumCurrencyMindoverMatter",
-        "Metadata/Items/Currency/SanctumCurrencyMinionInstability",
-        "Metadata/Items/Currency/SanctumCurrencyPainAttunement",
-        "Metadata/Items/Currency/SanctumCurrencyPerfectAgony",
-        "Metadata/Items/Currency/SanctumCurrencyPointBlank",
-        "Metadata/Items/Currency/SanctumCurrencyPreciseTechnique",
-        "Metadata/Items/Currency/SanctumCurrencyResoluteTechnique",
-        "Metadata/Items/Currency/SanctumCurrencyRunebinder",
-        "Metadata/Items/Currency/SanctumCurrencySolipsism",
-        "Metadata/Items/Currency/SanctumCurrencySupremeEgo",
-        "Metadata/Items/Currency/SanctumCurrencyTheAgnostic",
-        "Metadata/Items/Currency/SanctumCurrencyTheImpaler",
-        "Metadata/Items/Currency/SanctumCurrencyUnwaveringStance",
-        "Metadata/Items/Currency/SanctumCurrencyVaalPact",
-        "Metadata/Items/Currency/SanctumCurrencyVersatileCombatant",
-        "Metadata/Items/Currency/SanctumCurrencyWickedWard",
-        "Metadata/Items/Currency/SanctumCurrencyWindDancer",
-        "Metadata/Items/Currency/SanctumCurrencyZealotsOath",
-        # =================================================================
-        # Divination cards
-        # =================================================================
-        "Metadata/Items/DivinationCards/DivinationCardHisJudgement",
-        # =================================================================
-        # Corpse items
-        # =================================================================
-        "Metadata/Items/ItemisedCorpses/FlameblasterLow",
-        "Metadata/Items/ItemisedCorpses/FlameblasterMid",
-        "Metadata/Items/ItemisedCorpses/FlameblasterHigh",
-        "Metadata/Items/ItemisedCorpses/ForgeHoundLow",
-        "Metadata/Items/ItemisedCorpses/ForgeHoundMid",
-        "Metadata/Items/ItemisedCorpses/ForgeHoundHigh",
-        "Metadata/Items/ItemisedCorpses/SlammerDemonLow",
-        "Metadata/Items/ItemisedCorpses/SlammerDemonMid",
-        "Metadata/Items/ItemisedCorpses/SlammerDemonHigh",
-        "Metadata/Items/ItemisedCorpses/DeathKnightLow",
-        "Metadata/Items/ItemisedCorpses/DeathKnightMid",
-        "Metadata/Items/ItemisedCorpses/DeathKnightHigh",
-        # =================================================================
         # Quest items
         # =================================================================
+        # New in PoE2
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric2",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric4",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric5",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric7",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric8",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric10",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric11",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric13",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric14",
+        # Old from PoE1
         "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment1_1",
         "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment2_1",
         "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment3_1",
@@ -1757,6 +1712,9 @@ class ItemsParser(SkillParserShared):
         },
         "Support Skill Gem": {
             r"Royale",
+        },
+        "QuestItem": {
+            r"Heist/QuestContracts",
         },
         "Microtransaction": {
             r"Garena",
