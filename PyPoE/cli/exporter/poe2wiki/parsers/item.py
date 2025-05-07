@@ -1022,83 +1022,12 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Skill Gems
         # =================================================================
-        "Metadata/Items/Gems/SkillGemBackstab",
-        "Metadata/Items/Gems/SkillGemBlitz",
-        "Metadata/Items/Gems/SkillGemBloodWhirl",
-        "Metadata/Items/Gems/SkillGemBoneArmour",
-        "Metadata/Items/Gems/SkillGemCaptureMonster",
-        "Metadata/Items/Gems/SkillGemCoilingAssault",
-        "Metadata/Items/Gems/SkillGemComboStrike",
-        "Metadata/Items/Gems/SkillGemDamageInfusion",
-        "Metadata/Items/Gems/SkillGemDiscorectangleSlam",
-        "Metadata/Items/Gems/SkillGemElementalProjectiles",
-        "Metadata/Items/Gems/SkillGemFireWeapon",
-        "Metadata/Items/Gems/SkillGemHeraldOfBlood",
-        "Metadata/Items/Gems/SkillGemIceFire",
-        "Metadata/Items/Gems/SkillGemIcefire",
-        "Metadata/Items/Gems/SkillGemIgnite",
-        "Metadata/Items/Gems/SkillGemInfernalSwarm",
-        "Metadata/Items/Gems/SkillGemInfernalSweep",
-        "Metadata/Items/Gems/SkillGemLightningChannel",
-        "Metadata/Items/Gems/SkillGemLightningCircle",
-        "Metadata/Items/Gems/SkillGemLightningTendrilsChannelled",
-        "Metadata/Items/Gems/SkillGemNewBladeVortex",
-        "Metadata/Items/Gems/SkillGemNewPunishment",
-        "Metadata/Items/Gems/SkillGemNewShockNova",
-        "Metadata/Items/Gems/SkillGemProjectilePortal",
-        "Metadata/Items/Gems/SkillGemQuickBlock",
-        "Metadata/Items/Gems/SkillGemRendingSteel",
-        "Metadata/Items/Gems/SkillGemReplicate",
-        "Metadata/Items/Gems/SkillGemRighteousLightning",
-        "Metadata/Items/Gems/SkillGemRiptide",
-        "Metadata/Items/Gems/SkillGemSerpentStrike",
-        "Metadata/Items/Gems/SkillGemShadowBlades",
-        "Metadata/Items/Gems/SkillGemSlashTotem",
-        "Metadata/Items/Gems/SkillGemSliceAndDice",
-        "Metadata/Items/Gems/SkillGemSnipe",
-        "Metadata/Items/Gems/SkillGemSpectralSpinningWeapon",
-        "Metadata/Items/Gems/SkillGemStaticTether",
-        "Metadata/Items/Gems/SkillGemSummonSkeletonsChannelled",
-        "Metadata/Items/Gems/SkillGemTouchOfGod",
-        "Metadata/Items/Gems/SkillGemVaalFireTrap",
-        "Metadata/Items/Gems/SkillGemVaalFleshOffering",
-        "Metadata/Items/Gems/SkillGemVaalHeavyStrike",
-        "Metadata/Items/Gems/SkillGemVaalSweep",
-        "Metadata/Items/Gems/SkillGemVortexMine",
-        "Metadata/Items/Gems/SkillGemWandTeleport",
-        "Metadata/Items/Gems/SkillGemNewPhaseRun",
-        "Metadata/Items/Gems/SkillGemNewArcticArmour",
-        "Metadata/Items/Gems/SkillGemFlammableShot",
-        "Metadata/Items/Gems/SkillGemCallOfTheWild",
         "Metadata/Items/Gems/SkillGemPlaytestAttack",
         "Metadata/Items/Gems/SkillGemPlaytestSpell",
         "Metadata/Items/Gems/SkillGemPlaytestSlam",
         # =================================================================
-        # Royale Gear
-        # =================================================================
-        "Metadata/Items/Weapons/OneHandWeapons/Wands/Wand1Royale",
-        "Metadata/Items/Weapons/TwoHandWeapons/Bows/Bow1Royale",
-        "Metadata/Items/Rings/RingRoyale1",
-        "Metadata/Items/Rings/RingRoyale2",
-        "Metadata/Items/Rings/RingRoyale3",
-        "Metadata/Items/Rings/RingRoyale4",
-        "Metadata/Items/Amulets/AmuletRoyale1",
-        "Metadata/Items/Belts/BeltRoyale1",
-        "Metadata/Items/Belts/BeltRoyale2",
-        "Metadata/Items/Belts/BeltRoyale3",
-        "Metadata/Items/Flasks/FlaskLife1Royale",
-        "Metadata/Items/Flasks/FlaskLife2Royale",
-        "Metadata/Items/Flasks/FlaskLife3Royale",
-        # =================================================================
         # Support Gems
         # =================================================================
-        "Metadata/Items/Gems/SupportGemCastLinkedCursesOnCurse",
-        "Metadata/Items/Gems/SupportGemHandcastRapidFire",
-        "Metadata/Items/Gems/SupportGemSplit",
-        "Metadata/Items/Gems/SupportGemReturn",
-        "Metadata/Items/Gems/SupportGemTemporaryForTutorial",
-        "Metadata/Items/Gems/SupportGemVaalSoulHarvesting",
-        "Metadata/Items/Gems/SupportGemConflagration",
         # =================================================================
         # Cosmetic items
         # =================================================================
@@ -1624,17 +1553,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable3_7",
         "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable3_8",
         # =================================================================
-        # Mavenvitations (removed from the game in 3.17.0)
-        # =================================================================
-        "Metadata/Items/MapFragments/Maven/MavenMapOutsideBottomRight5",
-        "Metadata/Items/MapFragments/Maven/MavenMapOutsideBottomLeft5",
-        "Metadata/Items/MapFragments/Maven/MavenMapOutsideTopLeft5",
-        "Metadata/Items/MapFragments/Maven/MavenMapOutsideTopRight5",
-        "Metadata/Items/MapFragments/Maven/MavenMapInsideBottomRight5",
-        "Metadata/Items/MapFragments/Maven/MavenMapInsideBottomLeft5",
-        "Metadata/Items/MapFragments/Maven/MavenMapInsideTopLeft5",
-        "Metadata/Items/MapFragments/Maven/MavenMapInsideTopRight5",
-        # =================================================================
         # Quest items
         # =================================================================
         # New in PoE2
@@ -1647,44 +1565,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric11",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric13",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric14",
-        # Old from PoE1
-        "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment1_1",
-        "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment2_1",
-        "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment3_1",
-        "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment4_1",
-        "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment5_1",
-        "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment6_1",
-        "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment7_1",
-        "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment8_1",
-        "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment8_2",
-        "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment9_1",
-        "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment9_2",
-        "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment9_3",
-        "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment10_1",
-        "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment10_2",
-        "Metadata/Items/QuestItems/ShaperMemoryFragments/ShaperMemoryFragment10_3",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier1_1",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier2_1",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier3_1",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier4_1",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier5_1",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier6_1",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier7_1",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier8_1",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier8_2",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier9_1",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier9_2",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier9_3",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier10_1",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier10_2",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier10_3",
-        "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTierTo16",
-        "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestFaustus1B",
-        "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestNenet1",
-        "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestNenet2",
-        "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestAdiyah3",
-        "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestKurai2",
-        "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestKurai3",
         # =================================================================
         # Misc
         # =================================================================
@@ -1693,28 +1573,22 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Heist/HeistEquipmentUtilityTest",
         "Metadata/Items/Heist/HeistEquipmentRewardTest",
         "Metadata/Items/Weapons/OneHandWeapons/Daggers/EtherealBlade1",
-        "Metadata/Items/Weapons/TwoHandWeapons/Bows/EtherealBow1",
-        "Metadata/Items/ItemEffects/SekhemasBanner",
-        "Metadata/Items/Armours/BodyArmours/BodyStrTemp",
-        "Metadata/Items/Armours/Boots/BootsStrTemp",
         "Metadata/Items/Classic/MysteryLeaguestone",
-        "Metadata/Items/Relics/Relic1x3",
-        "Metadata/Items/Relics/Relic1x4",
-        "Metadata/Items/Relics/Relic2x1",
-        "Metadata/Items/Relics/Relic2x2",
-        "Metadata/Items/Relics/Relic3x1",
-        "Metadata/Items/Relics/Relic4x1",
     }
 
     _ITEM_SKIP_PATTERNS = {
-        "Active Skill Gem": {
-            r"Royale",
+        "MapFragment": {
+            r"Scarabs",
+            r"Maven/MavenMap",
         },
-        "Support Skill Gem": {
-            r"Royale",
+        "MiscMapItem": {
+            r"Maven/MavenMap",
         },
         "QuestItem": {
+            r"Heist/QuestItems",
             r"Heist/QuestContracts",
+            r"ShaperMemoryFragments",
+            r"MapUpgrades",
         },
         "Microtransaction": {
             r"Garena",
