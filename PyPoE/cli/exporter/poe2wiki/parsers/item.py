@@ -523,6 +523,11 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Quest items
         # =================================================================
+        "Metadata/Items/QuestItems/Gallows/Act1/CrowbellSkillBook": "Book of Specialisation",
+        "Metadata/Items/QuestItems/Gallows/Act1/UnaSkillBook": "Book of Specialisation",
+        "Metadata/Items/QuestItems/Gallows/Act2/SerpentClanCasterBossDrop": "Book of Specialisation",
+        "Metadata/Items/QuestItems/Gallows/Act2/FinalLetterSkillBook": "Book of Specialisation",
+        "Metadata/Items/QuestItems/Gallows/Act3/QuadrillaSkillBook": "Book of Specialisation",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric1": "Crystalline Core of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric3": "Crystalline Core of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric6": "Crystalline Core of Knowledge",
@@ -589,6 +594,7 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/Gems/SupportGemPierce": " (support gem)",
             "Metadata/Items/Gems/SupportGemRage": " (support gem)",
             "Metadata/Items/Gem/SupportGemVolatility": " (support gem)",
+            "Metadata/Items/Gems/SupportGemUnleash": "",
             # =================================================================
             # Uncut Gems
             # =================================================================
@@ -616,6 +622,11 @@ class ItemsParser(SkillParserShared):
             # =================================================================
             # Quest items
             # =================================================================
+            "Metadata/Items/QuestItems/Gallows/Act1/CrowbellSkillBook": " (Crowbell)",
+            "Metadata/Items/QuestItems/Gallows/Act1/UnaSkillBook": " (Una)",
+            "Metadata/Items/QuestItems/Gallows/Act2/SerpentClanCasterBossDrop": " (Serpent)",
+            "Metadata/Items/QuestItems/Gallows/Act2/FinalLetterSkillBook": " (Final Letter)",
+            "Metadata/Items/QuestItems/Gallows/Act3/QuadrillaSkillBook": " (Quadrilla)",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDrop": "",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": " (Cruel)",
             "Metadata/Items/Gems/SkillGemUncutQuest": " (quest item)",
@@ -1556,6 +1567,7 @@ class ItemsParser(SkillParserShared):
         # Quest items
         # =================================================================
         # New in PoE2
+        "Metadata/Items/QuestItems/Gallows/Act3/BogWitchSkillBook",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric2",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric4",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric5",
@@ -1565,6 +1577,11 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric11",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric13",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric14",
+        # Old from PoE1
+        "Metadata/Items/QuestItems/SkillBooks/Descent2_1",
+        "Metadata/Items/QuestItems/SkillBooks/Descent2_2",
+        "Metadata/Items/QuestItems/SkillBooks/Descent2_3",
+        "Metadata/Items/QuestItems/SkillBooks/Descent2_4",
         # =================================================================
         # Misc
         # =================================================================
@@ -2534,47 +2551,6 @@ class ItemsParser(SkillParserShared):
             return base_item_type["Name"]
 
     def _conflict_quest_items(self, infobox, base_item_type, rr, language):
-        qid = base_item_type["Id"].replace("Metadata/Items/QuestItems/", "")
-        match = re.match(r"(?:SkillBooks|Act[0-9]+)/Book-(?P<id>.*)", qid)
-        if match:
-            qid = match.group("id")
-            ver = re.findall(r"v[0-9]$", qid)
-            # Only need one of the skill books from "choice" quests
-            if ver:
-                if ver[0] != "v0":
-                    return
-                qid = qid.replace(ver[0], "")
-
-            try:
-                return base_item_type["Name"] + " (%s)" % rr["Quest.dat64"].index["Id"][qid]["Name"]
-            except KeyError:
-                console("Quest %s not found" % qid, msg=Msg.warning)
-        else:
-            # Descent skill books
-            match = re.match(r"SkillBooks/Descent2_(?P<id>[0-9]+)", qid)
-            if match:
-                return base_item_type["Name"] + " (%s %s)" % (
-                    self._LANG[language]["descent"],
-                    match.group("id"),
-                )
-            else:
-                # Bandit respec
-                match = re.match(r"SkillBooks/BanditRespec(?P<id>.+)", qid)
-                if match:
-                    return base_item_type["Name"] + " (%s)" % match.group("id")
-                else:
-                    match = re.match(
-                        r"Metadata/Items/QuestItems/Act7/Firefly(?P<id>[0-9]+)$",
-                        base_item_type["Id"],
-                    )
-                    if match:
-                        pageid = "%s (%s)" % (
-                            base_item_type["Name"],
-                            self._LANG[language]["of"] % (match.group("id"), 7),
-                        )
-                        infobox["inventory_icon"] = pageid
-                        return pageid
-
         return
 
     def _conflict_hideout_doodad(self, infobox, base_item_type, rr, language):
