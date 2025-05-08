@@ -2385,18 +2385,50 @@ class ItemsParser(SkillParserShared):
         skip_warning=True,
     )
 
-    _type_blight_item = _type_factory(
+    # TODO: Make mods in proper way when the wiki will support it
+    def _type_distilled_emotion_extra(self, infobox, base_item_type, emotions):
+        stats = [emotions["EnchantedMod"]["Stat1"]["Id"]]
+        values = [[emotions["EnchantedMod"]["Stat1Min"], emotions["EnchantedMod"]["Stat1Max"]]]
+        if emotions["EnchantedMod"]["Stat2"]:
+            stats.append(emotions["EnchantedMod"]["Stat2"]["Id"])
+            values.append(
+                [emotions["EnchantedMod"]["Stat2Min"], emotions["EnchantedMod"]["Stat2Max"]]
+            )
+
+        tr = self.tc["stat_descriptions.txt"].get_translation(
+            stats,
+            values,
+            full_result=True,
+            lang=self._language,
+        )
+        desc = process_keywords(
+            "<br>".join([parser.make_inter_wiki_links(line) for line in tr.lines])
+        )
+        infobox["implicit1_text"] = "{{c|enchanted|" + desc + "}}"
+
+        return True
+
+    _type_distilled_emotion = _type_factory(
         data_file="BlightCraftingItems.dat64",
         index_column="Oil",
         data_mapping=(
             (
                 "Tier",
                 {
-                    "template": "blight_item_tier",
+                    "template": "distilled_emotion_tier",
                 },
             ),
+            # (
+            #    "EnchantedMod",
+            #    {
+            #        "template": "distilled_emotion_mod",
+            #        "condition": lambda v: v,
+            #        "format": lambda v: v["Id"],
+            #    },
+            # ),
         ),
         row_index=True,
+        function=_type_distilled_emotion_extra,
         fail_condition=True,
         skip_warning=True,
     )
@@ -2640,7 +2672,7 @@ class ItemsParser(SkillParserShared):
         "UncutReservationGem": (_type_uncutgem,),
         # Currency-like items
         "Currency": (_type_currency,),
-        "StackableCurrency": (_type_currency, _type_essence, _type_blight_item),
+        "StackableCurrency": (_type_currency, _type_essence, _type_distilled_emotion),
         "SoulCore": (
             _type_currency,
             _type_soulcore,
