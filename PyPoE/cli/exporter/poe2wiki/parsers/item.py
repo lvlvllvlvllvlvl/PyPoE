@@ -521,6 +521,11 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4bEndgame": "Cloaked Mail",
         "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4cEndgame": "Cloaked Mail",
         # =================================================================
+        # Bucklers
+        # =================================================================
+        "Metadata/Items/Armours/Shields/FourShieldDex3Endgame": "Plated Buckler",
+        "Metadata/Items/Armours/Shields/FourShieldDex11": "Ornate Buckler",
+        # =================================================================
         # Quest items
         # =================================================================
         "Metadata/Items/QuestItems/Gallows/Act1/CrowbellSkillBook": "Book of Specialisation",
@@ -627,6 +632,12 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4aEndgame": " (Fire)",
             "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4bEndgame": " (Cold)",
             "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4cEndgame": " (Lightning)",
+            # =================================================================
+            # Bucklers
+            # =================================================================
+            # Ornate
+            "Metadata/Items/Armours/Shields/FourShieldDex3Endgame": "",
+            "Metadata/Items/Armours/Shields/FourShieldDex11": " (unique only)",
             # =================================================================
             # Sceptres
             # =================================================================
@@ -1057,6 +1068,19 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemPlaytestAttack",
         "Metadata/Items/Gems/SkillGemPlaytestSpell",
         "Metadata/Items/Gems/SkillGemPlaytestSlam",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultSpearOffHand",
+        # Item granted versions
+        "Metadata/Items/Gems/SkillGemSkeletalWarrior",
+        "Metadata/items/Gems/SkillGemStaffUnleash",
+        "Metadata/Items/Gems/SkillGemCorpsewadeCorpseCloud",
+        "Metadata/Items/Gem/SkillGemBlinkSandPlayer",
+        "Metadata/Items/Gem/SkillGemUniqueDuskVigilTriggeredBlazingCluster",
+        "Metadata/Items/Gem/SkillGemUniqueEarthboundTriggeredSpark",
+        "Metadata/Items/Gem/SkillGemUniqueBreachLightningBolt",
+        "Metadata/Items/Gems/UniqueSkillGemHeraldOfAsh",
+        "Metadata/Items/Gems/UniqueSkillGemHeraldOfIce",
+        "Metadata/Items/Gems/UniqueSkillGemHeraldOfThunder",
+        "Metadata/Items/Gems/UniqueSkillGemWitheringPresence",
         # =================================================================
         # Support Gems
         # =================================================================
@@ -1613,12 +1637,24 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Misc
         # =================================================================
+        # New in PoE2
         "Metadata/Items/Ultimatum/UltimatumKeySpecial",
+        "Metadata/Items/Sanctum/SanctumBronzeKeyDrop",
+        "Metadata/Items/Sanctum/SanctumSilverKeyDrop",
+        "Metadata/Items/Sanctum/SanctumGoldKeyDrop",
+        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGemMedium2",
+        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGemMedium3",
+        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGem2",
+        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGem3",
+        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGem4",
+        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGem5",
+        # Old from PoE1
         "Metadata/Items/Heist/HeistEquipmentToolTest",
         "Metadata/Items/Heist/HeistEquipmentWeaponTest",
         "Metadata/Items/Heist/HeistEquipmentUtilityTest",
         "Metadata/Items/Heist/HeistEquipmentRewardTest",
         "Metadata/Items/Weapons/OneHandWeapons/Daggers/EtherealBlade1",
+        "Metadata/items/Weapons/OneHandWeapons/OneHandSwords/OneHandSwordDemigods1",
         "Metadata/Items/Classic/MysteryLeaguestone",
     }
 
@@ -1630,16 +1666,23 @@ class ItemsParser(SkillParserShared):
             r"SupportGemUnknown",
         },
         "StackableCurrency": {
+            r"ScoutingReports",
             r"CurrencyHellscape",
             r"HarvestSeed",
             r"CurrencyLegion",
             r"CurrencyIncursionVial",
             r"RandomFossilOutcome",
+            r"CurrencyIncursionCorrupt",
         },
         "MapFragment": {
             r"Scarabs",
             r"CurrencyLegion",
             r"Maven/MavenMap",
+            r"CurrencyVaalFragment",
+            r"CurrencyElderFragment",
+            r"CurrencyShaperFragment",
+            r"CurrencyProphecyFragment",
+            r"CurrencyUberElderFragment",
         },
         "MiscMapItem": {
             r"Maven/MavenMap",
@@ -1977,7 +2020,7 @@ class ItemsParser(SkillParserShared):
                 {
                     "template": "reload_time",
                     "condition": lambda v: v > 0,
-                    "format": lambda v: "{0:n}".format(v / 100),
+                    "format": lambda v: "{0:n}".format(v / 1000),
                 },
             ),
         ),
@@ -2021,7 +2064,6 @@ class ItemsParser(SkillParserShared):
             ),
         ),
         row_index=True,
-        fail_condition=True,
     )
 
     def _currency_extra(self, infobox, base_item_type, currency):
@@ -2300,7 +2342,6 @@ class ItemsParser(SkillParserShared):
                 "Tier",
                 {
                     "template": "essence_level",
-                    "condition": lambda v: v > 0,
                 },
             ),
             (
