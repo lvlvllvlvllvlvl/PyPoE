@@ -521,6 +521,11 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4bEndgame": "Cloaked Mail",
         "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4cEndgame": "Cloaked Mail",
         # =================================================================
+        # Gloves
+        # =================================================================
+        "Metadata/Items/Armours/Gloves/FourGlovesInt3Cruel": "Stitched Gloves",
+        "Metadata/Items/Armours/Gloves/FourGlovesInt7": "Leopold's Applause",
+        # =================================================================
         # Bucklers
         # =================================================================
         "Metadata/Items/Armours/Shields/FourShieldDex3Endgame": "Plated Buckler",
@@ -632,6 +637,11 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4aEndgame": " (Fire)",
             "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4bEndgame": " (Cold)",
             "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4cEndgame": " (Lightning)",
+            # =================================================================
+            # Gloves
+            # =================================================================
+            "Metadata/Items/Armours/Gloves/FourGlovesInt3Cruel": "",
+            "Metadata/Items/Armours/Gloves/FourGlovesInt7": " (unique only)",
             # =================================================================
             # Bucklers
             # =================================================================
@@ -1085,6 +1095,14 @@ class ItemsParser(SkillParserShared):
         # Support Gems
         # =================================================================
         # =================================================================
+        # Body armours
+        # =================================================================
+        "Metadata/Items/Armours/BodyArmours/FourBodyDexInt8",
+        # =================================================================
+        # Currency items
+        # =================================================================
+        "Metadata/Items/Currency/CurrencySilverCoin",
+        # =================================================================
         # Cosmetic items
         # =================================================================
         "Metadata/Items/MicrotransactionCurrency/MysteryBox1x1",
@@ -1474,11 +1492,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Hideout/HideoutSteampunkPipes",
         "Metadata/Items/Hideout/HideoutLionStatueKneeling2",
         # =================================================================
-        # Currency items
-        # =================================================================
-        "Metadata/Items/Currency/CurrencySilverCoin",
-        "Metadata/Items/Currency/CurrencyLabyrinthEnchant",
-        # =================================================================
         # Non-stackable resonators from before 3.8.0
         # =================================================================
         "Metadata/Items/Delve/DelveSocketableCurrencyUpgrade1",
@@ -1653,9 +1666,16 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Heist/HeistEquipmentWeaponTest",
         "Metadata/Items/Heist/HeistEquipmentUtilityTest",
         "Metadata/Items/Heist/HeistEquipmentRewardTest",
+        "Metadata/Items/Weapons/OneHandWeapons/OneHandSwords/StormBladeOneHand",
+        "Metadata/Items/Weapons/TwoHandWeapons/TwoHandSwords/StormBladeTwoHand",
         "Metadata/Items/Weapons/OneHandWeapons/Daggers/EtherealBlade1",
         "Metadata/items/Weapons/OneHandWeapons/OneHandSwords/OneHandSwordDemigods1",
+        "Metadata/Items/Armours/Helmets/HelmetDemigods1",
+        "Metadata/Items/Armours/Gloves/FourGlovesDemigod",
+        "Metadata/Items/Armours/Gloves/GlovesDemigods1",
         "Metadata/Items/Classic/MysteryLeaguestone",
+        "Metadata/Items/MapFragments/VoidbornVaultKey",
+        "Metadata/Items/MapFragments/TencentVoidbornVaultKey",
     }
 
     _ITEM_SKIP_PATTERNS = {
