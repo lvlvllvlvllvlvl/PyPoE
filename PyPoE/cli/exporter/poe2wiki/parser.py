@@ -1974,18 +1974,87 @@ def make_inter_wiki_links(string):
     return string
 
 
+_KEYWORD_LINK_MAP = {
+    # Keyword:
+    # ("visible text", "link")
+    "ArmourBreak": [
+        ("Armour Break", "Armour Break"),
+    ],
+    "Charges": [
+        ("Power Charge", "Power Charge"),
+        ("Frenzy Charge", "Frenzy Charge"),
+        ("Endurance Charge", "Endurance Charge"),
+        ("Charge", "Charge"),
+    ],
+    "HeavyStun": [
+        ("Heavy Stun", "Heavy Stun"),
+    ],
+    "HitDamage": [
+        ("Hit", "Hit"),
+    ],
+    "KillingBlow": [
+        ("Killing Blow", "Killing Blow"),
+        ("Kill", "Kill"),
+    ],
+    "Resonance": [
+        ("Resonance", "Resonance (buff)"),
+    ],
+}
+
+
 def process_keywords(text: str):
-    return text.replace("[", "[[").replace("]", "]]").replace("\n", "<br>")
+    text = text.replace("\n", "<br>")
+
+    def replace_match(match):
+        raw = match.group(1)
+
+        # Handle pipe-form keywords: [keyword|visible text]
+        if "|" in raw:
+            base, variant = raw.split("|", 1)
+
+            # If exact match, simple wrap
+            if base == variant:
+                return f"[[{variant}]]"
+
+            # Case: variant starts with base + suffix (e.g., "Remnant|Remnants")
+            if variant.startswith(base):
+                suffix = variant[len(base) :]
+                if "'" not in suffix and " " not in suffix:
+                    return f"[[{base}]]{suffix}"
+
+            # Try using _KEYWORD_LINK_MAP
+            if base in _KEYWORD_LINK_MAP:
+                for display, link in _KEYWORD_LINK_MAP[base]:
+                    if variant == display:
+                        return f"[[{display}]]"
+                    elif variant.startswith(display):
+                        suffix = variant[len(display) :]
+                        if "'" not in suffix and " " not in suffix:
+                            return f"[[{link}]]{suffix}"
+                        else:
+                            return f"[[{link}|{variant}]]"
+
+        # Default case: no pipe, regular keyword
+        else:
+            key = raw
+            if key in _KEYWORD_LINK_MAP:
+                for display, link in _KEYWORD_LINK_MAP[key]:
+                    if key == display and display == link:
+                        return f"[[{key}]]"
+                    else:
+                        return f"[[{link}|{key}]]"
+
+        return f"[[{raw}]]"
+
+    return re.sub(r"\[(.+?)\]", replace_match, text)
 
 
 def strip_keywords(text: str):
-    for match in re.finditer(r"\[(.+?)\]", text):
-        full_match = match.group(0)
-        key = match.group(1)
-        if "|" in key:
-            key = key[key.index("|") + 1 :]
-        text = text.replace(full_match, key)
-    return text
+    def replace_keyword(match):
+        content = match.group(1)
+        return content.split("|", 1)[-1] if "|" in content else content
+
+    return re.sub(r"\[(.+?)\]", replace_keyword, text)
 
 
 def find_template(wikitext, template_name):
