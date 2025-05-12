@@ -1977,8 +1977,34 @@ def make_inter_wiki_links(string):
 _KEYWORD_LINK_MAP = {
     # Keyword:
     # ("visible text", "link")
+    "AilmentSpread": [
+        ("Spread", "Spread"),
+    ],
+    "AncestralBoost": [
+        ("Ancestral Boost", "Ancestral Boost"),
+    ],
     "ArmourBreak": [
         ("Armour Break", "Armour Break"),
+        ("Break Armour", "Break Armour"),
+        ("Fully Break", "Fully Break"),
+        ("Fully Broken Armour", "Fully Broken Armour"),
+    ],
+    "ArtificersOrb": [
+        ("Artificer's Orb", "Artificer's Orb"),
+    ],
+    "Attributes": [
+        ("Attribute", "Attribute"),
+        ("attribute", "attribute"),
+    ],
+    "BuffMagnitude": [
+        ("Magnitude", "Magnitude"),
+    ],
+    "Channelling": [
+        ("Channelled", "Channelled"),
+        ("Channelling", "Channelling"),
+    ],
+    "ChaosOrb": [
+        ("ChaosOrb", "Chaos Orb"),
     ],
     "Charges": [
         ("Power Charge", "Power Charge"),
@@ -1986,18 +2012,95 @@ _KEYWORD_LINK_MAP = {
         ("Endurance Charge", "Endurance Charge"),
         ("Charge", "Charge"),
     ],
+    "Conditional": [
+        ("Condition", "Condition"),
+    ],
+    "ContainsDelirium": [
+        ("Delirium", "Delirium"),
+    ],
+    "Critical": [
+        ("Critically Hit", "Critically Hit"),
+        ("Critically hit", "Critically hit"),
+        ("Critical Hit", "Critical Hit"),
+        ("Critical hit", "Critical hit"),
+        ("Critical", "Critical"),
+    ],
+    "CriticalDamageBonus": [
+        ("Critical Damage Bonus", "Critical Damage Bonus"),
+    ],
+    "DamagingAilments": [
+        ("Damaging Ailment", "Damaging Ailment"),
+    ],
+    "Defences": [
+        ("Defence", "Defence"),
+    ],
+    "DistilledEmotion": [
+        ("Distilled Emotion", "Distilled Emotion"),
+    ],
+    "EnergyShield": [
+        ("Energy Shield", "Energy Shield"),
+    ],
+    "FinalStrike": [
+        ("Final Strike", "Final Strike"),
+    ],
     "HeavyStun": [
         ("Heavy Stun", "Heavy Stun"),
     ],
     "HitDamage": [
         ("Hit", "Hit"),
     ],
+    "ItemRarity": [
+        ("Normal", "Normal"),
+        ("Rare", "Rare"),
+        ("Magic", "Magic"),
+        ("Unique", "Unique"),
+        ("", "Rarity"),
+    ],
     "KillingBlow": [
         ("Killing Blow", "Killing Blow"),
         ("Kill", "Kill"),
     ],
+    "LifeLeech": [
+        ("Leech", "Leech"),
+    ],
+    "MartialWeapon": [
+        ("Martial Weapon", "Martial Weapon"),
+        ("Martial weapon", "Martial weapon"),
+        ("martial weapon", "martial weapon"),
+    ],
+    "OrbOfAlchemy": [
+        ("Orb of Alchemy", "Orb of Alchemy"),
+    ],
+    "OrbOfAlteration": [
+        ("Orb of Alteration", "Orb of Alteration"),
+    ],
+    "OrbOfChance": [
+        ("Orb of Chance", "Orb of Chance"),
+    ],
+    "Physical": [
+        ("Physical Damage", "Physical Damage"),
+        ("Physical", "Physical"),
+    ],
+    "Quality": [
+        ("Quality", "Quality"),
+        ("quality", "quality"),
+    ],
+    "Resistances": [
+        ("Fire Resistance", "Fire Resistance"),
+        ("Cold Resistance", "Cold Resistance"),
+        ("Lightning Resistance", "Lightning Resistance"),
+        ("Chaos Resistance", "Chaos Resistance"),
+        ("Resistance", "Resistance"),
+    ],
     "Resonance": [
         ("Resonance", "Resonance (buff)"),
+    ],
+    "ThornsRetaliation": [
+        ("Retaliate with Thorns", "Thorns"),
+        ("Retaliate", "Thorns"),
+    ],
+    "Wells": [
+        ("Well", "Well"),
     ],
 }
 
@@ -2027,6 +2130,8 @@ def process_keywords(text: str):
                 for display, link in _KEYWORD_LINK_MAP[base]:
                     if variant == display:
                         return f"[[{display}]]"
+                    elif display == "":
+                        return f"[[{link}|{variant}]]"
                     elif variant.startswith(display):
                         suffix = variant[len(display) :]
                         if "'" not in suffix and " " not in suffix:
@@ -2041,8 +2146,12 @@ def process_keywords(text: str):
                 for display, link in _KEYWORD_LINK_MAP[key]:
                     if key == display and display == link:
                         return f"[[{key}]]"
-                    else:
+                    elif display == "":
                         return f"[[{link}|{key}]]"
+                    elif display.startswith(key):
+                        suffix = display[len(key) :]
+                        if "'" not in suffix and " " not in suffix:
+                            return f"[[{link}|{key}]]"
 
         return f"[[{raw}]]"
 

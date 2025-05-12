@@ -544,6 +544,36 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric9": "Crystalline Core of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric12": "Crystalline Core of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric15": "Crystalline Core of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookUniqueMaps1": "Book of Unique Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookUniqueMaps2": "Book of Unique Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookUniqueMaps3": "Book of Unique Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookUniqueMaps4": "Book of Unique Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookUniqueMaps5": "Book of Unique Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookPinnacle1": "Arbiter's Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookPinnacle2": "Arbiter's Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookPinnacle3": "Arbiter's Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookPinnacle4": "Arbiter's Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBreach1": "Otherworldly Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBreach2": "Otherworldly Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBreach3": "Otherworldly Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBreach4": "Otherworldly Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookDelirium1": "Deranging Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookDelirium2": "Deranging Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookDelirium3": "Deranging Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookDelirium4": "Deranging Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookRitual1": "Ritualistic Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookRitual2": "Ritualistic Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookRitual3": "Ritualistic Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookRitual4": "Ritualistic Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition1": "Runic Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition2": "Runic Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition3": "Runic Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition4": "Runic Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss1": "Vanquisher's Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss2": "Vanquisher's Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss3": "Vanquisher's Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss4": "Vanquisher's Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss5": "Vanquisher's Book of Knowledge",
         "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": "Candlemass' Essence",
         "Metadata/Items/QuestItems/Gallows/Act3/GoldIdol4": "Grand Idol",
         "Metadata/Items/QuestItems/Gallows/Act3/GoldIdol5": "Golden Idol",
@@ -555,6 +585,7 @@ class ItemsParser(SkillParserShared):
 
     _EXCLUDE_CLASSES = {
         "HiddenItem",
+        "AtlasUpgradeItem",
         "PantheonSoul",
         "MiscMapItem",
         "UniqueFragment",
@@ -577,6 +608,14 @@ class ItemsParser(SkillParserShared):
         "GiftBox",
         "ConventionTreasure",
         "SkillGemToken",
+        # Not released yet
+        "Dagger",
+        "Claw",
+        "TrapTool",
+        "One Hand Sword",
+        "Two Hand Sword",
+        "One Hand Axe",
+        "Two Hand Axe",
     }
 
     _NAME_OVERRIDE_BY_ID = {
@@ -1075,6 +1114,18 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Skill Gems
         # =================================================================
+        "Metadata/Items/Gems/SkillGemSummonBeast",
+        "Metadata/Items/Gems/SkillGemSummonSpectre",
+        "Metadata/Items/Gems/SkillGemWither",
+        "Metadata/Items/Gems/SkillGemCastOnDeath",
+        "Metadata/Items/Gems/SkillGemCastOnMeleeKill",
+        "Metadata/Items/Gems/SkillGemCastOnMeleeStun",
+        "Metadata/Items/Gems/SkillGemCastWhenDamageTaken",
+        "Metadata/Items/Gems/SkillGemCastWhenStunned",
+        "Metadata/Items/Gems/SkillGemCastWhileChannelling",
+        "Metadata/Items/Gems/SkillGemDarkPact",
+        "Metadata/Items/Gems/SkillGemDemonMagus",
+        "Metadata/Items/Gem/SkillGemDetonateMinion",
         "Metadata/Items/Gems/SkillGemPlaytestAttack",
         "Metadata/Items/Gems/SkillGemPlaytestSpell",
         "Metadata/Items/Gems/SkillGemPlaytestSlam",
@@ -1091,17 +1142,173 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/UniqueSkillGemHeraldOfIce",
         "Metadata/Items/Gems/UniqueSkillGemHeraldOfThunder",
         "Metadata/Items/Gems/UniqueSkillGemWitheringPresence",
+        "Metadata/items/Gems/SkillGemStaffConsecrate",
         # =================================================================
         # Support Gems
         # =================================================================
+        "Metadata/Items/Gems/SupportGemChanceToFreeze",
         # =================================================================
         # Body armours
         # =================================================================
+        "Metadata/Items/Armours/BodyArmours/FourBodyStrDex8",
         "Metadata/Items/Armours/BodyArmours/FourBodyDexInt8",
+        "Metadata/Items/Armours/BodyArmours/FourBodyDex9",
+        "Metadata/Items/Armours/BodyArmours/FourBodyDexInt9",
+        "Metadata/Items/Armours/BodyArmours/FourBodyStr10",
+        "Metadata/Items/Armours/BodyArmours/FourBodyStr11",
+        "Metadata/Items/Armours/BodyArmours/FourBodyDexInt12",
+        "Metadata/Items/Armours/BodyArmours/FourBodyDexInt13",
+        "Metadata/Items/Armours/BodyArmours/FourBodyInt15",
+        "Metadata/Items/Armours/BodyArmours/FourBodyStr15",
+        # =================================================================
+        # Helmets
+        # =================================================================
+        "Metadata/Items/Armours/Helmets/FourHelmetStr7",
+        "Metadata/Items/Armours/Helmets/FourHelmetDexInt8",
+        "Metadata/Items/Armours/Helmets/FourHelmetStrInt8",
+        # =================================================================
+        # Gloves
+        # =================================================================
+        "Metadata/Items/Armours/Gloves/FourGlovesDexInt4",
+        "Metadata/Items/Armours/Gloves/FourGlovesStr6",
+        "Metadata/Items/Armours/Gloves/FourGlovesInt8",
+        # =================================================================
+        # Boots
+        # =================================================================
+        "Metadata/Items/Armours/Boots/FourBootsStrDex4",
+        "Metadata/Items/Armours/Boots/FourBootsStrDex6",
+        "Metadata/Items/Armours/Boots/FourBootsDexInt6",
+        # =================================================================
+        # Shields
+        # =================================================================
+        "Metadata/Items/Armours/Shields/FourShieldStrDex8",
+        "Metadata/Items/Armours/Shields/FourShieldStr10",
+        "Metadata/Items/Armours/Shields/FourShieldStrDex10",
+        "Metadata/Items/Armours/Shields/FourShieldStrInt11",
+        "Metadata/Items/Armours/Shields/FourShieldStr12",
+        # =================================================================
+        # Bucklers
+        # =================================================================
+        "Metadata/Items/Armours/Shields/FourShieldDex13",
+        # =================================================================
+        # Foci
+        # =================================================================
+        "Metadata/Items/Armours/Focii/FourFocus12",
+        # =================================================================
+        # Bows
+        # =================================================================
+        "Metadata/Items/Weapons/TwoHandWeapons/Bows/FourBow9",
+        "Metadata/Items/Weapons/TwoHandWeapons/Bows/FourBow12",
+        # =================================================================
+        # Crossbows
+        # =================================================================
+        "Metadata/Items/Weapons/TwoHandWeapons/Crossbows/FourCrossbow9",
+        "Metadata/Items/Weapons/TwoHandWeapons/Crossbows/FourCrossbow11",
+        "Metadata/Items/Weapons/TwoHandWeapons/Crossbows/FourCrossbow12",
+        # =================================================================
+        # Quarterstaves
+        # =================================================================
+        "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourQuarterstaff11",
+        # =================================================================
+        # Staves
+        # =================================================================
+        "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff12",
+        "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff13",
+        # =================================================================
+        # Wands
+        # =================================================================
+        "Metadata/Items/Weapons/OneHandWeapons/Wands/FourWand11",
+        "Metadata/Items/Weapons/OneHandWeapons/Wands/FourWand13",
+        # =================================================================
+        # Sceptres
+        # =================================================================
+        "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre7",
+        "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre8",
+        "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre9",
+        "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre11",
         # =================================================================
         # Currency items
         # =================================================================
+        "Metadata/Items/Currency/CurrencyUpgradeToRareShard",
+        "Metadata/Items/Currency/CurrencyRerollMagicShard",
+        "Metadata/Items/Currency/CurrencyRerollRareShard",
+        "Metadata/Items/Currency/CurrencyRerollUnique",
+        "Metadata/Items/Currency/CurrencyRerollUniqueShard",
+        "Metadata/Items/Currency/CurrencyRerollSocketColours",
+        "Metadata/Items/Currency/CurrencyRerollImplicit",
+        "Metadata/Items/Currency/CurrencyRemoveModShard",
+        "Metadata/Items/Currency/CurrencyItemiseCapturedMonster",
+        "Metadata/Items/Currency/CurrencyUpgradeToRareAndSetSocketsShard",
         "Metadata/Items/Currency/CurrencySilverCoin",
+        "Metadata/Items/AtlasExiles/AddModToRareCrusader",
+        "Metadata/Items/AtlasExiles/ApplyInfluence",
+        "Metadata/Items/Currency/CurrencyMapQuality",
+        # =================================================================
+        # Vault key items
+        # =================================================================
+        "Metadata/Items/MapFragments/ClassicVaultKey",
+        "Metadata/Items/MapFragments/UberShaperVaultKey",
+        "Metadata/Items/MapFragments/UberUberElderVaultKey",
+        "Metadata/Items/MapFragments/UberSearingExarchVaultKey",
+        # =================================================================
+        # Quest items
+        # =================================================================
+        # New in PoE2
+        "Metadata/Items/QuestItems/Gallows/Act3/BogWitchSkillBook",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric2",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric4",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric5",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric7",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric8",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric10",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric11",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric13",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric14",
+        "Metadata/Items/QuestItems/Gallows/Act2/BurningHeart",
+        # Old from PoE1
+        "Metadata/Items/QuestItems/SkillBooks/DelevelBook",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookElder",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookMaven",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookTangle",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookCleansingFire",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookInfiniteHunger",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBlackStar",
+        "Metadata/Items/QuestItems/SkillBooks/Descent2_1",
+        "Metadata/Items/QuestItems/SkillBooks/Descent2_2",
+        "Metadata/Items/QuestItems/SkillBooks/Descent2_3",
+        "Metadata/Items/QuestItems/SkillBooks/Descent2_4",
+        # =================================================================
+        # Misc
+        # =================================================================
+        # New in PoE2
+        "Metadata/Items/Ultimatum/UltimatumKeySpecial",
+        "Metadata/Items/Sanctum/SanctumBronzeKeyDrop",
+        "Metadata/Items/Sanctum/SanctumSilverKeyDrop",
+        "Metadata/Items/Sanctum/SanctumGoldKeyDrop",
+        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGemMedium2",
+        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGemMedium3",
+        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGem2",
+        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGem3",
+        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGem4",
+        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGem5",
+        # Old from PoE1
+        "Metadata/Items/Heist/HeistEquipmentToolTest",
+        "Metadata/Items/Heist/HeistEquipmentWeaponTest",
+        "Metadata/Items/Heist/HeistEquipmentUtilityTest",
+        "Metadata/Items/Heist/HeistEquipmentRewardTest",
+        "Metadata/Items/Weapons/OneHandWeapons/OneHandSwords/StormBladeOneHand",
+        "Metadata/Items/Weapons/TwoHandWeapons/TwoHandSwords/StormBladeTwoHand",
+        "Metadata/Items/Weapons/OneHandWeapons/Daggers/EtherealBlade1",
+        "Metadata/items/Weapons/OneHandWeapons/OneHandSwords/OneHandSwordDemigods1",
+        "Metadata/Items/Armours/Helmets/HelmetDemigods1",
+        "Metadata/Items/Armours/Gloves/FourGlovesDemigod",
+        "Metadata/Items/Armours/Gloves/GlovesDemigods1",
+        "Metadata/Items/Classic/MysteryLeaguestone",
+        "Metadata/Items/MapFragments/CurrencyFragmentPantheonFlask",
+        "Metadata/Items/MapFragments/RitualFragment",
+        "Metadata/Items/MapFragments/CurrencyMavenKeyFragment",
+        "Metadata/Items/MapFragments/VoidbornVaultKey",
+        "Metadata/Items/MapFragments/TencentVoidbornVaultKey",
         # =================================================================
         # Cosmetic items
         # =================================================================
@@ -1562,7 +1769,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/MapFragments/BreachFragmentChaos",
         "Metadata/Items/Labyrinth/OfferingToTheGoddess",
         # =================================================================
-        # Watchstones (removed from the game in 3.17.0)
+        # Watchstones
         # =================================================================
         "Metadata/Items/AtlasUpgrades/AtlasRegionUpgradeFinal",
         "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_1",
@@ -1621,61 +1828,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable3_6",
         "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable3_7",
         "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable3_8",
-        # =================================================================
-        # Quest items
-        # =================================================================
-        # New in PoE2
-        "Metadata/Items/QuestItems/Gallows/Act3/BogWitchSkillBook",
-        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric2",
-        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric4",
-        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric5",
-        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric7",
-        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric8",
-        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric10",
-        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric11",
-        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric13",
-        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric14",
-        # Old from PoE1
-        "Metadata/Items/QuestItems/SkillBooks/DelevelBook",
-        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookElder",
-        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookMaven",
-        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookTangle",
-        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookCleansingFire",
-        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookInfiniteHunger",
-        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBlackStar",
-        "Metadata/Items/QuestItems/SkillBooks/Descent2_1",
-        "Metadata/Items/QuestItems/SkillBooks/Descent2_2",
-        "Metadata/Items/QuestItems/SkillBooks/Descent2_3",
-        "Metadata/Items/QuestItems/SkillBooks/Descent2_4",
-        # =================================================================
-        # Misc
-        # =================================================================
-        # New in PoE2
-        "Metadata/Items/Ultimatum/UltimatumKeySpecial",
-        "Metadata/Items/Sanctum/SanctumBronzeKeyDrop",
-        "Metadata/Items/Sanctum/SanctumSilverKeyDrop",
-        "Metadata/Items/Sanctum/SanctumGoldKeyDrop",
-        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGemMedium2",
-        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGemMedium3",
-        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGem2",
-        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGem3",
-        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGem4",
-        "Metadata/Items/QuestItems/Gallows/Act3/VaalKeyGem5",
-        # Old from PoE1
-        "Metadata/Items/Heist/HeistEquipmentToolTest",
-        "Metadata/Items/Heist/HeistEquipmentWeaponTest",
-        "Metadata/Items/Heist/HeistEquipmentUtilityTest",
-        "Metadata/Items/Heist/HeistEquipmentRewardTest",
-        "Metadata/Items/Weapons/OneHandWeapons/OneHandSwords/StormBladeOneHand",
-        "Metadata/Items/Weapons/TwoHandWeapons/TwoHandSwords/StormBladeTwoHand",
-        "Metadata/Items/Weapons/OneHandWeapons/Daggers/EtherealBlade1",
-        "Metadata/items/Weapons/OneHandWeapons/OneHandSwords/OneHandSwordDemigods1",
-        "Metadata/Items/Armours/Helmets/HelmetDemigods1",
-        "Metadata/Items/Armours/Gloves/FourGlovesDemigod",
-        "Metadata/Items/Armours/Gloves/GlovesDemigods1",
-        "Metadata/Items/Classic/MysteryLeaguestone",
-        "Metadata/Items/MapFragments/VoidbornVaultKey",
-        "Metadata/Items/MapFragments/TencentVoidbornVaultKey",
     }
 
     _ITEM_SKIP_PATTERNS = {
@@ -1687,15 +1839,24 @@ class ItemsParser(SkillParserShared):
         },
         "StackableCurrency": {
             r"ScoutingReports",
+            r"CurrencySealMap",
+            r"CurrencyItemisedSextant",
             r"CurrencyHellscape",
             r"HarvestSeed",
             r"CurrencyLegion",
             r"CurrencyIncursionVial",
+            r"CurrencyDelveCrafting",
+            r"CurrencyBreach[^S]",
+            r"CurrencyHarbinger",
+            r"SentinelCurrency",
+            r"BestiaryNet",
             r"RandomFossilOutcome",
             r"CurrencyIncursionCorrupt",
+            r"CurrencyAddAtlasMod",
         },
         "MapFragment": {
             r"Scarabs",
+            r"CurrencyOfferingToTheGoddess",
             r"CurrencyLegion",
             r"Maven/MavenMap",
             r"CurrencyVaalFragment",
@@ -1703,6 +1864,7 @@ class ItemsParser(SkillParserShared):
             r"CurrencyShaperFragment",
             r"CurrencyProphecyFragment",
             r"CurrencyUberElderFragment",
+            r"CurrencySirusFragment",
         },
         "MiscMapItem": {
             r"Maven/MavenMap",
@@ -1738,6 +1900,7 @@ class ItemsParser(SkillParserShared):
             r"Premium.*Pet",
             r"UnifiedAuraEffect",
             r"MicrotransactionWrapper",
+            r"MicrotransactionDance",
         },
     }
 
@@ -1818,7 +1981,7 @@ class ItemsParser(SkillParserShared):
 
         # some descriptions come from active skills
         if ge["IsSupport"] and gem_type["SupportText"]:
-            infobox["description"] = process_keywords(gem_type["SupportText"])
+            infobox["gem_description"] = process_keywords(gem_type["SupportText"])
 
         return True
 
@@ -1937,8 +2100,8 @@ class ItemsParser(SkillParserShared):
                 full_result=True,
                 lang=self._language,
             )
-            infobox["buff_stat_text"] = "<br>".join(
-                [parser.make_inter_wiki_links(line) for line in tr.lines]
+            infobox["buff_stat_text"] = process_keywords(
+                "<br>".join([parser.make_inter_wiki_links(line) for line in tr.lines])
             )
 
     _type_flask = _type_factory(
@@ -2092,6 +2255,13 @@ class ItemsParser(SkillParserShared):
                 parser.parse_and_handle_description_tags(
                     rr=self.rr,
                     text=infobox["description"],
+                )
+            )
+        if infobox.get("help_text"):
+            infobox["help_text"] = process_keywords(
+                parser.parse_and_handle_description_tags(
+                    rr=self.rr,
+                    text=infobox["help_text"],
                 )
             )
 
@@ -2443,7 +2613,7 @@ class ItemsParser(SkillParserShared):
         except KeyError:
             return False
 
-        infobox["soulcore_rank"] = soulCore["Rank"]
+        # infobox["soulcore_rank"] = soulCore["Rank"]
 
         socket_types = [
             # stats, values, text

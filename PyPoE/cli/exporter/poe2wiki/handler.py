@@ -62,7 +62,7 @@ from PyPoE.cli.handler import BaseHandler
 
 __all__ = ["ExporterHandler", "ExporterResult", "WikiHandler"]
 
-WIKIS = {"English": "www.poew2iki.net/w"}
+WIKIS = {"English": "www.poe2wiki.net/w"}
 
 # =============================================================================
 # Classes
