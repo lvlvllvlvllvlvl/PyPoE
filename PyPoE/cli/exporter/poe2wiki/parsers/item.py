@@ -23,9 +23,6 @@ Agreement
 ===============================================================================
 
 See PyPoE/LICENSE
-
-# TODO
-Kishara's Star (item)
 """
 
 # =============================================================================
@@ -285,6 +282,13 @@ class WikiCondition(parser.WikiCondition):
         "quest_reward4_act",
         "quest_reward4_class_ids",
         "quest_reward4_npc",
+        # Temporary for jewels TODO: remove when mods will be done
+        "extra_stat1_id",
+        "extra_stat1_min",
+        "extra_stat1_max",
+        "extra_stat2_id",
+        "extra_stat2_min",
+        "extra_stat2_max",
     )
     COPY_MATCH = re.compile(
         r"^(recipe|sell_price|implicit[0-9]+_(?:text|random_list)).*", re.UNICODE
@@ -421,20 +425,7 @@ class ItemsParser(SkillParserShared):
         "InstanceLocalItem",
     )
 
-    _DROP_DISABLED_ITEMS_BY_ID = {
-        "Metadata/Items/Quivers/Quiver1",
-        "Metadata/Items/Quivers/Quiver2",
-        "Metadata/Items/Quivers/Quiver3",
-        "Metadata/Items/Quivers/Quiver4",
-        "Metadata/Items/Quivers/Quiver5",
-        "Metadata/Items/Quivers/QuiverDescent",
-        "Metadata/Items/Rings/RingVictor1",
-        # Eternal Orb
-        "Metadata/Items/Currency/CurrencyImprintOrb",
-        # Demigod items
-        "Metadata/Items/Belts/BeltDemigods1",
-        "Metadata/Items/Rings/RingDemigods1",
-    }
+    _DROP_DISABLED_ITEMS_BY_ID = {}
 
     _FORCE_INVENTORY_ICON_BY_ID = {
         # =================================================================
@@ -575,8 +566,8 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss4": "Vanquisher's Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss5": "Vanquisher's Book of Knowledge",
         "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": "Candlemass' Essence",
-        "Metadata/Items/QuestItems/Gallows/Act3/GoldIdol4": "Grand Idol",
-        "Metadata/Items/QuestItems/Gallows/Act3/GoldIdol5": "Golden Idol",
+        "Metadata/Items/QuestItems/Gallows/Act3/GoldIdol4": "Golden Idol",
+        "Metadata/Items/QuestItems/Gallows/Act3/GoldIdol5": "Grand Idol",
         "Metadata/Items/QuestItems/Gallows/Act3/GoldIdol6": "Glorious Idol",
         "Metadata/Items/QuestItems/Gallows/Act3/SnakeLadyPotionConsumable4": "Venom Draught of Stone",
         "Metadata/Items/QuestItems/Gallows/Act3/SnakeLadyPotionConsumable5": "Venom Draught of the Veil",
@@ -585,13 +576,22 @@ class ItemsParser(SkillParserShared):
         # Misc
         # =================================================================
         "Metadata/Items/Gems/SkillGemUncutQuest": "Uncut Skill Gem",
+        "Metadata/Items/TowerAugment/GenericAugment": "Precursor Tablet",
     }
 
-    _NAME_OVERRIDE_BY_ID = {
+    _NAME_OVERRIDE_BY_ID = {"English": {}}
+
+    # Override also name in infobox (temporary, maybe)
+    _NAME_OVERRIDE_BY_ID_2 = {
         "English": {
-            # "Metadata/Items/PantheonSouls/PantheonSoulBrineKingUpgrade1": (
-            #    "Captured Soul (The Brine King upgrade 1 of 3)"
-            # ),
+            "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric1": "Crystalline Core of Knowledge",
+            "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookUniqueMaps1": "Book of Unique Knowledge",
+            "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookPinnacle1": "Arbiter's Book of Knowledge",
+            "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBreach1": "Otherworldly Book of Knowledge",
+            "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookDelirium1": "Deranging Book of Knowledge",
+            "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookRitual1": "Ritualistic Book of Knowledge",
+            "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition1": "Runic Book of Knowledge",
+            "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss1": "Vanquisher's Book of Knowledge",
         }
     }
 
@@ -673,11 +673,11 @@ class ItemsParser(SkillParserShared):
             # =================================================================
             # Quest items
             # =================================================================
-            "Metadata/Items/QuestItems/Gallows/Act1/CrowbellSkillBook": " (Crowbell)",
-            "Metadata/Items/QuestItems/Gallows/Act1/UnaSkillBook": " (Una)",
-            "Metadata/Items/QuestItems/Gallows/Act2/SerpentClanCasterBossDrop": " (Serpent)",
-            "Metadata/Items/QuestItems/Gallows/Act2/FinalLetterSkillBook": " (Final Letter)",
-            "Metadata/Items/QuestItems/Gallows/Act3/QuadrillaSkillBook": " (Quadrilla)",
+            # "Metadata/Items/QuestItems/Gallows/Act1/CrowbellSkillBook": " (Crowbell)",
+            # "Metadata/Items/QuestItems/Gallows/Act1/UnaSkillBook": " (Una)",
+            # "Metadata/Items/QuestItems/Gallows/Act2/SerpentClanCasterBossDrop": " (Serpent)",
+            # "Metadata/Items/QuestItems/Gallows/Act2/FinalLetterSkillBook": " (Final Letter)",
+            # "Metadata/Items/QuestItems/Gallows/Act3/QuadrillaSkillBook": " (Quadrilla)",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDrop": "",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": " (Cruel)",
             "Metadata/Items/Gems/SkillGemUncutQuest": " (quest item)",
@@ -1112,6 +1112,11 @@ class ItemsParser(SkillParserShared):
         "Two Hand Sword",
         "One Hand Axe",
         "Two Hand Axe",
+        # Don't do this for now
+        "VaultKey",
+        "Active Skill Gem",
+        "Meta Skill Gem",
+        "Support Skill Gem",
     }
 
     # Unreleased or disabled items to avoid exporting to the wiki
@@ -1331,6 +1336,7 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Staves
         # =================================================================
+        "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff4",
         "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff7",
         "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff8",
         "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff9",
@@ -1362,10 +1368,16 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Maces
         # =================================================================
+        "Metadata/Items/Weapons/OneHandWeapons/OneHandMaces/FourOneHandMace9",
         "Metadata/Items/Weapons/OneHandWeapons/OneHandMaces/FourOneHandMace10",
         "Metadata/Items/Weapons/OneHandWeapons/OneHandMaces/FourOneHandMace11",
         "Metadata/Items/Weapons/TwoHandWeapons/TwoHandMaces/FourTwoHandMace10",
         "Metadata/Items/Weapons/TwoHandWeapons/TwoHandMaces/FourTwoHandMace11",
+        "Metadata/Items/Weapons/TwoHandWeapons/TwoHandMaces/FourTwoHandMace12",
+        # =================================================================
+        # Fishing rods
+        # =================================================================
+        "Metadata/Items/Weapons/TwoHandWeapon/FishingRods/FishingRod1",
         # =================================================================
         # Currency items
         # =================================================================
@@ -1418,7 +1430,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Currency/CurrencyHeistArmourEnchant",
         "Metadata/Items/Currency/CurrencyHeistWeaponEnchant",
         "Metadata/Items/AtlasExiles/AddModToRareCrusader",
-        "Metadata/Items/AtlasExiles/AddModToRareHunter"
+        "Metadata/Items/AtlasExiles/AddModToRareHunter",
         "Metadata/Items/AtlasExiles/AddModToRareRedeemer",
         "Metadata/Items/AtlasExiles/AddModToRareWarlord",
         "Metadata/Items/AtlasExiles/ApplyInfluence",
@@ -1458,6 +1470,39 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Quest items
         # =================================================================
+        # Books merged into 1 (most of this can be handled in name_conflict)
+        "Metadata/Items/QuestItems/Gallows/Act1/UnaSkillBook",
+        "Metadata/Items/QuestItems/Gallows/Act2/SerpentClanCasterBossDrop",
+        "Metadata/Items/QuestItems/Gallows/Act2/FinalLetterSkillBook",
+        "Metadata/Items/QuestItems/Gallows/Act3/QuadrillaSkillBook",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric3",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric6",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric9",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric12",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric15",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookUniqueMaps2",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookUniqueMaps3",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookUniqueMaps4",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookUniqueMaps5",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookPinnacle2",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookPinnacle3",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookPinnacle4",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBreach2",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBreach3",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBreach4",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookDelirium2",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookDelirium3",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookDelirium4",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookRitual2",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookRitual3",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookRitual4",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition2",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition3",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition4",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss2",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss3",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss4",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss5",
         # New in PoE2
         "Metadata/Items/QuestItems/Gallows/Act3/BogWitchSkillBook",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric2",
@@ -3265,8 +3310,9 @@ class ItemsParser(SkillParserShared):
                 )
             )
 
-        for i, mod in enumerate(base_item_type["Implicit_ModsKeys"]):
-            infobox["implicit%s" % (i + 1)] = mod["Id"]
+        # TODO: unnote when modifiers will be done
+        # for i, mod in enumerate(base_item_type["Implicit_Mods"]):
+        #    infobox["implicit%s" % (i + 1)] = mod["Id"]
 
     def _process_name_conflicts(self, infobox, base_item_type, language):
         rr = self.rr2 if language != self._language else self.rr
@@ -3277,10 +3323,15 @@ class ItemsParser(SkillParserShared):
         cls_id = base_item_type["ItemClass"]["Id"]
         m_id = base_item_type["Id"]
         override = self._NAME_OVERRIDE_BY_ID[language].get(m_id)
+        override_2 = self._NAME_OVERRIDE_BY_ID_2[language].get(m_id)
         appendix = self._NAME_APPENDIX_BY_ID[language].get(m_id)
 
         if override is not None:
             name = override
+            infobox["inventory_icon"] = name
+        if override_2 is not None:
+            name = override_2
+            infobox["name"] = override_2
             infobox["inventory_icon"] = name
         if appendix is not None:
             name += appendix

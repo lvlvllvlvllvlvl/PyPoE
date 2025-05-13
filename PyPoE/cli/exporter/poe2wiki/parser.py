@@ -2003,6 +2003,9 @@ _KEYWORD_LINK_MAP = {
         ("Attribute", "Attribute"),
         ("attribute", "attribute"),
     ],
+    "AzmeriSpirit": [
+        ("Azmeri Spirit", "Azmeri Spirit"),
+    ],
     "BuffMagnitude": [
         ("Magnitude", "Magnitude"),
     ],
@@ -2026,6 +2029,7 @@ _KEYWORD_LINK_MAP = {
         ("Delirium", "Delirium"),
     ],
     "CooldownRecovery": [
+        ("Cooldown Recovery Rate", "Cooldown Recovery Rate"),
         ("", "Cooldown"),
     ],
     "Critical": [
@@ -2059,6 +2063,10 @@ _KEYWORD_LINK_MAP = {
     "EnergyShield": [
         ("Energy Shield", "Energy Shield"),
     ],
+    "ESRechargeRate": [
+        ("Energy Shield Recharge Rate", "Energy Shield Recharge Rate"),
+        ("", "Energy Shield"),
+    ],
     "FinalStrike": [
         ("Final Strike", "Final Strike"),
     ],
@@ -2090,6 +2098,9 @@ _KEYWORD_LINK_MAP = {
     "LifeLeech": [
         ("Leech", "Leech"),
     ],
+    "LowLife": [
+        ("Low Life", "Low Life"),
+    ],
     "ManaLeech": [
         ("Leech", "Leech"),
     ],
@@ -2097,6 +2108,13 @@ _KEYWORD_LINK_MAP = {
         ("Martial Weapon", "Martial Weapon"),
         ("Martial weapon", "Martial weapon"),
         ("martial weapon", "martial weapon"),
+    ],
+    "MaximumResistances": [
+        ("Maximum Fire Resistance", "Maximum Fire Resistance"),
+        ("Maximum Cold Resistance", "Maximum Cold Resistance"),
+        ("Maximum Lightning Resistance", "Maximum Lightning Resistance"),
+        ("Maximum Chaos Resistance", "Maximum Chaos Resistance"),
+        ("", "Maximum Resistance"),
     ],
     "OrbOfAlchemy": [
         ("Orb of Alchemy", "Orb of Alchemy"),
@@ -2130,6 +2148,9 @@ _KEYWORD_LINK_MAP = {
     ],
     "Resonance": [
         ("Resonance", "Resonance (buff)"),
+    ],
+    "RogueExile": [
+        ("Rogue Exile", "Rogue Exile"),
     ],
     "StatConversion": [
         ("Convert", "Convert"),
