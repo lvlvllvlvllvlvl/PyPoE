@@ -1977,8 +1977,15 @@ def make_inter_wiki_links(string):
 _KEYWORD_LINK_MAP = {
     # Keyword:
     # ("visible text", "link")
+    "Ailments": [
+        ("Ailment", "Ailment"),
+    ],
     "AilmentSpread": [
         ("Spread", "Spread"),
+    ],
+    "AilmentThreshold": [
+        ("Ailment Threshold", "Ailment Threshold"),
+        ("", "Ailment"),
     ],
     "AncestralBoost": [
         ("Ancestral Boost", "Ancestral Boost"),
@@ -2018,7 +2025,11 @@ _KEYWORD_LINK_MAP = {
     "ContainsDelirium": [
         ("Delirium", "Delirium"),
     ],
+    "CooldownRecovery": [
+        ("", "Cooldown"),
+    ],
     "Critical": [
+        ("Critical Hit Chance", "Critical Hit Chance"),
         ("Critically Hit", "Critically Hit"),
         ("Critically hit", "Critically hit"),
         ("Critical Hit", "Critical Hit"),
@@ -2037,17 +2048,33 @@ _KEYWORD_LINK_MAP = {
     "DistilledEmotion": [
         ("Distilled Emotion", "Distilled Emotion"),
     ],
+    "ElementalDamage": [
+        ("Elemental Damage", "Elemental Damage"),
+        ("Elemental damage", "Elemental damage"),
+        ("Elemental", "Elemental"),
+    ],
+    "Empowered": [
+        ("Empower", "Empower"),
+    ],
     "EnergyShield": [
         ("Energy Shield", "Energy Shield"),
     ],
     "FinalStrike": [
         ("Final Strike", "Final Strike"),
     ],
+    "Flask": [
+        ("Flask", "Flask"),
+        ("flask", "flask"),
+    ],
     "HeavyStun": [
         ("Heavy Stun", "Heavy Stun"),
     ],
     "HitDamage": [
         ("Hit", "Hit"),
+        ("", "Hit"),
+    ],
+    "IceCrystals": [
+        ("Ice Crystal", "Ice Crystal"),
     ],
     "ItemRarity": [
         ("Normal", "Normal"),
@@ -2061,6 +2088,9 @@ _KEYWORD_LINK_MAP = {
         ("Kill", "Kill"),
     ],
     "LifeLeech": [
+        ("Leech", "Leech"),
+    ],
+    "ManaLeech": [
         ("Leech", "Leech"),
     ],
     "MartialWeapon": [
@@ -2077,6 +2107,9 @@ _KEYWORD_LINK_MAP = {
     "OrbOfChance": [
         ("Orb of Chance", "Orb of Chance"),
     ],
+    "OrbOfTransmutation": [
+        ("Orb of Transmutation", "Orb of Transmutation"),
+    ],
     "Physical": [
         ("Physical Damage", "Physical Damage"),
         ("Physical", "Physical"),
@@ -2084,6 +2117,9 @@ _KEYWORD_LINK_MAP = {
     "Quality": [
         ("Quality", "Quality"),
         ("quality", "quality"),
+    ],
+    "RegalOrb": [
+        ("Regal Orb", "Regal Orb"),
     ],
     "Resistances": [
         ("Fire Resistance", "Fire Resistance"),
@@ -2095,9 +2131,20 @@ _KEYWORD_LINK_MAP = {
     "Resonance": [
         ("Resonance", "Resonance (buff)"),
     ],
+    "StatConversion": [
+        ("Convert", "Convert"),
+        ("", "Conversion"),
+    ],
+    "StunThreshold": [
+        ("Stun Threshold", "Stun Threshold"),
+    ],
     "ThornsRetaliation": [
         ("Retaliate with Thorns", "Thorns"),
         ("Retaliate", "Thorns"),
+    ],
+    "WeaponSetPassiveSkillPoints": [
+        ("Weapon Set Passive Skill Points", "Weapon Set Passive Skill Points"),
+        ("", "Weapon set#Weapon set passive skill points"),
     ],
     "Wells": [
         ("Well", "Well"),
