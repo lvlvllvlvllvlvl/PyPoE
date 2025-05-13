@@ -2928,9 +2928,9 @@ class ItemsParser(SkillParserShared):
     """
     _cls_map = {
         # Jewellery
-        "Amulet": (),
-        "Ring": (),
-        "Belt": (),
+        "Amulet": (_type_level,),
+        "Ring": (_type_level,),
+        "Belt": (_type_level,),
         # Armour types
         "Gloves": (
             _type_level,
