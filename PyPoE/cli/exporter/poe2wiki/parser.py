@@ -1977,6 +1977,9 @@ def make_inter_wiki_links(string):
 _KEYWORD_LINK_MAP = {
     # Keyword:
     # ("visible text", "link")
+    "Accuracy": [
+        ("Accurate", "Accurate"),
+    ],
     "Ailments": [
         ("Ailment", "Ailment"),
     ],
@@ -1987,14 +1990,24 @@ _KEYWORD_LINK_MAP = {
         ("Ailment Threshold", "Ailment Threshold"),
         ("", "Ailment"),
     ],
+    "Allies": [
+        ("Allied", "Allied"),
+    ],
     "AncestralBoost": [
+        ("Ancestrally Boosted", "Ancestrally Boosted"),
         ("Ancestral Boost", "Ancestral Boost"),
     ],
     "ArmourBreak": [
         ("Armour Break", "Armour Break"),
+        ("Armour Broken", "Armour Broken"),
         ("Break Armour", "Break Armour"),
+        ("Breaking Armour", "Breaking Armour"),
+        ("Broken Armour", "Broken Armour"),
+        ("Fully Armour Broken", "Fully Armour Broken"),
         ("Fully Break", "Fully Break"),
         ("Fully Broken Armour", "Fully Broken Armour"),
+        ("Fully Broken", "Fully Broken"),
+        ("Break", "Break"),
     ],
     "ArtificersOrb": [
         ("Artificer's Orb", "Artificer's Orb"),
@@ -2006,8 +2019,14 @@ _KEYWORD_LINK_MAP = {
     "AzmeriSpirit": [
         ("Azmeri Spirit", "Azmeri Spirit"),
     ],
+    "Bleeding": [
+        ("Bleed", "Bleed"),
+    ],
     "BuffMagnitude": [
         ("Magnitude", "Magnitude"),
+    ],
+    "Burning": [
+        ("Burn", "Burn"),
     ],
     "Channelling": [
         ("Channelled", "Channelled"),
@@ -2022,6 +2041,9 @@ _KEYWORD_LINK_MAP = {
         ("Endurance Charge", "Endurance Charge"),
         ("Charge", "Charge"),
     ],
+    "ChilledGround": [
+        ("Chilled Ground", "Chilled Ground"),
+    ],
     "Conditional": [
         ("Condition", "Condition"),
     ],
@@ -2030,7 +2052,14 @@ _KEYWORD_LINK_MAP = {
     ],
     "CooldownRecovery": [
         ("Cooldown Recovery Rate", "Cooldown Recovery Rate"),
+        ("Cooldowns Recover", "Cooldowns Recover"),
         ("", "Cooldown"),
+    ],
+    "CorruptedBlood": [
+        ("Corrupted Blood", "Corrupted Blood"),
+    ],
+    "ConsecratedGround": [
+        ("Consecrated Ground", "Consecrated Ground"),
     ],
     "Critical": [
         ("Critical Hit Chance", "Critical Hit Chance"),
@@ -2043,16 +2072,44 @@ _KEYWORD_LINK_MAP = {
     "CriticalDamageBonus": [
         ("Critical Damage Bonus", "Critical Damage Bonus"),
     ],
+    "CrushingBlow": [
+        ("Crushing Blow", "Crushing Blow"),
+    ],
+    "CullingStrike": [
+        ("Culling Strike", "Culling Strike"),
+        ("Culling strike", "Culling strike"),
+        ("Cull", "Cull"),
+        ("", "Cull"),
+    ],
+    "DamageTypes": [
+        ("Damage Type", "Damage Type"),
+        ("Damage type", "Damage type"),
+        ("", "Damage Type"),
+    ],
     "DamagingAilments": [
         ("Damaging Ailment", "Damaging Ailment"),
+        ("", "Damaging Ailment"),
     ],
     "Defences": [
         ("Defence", "Defence"),
     ],
+    "DetonationTime": [
+        ("Detonation Time", "Detonation Time"),
+        ("Detonation", "Detonation"),
+        ("Detonate", "Detonate"),
+    ],
     "DistilledEmotion": [
         ("Distilled Emotion", "Distilled Emotion"),
     ],
+    "EasyTargetDebuff": [
+        ("Easy Target", "Easy Target"),
+    ],
+    "ElementalAilments": [
+        ("Elemental Ailment", "Elemental Ailment"),
+        ("Elemental ailment", "Elemental ailment"),
+    ],
     "ElementalDamage": [
+        ("Elemental Hit Damage", "Elemental Hit Damage"),
         ("Elemental Damage", "Elemental Damage"),
         ("Elemental damage", "Elemental damage"),
         ("Elemental", "Elemental"),
@@ -2067,6 +2124,13 @@ _KEYWORD_LINK_MAP = {
         ("Energy Shield Recharge Rate", "Energy Shield Recharge Rate"),
         ("", "Energy Shield"),
     ],
+    "Evasion": [
+        ("Evasion Rating", "Evasion Rating"),
+        ("", "Evasion"),
+    ],
+    "Exposure": [
+        ("", "Exposure"),
+    ],
     "FinalStrike": [
         ("Final Strike", "Final Strike"),
     ],
@@ -2074,15 +2138,35 @@ _KEYWORD_LINK_MAP = {
         ("Flask", "Flask"),
         ("flask", "flask"),
     ],
+    "Freeze": [
+        ("Freezing", "Freezing"),
+    ],
     "HeavyStun": [
+        ("Heavily Stun", "Heavily Stun"),
+        ("Heavy Stun", "Heavy Stun"),
+    ],
+    "HeavyStunPlayer": [
+        ("Heavily Stun", "Heavily Stun"),
         ("Heavy Stun", "Heavy Stun"),
     ],
     "HitDamage": [
+        ("Damaging Hit", "Damaging Hit"),
+        ("Damaging hit", "Damaging hit"),
+        ("Hit Damage", "Hit Damage"),
         ("Hit", "Hit"),
         ("", "Hit"),
     ],
     "IceCrystals": [
         ("Ice Crystal", "Ice Crystal"),
+    ],
+    "Ignite": [
+        ("Igniting", "Igniting"),
+    ],
+    "IgnitedGround": [
+        ("Ignited Ground", "Ignited Ground"),
+    ],
+    "Invoke": [
+        ("Invoking", "Invoking"),
     ],
     "ItemRarity": [
         ("Normal", "Normal"),
@@ -2091,9 +2175,18 @@ _KEYWORD_LINK_MAP = {
         ("Unique", "Unique"),
         ("", "Rarity"),
     ],
+    "JaggedGround": [
+        ("Jagged Ground", "Jagged Ground"),
+    ],
     "KillingBlow": [
         ("Killing Blow", "Killing Blow"),
         ("Kill", "Kill"),
+    ],
+    "Knockback": [
+        ("Knocking Back", "Knocking Back"),
+        ("Knock Back", "Knock Back"),
+        ("Knock back", "Knock back"),
+        ("", "Knockback"),
     ],
     "LifeLeech": [
         ("Leech", "Leech"),
@@ -2114,7 +2207,11 @@ _KEYWORD_LINK_MAP = {
         ("Maximum Cold Resistance", "Maximum Cold Resistance"),
         ("Maximum Lightning Resistance", "Maximum Lightning Resistance"),
         ("Maximum Chaos Resistance", "Maximum Chaos Resistance"),
+        ("Maximum Resistance", "Maximum Resistance"),
         ("", "Maximum Resistance"),
+    ],
+    "MonsterModifiers": [
+        ("Modifier", "Modifier"),
     ],
     "OrbOfAlchemy": [
         ("Orb of Alchemy", "Orb of Alchemy"),
@@ -2128,13 +2225,36 @@ _KEYWORD_LINK_MAP = {
     "OrbOfTransmutation": [
         ("Orb of Transmutation", "Orb of Transmutation"),
     ],
+    "ParriedDebuff": [
+        ("Parried", "Parried"),
+    ],
+    "Penetration": [
+        ("Penetrate", "Penetrate"),
+    ],
+    "PerfectionBuff": [
+        ("Perfection Buff", "Perfection Buff"),
+        ("", "Perfection Buff"),
+    ],
+    "PerfectTiming": [
+        ("Perfect Timing", "Perfect Timing"),
+        ("Perfectly Timing", "Perfectly Timing"),
+    ],
     "Physical": [
         ("Physical Damage", "Physical Damage"),
-        ("Physical", "Physical"),
+    ],
+    "PrimedElectrocution": [
+        ("Primed for Electrocution", "Primed for Electrocution"),
     ],
     "Quality": [
         ("Quality", "Quality"),
         ("quality", "quality"),
+    ],
+    "Rarity": [
+        ("Normal", "Normal"),
+        ("Rare", "Rare"),
+        ("Magic", "Magic"),
+        ("Unique", "Unique"),
+        ("", "Rarity"),
     ],
     "RegalOrb": [
         ("Regal Orb", "Regal Orb"),
@@ -2149,8 +2269,20 @@ _KEYWORD_LINK_MAP = {
     "Resonance": [
         ("Resonance", "Resonance (buff)"),
     ],
+    "Reviving": [
+        ("Revived", "Revived"),
+    ],
     "RogueExile": [
         ("Rogue Exile", "Rogue Exile"),
+    ],
+    "RunicInscription": [
+        ("Runic Inscriptions", "Runic Inscriptions"),
+    ],
+    "ShockedGround": [
+        ("Shocked Ground", "Shocked Ground"),
+    ],
+    "SkillSpeed": [
+        ("Skill Speed", "Skill Speed"),
     ],
     "StatConversion": [
         ("Convert", "Convert"),
@@ -2161,7 +2293,10 @@ _KEYWORD_LINK_MAP = {
     ],
     "ThornsRetaliation": [
         ("Retaliate with Thorns", "Thorns"),
-        ("Retaliate", "Thorns"),
+        ("", "Thorns"),
+    ],
+    "Warcry": [
+        ("Warcries", "Warcries"),
     ],
     "WeaponSetPassiveSkillPoints": [
         ("Weapon Set Passive Skill Points", "Weapon Set Passive Skill Points"),
@@ -2169,6 +2304,10 @@ _KEYWORD_LINK_MAP = {
     ],
     "Wells": [
         ("Well", "Well"),
+    ],
+    "Withered": [
+        ("Withered", "Withered"),
+        ("Wither", "Wither"),
     ],
 }
 
@@ -2196,15 +2335,15 @@ def process_keywords(text: str):
             # Try using _KEYWORD_LINK_MAP
             if base in _KEYWORD_LINK_MAP:
                 for display, link in _KEYWORD_LINK_MAP[base]:
-                    if variant == display:
-                        return f"[[{display}]]"
+                    if variant == link:
+                        return f"[[{variant}]]"
                     elif display == "":
                         return f"[[{link}|{variant}]]"
                     elif variant.startswith(display):
                         suffix = variant[len(display) :]
-                        if "'" not in suffix and " " not in suffix:
+                        if display == link and "'" not in suffix and " " not in suffix:
                             return f"[[{link}]]{suffix}"
-                        else:
+                        elif "" not in _KEYWORD_LINK_MAP[base][-1][1]:
                             return f"[[{link}|{variant}]]"
 
         # Default case: no pipe, regular keyword
@@ -2212,7 +2351,7 @@ def process_keywords(text: str):
             key = raw
             if key in _KEYWORD_LINK_MAP:
                 for display, link in _KEYWORD_LINK_MAP[key]:
-                    if key == display and display == link:
+                    if key == link:
                         return f"[[{key}]]"
                     elif display == "":
                         return f"[[{link}|{key}]]"

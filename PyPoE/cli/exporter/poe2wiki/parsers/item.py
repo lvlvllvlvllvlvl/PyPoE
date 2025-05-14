@@ -1116,7 +1116,7 @@ class ItemsParser(SkillParserShared):
         "VaultKey",
         "Active Skill Gem",
         "Meta Skill Gem",
-        "Support Skill Gem",
+        # "Support Skill Gem",
     }
 
     # Unreleased or disabled items to avoid exporting to the wiki
@@ -1188,6 +1188,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SupportGemSpreadingFrost",
         "Metadata/Items/Gem/SupportGemUndermine",
         "Metadata/Items/Gem/SupportGemHoarfrost",
+        "Metadata/Items/Gems/SupportGemShockSiphon",
         # =================================================================
         # Rings
         # =================================================================
