@@ -2022,6 +2022,9 @@ _KEYWORD_LINK_MAP = {
     "Bleeding": [
         ("Bleed", "Bleed"),
     ],
+    "BuffEffect": [
+        ("", "Buff"),
+    ],
     "BuffMagnitude": [
         ("Magnitude", "Magnitude"),
     ],
@@ -2212,6 +2215,10 @@ _KEYWORD_LINK_MAP = {
     ],
     "MonsterModifiers": [
         ("Modifier", "Modifier"),
+    ],
+    "NonDamagingAilments": [
+        ("Non-Damaging Ailment", "Non-Damaging Ailment"),
+        ("", "Ailment"),
     ],
     "OrbOfAlchemy": [
         ("Orb of Alchemy", "Orb of Alchemy"),
