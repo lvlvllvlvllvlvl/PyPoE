@@ -1116,7 +1116,7 @@ class ItemsParser(SkillParserShared):
         "VaultKey",
         "Active Skill Gem",
         "Meta Skill Gem",
-        # "Support Skill Gem",
+        "Support Skill Gem",
     }
 
     # Unreleased or disabled items to avoid exporting to the wiki
@@ -2484,7 +2484,6 @@ class ItemsParser(SkillParserShared):
 
     _type_quest_item = _type_factory(
         data_file="QuestItems.dat64",
-        index_column="Item",
         data_mapping=(
             (
                 "HelpText",
@@ -2837,7 +2836,6 @@ class ItemsParser(SkillParserShared):
 
     _type_distilled_emotion = _type_factory(
         data_file="BlightCraftingItems.dat64",
-        index_column="Oil",
         data_mapping=(
             (
                 "Tier",

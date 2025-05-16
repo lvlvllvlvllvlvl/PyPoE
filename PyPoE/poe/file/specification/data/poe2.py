@@ -4608,7 +4608,7 @@ specification = Specification(
         "BlightCraftingItems.dat": File(
             fields=(
                 Field(
-                    name="Oil",
+                    name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
                     unique=True,
@@ -25732,7 +25732,7 @@ specification = Specification(
         "QuestItems.dat": File(
             fields=(
                 Field(
-                    name="Item",
+                    name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
                     unique=True,
@@ -26408,6 +26408,45 @@ specification = Specification(
                 Field(
                     name="SpawnOrder",
                     type="ref|list|ref|string",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+            ),
+        ),
+        "RitualStashTabLayout.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="StoredItem",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="XOffset",
+                    type="int",
+                ),
+                Field(
+                    name="YOffset",
+                    type="int",
+                ),
+                Field(
+                    name="FirstSlotIndex",
+                    type="int",
+                    unique=True,
+                ),
+                Field(
+                    name="Width",
+                    type="int",
+                ),
+                Field(
+                    name="Height",
+                    type="int",
                 ),
                 Field(
                     name="Flag0",
@@ -28159,6 +28198,45 @@ specification = Specification(
                 Field(
                     name="GreenSocketImage",
                     type="ref|string",
+                ),
+            ),
+        ),
+        "SocketableStashTabLayout.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="StoredItem",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="XOffset",
+                    type="int",
+                ),
+                Field(
+                    name="YOffset",
+                    type="int",
+                ),
+                Field(
+                    name="FirstSlotIndex",
+                    type="int",
+                    unique=True,
+                ),
+                Field(
+                    name="Width",
+                    type="int",
+                ),
+                Field(
+                    name="Height",
+                    type="int",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
                 ),
             ),
         ),
