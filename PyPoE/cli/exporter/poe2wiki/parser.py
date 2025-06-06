@@ -2001,6 +2001,7 @@ _KEYWORD_LINK_MAP = {
         ("Armour Break", "Armour Break"),
         ("Armour Broken", "Armour Broken"),
         ("Break Armour", "Break Armour"),
+        ("Breaks Armour", "Breaks Armour"),
         ("Breaking Armour", "Breaking Armour"),
         ("Broken Armour", "Broken Armour"),
         ("Fully Armour Broken", "Fully Armour Broken"),
@@ -2021,6 +2022,9 @@ _KEYWORD_LINK_MAP = {
     ],
     "Bleeding": [
         ("Bleed", "Bleed"),
+    ],
+    "BooleanDamageRoll": [
+        ("", "Damage"),
     ],
     "BuffEffect": [
         ("", "Buff"),
@@ -2075,6 +2079,9 @@ _KEYWORD_LINK_MAP = {
     "CriticalDamageBonus": [
         ("Critical Damage Bonus", "Critical Damage Bonus"),
     ],
+    "CriticalWeakness": [
+        ("Critical Weakness", "Critical Weakness"),
+    ],
     "CrushingBlow": [
         ("Crushing Blow", "Crushing Blow"),
     ],
@@ -2116,12 +2123,21 @@ _KEYWORD_LINK_MAP = {
         ("Elemental Damage", "Elemental Damage"),
         ("Elemental damage", "Elemental damage"),
         ("Elemental", "Elemental"),
+        ("", "Elemental"),
     ],
     "Empowered": [
         ("Empower", "Empower"),
     ],
     "EnergyShield": [
         ("Energy Shield", "Energy Shield"),
+    ],
+    "EnergyShieldLeech": [
+        ("Energy Shield Leech", "Energy Shield Leech"),
+        ("Leech", "Leech"),
+    ],
+    "ESRecharge": [
+        ("Energy Shield Recharge", "Energy Shield Recharge"),
+        ("", "Energy Shield"),
     ],
     "ESRechargeRate": [
         ("Energy Shield Recharge Rate", "Energy Shield Recharge Rate"),
@@ -2134,12 +2150,18 @@ _KEYWORD_LINK_MAP = {
     "Exposure": [
         ("", "Exposure"),
     ],
+    "FasterESRechargeStart": [
+        ("", "Energy Shield"),
+    ],
     "FinalStrike": [
         ("Final Strike", "Final Strike"),
     ],
     "Flask": [
         ("Flask", "Flask"),
         ("flask", "flask"),
+    ],
+    "ForksCrit": [
+        ("", "Critical"),
     ],
     "Freeze": [
         ("Freezing", "Freezing"),
@@ -2168,6 +2190,9 @@ _KEYWORD_LINK_MAP = {
     "IgnitedGround": [
         ("Ignited Ground", "Ignited Ground"),
     ],
+    "IgnoreResistances": [
+        ("", "Resistance"),
+    ],
     "Invoke": [
         ("Invoking", "Invoking"),
     ],
@@ -2192,12 +2217,14 @@ _KEYWORD_LINK_MAP = {
         ("", "Knockback"),
     ],
     "LifeLeech": [
+        ("Life Leech", "Life Leech"),
         ("Leech", "Leech"),
     ],
     "LowLife": [
         ("Low Life", "Low Life"),
     ],
     "ManaLeech": [
+        ("Mana Leech", "Mana Leech"),
         ("Leech", "Leech"),
     ],
     "MartialWeapon": [
@@ -2232,7 +2259,11 @@ _KEYWORD_LINK_MAP = {
     "OrbOfTransmutation": [
         ("Orb of Transmutation", "Orb of Transmutation"),
     ],
+    "OvercappedBlock": [
+        ("", "Block"),
+    ],
     "ParriedDebuff": [
+        ("Parried Debuff", "Parried Debuff"),
         ("Parried", "Parried"),
     ],
     "Penetration": [
@@ -2248,6 +2279,9 @@ _KEYWORD_LINK_MAP = {
     ],
     "Physical": [
         ("Physical Damage", "Physical Damage"),
+    ],
+    "PlayerPossessed": [
+        ("", "Azmerian wisp"),
     ],
     "PrimedElectrocution": [
         ("Primed for Electrocution", "Primed for Electrocution"),
@@ -2273,6 +2307,9 @@ _KEYWORD_LINK_MAP = {
         ("Chaos Resistance", "Chaos Resistance"),
         ("Resistance", "Resistance"),
     ],
+    "ResistedBy": [
+        ("", "Resistance"),
+    ],
     "Resonance": [
         ("Resonance", "Resonance (buff)"),
     ],
@@ -2291,9 +2328,36 @@ _KEYWORD_LINK_MAP = {
     "SkillSpeed": [
         ("Skill Speed", "Skill Speed"),
     ],
+    "SpiritOfTheBearPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
+    "SpiritOfTheBoarPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
+    "SpiritOfTheCatPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
+    "SpiritOfTheOwlPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
+    "SpiritOfTheOxPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
+    "SpiritOfTheSerpentPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
+    "SpiritOfTheStagPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
+    "SpiritOfTheWolfPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
     "StatConversion": [
         ("Convert", "Convert"),
         ("", "Conversion"),
+    ],
+    "StatGain": [
+        ("Gain", "Gain"),
     ],
     "StunThreshold": [
         ("Stun Threshold", "Stun Threshold"),
@@ -2301,6 +2365,9 @@ _KEYWORD_LINK_MAP = {
     "ThornsRetaliation": [
         ("Retaliate with Thorns", "Thorns"),
         ("", "Thorns"),
+    ],
+    "UnholyMight": [
+        ("Unholy Might", "Unholy Might"),
     ],
     "Warcry": [
         ("Warcries", "Warcries"),

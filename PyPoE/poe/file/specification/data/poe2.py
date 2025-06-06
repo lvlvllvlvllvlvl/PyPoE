@@ -9839,47 +9839,6 @@ specification = Specification(
                     name="Unknown0",
                     type="int",
                 ),
-                Field(
-                    name="Biomes",
-                    type="ref|list|ref|out",
-                    key="EndgameMapBiomes.dat",
-                ),
-                Field(
-                    name="AdjacentBiomes",
-                    type="ref|list|ref|out",
-                    key="EndgameMapBiomes.dat",
-                ),
-                Field(
-                    name="WorldAreaBoss",
-                    type="ref|out",
-                    key="WorldAreas.dat",
-                ),
-                Field(
-                    name="WorldArea",
-                    type="ref|out",
-                    key="WorldAreas.dat",
-                ),
-                Field(
-                    name="NaturalSpawnWeight",
-                    type="ref|list|int",
-                ),
-                Field(
-                    name="NativePacks",
-                    type="ref|list|ref|out",
-                    key="MonsterPacks.dat",
-                ),
-                Field(
-                    name="FlavourText",
-                    type="ref|string",
-                ),
-                Field(
-                    name="MinWatchstoneTier",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown1",
-                    type="int",
-                ),
             ),
         ),
         "EndlessLedgeChests.dat": File(
@@ -20188,36 +20147,7 @@ specification = Specification(
             ),
         ),
         "MiscAnimated.dat": File(
-            fields=(
-                Field(
-                    name="Id",
-                    type="ref|string",
-                    unique=True,
-                ),
-                Field(
-                    name="AOFile",
-                    type="ref|string",
-                    file_path=True,
-                    file_ext=".ao",
-                ),
-                Field(
-                    name="PreloadGroupsKeys",
-                    type="ref|list|ref|out",
-                    key="PreloadGroups.dat",
-                ),
-                Field(
-                    name="Unknown0",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown1",
-                    type="int",
-                ),
-                Field(
-                    name="HASH32",
-                    type="int",
-                ),
-            ),
+            fields=(),
         ),
         "MiscAnimatedArtVariations.dat": File(
             fields=(
@@ -27061,6 +26991,9 @@ specification = Specification(
                 ),
             ),
         ),
+        "Scarabs.dat": File(
+            fields=(),
+        ),
         "ScoutingReports.dat": File(
             fields=(
                 Field(
@@ -28119,6 +28052,9 @@ specification = Specification(
                 ),
             ),
         ),
+        "SkillSurgeEffects.dat": File(
+            fields=(),
+        ),
         "SkillTotemVariations.dat": File(
             fields=(
                 Field(
@@ -28277,6 +28213,15 @@ specification = Specification(
                 ),
                 Field(
                     name="StatsValuesCasterWeapon",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="StatsAllEquipment",
+                    type="ref|list|ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="StatsValuesAllEquipment",
                     type="ref|list|int",
                 ),
             ),
@@ -28630,6 +28575,9 @@ specification = Specification(
                     type="bool",
                 ),
             ),
+        ),
+        "StatisticTrackingMicrotransactionsStatistics.dat": File(
+            fields=(),
         ),
         "Stats.dat": File(
             fields=(

@@ -662,6 +662,7 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre6a": " (Fire)",
             "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre6b": " (Cold)",
             "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre6c": " (Lightning)",
+            "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptreUnique1": " (base type)",
             # =================================================================
             # Rings
             # =================================================================
@@ -1112,8 +1113,7 @@ class ItemsParser(SkillParserShared):
         "Two Hand Sword",
         "One Hand Axe",
         "Two Hand Axe",
-        # Don't do this for now
-        "VaultKey",
+        # Skills are not supported yet
         "Active Skill Gem",
         "Meta Skill Gem",
         "Support Skill Gem",
@@ -1318,7 +1318,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Weapons/TwoHandWeapons/Bows/FourBow10",
         "Metadata/Items/Weapons/TwoHandWeapons/Bows/FourBow11",
         "Metadata/Items/Weapons/TwoHandWeapons/Bows/FourBow12",
-        "Metadata/Items/Weapons/TwoHandWeapons/Bows/FourBow13",
         # =================================================================
         # Crossbows
         # =================================================================
@@ -2868,6 +2867,9 @@ class ItemsParser(SkillParserShared):
         except KeyError:
             return False
 
+        if infobox.get("description"):
+            infobox.pop("description")
+
         # infobox["soulcore_rank"] = soulCore["Rank"]
 
         socket_types = [
@@ -2886,6 +2888,11 @@ class ItemsParser(SkillParserShared):
                 "StatsCasterWeapon",
                 "StatsValuesCasterWeapon",
                 "Wand or Staff",
+            ),
+            (
+                "StatsAllEquipment",
+                "StatsValuesAllEquipment",
+                "All Equipment",
             ),
         ]
 
