@@ -84,7 +84,7 @@ def _read_dat_schema_local(path) -> str:
 def _load_dat_schema_tables(schema_json: str, sequel: int):
     data = json.loads(schema_json, object_hook=lambda d: SimpleNamespace(**d))
     return sorted(
-        filter(lambda v: v.columns and v.validFor & sequel, data.tables),
+        filter(lambda v: v.validFor & sequel, data.tables),
         key=lambda table: table.name,
     )
 
