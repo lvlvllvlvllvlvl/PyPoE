@@ -877,21 +877,26 @@ class DatReader(ReprMixin):
         else:
             raise TypeError("Raw must be bytes or BytesIO instance, got %s" % type)
 
+        # First 4 bytes hold the row count
+        self.table_rows = struct.unpack("<I", self._file_raw[0 : self._table_offset])[0]
         # Jump to last byte to get length
         self.file_length = len(self._file_raw)
-
-        self.data_offset = self._file_raw.find(DAT_FILE_MAGIC_NUMBER)
-
-        if self.data_offset == -1:
-            raise ValueError(
-                'Did not find data magic number in "%(file)s"'
-                % {
-                    "file": self.file_name,
-                }
+        self.table_length = 0
+        while True:
+            self.table_length = (
+                self._file_raw.find(DAT_FILE_MAGIC_NUMBER, self.table_length + self._table_offset)
+                - self._table_offset
             )
+            if self.table_length == -1:
+                raise ValueError(f'Did not find data magic number in "{self.file_name}"')
 
-        self.table_rows = struct.unpack("<I", self._file_raw[0:4])[0]
-        self.table_length = self.data_offset - self._table_offset
+            if self.table_length % self.table_rows:
+                # Not aligned to the end of a row; check again starting from next byte
+                self.table_length = self.table_length + 1
+            else:
+                break
+
+        self.data_offset = self.table_length + self._table_offset
         if self.table_rows > 0:
             self.table_record_length = self.table_length // self.table_rows
         elif self.table_rows == 0 and self.table_length == 0:
@@ -906,12 +911,7 @@ class DatReader(ReprMixin):
         if self.cast_size > self.table_record_length:
             raise SpecificationError(
                 SpecificationError.ERRORS.RUNTIME_ROWSIZE_MISMATCH,
-                '"%(name)s": Specification row size %(spec_size)s vs real size %(cast_size)s'
-                % {
-                    "name": self.file_name,
-                    "spec_size": self.cast_size,
-                    "cast_size": self.table_record_length,
-                },
+                f'"{self.file_name}": Specification row size {self.cast_size} vs real size {self.table_record_length}',
             )
 
         self.table_data = []

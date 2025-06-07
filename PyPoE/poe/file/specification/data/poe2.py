@@ -3194,6 +3194,7 @@ specification = Specification(
                     name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="ReqStr",
@@ -4607,7 +4608,7 @@ specification = Specification(
         "BlightCraftingItems.dat": File(
             fields=(
                 Field(
-                    name="Oil",
+                    name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
                     unique=True,
@@ -9838,47 +9839,6 @@ specification = Specification(
                     name="Unknown0",
                     type="int",
                 ),
-                Field(
-                    name="Biomes",
-                    type="ref|list|ref|out",
-                    key="EndgameMapBiomes.dat",
-                ),
-                Field(
-                    name="AdjacentBiomes",
-                    type="ref|list|ref|out",
-                    key="EndgameMapBiomes.dat",
-                ),
-                Field(
-                    name="WorldAreaBoss",
-                    type="ref|out",
-                    key="WorldAreas.dat",
-                ),
-                Field(
-                    name="WorldArea",
-                    type="ref|out",
-                    key="WorldAreas.dat",
-                ),
-                Field(
-                    name="NaturalSpawnWeight",
-                    type="ref|list|int",
-                ),
-                Field(
-                    name="NativePacks",
-                    type="ref|list|ref|out",
-                    key="MonsterPacks.dat",
-                ),
-                Field(
-                    name="FlavourText",
-                    type="ref|string",
-                ),
-                Field(
-                    name="MinWatchstoneTier",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown1",
-                    type="int",
-                ),
             ),
         ),
         "EndlessLedgeChests.dat": File(
@@ -10108,6 +10068,7 @@ specification = Specification(
                     name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="HASH32",
@@ -10144,17 +10105,18 @@ specification = Specification(
                     key="Tags.dat",
                 ),
                 Field(
-                    name="Unknown3",
+                    name="UpgradeResult",
                     type="ref|generic",
                     key="Essences.dat",
                 ),
                 Field(
-                    name="Unknown4",
+                    name="Tier",
                     type="int",
                 ),
                 Field(
-                    name="Key0",
+                    name="Stats",
                     type="ref|out",
+                    key="Stats.dat",
                 ),
                 Field(
                     name="CraftedMod",
@@ -10167,7 +10129,7 @@ specification = Specification(
                     key="ItemClasses.dat",
                 ),
                 Field(
-                    name="Unknown5",
+                    name="Unknown3",
                     type="int",
                 ),
             ),
@@ -16091,6 +16053,7 @@ specification = Specification(
                     name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="SkillsGranted",
@@ -16155,6 +16118,7 @@ specification = Specification(
                     name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="SpiritGranted",
@@ -25727,9 +25691,10 @@ specification = Specification(
         "QuestItems.dat": File(
             fields=(
                 Field(
-                    name="Item",
+                    name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="TriggeredQuestFlag",
@@ -26409,6 +26374,45 @@ specification = Specification(
                 ),
             ),
         ),
+        "RitualStashTabLayout.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="StoredItem",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="XOffset",
+                    type="int",
+                ),
+                Field(
+                    name="YOffset",
+                    type="int",
+                ),
+                Field(
+                    name="FirstSlotIndex",
+                    type="int",
+                    unique=True,
+                ),
+                Field(
+                    name="Width",
+                    type="int",
+                ),
+                Field(
+                    name="Height",
+                    type="int",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+            ),
+        ),
         "RogueExileLifeScalingPerLevel.dat": File(
             fields=(
                 Field(
@@ -27015,6 +27019,9 @@ specification = Specification(
                     key="Stats.dat",
                 ),
             ),
+        ),
+        "Scarabs.dat": File(
+            fields=(),
         ),
         "ScoutingReports.dat": File(
             fields=(
@@ -28074,6 +28081,9 @@ specification = Specification(
                 ),
             ),
         ),
+        "SkillSurgeEffects.dat": File(
+            fields=(),
+        ),
         "SkillTotemVariations.dat": File(
             fields=(
                 Field(
@@ -28156,12 +28166,52 @@ specification = Specification(
                 ),
             ),
         ),
+        "SocketableStashTabLayout.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="StoredItem",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="XOffset",
+                    type="int",
+                ),
+                Field(
+                    name="YOffset",
+                    type="int",
+                ),
+                Field(
+                    name="FirstSlotIndex",
+                    type="int",
+                    unique=True,
+                ),
+                Field(
+                    name="Width",
+                    type="int",
+                ),
+                Field(
+                    name="Height",
+                    type="int",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+            ),
+        ),
         "SoulCores.dat": File(
             fields=(
                 Field(
                     name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="StatsMartialWeapon",
@@ -28192,6 +28242,15 @@ specification = Specification(
                 ),
                 Field(
                     name="StatsValuesCasterWeapon",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="StatsAllEquipment",
+                    type="ref|list|ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="StatsValuesAllEquipment",
                     type="ref|list|int",
                 ),
             ),
@@ -28545,6 +28604,9 @@ specification = Specification(
                     type="bool",
                 ),
             ),
+        ),
+        "StatisticTrackingMicrotransactionsStatistics.dat": File(
+            fields=(),
         ),
         "Stats.dat": File(
             fields=(
