@@ -829,6 +829,7 @@ class MOD_GENERATION_TYPE(IntEnumOverride):
     AZMERI_EMPOWERED_MONSTER = 33
     NECROPOLIS_MONSTER = 34
     NECROPOLIS_DEVOTED_MONSTER = 35
+    MEMORY_ALTAR = 36
 
 
 class WORDLISTS(IntEnumOverride):
@@ -978,6 +979,7 @@ class ITEM_CLASS_FLAGS(IntEnumOverride):
     ARMOUR = 5
     ACCESSORY = 6
     CURRENCY = 7
+
 
 class GAME_MODES(IntEnumOverride):
     ALL = 0

@@ -487,6 +487,7 @@ class ItemsParser(SkillParserShared):
         "Azmeri": "3.23.0",  # AKA Affliction
         "Necropolis": "3.24.0",
         "Settlers": "3.25.0",
+        "Mercenaries": "3.26.0",
     }
 
     _IGNORE_DROP_LEVEL_CLASSES = (

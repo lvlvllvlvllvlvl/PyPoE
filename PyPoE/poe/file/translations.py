@@ -2619,6 +2619,12 @@ TQNumberFormat(
 )
 
 TQNumberFormat(
+    id="permyriad_per_minute_to_%_per_second",
+    divisor=6,
+    dp=1,
+)
+
+TQNumberFormat(
     id="times_twenty",
     multiplier=20,
 )
