@@ -25,11 +25,9 @@ Agreement
 See PyPoE/LICENSE
 """
 
-import json
-
 # Python
 import re
-from urllib import request
+import socket
 
 from PyPoE.cli.exporter import config
 
@@ -70,14 +68,18 @@ def get_content_path(sequel=1):
     if path == "":
         args = config.get_option("version"), config.get_option("distributor")
         paths = PoEPath(*args).get_installation_paths()
+        if paths:
+            return next(iter(paths))
 
-        if not paths:
-            with request.urlopen(
-                f"https://lvlvllvlvllvlvl.github.io/poecdn-bundle-index/poe{sequel}/urls.json"
-            ) as cdn_url:
-                paths = json.loads(cdn_url.read().decode("utf-8"))["urls"]
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect(
+            ("patch.pathofexile.com", 12995) if sequel == 1 else ("patch.pathofexile2.com", 13060)
+        )
+        s.sendall(bytes([1, 7]))
+        response = s.recv(1000)
+        length = response[34]
+        return response[35 : 35 + length * 2].decode("utf-16le")
 
-        return paths[0]
     else:
         return path
 
