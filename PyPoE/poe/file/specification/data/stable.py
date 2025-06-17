@@ -2393,6 +2393,11 @@ specification = Specification(
                     name="Unknown5",
                     type="int",
                 ),
+                Field(
+                    name="DivCards",
+                    type="ref|list|ref|out",
+                    key="BaseItemTypes.dat",
+                ),
             ),
         ),
         "AtlasNodeDefinition.dat": File(
