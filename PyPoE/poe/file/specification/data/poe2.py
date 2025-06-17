@@ -4608,7 +4608,7 @@ specification = Specification(
         "BlightCraftingItems.dat": File(
             fields=(
                 Field(
-                    name="Oil",
+                    name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
                     unique=True,
@@ -9837,47 +9837,6 @@ specification = Specification(
             fields=(
                 Field(
                     name="Unknown0",
-                    type="int",
-                ),
-                Field(
-                    name="Biomes",
-                    type="ref|list|ref|out",
-                    key="EndgameMapBiomes.dat",
-                ),
-                Field(
-                    name="AdjacentBiomes",
-                    type="ref|list|ref|out",
-                    key="EndgameMapBiomes.dat",
-                ),
-                Field(
-                    name="WorldAreaBoss",
-                    type="ref|out",
-                    key="WorldAreas.dat",
-                ),
-                Field(
-                    name="WorldArea",
-                    type="ref|out",
-                    key="WorldAreas.dat",
-                ),
-                Field(
-                    name="NaturalSpawnWeight",
-                    type="ref|list|int",
-                ),
-                Field(
-                    name="NativePacks",
-                    type="ref|list|ref|out",
-                    key="MonsterPacks.dat",
-                ),
-                Field(
-                    name="FlavourText",
-                    type="ref|string",
-                ),
-                Field(
-                    name="MinWatchstoneTier",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown1",
                     type="int",
                 ),
             ),
@@ -25732,7 +25691,7 @@ specification = Specification(
         "QuestItems.dat": File(
             fields=(
                 Field(
-                    name="Item",
+                    name="BaseItemType",
                     type="ref|out",
                     key="BaseItemTypes.dat",
                     unique=True,
@@ -26415,6 +26374,45 @@ specification = Specification(
                 ),
             ),
         ),
+        "RitualStashTabLayout.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="StoredItem",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="XOffset",
+                    type="int",
+                ),
+                Field(
+                    name="YOffset",
+                    type="int",
+                ),
+                Field(
+                    name="FirstSlotIndex",
+                    type="int",
+                    unique=True,
+                ),
+                Field(
+                    name="Width",
+                    type="int",
+                ),
+                Field(
+                    name="Height",
+                    type="int",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+            ),
+        ),
         "RogueExileLifeScalingPerLevel.dat": File(
             fields=(
                 Field(
@@ -27021,6 +27019,9 @@ specification = Specification(
                     key="Stats.dat",
                 ),
             ),
+        ),
+        "Scarabs.dat": File(
+            fields=(),
         ),
         "ScoutingReports.dat": File(
             fields=(
@@ -28080,6 +28081,9 @@ specification = Specification(
                 ),
             ),
         ),
+        "SkillSurgeEffects.dat": File(
+            fields=(),
+        ),
         "SkillTotemVariations.dat": File(
             fields=(
                 Field(
@@ -28162,6 +28166,45 @@ specification = Specification(
                 ),
             ),
         ),
+        "SocketableStashTabLayout.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="StoredItem",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="XOffset",
+                    type="int",
+                ),
+                Field(
+                    name="YOffset",
+                    type="int",
+                ),
+                Field(
+                    name="FirstSlotIndex",
+                    type="int",
+                    unique=True,
+                ),
+                Field(
+                    name="Width",
+                    type="int",
+                ),
+                Field(
+                    name="Height",
+                    type="int",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+            ),
+        ),
         "SoulCores.dat": File(
             fields=(
                 Field(
@@ -28199,6 +28242,15 @@ specification = Specification(
                 ),
                 Field(
                     name="StatsValuesCasterWeapon",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="StatsAllEquipment",
+                    type="ref|list|ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="StatsValuesAllEquipment",
                     type="ref|list|int",
                 ),
             ),
@@ -28552,6 +28604,9 @@ specification = Specification(
                     type="bool",
                 ),
             ),
+        ),
+        "StatisticTrackingMicrotransactionsStatistics.dat": File(
+            fields=(),
         ),
         "Stats.dat": File(
             fields=(

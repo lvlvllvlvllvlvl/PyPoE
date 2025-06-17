@@ -487,6 +487,7 @@ class ItemsParser(SkillParserShared):
         "Azmeri": "3.23.0",  # AKA Affliction
         "Necropolis": "3.24.0",
         "Settlers": "3.25.0",
+        "Mercenaries": "3.26.0",
     }
 
     _IGNORE_DROP_LEVEL_CLASSES = (
@@ -4012,6 +4013,9 @@ class ItemsParser(SkillParserShared):
             adorn = img.crop((0, 0, 78, 78))
             base = img.crop((2 * 78, 0, 3 * 78, 78))
             if var == 3:
+                # Trarthian constants not known
+                return None
+            elif var == 4:
                 return Image.alpha_composite(base, adorn)
             const = SHADE_LUT[(attr, var)]
 

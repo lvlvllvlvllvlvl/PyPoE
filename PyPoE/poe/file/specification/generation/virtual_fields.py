@@ -77,6 +77,7 @@ virtual_fields_mappings = {
             ],
             "MapSeriesTiers": [
                 Alias("AncestralTier", "AncestorTier"),
+                Alias("MercenariesTier", "SecretsTier"),
             ],
             "Mods": [
                 Zip("SpawnWeight", ("SpawnWeight_TagsKeys", "SpawnWeight_Values")),

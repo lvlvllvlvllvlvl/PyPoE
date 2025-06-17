@@ -225,12 +225,12 @@ class AreaParser(parser.BaseParser):
                 },
             ),
             (
-                "LoadingScreen_DDSFile",
+                "LoadingScreens",
                 {
                     "template": "loading_screen",
-                    "format": lambda value: value.replace(
-                        "Art/Textures/Interface/LoadingImages/", ""
-                    ).replace(".dds", ""),
+                    "format": lambda value: next(iter(value), "")
+                    .replace("Art/Textures/Interface/LoadingImages/", "")
+                    .replace(".dds", ""),
                     "default": [],
                 },
             ),

@@ -1885,13 +1885,13 @@ class CraftingBenchParser(GenericLuaParser):
         #     'key': 'crafting_bench_unlock_category_description',
         #     'value': lambda v: v['ObtainingDescription'],
         # }),
-        (
-            "UnveilsRequired",
-            {
-                "key": "unveils_required",
-                "default": 0,
-            },
-        ),
+        # (
+        #     "UnveilsRequired",
+        #     {
+        #         "key": "unveils_required",
+        #         "default": 0,
+        #     },
+        # ),
         (
             "SortCategory",
             {
