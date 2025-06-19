@@ -66,8 +66,7 @@ __all__ = []
 
 class WikiCondition(parser.WikiCondition):
     COPY_KEYS = (
-        "main_page",
-        "icon",
+        "is_disabled",
     )
 
     NAME = "Passive skill"
@@ -356,7 +355,8 @@ class PassiveSkillParser(parser.BaseParser):
                 data[copy_data["template"]] = value
 
             # Flag if it's an atlas skill
-            if passive["Id"].startswith("atlas"):
+            skill_type = passive["SkillType"] # 0: Passive skill, 1: Atlas passive skill
+            if skill_type == 1:
                 data["is_atlas_passive"] = True
 
             # Handle icon paths
