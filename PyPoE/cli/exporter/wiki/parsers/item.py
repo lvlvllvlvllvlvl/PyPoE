@@ -2545,6 +2545,7 @@ class ItemsParser(SkillParserShared):
                 {
                     "template": "help_text",
                     "condition": lambda v: v,
+                    "format": lambda v: " ".join(v.splitlines()),
                 },
             ),
             (
