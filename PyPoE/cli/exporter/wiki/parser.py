@@ -1710,6 +1710,7 @@ class TagHandler:
         "Precursor's Emblem": "[[%s]]",
         "Shroud of the Lightless": "[[%s]]",
         "Thread of Hope": "{{il|page=%s}}",
+        "Lightning Coil": "{{il|page=%s}}",
         "Aul's Uprising": "[[%s]]",
     }
 
