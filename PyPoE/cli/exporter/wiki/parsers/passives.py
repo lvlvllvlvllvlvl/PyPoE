@@ -66,8 +66,7 @@ __all__ = []
 
 class WikiCondition(parser.WikiCondition):
     COPY_KEYS = (
-        "main_page",
-        "icon",
+        
     )
 
     NAME = "Passive skill"
@@ -275,6 +274,21 @@ class PassiveSkillParser(parser.BaseParser):
 
         return new
 
+    def _build_psg(self, psg_filename):
+        psg = PSGFile()
+        psg.read(
+            file_path_or_raw=self.file_system.get_file(psg_filename),
+        )
+        node_index = {}
+        for group in psg.groups:
+            for node in group.nodes:
+                node_index[normalize(node.passive_skill)] = node
+        # Connections are one-way, make them two way
+        for psg_id, node in node_index.items():
+            for other_psg_id in node.connections:
+                node_index[normalize(other_psg_id)].connections.append(psg_id)
+        return node_index
+
     def by_rowid(self, parsed_args):
         return self.export(
             parsed_args,
@@ -310,19 +324,10 @@ class PassiveSkillParser(parser.BaseParser):
 
         console("Accessing additional data...")
 
-        psg = PSGFile()
-        psg.read(
-            file_path_or_raw=self.file_system.get_file("Metadata/PassiveSkillGraph.psg"),
-        )
-
-        node_index = {}
-        for group in psg.groups:
-            for node in group.nodes:
-                node_index[normalize(node.passive_skill)] = node
-        # Connections are one-way, make them two way
-        for psg_id, node in node_index.items():
-            for other_psg_id in node.connections:
-                node_index[normalize(other_psg_id)].connections.append(psg_id)
+        node_index = [
+            self._build_psg("Metadata/PassiveSkillGraph.psg"),
+            self._build_psg("Metadata/AtlasSkillGraphs/AtlasSkillGraph.psg"),
+        ]
 
         self.rr["PassiveSkills.dat64"].build_index("PassiveSkillGraphId")
 
@@ -356,7 +361,8 @@ class PassiveSkillParser(parser.BaseParser):
                 data[copy_data["template"]] = value
 
             # Flag if it's an atlas skill
-            if passive["Id"].startswith("atlas"):
+            skill_type = passive["SkillType"] # 0: Passive skill, 1: Atlas passive skill
+            if skill_type == 1:
                 data["is_atlas_passive"] = True
 
             # Handle icon paths
@@ -434,7 +440,7 @@ class PassiveSkillParser(parser.BaseParser):
                 else:
                     data["stat_text"] = text
 
-            node = node_index.get(normalize(passive["PassiveSkillGraphId"]))
+            node = node_index[skill_type].get(normalize(passive["PassiveSkillGraphId"]))
             if node and node.connections:
                 data["connections"] = ",".join(
                     [
