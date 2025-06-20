@@ -4355,6 +4355,10 @@ class ItemsParser(SkillParserShared):
                         infobox["atlas_connection%s_target" % i] = k
                         infobox["atlas_connection%s_tier" % i] = ", ".join(v)
 
+                    infobox["atlas_div_cards"] = ", ".join(
+                        card["Id"] for card in atlas_node["DivCards"]
+                    )
+
                 infobox["flavour_text"] = (
                     atlas_node["FlavourTextKey"]["Text"].replace("\n", "<br>").replace("\r", "")
                 )

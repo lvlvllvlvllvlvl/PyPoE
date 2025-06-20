@@ -377,6 +377,13 @@ class AreaParser(parser.BaseParser):
                     "default": False,
                 },
             ),
+            (
+                "DivCards",
+                {
+                    "template": "atlas_div_cards",
+                    "default": False,
+                },
+            ),
         )
     )
 
