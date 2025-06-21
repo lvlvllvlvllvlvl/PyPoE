@@ -490,9 +490,7 @@ class AreaParser(parser.BaseParser):
 
             atlas_node = self.rr["AtlasNode.dat64"].index["WorldAreasKey"].get(area)
             if atlas_node:
-                atlas_node = next(iter(atlas_node))
-                data["flavour_text"] = atlas_node["FlavourTextKey"]["Text"]
-                data["atlas_div_cards"] = ", ".join(card["Id"] for card in atlas_node["DivCards"])
+                data["flavour_text"] = atlas_node[0]["FlavourTextKey"]["Text"]
 
             #
             # Add main-page if possible
