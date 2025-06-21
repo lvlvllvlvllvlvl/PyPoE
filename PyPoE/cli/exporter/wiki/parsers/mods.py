@@ -306,6 +306,14 @@ class ModParser(BaseParser):
                     data["stat_text"],
                 )
 
+            # Veiled modifiers
+            if mod["Domain"] == 26:
+                data["stat_text"] = re.sub(
+                    r"<veiled (\w+) (.+)>",
+                    lambda match: f"{{{{Veiled|{match.group(1)}|{match.group(2)}}}}}",
+                    data["stat_text"],
+                )
+
             for i, (sid, (vmin, vmax)) in enumerate(zip(stats, values), start=1):
                 data["stat%s_id" % i] = sid
                 data["stat%s_min" % i] = vmin
