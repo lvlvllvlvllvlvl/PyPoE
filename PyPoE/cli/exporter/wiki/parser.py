@@ -1395,7 +1395,7 @@ class BaseParser:
     :type custom: TranslationFile
     """
 
-    _DETAILED_FORMAT = '<abbr title="%s">%s</abbr>'
+    _DETAILED_FORMAT = '<span title="%s">%s</span>'
 
     _HIDDEN_FORMAT = {
         "English": "%s (Hidden)",
@@ -1488,7 +1488,7 @@ class BaseParser:
         return self._HIDDEN_FORMAT[self.lang] % make_inter_wiki_links(custom)
 
     def _format_detailed(self, custom, ingame):
-        return self._DETAILED_FORMAT % (ingame, make_inter_wiki_links(custom))
+        return self._DETAILED_FORMAT % (custom, ingame)
 
     def _write_dds(
         self, data, out_path, parsed_args, process: Callable[[PIL.Image], PIL.Image] = None
