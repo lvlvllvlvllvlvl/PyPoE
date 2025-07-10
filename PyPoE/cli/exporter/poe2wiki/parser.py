@@ -2038,6 +2038,7 @@ _KEYWORD_LINK_MAP = {
     "Channelling": [
         ("Channelled", "Channelled"),
         ("Channelling", "Channelling"),
+        ("Channel", "Channelling"),
     ],
     "ChaosOrb": [
         ("ChaosOrb", "Chaos Orb"),

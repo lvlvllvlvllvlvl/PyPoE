@@ -1235,7 +1235,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Armours/Helmets/FourHelmetStr7",
         "Metadata/Items/Armours/Helmets/FourHelmetDexInt7",
         "Metadata/Items/Armours/Helmets/FourHelmetStrInt7",
-        "Metadata/Items/Armours/Helmets/FourHelmetDexInt8",
         "Metadata/Items/Armours/Helmets/FourHelmetStrDex8",
         "Metadata/Items/Armours/Helmets/FourHelmetStrInt8",
         "Metadata/Items/Armours/Helmets/FourHelmetStr9",
@@ -2235,9 +2234,24 @@ class ItemsParser(SkillParserShared):
         if additional:
             infobox["additional_skill_ids"] = ", ".join(a["Id"] for a in additional)
 
-        # some descriptions come from active skills
+        max_level = 20
+
+        # Active skills descriptions come from ActiveSkill.dat
         if ge["IsSupport"] and gem_type["SupportText"]:
             infobox["gem_description"] = process_keywords(gem_type["SupportText"])
+            max_level = 1
+
+        primary = OrderedDict()
+        self._skill(
+            gra_eff=ge,
+            infobox=primary,
+            parsed_args=self._parsed_args,
+            msg_name=gem_type["Name"],
+            max_level=max_level,
+        )
+
+        for k, v in primary.items():
+            infobox[k] = v
 
         return True
 
