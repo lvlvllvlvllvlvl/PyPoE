@@ -65,9 +65,7 @@ __all__ = []
 
 
 class WikiCondition(parser.WikiCondition):
-    COPY_KEYS = (
-        
-    )
+    COPY_KEYS = ()
 
     NAME = "Passive skill"
     ADD_INCLUDE = False
@@ -361,7 +359,7 @@ class PassiveSkillParser(parser.BaseParser):
                 data[copy_data["template"]] = value
 
             # Flag if it's an atlas skill
-            skill_type = passive["SkillType"] # 0: Passive skill, 1: Atlas passive skill
+            skill_type = passive["SkillType"]  # 0: Passive skill, 1: Atlas passive skill
             if skill_type == 1:
                 data["is_atlas_passive"] = True
 

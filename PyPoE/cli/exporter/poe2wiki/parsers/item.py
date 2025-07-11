@@ -3538,9 +3538,9 @@ class ItemsParser(SkillParserShared):
         if comp == 1:  # Flask
 
             def flask_icon_process(img: Image):
-                layer1 = img.crop((78, 0, 156, 156))
-                layer2 = img.crop((156, 0, 234, 156))
-                layer3 = img.crop((0, 0, 78, 156))
+                layer1 = img.crop((105, 0, 210, 212))
+                layer2 = img.crop((210, 0, 315, 212))
+                layer3 = img.crop((0, 0, 105, 212))
                 return Image.alpha_composite(layer1, Image.alpha_composite(layer2, layer3))
 
             return flask_icon_process
