@@ -427,6 +427,10 @@ class ItemsParser(SkillParserShared):
 
     _DROP_DISABLED_ITEMS_BY_ID = {}
 
+    _REQUIRED_LEVEL_BY_ID = {
+        "Metadata/Items/Amulets/FourAmulet8": 24,
+    }
+
     _FORCE_INVENTORY_ICON_BY_ID = {
         # =================================================================
         # Skill Gems
@@ -2256,7 +2260,10 @@ class ItemsParser(SkillParserShared):
         return True
 
     def _type_level(self, infobox, base_item_type):
-        infobox["required_level"] = base_item_type["DropLevel"]
+        if base_item_type["Id"] in self._REQUIRED_LEVEL_BY_ID:
+            infobox["required_level"] = self._REQUIRED_LEVEL_BY_ID[base_item_type["Id"]]
+        else:
+            infobox["required_level"] = base_item_type["DropLevel"]
         return True
 
     _type_attribute = _type_factory(
