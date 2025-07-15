@@ -5,7 +5,7 @@ Overview
 ===============================================================================
 
 +----------+------------------------------------------------------------------+
-| Path     | PyPoE/cli/exporter/wiki/handler.py                               |
+| Path     | PyPoE/cli/exporter/poe2wiki/handler.py                           |
 +----------+------------------------------------------------------------------+
 | Version  | 1.0.0a0                                                          |
 +----------+------------------------------------------------------------------+
@@ -62,7 +62,7 @@ from PyPoE.cli.handler import BaseHandler
 
 __all__ = ["ExporterHandler", "ExporterResult", "WikiHandler"]
 
-WIKIS = {"English": "www.poew2iki.net/w"}
+WIKIS = {"English": "www.poe2wiki.net/w"}
 
 # =============================================================================
 # Classes

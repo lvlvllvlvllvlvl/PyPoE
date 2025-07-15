@@ -5,7 +5,7 @@ Overview
 ===============================================================================
 
 +----------+------------------------------------------------------------------+
-| Path     | PyPoE/cli/exporter/wiki/parsers/skill.py                         |
+| Path     | PyPoE/cli/exporter/poe2wiki/parsers/skill.py                     |
 +----------+------------------------------------------------------------------+
 | Version  | 1.0.0a0                                                          |
 +----------+------------------------------------------------------------------+
@@ -43,6 +43,7 @@ from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
+from PyPoE.cli.exporter.poe2wiki.parser import process_keywords, strip_keywords
 from PyPoE.poe.file.stat_filters import StatFilterFile
 from PyPoE.poe.file.translations import StatValue, TranslationFile
 
@@ -186,10 +187,8 @@ class SkillParserShared(parser.BaseParser):
     # Fields to copy from GrantedEffectsPerLevel.dat64
     _GEPL_COPY = (
         "Level",
-        "PlayerLevelReq",
         "CostMultiplier",
         "CostAmounts",
-        "CostTypes",
         "VaalSouls",
         "VaalStoredUses",
         "SoulGainPreventionDuration",
@@ -697,7 +696,7 @@ class SkillParserShared(parser.BaseParser):
 
         # From ActiveSkills.dat64
         if act_skill:
-            infobox["gem_description"] = act_skill["Description"].replace("\n", "<br>")
+            infobox["gem_description"] = process_keywords(act_skill["Description"])
             infobox["active_skill_name"] = act_skill["DisplayedName"]
             # Need to get info from ActiveSkillWeaponRequirement.json and WieldableClasses.json
             # if act_skill["WeaponRequirements"]:
@@ -717,16 +716,6 @@ class SkillParserShared(parser.BaseParser):
 
         if not gra_eff["IsSupport"]:
             infobox["cast_time"] = gra_eff["CastTime"] / 1000
-
-        # GrantedEffectsPerLevel.dat64
-        infobox["required_level"] = level_data[0]["PlayerLevelReq"]
-
-        # In 3.21, the player level requirement is a float
-        # Cast required level to an int
-        infobox["required_level"] = int(infobox["required_level"])
-        # If its not a whole number, raise error, just to be safe
-        if infobox["required_level"] % 1 != 0:
-            raise ValueError("PlayerLevelReq is not a whole number")
 
         #
         # Quality stats
@@ -788,7 +777,7 @@ class SkillParserShared(parser.BaseParser):
                     )[0].split("\n")
                 )
 
-            infobox[prefix + "stat_text"] = "<br>".join(lines)
+            infobox[prefix + "stat_text"] = process_keywords("<br>".join(lines))
             if breakpoints:
                 infobox[prefix + "breakpoints"] = ",".join(breakpoints)
 
@@ -921,7 +910,7 @@ class SkillParserShared(parser.BaseParser):
             if added:
                 lines = added + lines
 
-        infobox["stat_text"] = self._format_lines(lines)
+        infobox["stat_text"] = process_keywords(self._format_lines(lines))
 
         #
         # Output handling for progression
@@ -932,18 +921,15 @@ class SkillParserShared(parser.BaseParser):
             prefix = "level%s" % (i + 1)
             infobox[prefix] = "True"
 
-            # In 3.21 the level requirement is a float so we need to cast it to int
-            if "PlayerLevelReq" in row and row["PlayerLevelReq"] == int(row["PlayerLevelReq"]):
-                row["PlayerLevelReq"] = int(row["PlayerLevelReq"])
-            # If its not a whole number, raise error, just to be safe
-            if "PlayerLevelReq" in row and row["PlayerLevelReq"] % 1 != 0:
-                console(
-                    f"{msg_name} level requirement for level {i} is {row['PlayerLevelReq']}",
-                    msg=Msg.warning,
-                )
+            # Required levels per skill level (temporary)
+            req_lvl = [0, 3, 6, 10, 14, 18, 22, 26, 31, 36, 41, 46, 52, 58, 64, 66, 72, 78, 84, 90]
 
             prefix += "_"
-            infobox[prefix + "level_requirement"] = row["PlayerLevelReq"]
+            if act_skill:
+                if i < 20:
+                    infobox[prefix + "level_requirement"] = req_lvl[i]
+                else:
+                    infobox[prefix + "level_requirement"] = req_lvl[19]
 
             # Column handling
             for column, column_data in self._SKILL_COLUMN_MAP:
@@ -974,7 +960,7 @@ class SkillParserShared(parser.BaseParser):
                 stats.extend(stat_dict["stats"])
                 values.extend(stat_dict["values"])
             if lines:
-                infobox[prefix + "stat_text"] = self._format_lines(lines)
+                infobox[prefix + "stat_text"] = strip_keywords(self._format_lines(lines))
             self._write_stats(
                 infobox,
                 [(s, v) for s, v in zip(stats, values) if s not in static["stat_keys"]],

@@ -20147,36 +20147,7 @@ specification = Specification(
             ),
         ),
         "MiscAnimated.dat": File(
-            fields=(
-                Field(
-                    name="Id",
-                    type="ref|string",
-                    unique=True,
-                ),
-                Field(
-                    name="AOFile",
-                    type="ref|string",
-                    file_path=True,
-                    file_ext=".ao",
-                ),
-                Field(
-                    name="PreloadGroupsKeys",
-                    type="ref|list|ref|out",
-                    key="PreloadGroups.dat",
-                ),
-                Field(
-                    name="Unknown0",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown1",
-                    type="int",
-                ),
-                Field(
-                    name="HASH32",
-                    type="int",
-                ),
-            ),
+            fields=(),
         ),
         "MiscAnimatedArtVariations.dat": File(
             fields=(
