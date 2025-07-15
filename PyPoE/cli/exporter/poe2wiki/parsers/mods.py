@@ -5,7 +5,7 @@ Overview
 ===============================================================================
 
 +----------+------------------------------------------------------------------+
-| Path     | PyPoE/cli/exporter/wiki/parsers/mods.py                          |
+| Path     | PyPoE/cli/exporter/poe2wiki/parsers/mods.py                      |
 +----------+------------------------------------------------------------------+
 | Version  | 1.0.0a0                                                          |
 +----------+------------------------------------------------------------------+
@@ -34,25 +34,22 @@ FIX the jewel generator (corrupted)
 # Imports
 # =============================================================================
 
-import re
-
 # Python
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 from functools import partialmethod
 
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
-from PyPoE.cli.exporter.poe2wiki.parser import BaseParser, WikiCondition
+from PyPoE.cli.exporter.poe2wiki.parser import (
+    BaseParser,
+    WikiCondition,
+    process_keywords,
+)
 
 # Self
 from PyPoE.poe import text
-from PyPoE.poe.constants import (
-    MOD_DOMAIN,
-    MOD_GENERATION_TYPE,
-    MOD_SELL_PRICES,
-    MOD_STATS_RANGE,
-)
+from PyPoE.poe.constants import MOD_DOMAIN, MOD_GENERATION_TYPE, MOD_STATS_RANGE
 from PyPoE.shared.decorators import deprecated
 
 # =============================================================================
@@ -276,14 +273,14 @@ class ModParser(BaseParser):
                 stats.append(stat)
                 values.append(value)
 
-            data["stat_text"] = "<br>".join(self._get_stats(stats, values, mod))
-            if mod["BuffTemplate"] and mod["BuffTemplate"]["AuraRadius"]:
-                radius = mod["BuffTemplate"]["AuraRadius"] / 10
-                data["stat_text"] = re.sub(
-                    r"\[\[Nearby\|?([^]]*)]]",
-                    lambda match: f"{{{{Radius|{match.group(1)}|{radius}m}}}}",
-                    data["stat_text"],
-                )
+            data["stat_text"] = process_keywords("<br>".join(self._get_stats(stats, values, mod)))
+            # if mod["BuffTemplate"] and mod["BuffTemplate"]["AuraRadius"]:
+            #    radius = mod["BuffTemplate"]["AuraRadius"] / 10
+            #    data["stat_text"] = re.sub(
+            #        r"\[\[Nearby\|?([^]]*)]]",
+            #        lambda match: f"{{{{Radius|{match.group(1)}|{radius}m}}}}",
+            #        data["stat_text"],
+            #   )
 
             for i, (sid, (vmin, vmax)) in enumerate(zip(stats, values), start=1):
                 data["stat%s_id" % i] = sid
@@ -312,27 +309,6 @@ class ModParser(BaseParser):
             # tags = ','.join(tags)
             if tags:
                 data["tags"] = ", ".join(tags)
-
-            if mod["ModTypeKey"]:
-                sell_price = defaultdict(int)
-            for msp in mod["ModTypeKey"]["ModSellPriceTypesKeys"]:
-                if mod["ModTypeKey"]["Name"] != "SellPriceIsWisdomFragment":
-                    if msp["Id"] in MOD_SELL_PRICES:
-                        for i, (item_id, amount) in enumerate(
-                            MOD_SELL_PRICES[msp["Id"]].items(), start=1
-                        ):
-                            # print(mod['ModTypeKey']['Name'])
-                            data["sell_price%s_name" % i] = self.rr["BaseItemTypes.dat64"].index[
-                                "Id"
-                            ][item_id]["Name"]
-                            data["sell_price%s_amount" % i] = amount
-
-                # Make sure this is always the same order
-                sell_price = sorted(sell_price.items(), key=lambda x: x[0])
-
-                for i, (item_name, amount) in enumerate(sell_price, start=1):
-                    data["sell_price%s_name" % i] = item_name
-                    data["sell_price%s_amount" % i] = amount
 
             # 3+ tildes not allowed
             page_name = "Modifier:" + self._format_wiki_title(mod["Id"])
