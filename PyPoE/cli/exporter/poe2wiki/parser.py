@@ -2582,7 +2582,7 @@ def parse_and_handle_description_tags(rr, text):
     return (
         parse_description_tags(text)
         .handle_tags(TagHandler(rr).tag_handlers)
-        .replace("{0}", "#") #Numerical placeholder
+        .replace("{0}", "#")  # Numerical placeholder
         .replace("\n", "<br>")
         .replace("\r", "")
     )

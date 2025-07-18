@@ -64,9 +64,7 @@ __all__ = []
 
 
 class WikiCondition(parser.WikiCondition):
-    COPY_KEYS = (
-        
-    )
+    COPY_KEYS = ()
 
     NAME = "Mastery"
     ADD_INCLUDE = False
@@ -100,6 +98,7 @@ class MasteryCommandHandler(ExporterHandler):
             dest="re_id",
         )
 
+
 class MasteryParser(parser.BaseParser):
     _MASTERY_GROUPS_FILE_NAME = "PassiveSkillMasteryGroups.datc64"
     _MASTERY_EFFECTS_FILE_NAME = "PassiveSkillMasteryEffects.datc64"
@@ -128,9 +127,9 @@ class MasteryParser(parser.BaseParser):
                 "InactiveIcon",
                 {
                     "template": "icon",
-                    "format": lambda value: value
-                    .replace("Art/2DArt/SkillIcons/passives/MasteryPassiveIcons/", "")
-                    .replace(".dds", ""),
+                    "format": lambda value: value.replace(
+                        "Art/2DArt/SkillIcons/passives/MasteryPassiveIcons/", ""
+                    ).replace(".dds", ""),
                     "default": "",
                 },
             ),

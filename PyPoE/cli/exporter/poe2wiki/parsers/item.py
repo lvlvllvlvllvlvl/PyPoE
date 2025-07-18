@@ -642,7 +642,8 @@ class ItemsParser(SkillParserShared):
             # =================================================================
             # Uncut Gems
             # =================================================================
-            "Metadata/Items/Gems/SkillGemUncut": "",  # Because of quest item
+            "Metadata/Items/Gems/SkillGemUncut": "",
+            "Metadata/Items/Gems/SkillGemUncutQuest": " (quest item)",
             # =================================================================
             # Body armours
             # =================================================================
@@ -685,7 +686,6 @@ class ItemsParser(SkillParserShared):
             # "Metadata/Items/QuestItems/Gallows/Act3/QuadrillaSkillBook": " (Quadrilla)",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDrop": "",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": " (Cruel)",
-            "Metadata/Items/Gems/SkillGemUncutQuest": " (quest item)",
             # =================================================================
             # Hideout decorations
             # =================================================================
