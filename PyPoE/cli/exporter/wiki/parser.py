@@ -1714,7 +1714,7 @@ class TagHandler:
         "Grand Spectrum": "[[%s]]",
         "Precursor's Emblem": "[[%s]]",
         "Shroud of the Lightless": "[[%s]]",
-        "Thread of Hope": "{{il|page=%s}}",
+        "Thread of Hope": "{{il|html=|page=%s}}",
         "Aul's Uprising": "[[%s]]",
     }
 
@@ -1725,7 +1725,6 @@ class TagHandler:
         "Divination Scarab": "[[Divination Scarab (disambiguation)|Divination Scarab]]",
         "Bestiary Scarab": "[[Bestiary Scarab (disambiguation)|Bestiary Scarab]]",
         "Sulphite Scarab": "[[Sulphite Scarab (disambiguation)|Sulphite Scarab]]",
-        "Einhar's Memory of Harvest Beasts": "{{il|html=|Einhar's Memory|Einhar's Memory of Harvest Beasts}}",
     }
 
     def __init__(self, rr):
@@ -1807,7 +1806,6 @@ class TagHandler:
         "rareitem": partial(_default_handler, tid="rare"),
         "uniqueitem": _unique_handler,
         "divination": partial(_default_handler, tid="divination"),
-        "prophecy": partial(_default_handler, tid="prophecy"),
         "corrupted": partial(_link_handler, tid="corrupted"),
         "fractured": partial(_link_handler, tid="fractured"),
     }
@@ -2115,6 +2113,7 @@ def parse_and_handle_description_tags(rr, text):
     return (
         parse_description_tags(text)
         .handle_tags(TagHandler(rr).tag_handlers)
+        .replace("{0}", "#") #Numerical placeholder
         .replace("\n", "<br>")
         .replace("\r", "")
     )
