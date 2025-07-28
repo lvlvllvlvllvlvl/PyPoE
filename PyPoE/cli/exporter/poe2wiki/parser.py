@@ -1361,10 +1361,7 @@ def _make_inter_wiki_re():
             id = i * _MAX_RE
             out[language].append(
                 re.compile(
-                    r"(?![^\[]*\]\])"
-                    r"(?: |^)"
-                    r"(?P<text>%s)"
-                    r"(?=\W|$)"
+                    r"(?![^\[]*\]\])\b(?P<text>%s)\b"
                     % "|".join(
                         ["(%s)" % item[0] for item in _inter_wiki_mapping[id : id + _MAX_RE]]
                     ),
@@ -1395,7 +1392,7 @@ class BaseParser:
     :type custom: TranslationFile
     """
 
-    _DETAILED_FORMAT = '<abbr title="%s">%s</abbr>'
+    _DETAILED_FORMAT = '<span class="tooltip" title="%s">%s</span>'
 
     _HIDDEN_FORMAT = {
         "English": "%s (Hidden)",
@@ -1489,7 +1486,7 @@ class BaseParser:
         return self._HIDDEN_FORMAT[self.lang] % make_inter_wiki_links(custom)
 
     def _format_detailed(self, custom, ingame):
-        return self._DETAILED_FORMAT % (ingame, make_inter_wiki_links(custom))
+        return self._DETAILED_FORMAT % (custom, ingame)
 
     def _write_dds(
         self, data, out_path, parsed_args, process: Callable[[PIL.Image], PIL.Image] = None
@@ -1661,7 +1658,7 @@ class BaseParser:
             if "\n" in line:
                 # By request differentiate between breaks from the source file
                 # and different stats
-                finalout.append("<br />".join(line.split("\n")))
+                finalout.append("<br>".join(line.split("\n")))
             else:
                 finalout.append(line)
 
