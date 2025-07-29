@@ -109,10 +109,10 @@ _inter_wiki_map = {
         #
         # Support gems
         #
-        ("(?<=[0-9] )Added Chaos Damage", {"link": "Added Chaos Damage Support"}),
-        ("(?<=[0-9] )Added Cold Damage", {"link": "Added Cold Damage Support"}),
-        ("(?<=[0-9] )Added Fire Damage", {"link": "Added Fire Damage Support"}),
-        ("(?<=[0-9] )Added Lightning Damage", {"link": "Added Lightning Damage Support"}),
+        ("(?<=level [0-9] |evel [0-9][0-9] )Added Chaos Damage", {"link": "Added Chaos Damage Support"}),
+        ("(?<=level [0-9] |evel [0-9][0-9] )Added Cold Damage", {"link": "Added Cold Damage Support"}),
+        ("(?<=level [0-9] |evel [0-9][0-9] )Added Fire Damage", {"link": "Added Fire Damage Support"}),
+        ("(?<=level [0-9] |evel [0-9][0-9] )Added Lightning Damage", {"link": "Added Lightning Damage Support"}),
         ("(?<=[0-9] )Additional Accuracy", {"link": "Additional Accuracy Support"}),
         ("(?<=[0-9] )Advanced Traps", {"link": "Advanced Traps Support"}),
         ("(?<=[0-9] )Ancestral Call", {"link": "Ancestral Call Support"}),
