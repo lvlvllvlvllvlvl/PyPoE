@@ -1803,9 +1803,9 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Currency/SanctumCurrencyWindDancer",
         "Metadata/Items/Currency/SanctumCurrencyZealotsOath",
         # =================================================================
-        # Divination cards
+        # Scarabs
         # =================================================================
-        "Metadata/Items/DivinationCards/DivinationCardHisJudgement",
+        "Metadata/Items/Scarabs/ScarabMisc10",
         # =================================================================
         # Corpse items
         # =================================================================
@@ -1870,7 +1870,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Heist/HeistEquipmentRewardTest",
         "Metadata/Items/Weapons/OneHandWeapons/Daggers/EtherealBlade1",
         "Metadata/Items/Weapons/TwoHandWeapons/Bows/EtherealBow1",
-        "Metadata/Items/ItemEffects/SekhemasBanner",
         "Metadata/Items/Armours/BodyArmours/BodyStrTemp",
         "Metadata/Items/Armours/Boots/BootsStrTemp",
         "Metadata/Items/Classic/MysteryLeaguestone",
