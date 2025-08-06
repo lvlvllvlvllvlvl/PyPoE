@@ -105,6 +105,8 @@ __all__ = [
 DEFAULT_INDENT = 32
 
 _inter_wiki_map = {
+    # Important: These patterns must NOT contain any capturing groups
+    # or else replacement will have buggy results!
     "English": (
         #
         # Support gems
@@ -329,6 +331,7 @@ _inter_wiki_map = {
         ("Damage Reduction", {"link": "Damage Reduction"}),
         ("(?:|Item )Quantity(?= of Items)", {"link": "IIQ"}),
         ("(?:|Item )Rarity(?= of Items)", {"link": "IIR"}),
+        ("Cooldown", {"link": "Cooldown"}),
         #
         # Charges
         #
@@ -336,6 +339,16 @@ _inter_wiki_map = {
         ("Endurance Charge(?:|s)", {"link": "Endurance Charge"}),
         ("Frenzy Charge(?:|s)", {"link": "Frenzy Charge"}),
         ("Power Charge(?:|s)", {"link": "Power Charge"}),
+        ("Brutal Charge(?:|s)", {"link": "Brutal Charge"}),
+        ("Affliction Charge(?:|s)", {"link": "Affliction Charge"}),
+        ("Absorption Charge(?:|s)", {"link": "Absorption Charge"}),
+        ("Spirit Charge(?:|s)", {"link": "Spirit Charge"}),
+        ("Divine Charge(?:|s)", {"link": "Divine Charge"}),
+        ("Void Charge(?:|s)", {"link": "Void Charge"}),
+        ("Siphoning Charge(?:|s)", {"link": "Siphoning Charge"}),
+        ("Fanatic Charge(?:|s)", {"link": "Fanatic Charge"}),
+        ("Inspiration Charge(?:|s)", {"link": "Inspiration Charge"}),
+        ("Blood Charge(?:|s)", {"link": "Blood Charge"}),
         #
         # Buffs
         #
@@ -530,9 +543,10 @@ _inter_wiki_map = {
         #
         ("Alchemist's Mark", {"link": "Alchemist's Mark"}),
         ("Ancestral Cry", {"link": "Ancestral Cry"}),
+        ("Ancestral Protector", {"link": "Ancestral Protector"}),
+        ("Ancestral Warchief", {"link": "Ancestral Warchief"}),
         ("Anger", {"link": "Anger"}),
-        ("Animate Guardian's Weapon", {"link": "Animate Guardian's Weapon"}),
-        ("Animate(?:|d) Guardian", {"link": "Animate Guardian"}),
+        ("Animate(?:|d) Guardian(?!'s Weapon')", {"link": "Animate Guardian"}),
         ("Animate(?:|d) Weapon(?:|s)", {"link": "Animate Weapon"}),
         ("Arcane Cloak", {"link": "Arcane Cloak"}),
         ("Arcanist Brand", {"link": "Arcanist Brand"}),
@@ -620,7 +634,6 @@ _inter_wiki_map = {
         ("Fireball", {"link": "Fireball"}),
         ("Firestorm", {"link": "Firestorm"}),
         ("Flame Dash", {"link": "Flame Dash"}),
-        ("Dash", {"link": "Dash"}),
         ("Flame Link", {"link": "Flame Link"}),
         ("Flame Surge", {"link": "Flame Surge"}),
         ("Flame Wall", {"link": "Flame Wall"}),
@@ -638,6 +651,7 @@ _inter_wiki_map = {
         ("Frost Shield", {"link": "Frost Shield"}),
         ("Frost Wall", {"link": "Frost Wall"}),
         ("Frostbite", {"link": "Frostbite"}),
+        ("Frostblink", {"link": "Frostblink"}),
         ("Frostbolt", {"link": "Frostbolt"}),
         ("Frozen Legion", {"link": "Frozen Legion"}),
         ("Galvanic Arrow", {"link": "Galvanic Arrow"}),
@@ -674,6 +688,7 @@ _inter_wiki_map = {
         ("Kinetic Blast", {"link": "Kinetic Blast"}),
         ("Kinetic Bolt", {"link": "Kinetic Bolt"}),
         ("Lacerate", {"link": "Lacerate"}),
+        ("Lancing Steel", {"link": "Lancing Steel"}),
         ("Leap Slam", {"link": "Leap Slam"}),
         ("Lightning Arrow", {"link": "Lightning Arrow"}),
         ("Lightning Conduit", {"link": "Lightning Conduit"}),
@@ -709,6 +724,7 @@ _inter_wiki_map = {
         ("Purity of Ice", {"link": "Purity of Ice"}),
         ("Purity of Lightning", {"link": "Purity of Lightning"}),
         ("Pyroclast Mine", {"link": "Pyroclast Mine"}),
+        ("Quickstep", {"link": "Quickstep"}),
         ("Rage Vortex", {"link": "Rage Vortex"}),
         ("Rain of Arrows", {"link": "Rain of Arrows"}),
         ("Raise(?:|d) Spectre(?:|s)", {"link": "Raise Spectre"}),
@@ -734,8 +750,8 @@ _inter_wiki_map = {
         ("Siphoning Trap", {"link": "Siphoning Trap"}),
         ("Smite", {"link": "Smite"}),
         ("Smoke Mine", {"link": "Smoke Mine"}),
-        ("Sniper's Mark", {"link": "Sniper's Mark"}),
         ("Snipe", {"link": "Snipe"}),
+        ("Sniper's Mark", {"link": "Sniper's Mark"}),
         ("Soul Link", {"link": "Soul Link"}),
         ("Soulrend", {"link": "Soulrend"}),
         ("Spark", {"link": "Spark"}),
@@ -796,6 +812,7 @@ _inter_wiki_map = {
         ("Winter Orb", {"link": "Winter Orb"}),
         ("Wintertide Brand", {"link": "Wintertide Brand"}),
         ("Wither", {"link": "Wither"}),
+        ("Withering Step", {"link": "Withering Step"}),
         ("Wrath", {"link": "Wrath"}),
         ("Zealotry", {"link": "Zealotry"}),
         #
@@ -803,6 +820,7 @@ _inter_wiki_map = {
         #
         ("Abberath's Fury", {"link": "Abberath's Fury"}),
         ("Affliction", {"link": "Affliction (skill)"}),
+        ("Animate Guardian's Weapon", {"link": "Animate Guardian's Weapon"}),
         ("Approaching Flames", {"link": "Approaching Flames"}),
         ("Arcane Wake", {"link": "Arcane Wake"}),
         ("Aspect of the Avian", {"link": "Aspect of the Avian"}),
@@ -1072,6 +1090,7 @@ _inter_wiki_map = {
         # Mixed and special
         ("Attack Damage", {"link": "Attack Damage"}),
         ("Spell Damage", {"link": "Spell Damage"}),
+        ("Damage over Time", {"link": "Damage over Time"}),
         ("Melee Damage", {"link": "Melee Damage"}),
         ("Elemental Damage", {"link": "Elemental Damage"}),
         ("Minion Damage", {"link": "Minion Damage"}),
@@ -1149,7 +1168,7 @@ _inter_wiki_map = {
         ("Tincture(?:|s)", {"link": "Tincture"}),
         ("Abyss Jewel(?:|s)", {"link": "Abyss Jewel"}),
         ("Jewel(?:|s)", {"link": "Jewel"}),
-        ("Blighted Map(?:|s)", {"link": "Blighted Map"}),
+        ("Blight(?:|ed) Map(?:|s)", {"link": "Blighted Map"}),
         ("Blight-Ravaged Map(?:|s)", {"link": "Blight-Ravaged Map"}),
         ("Map(?:|s)", {"link": "Map"}),
         ("Breach Splinter(?:|s)", {"link": "Breach Splinter"}),
@@ -1164,6 +1183,7 @@ _inter_wiki_map = {
         ("Simulacrum Splinter(?:|s)", {"link": "Simulacrum Splinter"}),
         ("Delirium Orb(?:|s)", {"link": "Delirium Orb"}),
         ("Divine Vessel(?:|s)", {"link": "Divine Vessel"}),
+        ("Divination Card(?:|s)", {"link": "Divination Card"}),
         #
         # Ailments
         #
@@ -1192,7 +1212,8 @@ _inter_wiki_map = {
         ("Beyond Demon", {"link": "Beyond Demon"}),
         ("Beyond", {"link": "Beyond"}),
         ("Breach(?:|es)", {"link": "Breach"}),
-        ("Blight(?:| Encounter(?:|s))", {"link": "Blight Encounter"}),
+        ("Blight Encounter(?:|s)", {"link": "Blight Encounter"}),
+        ("Blight(?:|ed)(?= Ches| Mons| Towe| Boss| Enem)", {"link": "Blight Encounter"}),
         ("Beast(?:|s)", {"link": "Beast"}),
         ("Einhar", {"link": "Einhar"}),
         ("Harbinger(?:|s)", {"link": "Harbinger"}),
@@ -1218,7 +1239,7 @@ _inter_wiki_map = {
         ("Wildwood", {"link": "Wildwood"}),
         ("Map Crafting Option(?:|s)", {"link": "Map Crafting Option"}),
         ("(?:|The )Maven", {"link": "The Maven"}),
-        ("(Eldritch|Searing Exarch|Eater of Worlds) Altar(?:|s)", {"link": "Eldritch Altar"}),
+        ("(?:Eldritch|Searing Exarch|Eater of Worlds) Altar(?:|s)", {"link": "Eldritch Altar"}),
         ("(?:|The )Searing Exarch", {"link": "The Searing Exarch"}),
         ("(?:|The )Eater of Worlds", {"link": "The Eater of Worlds"}),
         ("Vaal Side Area(?:|s)", {"link": "Vaal Side Area"}),
@@ -1230,6 +1251,7 @@ _inter_wiki_map = {
         ("Ambush", {"link": "Ambush"}),
         ("Arc", {"link": "Arc"}),
         ("Blight", {"link": "Blight"}),
+        ("Dash", {"link": "Dash"}),
         ("Reap", {"link": "Reap"}),
         ("Focus", {"link": "Focus"}),
         ("Focused", {"link": "Focused"}),
@@ -1240,12 +1262,13 @@ _inter_wiki_map = {
         ("Curse(?:|s|ed)", {"link": "Curse"}),
         ("Hex(?:|es|ed)", {"link": "Hex"}),
         ("Mark(?:|s|ed)", {"link": "Mark"}),
-        ("Socket(?:|s|ed)", {"link": "Item socket"}),
         ("Recently", {"link": "Recently"}),
         ("Crucible Passive Skill Tree", {"link": "Crucible Passive Skill Tree"}),
         ("Crucible Passive Skill(?:|s)", {"link": "Crucible Passive Skill"}),
         ("Passive Skill Tree", {"link": "Passive Skill Tree"}),
         ("Passive Skill(?:|s)|Passives", {"link": "Passive Skill"}),
+        ("Jewel Socket(?:|s)", {"link": "Jewel Socket"}),
+        ("Socket(?:|s|ed)", {"link": "Item socket"}),
         ("Support Gem(?:|s)", {"link": "Support Gem"}),
         ("Skill Gem(?:|s)", {"link": "Skill Gem"}),
         ("Skill(?:|s)", {"link": "Skill"}),
@@ -1983,8 +2006,7 @@ _inter_wiki_map = {
     re.UNICODE | re.IGNORECASE
 )"""
 
-_MAX_RE = 95
-
+_MAX_RE = 97
 
 def _make_inter_wiki_re():
     out = {}
