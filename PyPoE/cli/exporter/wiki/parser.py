@@ -105,6 +105,8 @@ __all__ = [
 DEFAULT_INDENT = 32
 
 _inter_wiki_map = {
+    # Important: These patterns must NOT contain any capturing groups
+    # or else replacement will have buggy results!
     "English": (
         #
         # Support gems
@@ -1218,7 +1220,7 @@ _inter_wiki_map = {
         ("Wildwood", {"link": "Wildwood"}),
         ("Map Crafting Option(?:|s)", {"link": "Map Crafting Option"}),
         ("(?:|The )Maven", {"link": "The Maven"}),
-        ("(Eldritch|Searing Exarch|Eater of Worlds) Altar(?:|s)", {"link": "Eldritch Altar"}),
+        ("(?:Eldritch|Searing Exarch|Eater of Worlds) Altar(?:|s)", {"link": "Eldritch Altar"}),
         ("(?:|The )Searing Exarch", {"link": "The Searing Exarch"}),
         ("(?:|The )Eater of Worlds", {"link": "The Eater of Worlds"}),
         ("Vaal Side Area(?:|s)", {"link": "Vaal Side Area"}),
@@ -1983,8 +1985,7 @@ _inter_wiki_map = {
     re.UNICODE | re.IGNORECASE
 )"""
 
-_MAX_RE = 95
-
+_MAX_RE = 97
 
 def _make_inter_wiki_re():
     out = {}
