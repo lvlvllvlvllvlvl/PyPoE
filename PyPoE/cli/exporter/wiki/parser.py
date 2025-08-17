@@ -293,9 +293,10 @@ _inter_wiki_map = {
         #
         ("(?<=ll is )Adrenaline", {"link": "Adrenaline (passive skill)"}),
         ("(?<=ll is )Blacksmith", {"link": "Blacksmith (passive skill)"}),
+        ("(?<=ll is )Eye of the Storm", {"link": "Eye of the Storm (passive skill)"}),
         ("(?<=ll is )Feast of Flesh", {"link": "Feast of Flesh (passive skill)"}),
         ("(?<=ll is )Intensity", {"link": "Intensity (passive skill)"}),
-        ("(?<=ll is ).+", {"link": "{text}"}),
+        ("(?<=ll is )(?!a Jewel).+", {"link": "{text}"}),
         #
         # Enchantment skills
         #
@@ -693,7 +694,6 @@ _inter_wiki_map = {
         # Other skills
         #
         ("Abberath's Fury", {"link": "Abberath's Fury"}),
-        ("Affliction", {"link": "Affliction (skill)"}),
         ("Animate Guardian's Weapon", {"link": "Animate Guardian's Weapon"}),
         ("Approaching Flames", {"link": "Approaching Flames"}),
         ("Arcane Wake", {"link": "Arcane Wake"}),
@@ -760,7 +760,7 @@ _inter_wiki_map = {
         ("Stance Swap", {"link": "Stance Swap"}),
         ("Starfall", {"link": "Starfall"}),
         ("Storm of Judgement", {"link": "Storm of Judgement"}),
-        ("Summon Arbalists", {"link": "Summon Arbalists"}),
+        ("Summon(?:|ed) Arbalist(?:|s)", {"link": "Summon Arbalists"}),
         ("Summon Bestial Rhoa", {"link": "Summon Bestial Rhoa"}),
         ("Summon Bestial Snake", {"link": "Summon Bestial Snake"}),
         ("Summon Bestial Ursa", {"link": "Summon Bestial Ursa"}),
@@ -795,7 +795,7 @@ _inter_wiki_map = {
         ("Summon Taunting Contraption", {"link": "Summon Taunting Contraption"}),
         ("Summon Triggerbots", {"link": "Summon Triggerbots"}),
         ("Summon Void Spawn", {"link": "Summon Void Spawn"}),
-        ("(?:|Summon )Volatile Anomaly", {"link": "Volatile Anomaly"}),
+        ("(?:Summon )?Volatile Anomaly", {"link": "Volatile Anomaly"}),
         ("Tawhoa's Chosen", {"link": "Tawhoa's Chosen"}),
         ("Tentacle Whip", {"link": "Tentacle Whip"}),
         ("Thirst for Blood", {"link": "Thirst for Blood"}),
@@ -916,6 +916,7 @@ _inter_wiki_map = {
         #
         # Friendly
         ("Adrenaline", {"link": "Adrenaline"}),
+        ("Arcane Surge", {"link": "Arcane Surge"}),
         ("Fortify|Fortified", {"link": "Fortify"}),
         ("Fortification", {"link": "Fortification"}),
         ("Onslaught", {"link": "Onslaught"}),
@@ -969,6 +970,7 @@ _inter_wiki_map = {
         ("Corrupted Blood", {"link": "Corrupted Blood"}),
         ("Mana Burn", {"link": "Mana Burn"}),
         ("Marked for Death", {"link": "Marked for Death"}),
+        ("Malignant Madness", {"link": "Malignant Madness"}),
         # Ground effects
         ("Burning Ground", {"link": "Burning Ground"}),
         ("Desecrated Ground", {"link": "Desecrated Ground"}),
@@ -1009,7 +1011,7 @@ _inter_wiki_map = {
         ("Lightning Resistance(?:|s)", {"link": "Lightning Resistance"}),
         ("Elemental Resistance(?:|s)", {"link": "Elemental Resistance"}),
         ("Flask Charge(?:|s)", {"link": "Flask Charge"}),
-        ("(?<!Share )Charge(?:|s)(?! Duration)", {"link": "Flask Charge"}),
+        ("(?<!are |ain | to )Charge(?:|s)(?! Duration)", {"link": "Flask Charge"}),
         ("Character Size", {"link": "Character Size"}),
         ("Hits can't be Evaded", {"link": "Hits can't be Evaded"}),
         ("Far Shot", {"link": "Far Shot"}),
@@ -1025,8 +1027,8 @@ _inter_wiki_map = {
         ("Physical Damage Reduction", {"link": "Physical Damage Reduction"}),
         ("Elemental Damage Reduction", {"link": "Elemental Damage Reduction"}),
         ("Damage Reduction", {"link": "Damage Reduction"}),
-        ("(?:|Item )Quantity(?= of Items)", {"link": "IIQ"}),
-        ("(?:|Item )Rarity(?= of Items)", {"link": "IIR"}),
+        ("Item Quantity|Quantity of Items", {"link": "IIQ"}),
+        ("Item Rarity|Rarity of Items", {"link": "IIR"}),
         ("Cooldown", {"link": "Cooldown"}),
         ("Rage", {"link": "Rage"}),
         ("Armour Rating", {"link": "Armour Rating"}),
@@ -1039,6 +1041,9 @@ _inter_wiki_map = {
         ("Suppress(?:|ed)", {"link": "Suppress"}),
         ("Avoid", {"link": "Avoid"}),
         ("Defence(?:|s)", {"link": "Defences"}),
+        ("Double Damage(?:|s)", {"link": "Double Damage"}),
+        ("Triple Damage(?:|s)", {"link": "Triple Damage"}),
+        ("Omniscience", {"link": "Omniscience"}),
         #
         # Grouped skills
         #
@@ -1115,6 +1120,7 @@ _inter_wiki_map = {
         #
         # Attibutes
         #
+        ("Attribute(?:|s)", {"link": "Attribute"}),
         ("Dexterity", {"link": "Dexterity"}),
         ("Intelligence", {"link": "Intelligence"}),
         ("Strength", {"link": "Strength"}),
@@ -1147,6 +1153,13 @@ _inter_wiki_map = {
         ("Amulet(?:|s)", {"link": "Amulet"}),
         ("Belt(?:|s)", {"link": "Belt"}),
         ("(?<!small |edium |large |ssive )Ring(?:|s)", {"link": "Ring"}),
+        # Jewels
+        ("Murderous Eye Jewel(?:|s)", {"link": "Murderous Eye Jewel"}),
+        ("Ghastly Eye Jewel(?:|s)", {"link": "Ghastly Eye Jewel"}),
+        ("Searching Eye Jewel(?:|s)", {"link": "Searching Eye Jewel"}),
+        ("Hypnotic Eye Jewel(?:|s)", {"link": "Hypnotic Eye Jewel"}),
+        ("Abyss Jewel(?:|s)", {"link": "Abyss Jewel"}),
+        ("Jewel(?:|s)", {"link": "Jewel"}),
         # Scarabs
         ("Abyss Scarab(?:|s)", {"link": "Abyss Scarab (disambiguation)"}),
         ("Ambush Scarab(?:|s)", {"link": "Ambush Scarab (disambiguation)"}),
@@ -1178,15 +1191,14 @@ _inter_wiki_map = {
         ("Quiver(?:|s)", {"link": "Quiver"}),
         ("Flask(?:|s)", {"link": "Flask"}),
         ("Tincture(?:|s)", {"link": "Tincture"}),
-        ("Abyss Jewel(?:|s)", {"link": "Abyss Jewel"}),
-        ("Jewel(?:|s)", {"link": "Jewel"}),
         ("Blight(?:|ed) Map(?:|s)", {"link": "Blighted Map"}),
         ("Blight-Ravaged Map(?:|s)", {"link": "Blight-Ravaged Map"}),
         ("Map(?:|s)", {"link": "Map"}),
         ("Breach Splinter(?:|s)", {"link": "Breach Splinter"}),
+        ("Breachstone(?:|s)", {"link": "Breachstone"}),
         ("Lifeforce", {"link": "Lifeforce"}),
         ("Remnant(?:|s) of Corruption", {"link": "Remnant of Corruption"}),
-        ("Currency(?:| Item(?:|s))", {"link": "Currency"}),
+        ("Currency(?: Item(?:|s))?", {"link": "Currency"}),
         ("Rogue(?:|'s) Marker(?:|s)", {"link": "Rogue's Marker"}),
         ("Contract(?:|s)", {"link": "Contract"}),
         ("Blueprint(?:|s)", {"link": "Blueprint"}),
@@ -1198,6 +1210,8 @@ _inter_wiki_map = {
         ("Divination Card(?:|s)", {"link": "Divination Card"}),
         ("Support Gem(?:|s)", {"link": "Support Gem"}),
         ("Skill Gem(?:|s)", {"link": "Skill Gem"}),
+        ("Improved Offering to the Goddess", {"link": "Improved Offering to the Goddess"}),
+        ("Offering to the Goddess", {"link": "Offering to the Goddess"}),
         #
         # Ailments
         #
@@ -1219,6 +1233,7 @@ _inter_wiki_map = {
         # Area, content, monsters, masters
         #
         ("Monster(?:|s)", {"link": "Monster"}),
+        ("Boss(?:|es)", {"link": "Boss"}),
         ("Abyss(?:|es)", {"link": "Abyss"}),
         ("Incursion(?:|s)", {"link": "Incursion"}),
         ("Alva", {"link": "Alva"}),
@@ -1231,12 +1246,12 @@ _inter_wiki_map = {
         ("Einhar", {"link": "Einhar"}),
         ("Harbinger(?:|s)", {"link": "Harbinger"}),
         ("Niko", {"link": "Niko"}),
-        ("(?:|Voltaxic )Sulphite(?:| Vein(?:|s))", {"link": "Voltaxic Sulphite"}),
-        ("Expedition(?:| Encounter(?:|s))", {"link": "Expedition"}),
+        ("(?:Voltaxic )?Sulphite(?: Vein(?:|s))?", {"link": "Voltaxic Sulphite"}),
+        ("Expedition(?: Encounter(?:|s))?", {"link": "Expedition"}),
         ("Jun", {"link": "Jun"}),
-        ("(?:|Immortal )Syndicate", {"link": "Immortal Syndicate"}),
-        ("Legion(?:| Encounter(?:|s))", {"link": "Legion"}),
-        ("Delirium(?:| Encounter(?:|s))", {"link": "Delirium"}),
+        ("(?:Immortal )?Syndicate", {"link": "Immortal Syndicate"}),
+        ("Legion(?: Encounter(?:|s))?", {"link": "Legion"}),
+        ("Delirium(?: Encounter(?:|s))?", {"link": "Delirium"}),
         ("Essence(?:|s)", {"link": "Essence"}),
         ("Ore Deposit(?:|s)", {"link": "Ore Deposit"}),
         ("Ritual(?:|s)", {"link": "Ritual"}),
@@ -1246,24 +1261,26 @@ _inter_wiki_map = {
         ("Harvest(?:|ed)", {"link": "Harvest"}),
         ("Shrine(?:|s)", {"link": "Shrine"}),
         ("Smuggler's Cache(?:|s)", {"link": "Smuggler's Cache"}),
-        ("Ultimatum(?:| Encounter(?:|s))", {"link": "Ultimatum"}),
+        ("Ultimatum(?: Encounter(?:|s))?", {"link": "Ultimatum"}),
         ("Strongbox(?:|es)", {"link": "Strongbox"}),
         ("Tormented Spirit(?:|s)", {"link": "Tormented Spirit"}),
         ("Wildwood", {"link": "Wildwood"}),
         ("Map Crafting Option(?:|s)", {"link": "Map Crafting Option"}),
-        ("(?:|The )Maven", {"link": "The Maven"}),
+        ("(?:The )?Maven", {"link": "The Maven"}),
         ("(?:Eldritch|Searing Exarch|Eater of Worlds) Altar(?:|s)", {"link": "Eldritch Altar"}),
-        ("(?:|The )Searing Exarch", {"link": "The Searing Exarch"}),
-        ("(?:|The )Eater of Worlds", {"link": "The Eater of Worlds"}),
+        ("(?:The )?Searing Exarch", {"link": "The Searing Exarch"}),
+        ("(?:The )?Eater of Worlds", {"link": "The Eater of Worlds"}),
         ("Vaal Side Area(?:|s)", {"link": "Vaal Side Area"}),
         ("Vaal Vessel(?:|s)", {"link": "Vaal Vessel"}),
+        ("Tempest(?:|s)", {"link": "Tempest"}),
+        ("Labyrinth Trial(?:|s)", {"link": "Labyrinth Trial"}),
         ("Area(?:|s)", {"link": "Area"}),
         #
         # Other game mechanics
         #
         ("Aura(?:|s)", {"link": "Aura"}),
         ("Herald", {"link": "Herald"}),
-        ("Curse(?:|s|ed)", {"link": "Curse"}),
+        ("Curse(?:|s|d)", {"link": "Curse"}),
         ("Hex(?:|es|ed)", {"link": "Hex"}),
         ("Mark(?:|s|ed)", {"link": "Mark"}),
         ("Spell(?:|s)", {"link": "Spell"}),
@@ -1275,7 +1292,7 @@ _inter_wiki_map = {
         ("Trap(?:|s)", {"link": "Trap"}),
         ("Warcry|Warcries", {"link": "Warcry"}),
         ("Brand(?:|s)", {"link": "Brand"}),
-        ("(?:|Melee )Strike(?:|s)", {"link": "Strike"}),
+        ("(?:Melee )?Strike(?:|s)", {"link": "Strike"}),
         ("Slam", {"link": "Slam"}),
         ("Trigger(?:|s|ed)", {"link": "Trigger"}),
         ("Linked(?= Targ| Play)", {"link": "Link skill"}),
@@ -1286,7 +1303,7 @@ _inter_wiki_map = {
         ("Fork(?:|ed|ing)", {"link": "Fork"}),
         ("Return(?= to you)|Returning(?= Projec)", {"link": "Return"}),
         ("Shrine Buff(?:|s)", {"link": "Shrine"}),
-        ("Guard(?:| Buff(?:|s))", {"link": "Guard skill"}),
+        ("Guard(?: Buff(?:|s))?", {"link": "Guard skill"}),
         ("Dual Wield(?:|ing)", {"link": "Dual Wielding"}),
         ("Unarmed", {"link": "Unarmed"}),
         ("Unencumbered", {"link": "Unencumbered"}),
@@ -1296,8 +1313,9 @@ _inter_wiki_map = {
         ("Unlucky", {"link": "Unlucky"}),
         ("Stationary", {"link": "Stationary"}),
         ("Recently", {"link": "Recently"}),
+        ("Range", {"link": "Range"}),
         ("Nearby", {"link": "Nearby"}),
-        ("in your Presence", {"link": "In your presence"}),
+        ("in your Presence", {"link": "In your Presence"}),
         ("Shatter(?:|ed)", {"link": "Shatter"}),
         ("Socket(?:|s|ed)", {"link": "Item socket"}),
         ("Skill(?:|s)", {"link": "Skill"}),
@@ -1306,12 +1324,14 @@ _inter_wiki_map = {
         ("Modifier(?:|s)", {"link": "Modifier"}),
         ("Corrupted", {"link": "Corrupted"}),
         ("Reflect(?:|s|ed)", {"link": "Reflect"}),
+        ("Penetrate(?:|s)", {"link": "Penetrate"}),
         ("PvP", {"link": "PvP"}),
         #
         # Late matching
         #
         ("Absolution", {"link": "Absolution"}),
-        ("Ambush", {"link": "Ambush"}),
+        ("Affliction", {"link": "Affliction (skill)"}),
+        ("(?<!ng in )Ambush", {"link": "Ambush"}),
         ("Arc", {"link": "Arc"}),
         ("Blight", {"link": "Blight"}),
         ("Dash", {"link": "Dash"}),
@@ -1321,7 +1341,7 @@ _inter_wiki_map = {
         ("Frenzy", {"link": "Frenzy"}),
         ("Reflection", {"link": "Reflection"}),
         ("Armour", {"link": "Armour"}),
-        ("Charge(?:|s)", {"link": "Charge"}),
+        ("(?<! to )Charge(?:|s)", {"link": "Charge"}),
         ("Crush(?:|ed)", {"link": "Crushed"}),
     ),
     "Russian": (
