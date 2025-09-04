@@ -32,7 +32,7 @@ class DGRFile(AbstractFile):
         return result
 
     def _read(self, buffer, *args, **kwargs):
-        lines = buffer.read().decode("utf-16").splitlines()
+        lines = [line for line in buffer.read().decode("utf-16").splitlines() if line.strip()]
 
         version = self._re_version.match(lines[0])
         if not version:
@@ -77,6 +77,7 @@ class DGRFile(AbstractFile):
                             print("Error parsing value", value, "for key", room)
                             raise
 
+        # After header data, all remaining lines should be nodes or edges
         if i + self.node_count + self.edge_count != len(lines):
             raise ParserError(
                 "Validation error: expected",
