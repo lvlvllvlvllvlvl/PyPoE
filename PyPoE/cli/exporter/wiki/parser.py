@@ -111,10 +111,22 @@ _inter_wiki_map = {
         #
         # Support gems
         #
-        ("(?<=level [0-9] |evel [0-9][0-9] )Added Chaos Damage", {"link": "Added Chaos Damage Support"}),
-        ("(?<=level [0-9] |evel [0-9][0-9] )Added Cold Damage", {"link": "Added Cold Damage Support"}),
-        ("(?<=level [0-9] |evel [0-9][0-9] )Added Fire Damage", {"link": "Added Fire Damage Support"}),
-        ("(?<=level [0-9] |evel [0-9][0-9] )Added Lightning Damage", {"link": "Added Lightning Damage Support"}),
+        (
+            "(?<=level [0-9] |evel [0-9][0-9] )Added Chaos Damage",
+            {"link": "Added Chaos Damage Support"},
+        ),
+        (
+            "(?<=level [0-9] |evel [0-9][0-9] )Added Cold Damage",
+            {"link": "Added Cold Damage Support"},
+        ),
+        (
+            "(?<=level [0-9] |evel [0-9][0-9] )Added Fire Damage",
+            {"link": "Added Fire Damage Support"},
+        ),
+        (
+            "(?<=level [0-9] |evel [0-9][0-9] )Added Lightning Damage",
+            {"link": "Added Lightning Damage Support"},
+        ),
         ("(?<=[0-9] )Additional Accuracy", {"link": "Additional Accuracy Support"}),
         ("(?<=[0-9] )Advanced Traps", {"link": "Advanced Traps Support"}),
         ("(?<=[0-9] )Ancestral Call", {"link": "Ancestral Call Support"}),
@@ -165,12 +177,18 @@ _inter_wiki_map = {
         ("(?<=[0-9] )Devour", {"link": "Devour Support"}),
         ("(?<=[0-9] )Efficacy", {"link": "Efficacy Support"}),
         ("(?<=[0-9] )Elemental Army", {"link": "Elemental Army Support"}),
-        ("(?<=[0-9] )Elemental Damage with Attacks", {"link": "Elemental Damage with Attacks Support"}),
+        (
+            "(?<=[0-9] )Elemental Damage with Attacks",
+            {"link": "Elemental Damage with Attacks Support"},
+        ),
         ("(?<=[0-9] )Elemental Focus", {"link": "Elemental Focus Support"}),
         ("(?<=[0-9] )Elemental Penetration", {"link": "Elemental Penetration Support"}),
         ("(?<=[0-9] )Elemental Proliferation", {"link": "Elemental Proliferation Support"}),
         ("(?<=[0-9] )Empower", {"link": "Empower Support"}),
-        ("(?<=[0-9] )Endurance Charge on Melee Stun", {"link": "Endurance Charge on Melee Stun Support"}),
+        (
+            "(?<=[0-9] )Endurance Charge on Melee Stun",
+            {"link": "Endurance Charge on Melee Stun Support"},
+        ),
         ("(?<=[0-9] )Energy Leech", {"link": "Energy Leech Support"}),
         ("(?<=[0-9] )Enhance", {"link": "Enhance Support"}),
         ("(?<=[0-9] )Enlighten", {"link": "Enlighten Support"}),
@@ -190,7 +208,10 @@ _inter_wiki_map = {
         ("(?<=[0-9] )Fresh Meat", {"link": "Fresh Meat Support"}),
         ("(?<=[0-9] )Frigid Bond", {"link": "Frigid Bond Support"}),
         ("(?<=[0-9] )Generosity", {"link": "Generosity Support"}),
-        ("(?<=[0-9] )Greater Multiple Projectiles", {"link": "Greater Multiple Projectiles Support"}),
+        (
+            "(?<=[0-9] )Greater Multiple Projectiles",
+            {"link": "Greater Multiple Projectiles Support"},
+        ),
         ("(?<=[0-9] )Greater Volley", {"link": "Greater Volley Support"}),
         ("(?<=[0-9] )Guardian's Blessing", {"link": "Guardian's Blessing Support"}),
         ("(?<=[0-9] )Hex Bloom", {"link": "Hex Bloom Support"}),
@@ -766,11 +787,20 @@ _inter_wiki_map = {
         ("Summon Bestial Ursa", {"link": "Summon Bestial Ursa"}),
         ("Summon Doedre's Effigy", {"link": "Summon Doedre's Effigy"}),
         ("Summon Elemental Relic", {"link": "Summon Elemental Relic"}),
-        ("Summon Greater Harbinger of Brutality", {"link": "Summon Greater Harbinger of Brutality"}),
-        ("Summon Greater Harbinger of Directions", {"link": "Summon Greater Harbinger of Directions"}),
+        (
+            "Summon Greater Harbinger of Brutality",
+            {"link": "Summon Greater Harbinger of Brutality"},
+        ),
+        (
+            "Summon Greater Harbinger of Directions",
+            {"link": "Summon Greater Harbinger of Directions"},
+        ),
         ("Summon Greater Harbinger of Focus", {"link": "Summon Greater Harbinger of Focus"}),
         ("Summon Greater Harbinger of Storms", {"link": "Summon Greater Harbinger of Storms"}),
-        ("Summon Greater Harbinger of the Arcane", {"link": "Summon Greater Harbinger of the Arcane"}),
+        (
+            "Summon Greater Harbinger of the Arcane",
+            {"link": "Summon Greater Harbinger of the Arcane"},
+        ),
         ("Summon Greater Harbinger of Time", {"link": "Summon Greater Harbinger of Time"}),
         ("Summon Harbinger of Brutality", {"link": "Summon Harbinger of Brutality"}),
         ("Summon Harbinger of Directions", {"link": "Summon Harbinger of Directions"}),
@@ -896,7 +926,10 @@ _inter_wiki_map = {
         #
         # Charges
         #
-        ("(?:Endurance|Frenzy|Power), (?:Endurance|Frenzy|Power)(?:|,) (?:and|or) (?:Endurance|Frenzy|Power) Charge(?:|s)", {"link": "Charge"}),
+        (
+            "(?:Endurance|Frenzy|Power), (?:Endurance|Frenzy|Power)(?:|,) (?:and|or) (?:Endurance|Frenzy|Power) Charge(?:|s)",  # noqa
+            {"link": "Charge"},
+        ),
         ("Endurance Charge(?:|s)", {"link": "Endurance Charge"}),
         ("Frenzy Charge(?:|s)", {"link": "Frenzy Charge"}),
         ("Power Charge(?:|s)", {"link": "Power Charge"}),
@@ -2037,6 +2070,7 @@ _inter_wiki_map = {
 
 _MAX_RE = 97
 
+
 def _make_inter_wiki_re():
     out = {}
     for language, _inter_wiki_mapping in _inter_wiki_map.items():
@@ -2182,9 +2216,9 @@ class BaseParser:
             out_img = decode_dds(data)
             if process:
                 out_img = process(out_img)
-            out_img.save(out_path.replace(".dds", parsed_args.convert_images))
-
-            console('Converted "%s" to png' % out_path)
+            if out_img:
+                out_img.save(out_path.replace(".dds", parsed_args.convert_images))
+                console('Converted "%s" to png' % out_path)
         else:
             with open(out_path, "wb") as f:
                 f.write(self.file_system.extract_dds(data))
@@ -2643,7 +2677,7 @@ def make_inter_wiki_links(string):
             # Offset by 1 to account for text group
             index = match.groups().index(text, 1) - 1
             data = mapping[i * _MAX_RE + index][1]
-            link = data["link"].format(text=text) # Replace {text} placeholder in link with text
+            link = data["link"].format(text=text)  # Replace {text} placeholder in link with text
             out.append(string[last_index : match.start("text")])
             if link == text:
                 out.append("[[%s]]" % link)

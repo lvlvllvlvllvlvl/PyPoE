@@ -167,7 +167,7 @@ regex_ids = re.compile(r"\S+.*(?!\s[0-9]+)", re.UNICODE | re.MULTILINE)
 regex_id_strings = re.compile(r"([\S]+)", re.UNICODE)
 regex_strings = re.compile(r'(?:"(.+)")|([\S]+)+', re.UNICODE)
 regex_int = re.compile(r"[0-9]+", re.UNICODE)
-regex_isnumber = re.compile(r"^[0-9\-]+$", re.UNICODE)
+regex_isnumber = re.compile(r"^-?[0-9]+$", re.UNICODE)
 regex_lang = re.compile(r'^[\s]*lang "(?P<language>[\w ]+)"[\s]*$', re.UNICODE | re.MULTILINE)
 regex_tokens = re.compile(
     r'(?:^"(?P<header>.*)"$)'
@@ -1672,8 +1672,12 @@ class TranslationFile(AbstractFileReadOnly):
                                 TranslationRange(value, value, parent=ts, negated=negated)
                             elif "|" in matchstr:
                                 minmax = matchstr.split("|")
-                                min_val = int(minmax[0]) if minmax[0] != "#" else None
-                                max_val = int(minmax[1]) if minmax[1] != "#" else None
+                                min_val = (
+                                    int(minmax[0]) if regex_isnumber.match(minmax[0]) else None
+                                )
+                                max_val = (
+                                    int(minmax[1]) if regex_isnumber.match(minmax[1]) else None
+                                )
                                 TranslationRange(min_val, max_val, parent=ts, negated=negated)
                             else:
                                 TranslationRange(None, None, parent=ts, negated=negated)
