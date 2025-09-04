@@ -1361,10 +1361,7 @@ def _make_inter_wiki_re():
             id = i * _MAX_RE
             out[language].append(
                 re.compile(
-                    r"(?![^\[]*\]\])"
-                    r"(?: |^)"
-                    r"(?P<text>%s)"
-                    r"(?=\W|$)"
+                    r"(?![^\[]*\]\])\b(?P<text>%s)\b"
                     % "|".join(
                         ["(%s)" % item[0] for item in _inter_wiki_mapping[id : id + _MAX_RE]]
                     ),
@@ -1395,7 +1392,7 @@ class BaseParser:
     :type custom: TranslationFile
     """
 
-    _DETAILED_FORMAT = '<abbr title="%s">%s</abbr>'
+    _DETAILED_FORMAT = '<span class="tooltip" title="%s">%s</span>'
 
     _HIDDEN_FORMAT = {
         "English": "%s (Hidden)",
@@ -1489,7 +1486,7 @@ class BaseParser:
         return self._HIDDEN_FORMAT[self.lang] % make_inter_wiki_links(custom)
 
     def _format_detailed(self, custom, ingame):
-        return self._DETAILED_FORMAT % (ingame, make_inter_wiki_links(custom))
+        return self._DETAILED_FORMAT % (custom, ingame)
 
     def _write_dds(
         self, data, out_path, parsed_args, process: Callable[[PIL.Image], PIL.Image] = None
@@ -1661,7 +1658,7 @@ class BaseParser:
             if "\n" in line:
                 # By request differentiate between breaks from the source file
                 # and different stats
-                finalout.append("<br />".join(line.split("\n")))
+                finalout.append("<br>".join(line.split("\n")))
             else:
                 finalout.append(line)
 
@@ -1710,7 +1707,7 @@ class TagHandler:
         "Grand Spectrum": "[[%s]]",
         "Precursor's Emblem": "[[%s]]",
         "Shroud of the Lightless": "[[%s]]",
-        "Thread of Hope": "{{il|page=%s}}",
+        "Thread of Hope": "{{il|html=|page=%s}}",
         "Aul's Uprising": "[[%s]]",
     }
 
@@ -1721,7 +1718,6 @@ class TagHandler:
         "Divination Scarab": "[[Divination Scarab (disambiguation)|Divination Scarab]]",
         "Bestiary Scarab": "[[Bestiary Scarab (disambiguation)|Bestiary Scarab]]",
         "Sulphite Scarab": "[[Sulphite Scarab (disambiguation)|Sulphite Scarab]]",
-        "Einhar's Memory of Harvest Beasts": "{{il|html=|Einhar's Memory|Einhar's Memory of Harvest Beasts}}",
     }
 
     def __init__(self, rr):
@@ -1801,7 +1797,6 @@ class TagHandler:
         "rareitem": partial(_default_handler, tid="rare"),
         "uniqueitem": _unique_handler,
         "divination": partial(_default_handler, tid="divination"),
-        "prophecy": partial(_default_handler, tid="prophecy"),
         "corrupted": partial(_link_handler, tid="corrupted"),
         "fractured": partial(_link_handler, tid="fractured"),
     }
@@ -1974,18 +1969,478 @@ def make_inter_wiki_links(string):
     return string
 
 
+_KEYWORD_LINK_MAP = {
+    # Keyword:
+    # ("visible text", "link")
+    "Accuracy": [
+        ("Accurate", "Accurate"),
+    ],
+    "Ailments": [
+        ("Ailment", "Ailment"),
+    ],
+    "AilmentSpread": [
+        ("Spread", "Spread"),
+    ],
+    "AilmentThreshold": [
+        ("Ailment Threshold", "Ailment Threshold"),
+        ("", "Ailment"),
+    ],
+    "Allies": [
+        ("Allied", "Allied"),
+    ],
+    "AncestralBoost": [
+        ("Ancestrally Boosted", "Ancestrally Boosted"),
+        ("Ancestral Boost", "Ancestral Boost"),
+    ],
+    "ArmourBreak": [
+        ("Armour Break", "Armour Break"),
+        ("Armour Broken", "Armour Broken"),
+        ("Break Armour", "Break Armour"),
+        ("Breaks Armour", "Breaks Armour"),
+        ("Breaking Armour", "Breaking Armour"),
+        ("Broken Armour", "Broken Armour"),
+        ("Fully Armour Broken", "Fully Armour Broken"),
+        ("Fully Break", "Fully Break"),
+        ("Fully Broken Armour", "Fully Broken Armour"),
+        ("Fully Broken", "Fully Broken"),
+        ("Break", "Break"),
+    ],
+    "ArtificersOrb": [
+        ("Artificer's Orb", "Artificer's Orb"),
+    ],
+    "Attributes": [
+        ("Attribute", "Attribute"),
+        ("attribute", "attribute"),
+    ],
+    "AzmeriSpirit": [
+        ("Azmeri Spirit", "Azmeri Spirit"),
+    ],
+    "Bleeding": [
+        ("Bleed", "Bleed"),
+    ],
+    "BooleanDamageRoll": [
+        ("", "Damage"),
+    ],
+    "BuffEffect": [
+        ("", "Buff"),
+    ],
+    "BuffMagnitude": [
+        ("Magnitude", "Magnitude"),
+    ],
+    "Burning": [
+        ("Burn", "Burn"),
+    ],
+    "Channelling": [
+        ("Channelled", "Channelled"),
+        ("Channelling", "Channelling"),
+        ("Channel", "Channelling"),
+    ],
+    "ChaosOrb": [
+        ("ChaosOrb", "Chaos Orb"),
+    ],
+    "Charges": [
+        ("Power Charge", "Power Charge"),
+        ("Frenzy Charge", "Frenzy Charge"),
+        ("Endurance Charge", "Endurance Charge"),
+        ("Charge", "Charge"),
+    ],
+    "ChilledGround": [
+        ("Chilled Ground", "Chilled Ground"),
+    ],
+    "Conditional": [
+        ("Condition", "Condition"),
+    ],
+    "ContainsDelirium": [
+        ("Delirium", "Delirium"),
+    ],
+    "CooldownRecovery": [
+        ("Cooldown Recovery Rate", "Cooldown Recovery Rate"),
+        ("Cooldowns Recover", "Cooldowns Recover"),
+        ("", "Cooldown"),
+    ],
+    "CorruptedBlood": [
+        ("Corrupted Blood", "Corrupted Blood"),
+    ],
+    "ConsecratedGround": [
+        ("Consecrated Ground", "Consecrated Ground"),
+    ],
+    "Critical": [
+        ("Critical Hit Chance", "Critical Hit Chance"),
+        ("Critically Hit", "Critically Hit"),
+        ("Critically hit", "Critically hit"),
+        ("Critical Hit", "Critical Hit"),
+        ("Critical hit", "Critical hit"),
+        ("Critical", "Critical"),
+    ],
+    "CriticalDamageBonus": [
+        ("Critical Damage Bonus", "Critical Damage Bonus"),
+    ],
+    "CriticalWeakness": [
+        ("Critical Weakness", "Critical Weakness"),
+    ],
+    "CrushingBlow": [
+        ("Crushing Blow", "Crushing Blow"),
+    ],
+    "CullingStrike": [
+        ("Culling Strike", "Culling Strike"),
+        ("Culling strike", "Culling strike"),
+        ("Cull", "Cull"),
+        ("", "Cull"),
+    ],
+    "DamageTypes": [
+        ("Damage Type", "Damage Type"),
+        ("Damage type", "Damage type"),
+        ("", "Damage Type"),
+    ],
+    "DamagingAilments": [
+        ("Damaging Ailment", "Damaging Ailment"),
+        ("", "Damaging Ailment"),
+    ],
+    "Defences": [
+        ("Defence", "Defence"),
+    ],
+    "DetonationTime": [
+        ("Detonation Time", "Detonation Time"),
+        ("Detonation", "Detonation"),
+        ("Detonate", "Detonate"),
+    ],
+    "DistilledEmotion": [
+        ("Distilled Emotion", "Distilled Emotion"),
+    ],
+    "EasyTargetDebuff": [
+        ("Easy Target", "Easy Target"),
+    ],
+    "ElementalAilments": [
+        ("Elemental Ailment", "Elemental Ailment"),
+        ("Elemental ailment", "Elemental ailment"),
+    ],
+    "ElementalDamage": [
+        ("Elemental Hit Damage", "Elemental Hit Damage"),
+        ("Elemental Damage", "Elemental Damage"),
+        ("Elemental damage", "Elemental damage"),
+        ("Elemental", "Elemental"),
+        ("", "Elemental"),
+    ],
+    "Empowered": [
+        ("Empower", "Empower"),
+    ],
+    "EnergyShield": [
+        ("Energy Shield", "Energy Shield"),
+    ],
+    "EnergyShieldLeech": [
+        ("Energy Shield Leech", "Energy Shield Leech"),
+        ("Leech", "Leech"),
+    ],
+    "ESRecharge": [
+        ("Energy Shield Recharge", "Energy Shield Recharge"),
+        ("", "Energy Shield"),
+    ],
+    "ESRechargeRate": [
+        ("Energy Shield Recharge Rate", "Energy Shield Recharge Rate"),
+        ("", "Energy Shield"),
+    ],
+    "Evasion": [
+        ("Evasion Rating", "Evasion Rating"),
+        ("", "Evasion"),
+    ],
+    "Exposure": [
+        ("", "Exposure"),
+    ],
+    "FasterESRechargeStart": [
+        ("", "Energy Shield"),
+    ],
+    "FinalStrike": [
+        ("Final Strike", "Final Strike"),
+    ],
+    "Flask": [
+        ("Flask", "Flask"),
+        ("flask", "flask"),
+    ],
+    "ForksCrit": [
+        ("", "Critical"),
+    ],
+    "Freeze": [
+        ("Freezing", "Freezing"),
+    ],
+    "HeavyStun": [
+        ("Heavily Stun", "Heavily Stun"),
+        ("Heavy Stun", "Heavy Stun"),
+    ],
+    "HeavyStunPlayer": [
+        ("Heavily Stun", "Heavily Stun"),
+        ("Heavy Stun", "Heavy Stun"),
+    ],
+    "HitDamage": [
+        ("Damaging Hit", "Damaging Hit"),
+        ("Damaging hit", "Damaging hit"),
+        ("Hit Damage", "Hit Damage"),
+        ("Hit", "Hit"),
+        ("", "Hit"),
+    ],
+    "IceCrystals": [
+        ("Ice Crystal", "Ice Crystal"),
+    ],
+    "Ignite": [
+        ("Igniting", "Igniting"),
+    ],
+    "IgnitedGround": [
+        ("Ignited Ground", "Ignited Ground"),
+    ],
+    "IgnoreResistances": [
+        ("", "Resistance"),
+    ],
+    "Invoke": [
+        ("Invoking", "Invoking"),
+    ],
+    "ItemRarity": [
+        ("Normal", "Normal"),
+        ("Rare", "Rare"),
+        ("Magic", "Magic"),
+        ("Unique", "Unique"),
+        ("", "Rarity"),
+    ],
+    "JaggedGround": [
+        ("Jagged Ground", "Jagged Ground"),
+    ],
+    "KillingBlow": [
+        ("Killing Blow", "Killing Blow"),
+        ("Kill", "Kill"),
+    ],
+    "Knockback": [
+        ("Knocking Back", "Knocking Back"),
+        ("Knock Back", "Knock Back"),
+        ("Knock back", "Knock back"),
+        ("", "Knockback"),
+    ],
+    "LifeLeech": [
+        ("Life Leech", "Life Leech"),
+        ("Leech", "Leech"),
+    ],
+    "LowLife": [
+        ("Low Life", "Low Life"),
+    ],
+    "ManaLeech": [
+        ("Mana Leech", "Mana Leech"),
+        ("Leech", "Leech"),
+    ],
+    "MartialWeapon": [
+        ("Martial Weapon", "Martial Weapon"),
+        ("Martial weapon", "Martial weapon"),
+        ("martial weapon", "martial weapon"),
+    ],
+    "MaximumResistances": [
+        ("Maximum Fire Resistance", "Maximum Fire Resistance"),
+        ("Maximum Cold Resistance", "Maximum Cold Resistance"),
+        ("Maximum Lightning Resistance", "Maximum Lightning Resistance"),
+        ("Maximum Chaos Resistance", "Maximum Chaos Resistance"),
+        ("Maximum Resistance", "Maximum Resistance"),
+        ("", "Maximum Resistance"),
+    ],
+    "MonsterModifiers": [
+        ("Modifier", "Modifier"),
+    ],
+    "NonDamagingAilments": [
+        ("Non-Damaging Ailment", "Non-Damaging Ailment"),
+        ("", "Ailment"),
+    ],
+    "OrbOfAlchemy": [
+        ("Orb of Alchemy", "Orb of Alchemy"),
+    ],
+    "OrbOfAlteration": [
+        ("Orb of Alteration", "Orb of Alteration"),
+    ],
+    "OrbOfChance": [
+        ("Orb of Chance", "Orb of Chance"),
+    ],
+    "OrbOfTransmutation": [
+        ("Orb of Transmutation", "Orb of Transmutation"),
+    ],
+    "OvercappedBlock": [
+        ("", "Block"),
+    ],
+    "ParriedDebuff": [
+        ("Parried Debuff", "Parried Debuff"),
+        ("Parried", "Parried"),
+    ],
+    "Penetration": [
+        ("Penetrate", "Penetrate"),
+    ],
+    "PerfectionBuff": [
+        ("Perfection Buff", "Perfection Buff"),
+        ("", "Perfection Buff"),
+    ],
+    "PerfectTiming": [
+        ("Perfect Timing", "Perfect Timing"),
+        ("Perfectly Timing", "Perfectly Timing"),
+    ],
+    "Physical": [
+        ("Physical Damage", "Physical Damage"),
+    ],
+    "PlayerPossessed": [
+        ("", "Azmerian wisp"),
+    ],
+    "PrimedElectrocution": [
+        ("Primed for Electrocution", "Primed for Electrocution"),
+    ],
+    "Quality": [
+        ("Quality", "Quality"),
+        ("quality", "quality"),
+    ],
+    "Rarity": [
+        ("Normal", "Normal"),
+        ("Rare", "Rare"),
+        ("Magic", "Magic"),
+        ("Unique", "Unique"),
+        ("", "Rarity"),
+    ],
+    "RegalOrb": [
+        ("Regal Orb", "Regal Orb"),
+    ],
+    "Resistances": [
+        ("Fire Resistance", "Fire Resistance"),
+        ("Cold Resistance", "Cold Resistance"),
+        ("Lightning Resistance", "Lightning Resistance"),
+        ("Chaos Resistance", "Chaos Resistance"),
+        ("Resistance", "Resistance"),
+    ],
+    "ResistedBy": [
+        ("", "Resistance"),
+    ],
+    "Resonance": [
+        ("Resonance", "Resonance (buff)"),
+    ],
+    "Reviving": [
+        ("Revived", "Revived"),
+    ],
+    "RogueExile": [
+        ("Rogue Exile", "Rogue Exile"),
+    ],
+    "RunicInscription": [
+        ("Runic Inscriptions", "Runic Inscriptions"),
+    ],
+    "ShockedGround": [
+        ("Shocked Ground", "Shocked Ground"),
+    ],
+    "SkillSpeed": [
+        ("Skill Speed", "Skill Speed"),
+    ],
+    "SpiritOfTheBearPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
+    "SpiritOfTheBoarPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
+    "SpiritOfTheCatPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
+    "SpiritOfTheOwlPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
+    "SpiritOfTheOxPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
+    "SpiritOfTheSerpentPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
+    "SpiritOfTheStagPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
+    "SpiritOfTheWolfPossessedPlayer": [
+        ("", "Azmerian wisp"),
+    ],
+    "StatConversion": [
+        ("Convert", "Convert"),
+        ("", "Conversion"),
+    ],
+    "StatGain": [
+        ("Gain", "Gain"),
+    ],
+    "StunThreshold": [
+        ("Stun Threshold", "Stun Threshold"),
+    ],
+    "ThornsRetaliation": [
+        ("Retaliate with Thorns", "Thorns"),
+        ("", "Thorns"),
+    ],
+    "UnholyMight": [
+        ("Unholy Might", "Unholy Might"),
+    ],
+    "Warcry": [
+        ("Warcries", "Warcries"),
+    ],
+    "WeaponSetPassiveSkillPoints": [
+        ("Weapon Set Passive Skill Points", "Weapon Set Passive Skill Points"),
+        ("", "Weapon set#Weapon set passive skill points"),
+    ],
+    "Wells": [
+        ("Well", "Well"),
+    ],
+    "Withered": [
+        ("Withered", "Withered"),
+        ("Wither", "Wither"),
+    ],
+}
+
+
 def process_keywords(text: str):
-    return text.replace("[", "[[").replace("]", "]]").replace("\n", "<br>")
+    text = text.replace("\n", "<br>")
+
+    def replace_match(match):
+        raw = match.group(1)
+
+        # Handle pipe-form keywords: [keyword|visible text]
+        if "|" in raw:
+            base, variant = raw.split("|", 1)
+
+            # If exact match, simple wrap
+            if base == variant:
+                return f"[[{variant}]]"
+
+            # Case: variant starts with base + suffix (e.g., "Remnant|Remnants")
+            if variant.startswith(base):
+                suffix = variant[len(base) :]
+                if "'" not in suffix and " " not in suffix:
+                    return f"[[{base}]]{suffix}"
+
+            # Try using _KEYWORD_LINK_MAP
+            if base in _KEYWORD_LINK_MAP:
+                for display, link in _KEYWORD_LINK_MAP[base]:
+                    if variant == link:
+                        return f"[[{variant}]]"
+                    elif display == "":
+                        return f"[[{link}|{variant}]]"
+                    elif variant.startswith(display):
+                        suffix = variant[len(display) :]
+                        if display == link and "'" not in suffix and " " not in suffix:
+                            return f"[[{link}]]{suffix}"
+                        elif "" not in _KEYWORD_LINK_MAP[base][-1][1]:
+                            return f"[[{link}|{variant}]]"
+
+        # Default case: no pipe, regular keyword
+        else:
+            key = raw
+            if key in _KEYWORD_LINK_MAP:
+                for display, link in _KEYWORD_LINK_MAP[key]:
+                    if key == link:
+                        return f"[[{key}]]"
+                    elif display == "":
+                        return f"[[{link}|{key}]]"
+                    elif display.startswith(key):
+                        suffix = display[len(key) :]
+                        if "'" not in suffix and " " not in suffix:
+                            return f"[[{link}|{key}]]"
+
+        return f"[[{raw}]]"
+
+    return re.sub(r"\[(.+?)\]", replace_match, text)
 
 
 def strip_keywords(text: str):
-    for match in re.finditer(r"\[(.+?)\]", text):
-        full_match = match.group(0)
-        key = match.group(1)
-        if "|" in key:
-            key = key[key.index("|") + 1 :]
-        text = text.replace(full_match, key)
-    return text
+    def replace_keyword(match):
+        content = match.group(1)
+        return content.split("|", 1)[-1] if "|" in content else content
+
+    return re.sub(r"\[(.+?)\]", replace_keyword, text)
 
 
 def find_template(wikitext, template_name):
@@ -2124,6 +2579,7 @@ def parse_and_handle_description_tags(rr, text):
     return (
         parse_description_tags(text)
         .handle_tags(TagHandler(rr).tag_handlers)
+        .replace("{0}", "#") #Numerical placeholder
         .replace("\n", "<br>")
         .replace("\r", "")
     )

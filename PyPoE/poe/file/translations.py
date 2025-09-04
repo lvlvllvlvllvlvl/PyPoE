@@ -2320,7 +2320,7 @@ def install_data_dependant_quantifiers(relational_reader: RelationalReader):
         id="mod_value_to_item_class",
         relational_reader=relational_reader,
         table="ItemClasses.dat64",
-        placeholder="<random item type>",
+        placeholder="&lt;random item type&gt;",
     )
 
     TQRelationalData(
@@ -2328,7 +2328,7 @@ def install_data_dependant_quantifiers(relational_reader: RelationalReader):
         relational_reader=relational_reader,
         table="Mods.dat64",
         predicate=("GenerationType", MOD_GENERATION_TYPE.TEMPEST),
-        placeholder="<random Tempest modifier>",
+        placeholder="&lt;random Tempest modifier&gt;",
     )
 
     if relational_reader.specification.sequel == 1:
@@ -2337,7 +2337,7 @@ def install_data_dependant_quantifiers(relational_reader: RelationalReader):
             relational_reader=relational_reader,
             table="IndexableSupportGems.dat64",
             index_column="Index",
-            placeholder="<random Support Gem>",
+            placeholder="&lt;random Support Gem&gt;",
         )
 
     TQRelationalData(
@@ -2352,7 +2352,7 @@ def install_data_dependant_quantifiers(relational_reader: RelationalReader):
             relational_reader=relational_reader,
             table="AfflictionRewardTypeVisuals.dat64",
             index_column="AfflictionRewardTypes",
-            placeholder="<Delirium reward>",
+            placeholder="&lt;Delirium reward&gt;",
         )
 
     if relational_reader.specification.sequel == 1:
@@ -2361,7 +2361,7 @@ def install_data_dependant_quantifiers(relational_reader: RelationalReader):
             relational_reader=relational_reader,
             table="IndexableSkillGems.dat64",
             index_column="Index",
-            placeholder="<Random Skill>",
+            placeholder="&lt;random Skill&gt;",
         )
 
     if relational_reader.specification.sequel == 2:
@@ -2389,7 +2389,7 @@ def install_data_dependant_quantifiers(relational_reader: RelationalReader):
         table="PassiveSkills.dat64",
         index_column="PassiveSkillGraphId",
         convert_type="short",
-        placeholder="<Passive Skill>",
+        placeholder="&lt;random Passive Skill&gt;",
     )
 
     TranslationQuantifierHandler.init()
