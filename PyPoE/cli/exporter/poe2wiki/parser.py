@@ -1972,6 +1972,10 @@ def make_inter_wiki_links(string):
 _KEYWORD_LINK_MAP = {
     # Keyword:
     # ("visible text", "link")
+    "Abyssalify": [
+        ("Desecrate", "Desecrate"),
+        ("", "Desecrate"),
+    ],
     "Accuracy": [
         ("Accurate", "Accurate"),
     ],
@@ -1992,6 +1996,9 @@ _KEYWORD_LINK_MAP = {
         ("Ancestrally Boosted", "Ancestrally Boosted"),
         ("Ancestral Boost", "Ancestral Boost"),
     ],
+    "ArcaneSurge": [
+        ("Arcane Surge", "Arcane Surge"),
+    ],
     "ArmourBreak": [
         ("Armour Break", "Armour Break"),
         ("Armour Broken", "Armour Broken"),
@@ -2002,8 +2009,13 @@ _KEYWORD_LINK_MAP = {
         ("Fully Armour Broken", "Fully Armour Broken"),
         ("Fully Break", "Fully Break"),
         ("Fully Broken Armour", "Fully Broken Armour"),
+        ("Fully Breaking Armour", "Fully Breaking Armour"),
         ("Fully Broken", "Fully Broken"),
         ("Break", "Break"),
+    ],
+    "ArmouredShield": [
+        ("Armoured Shield", "Shield"),
+        ("", "Shield"),
     ],
     "ArtificersOrb": [
         ("Artificer's Orb", "Artificer's Orb"),
@@ -2017,6 +2029,9 @@ _KEYWORD_LINK_MAP = {
     ],
     "Bleeding": [
         ("Bleed", "Bleed"),
+    ],
+    "BloodLoss": [
+        ("Blood Loss", "Blood Loss"),
     ],
     "BooleanDamageRoll": [
         ("", "Damage"),
@@ -2105,7 +2120,11 @@ _KEYWORD_LINK_MAP = {
         ("Detonate", "Detonate"),
     ],
     "DistilledEmotion": [
-        ("Distilled Emotion", "Distilled Emotion"),
+        ("Liquid Emotion", "Liquid Emotion"),
+    ],
+    "DualWield": [
+        ("Dual Wielding", "Dual Wielding"),
+        ("", "Dual Wielding"),
     ],
     "EasyTargetDebuff": [
         ("Easy Target", "Easy Target"),
@@ -2113,6 +2132,7 @@ _KEYWORD_LINK_MAP = {
     "ElementalAilments": [
         ("Elemental Ailment", "Elemental Ailment"),
         ("Elemental ailment", "Elemental ailment"),
+        ("Ailment", "Elemental ailment"),
     ],
     "ElementalDamage": [
         ("Elemental Hit Damage", "Elemental Hit Damage"),
@@ -2120,6 +2140,16 @@ _KEYWORD_LINK_MAP = {
         ("Elemental damage", "Elemental damage"),
         ("Elemental", "Elemental"),
         ("", "Elemental"),
+    ],
+    "ElementalGround": [
+        ("Elemental Ground Surfaces", "Elemental Ground Surfaces"),
+        ("", "Ground effect"),
+    ],
+    "ElementalInfusion": [
+        ("Elemental Infusion", "Elemental Infusion"),
+        ("Infusion", "Infusion"),
+        ("Infused", "Infused"),
+        ("", "Infusion"),
     ],
     "Empowered": [
         ("Empower", "Empower"),
@@ -2130,6 +2160,9 @@ _KEYWORD_LINK_MAP = {
     "EnergyShieldLeech": [
         ("Energy Shield Leech", "Energy Shield Leech"),
         ("Leech", "Leech"),
+    ],
+    "EquipArmour": [
+        ("", "Armour (equipment)"),
     ],
     "ESRecharge": [
         ("Energy Shield Recharge", "Energy Shield Recharge"),
@@ -2179,6 +2212,7 @@ _KEYWORD_LINK_MAP = {
     ],
     "IceCrystals": [
         ("Ice Crystal", "Ice Crystal"),
+        ("", "Ice Crystal"),
     ],
     "Ignite": [
         ("Igniting", "Igniting"),
@@ -2191,6 +2225,9 @@ _KEYWORD_LINK_MAP = {
     ],
     "Invoke": [
         ("Invoking", "Invoking"),
+    ],
+    "ItemDefences": [
+        ("", "Defences"),
     ],
     "ItemRarity": [
         ("Normal", "Normal"),
@@ -2216,6 +2253,13 @@ _KEYWORD_LINK_MAP = {
         ("Life Leech", "Life Leech"),
         ("Leech", "Leech"),
     ],
+    "LifeLoss": [
+        ("", "Life Lose"),
+    ],
+    "LightStun": [
+        ("Light Stun", "Light Stun"),
+        ("", "Stun"),
+    ],
     "LowLife": [
         ("Low Life", "Low Life"),
     ],
@@ -2223,10 +2267,14 @@ _KEYWORD_LINK_MAP = {
         ("Mana Leech", "Mana Leech"),
         ("Leech", "Leech"),
     ],
+    "MarkofAbyssalLord": [
+        ("Mark of the Abyssal Lord", "Mark of the Abyssal Lord"),
+    ],
     "MartialWeapon": [
         ("Martial Weapon", "Martial Weapon"),
         ("Martial weapon", "Martial weapon"),
         ("martial weapon", "martial weapon"),
+        ("", "Martial Weapon"),
     ],
     "MaximumResistances": [
         ("Maximum Fire Resistance", "Maximum Fire Resistance"),
@@ -2235,6 +2283,10 @@ _KEYWORD_LINK_MAP = {
         ("Maximum Chaos Resistance", "Maximum Chaos Resistance"),
         ("Maximum Resistance", "Maximum Resistance"),
         ("", "Maximum Resistance"),
+    ],
+    "MonsterCategory": [
+        ("Monster category", "Monster category"),
+        ("", "Monster category"),
     ],
     "MonsterModifiers": [
         ("Modifier", "Modifier"),
@@ -2255,12 +2307,17 @@ _KEYWORD_LINK_MAP = {
     "OrbOfTransmutation": [
         ("Orb of Transmutation", "Orb of Transmutation"),
     ],
+    "OvercapChance": [
+        ("Overcap Chance", "Overcap Chance"),
+        ("", "Overcap chance"),
+    ],
     "OvercappedBlock": [
         ("", "Block"),
     ],
     "ParriedDebuff": [
         ("Parried Debuff", "Parried Debuff"),
         ("Parried", "Parried"),
+        ("", "Parried"),
     ],
     "Penetration": [
         ("Penetrate", "Penetrate"),
@@ -2281,6 +2338,12 @@ _KEYWORD_LINK_MAP = {
     ],
     "PrimedElectrocution": [
         ("Primed for Electrocution", "Primed for Electrocution"),
+    ],
+    "PrimedPin": [
+        ("Primed for Pinning", "Pinned"),
+    ],
+    "PrimedStun": [
+        ("Primed for Stun", "Primed for Stun"),
     ],
     "Quality": [
         ("Quality", "Quality"),
@@ -2354,6 +2417,7 @@ _KEYWORD_LINK_MAP = {
     ],
     "StatGain": [
         ("Gain", "Gain"),
+        ("", "Gain"),
     ],
     "StunThreshold": [
         ("Stun Threshold", "Stun Threshold"),
@@ -2362,11 +2426,21 @@ _KEYWORD_LINK_MAP = {
         ("Retaliate with Thorns", "Thorns"),
         ("", "Thorns"),
     ],
+    "TotalPlus": [
+        ("", "Total"),
+    ],
+    "UnboundFury": [
+        ("Unbound Fury", "Unbound Fury"),
+        ("", "Unbound Fury"),
+    ],
     "UnholyMight": [
         ("Unholy Might", "Unholy Might"),
+        ("", "Unholy Might"),
     ],
     "Warcry": [
+        ("Warcry", "Warcry"),
         ("Warcries", "Warcries"),
+        ("", "Warcry"),
     ],
     "WeaponSetPassiveSkillPoints": [
         ("Weapon Set Passive Skill Points", "Weapon Set Passive Skill Points"),
@@ -2374,59 +2448,67 @@ _KEYWORD_LINK_MAP = {
     ],
     "Wells": [
         ("Well", "Well"),
+        ("", "Well"),
     ],
     "Withered": [
         ("Withered", "Withered"),
         ("Wither", "Wither"),
+        ("", "Wither"),
+    ],
+    "WitheringGround": [
+        ("Withering Ground", "Withering Ground"),
+        ("", "Withering Ground"),
     ],
 }
 
 
 def process_keywords(text: str):
-    text = text.replace("\n", "<br>")
+    text = text.replace("\r\n", "<br>").replace("\n", "<br>")
 
     def replace_match(match):
         raw = match.group(1)
 
         # Handle pipe-form keywords: [keyword|visible text]
         if "|" in raw:
-            base, variant = raw.split("|", 1)
+            base, display = raw.split("|", 1)
 
             # If exact match, simple wrap
-            if base == variant:
-                return f"[[{variant}]]"
+            if base == display:
+                return f"[[{display}]]"
 
-            # Case: variant starts with base + suffix (e.g., "Remnant|Remnants")
-            if variant.startswith(base):
-                suffix = variant[len(base) :]
+            # Case: display starts with base + suffix (e.g., "Remnant|Remnants")
+            if display.startswith(base):
+                suffix = display[len(base) :]
                 if "'" not in suffix and " " not in suffix:
                     return f"[[{base}]]{suffix}"
 
             # Try using _KEYWORD_LINK_MAP
             if base in _KEYWORD_LINK_MAP:
-                for display, link in _KEYWORD_LINK_MAP[base]:
-                    if variant == link:
-                        return f"[[{variant}]]"
-                    elif display == "":
-                        return f"[[{link}|{variant}]]"
-                    elif variant.startswith(display):
-                        suffix = variant[len(display) :]
-                        if display == link and "'" not in suffix and " " not in suffix:
+                for variant, link in _KEYWORD_LINK_MAP[base]:
+                    if display == link:
+                        return f"[[{display}]]"
+                    elif variant == display:
+                        return f"[[{link}|{display}]]"
+                    elif variant == "":
+                        return f"[[{link}|{display}]]"
+                    elif display.startswith(variant):
+                        suffix = display[len(variant) :]
+                        if variant == link and "'" not in suffix and " " not in suffix:
                             return f"[[{link}]]{suffix}"
                         elif "" not in _KEYWORD_LINK_MAP[base][-1][1]:
-                            return f"[[{link}|{variant}]]"
+                            return f"[[{link}|{display}]]"
 
         # Default case: no pipe, regular keyword
         else:
             key = raw
             if key in _KEYWORD_LINK_MAP:
-                for display, link in _KEYWORD_LINK_MAP[key]:
+                for variant, link in _KEYWORD_LINK_MAP[key]:
                     if key == link:
                         return f"[[{key}]]"
-                    elif display == "":
+                    elif variant == "":
                         return f"[[{link}|{key}]]"
-                    elif display.startswith(key):
-                        suffix = display[len(key) :]
+                    elif variant.startswith(key):
+                        suffix = variant[len(key) :]
                         if "'" not in suffix and " " not in suffix:
                             return f"[[{link}|{key}]]"
 

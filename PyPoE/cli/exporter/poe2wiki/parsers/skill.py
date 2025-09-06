@@ -206,16 +206,7 @@ class SkillParserShared(parser.BaseParser):
         "BaseMultiplier",
     )
 
-    # def CostTypeHelper(d):
-    #     print('yep', d)
-    #     return d['Cost_TypesKeys']['Id']
-
     _SKILL_COLUMN_MAP = (
-        # ('ManaCost', {
-        #     'template': 'mana_cost',
-        #     'default': 0,
-        #     'format': lambda v: '{0:n}'.format(v),
-        # }),
         (
             "CostAmounts",
             {
@@ -223,15 +214,6 @@ class SkillParserShared(parser.BaseParser):
                 "default": [],
                 "condition": lambda v: v and v[0] is not None,
                 "format": lambda v: ",".join(map(str, v)),
-            },
-        ),
-        (
-            "CostTypes",
-            {
-                "template": "cost_types",
-                "default": [],
-                "condition": lambda v: v and v[0] is not None,
-                "format": lambda v: ",".join(r["Id"] for r in v),
             },
         ),
         (
@@ -515,16 +497,9 @@ class SkillParserShared(parser.BaseParser):
 
         act_skill = gra_eff["ActiveSkill"]
         if act_skill:
-            try:
-                base_skill_id = (
-                    act_skill["TransfigureBase"]["Id"]
-                    if act_skill["TransfigureBase"]
-                    else act_skill["Id"]
-                )
-                tf = self.tc[self.skill_stat_filter.skills[base_skill_id].translation_file_path]
-            except KeyError as e:
-                warnings.warn("Missing active skill in stat files: %s" % e.args[0])
-                tf = self.tc["skill_stat_descriptions.txt"]
+            file = act_skill["StatDescription"]
+            file = file.removeprefix("Metadata/StatDescriptions/").removesuffix("/") + ".txt"
+            tf = self.tc[file]
 
             if parsed_args.store_images and act_skill["Icon_DDSFile"]:
                 self._write_dds(
@@ -698,9 +673,27 @@ class SkillParserShared(parser.BaseParser):
         if act_skill:
             infobox["gem_description"] = process_keywords(act_skill["Description"])
             infobox["active_skill_name"] = act_skill["DisplayedName"]
-            # Need to get info from ActiveSkillWeaponRequirement.json and WieldableClasses.json
-            # if act_skill["WeaponRequirements"]:
-            #    infobox["item_class_id_restriction"] =
+
+            if act_skill["WeaponRequirements"]:
+                wieldable_classes = act_skill["WeaponRequirements"]["WieldableClasses"]
+                infobox["item_class_id_restriction"] = ", ".join(
+                    [wc["ItemClass"]["Id"] for wc in wieldable_classes]
+                )
+
+                # Text displayed in gem
+                reqiured_eq = ""
+                if act_skill["WeaponRequirements"]["String"]:
+                    reqiured_eq = act_skill["WeaponRequirements"]["String"]["Text"]
+                else:
+                    wieldable = []
+                    for wc in wieldable_classes:
+                        if wc["ItemClass"]["ItemClassCategory"]:
+                            wieldable.append(wc["ItemClass"]["ItemClassCategory"]["Text"])
+                        else:
+                            break
+                    reqiured_eq = ", ".join(wieldable)
+
+                infobox["equipment_requirement"] = process_keywords(reqiured_eq)
 
         # From Projectile.dat64 if available
         # TODO - remap
@@ -716,6 +709,11 @@ class SkillParserShared(parser.BaseParser):
 
         if not gra_eff["IsSupport"]:
             infobox["cast_time"] = gra_eff["CastTime"] / 1000
+
+        if len(gra_eff["CostTypes"]) > 0:
+            infobox["static_cost_types"] = ",".join(ct["Id"] for ct in gra_eff["CostTypes"])
+            # cost_types are static so no need for 'static_'?
+            # infobox["cost_types"] = ",".join(ct["Id"] for ct in gra_eff["CostTypes"])
 
         #
         # Quality stats
@@ -918,18 +916,11 @@ class SkillParserShared(parser.BaseParser):
 
         # Body
         for i, row in enumerate(level_data):
+            # Break for now (only up to lvl 20) TODO: Remove
+            if i == 20:
+                break
             prefix = "level%s" % (i + 1)
             infobox[prefix] = "True"
-
-            # Required levels per skill level (temporary)
-            req_lvl = [0, 3, 6, 10, 14, 18, 22, 26, 31, 36, 41, 46, 52, 58, 64, 66, 72, 78, 84, 90]
-
-            prefix += "_"
-            if act_skill:
-                if i < 20:
-                    infobox[prefix + "level_requirement"] = req_lvl[i]
-                else:
-                    infobox[prefix + "level_requirement"] = req_lvl[19]
 
             # Column handling
             for column, column_data in self._SKILL_COLUMN_MAP:
