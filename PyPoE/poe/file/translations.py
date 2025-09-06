@@ -148,8 +148,10 @@ __all__ = [
     "install_data_dependant_quantifiers",
 ]
 
-CUSTOM_TRANSLATION_FILE = os.path.join(DATA_DIR, "custom_descriptions.txt")
-HARDCODED_TRANSLATION_FILE = os.path.join(DATA_DIR, "hardcoded_descriptions.txt")
+CUSTOM_TRANSLATION_FILE = os.path.join(DATA_DIR, os.environ.get("WIKI"), "custom_descriptions.txt")
+HARDCODED_TRANSLATION_FILE = os.path.join(
+    DATA_DIR, os.environ.get("WIKI"), "hardcoded_descriptions.txt"
+)
 
 regex_translation_string = re.compile(
     r"^"

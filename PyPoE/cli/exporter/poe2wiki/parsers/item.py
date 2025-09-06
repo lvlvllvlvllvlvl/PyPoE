@@ -2343,10 +2343,8 @@ class ItemsParser(SkillParserShared):
             attrdic = OrderedDict()
             self._skill_temporary_attr(attrdic, base_item_type, skill_gem, gem_type)
 
-            console(f"{base_item_type["Name"]}", msg=Msg.error)
             for i in range(1, len(req_levels) + 1):
                 prefix = "level%s_" % (i)
-                console(f"{req_levels[i-1]["Level"]}", msg=Msg.error)
                 infobox[prefix + "level_requirement"] = req_levels[i - 1]["Level"]
 
                 for req in attrdic[i]:
