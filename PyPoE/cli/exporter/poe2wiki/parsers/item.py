@@ -542,6 +542,11 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/Gallows/Act2/SerpentClanCasterBossDrop": "Book of Specialisation",
         "Metadata/Items/QuestItems/Gallows/Act2/FinalLetterSkillBook": "Book of Specialisation",
         "Metadata/Items/QuestItems/Gallows/Act3/QuadrillaSkillBook": "Book of Specialisation",
+        "Metadata/Items/QuestItems/Gallows/Act4/BlindBeastSkillBook": "Book of Specialisation",
+        "Metadata/Items/QuestItems/Gallows/Interlude/FrozenPrisonerSkillBook": "Book of Specialisation",
+        "Metadata/Items/QuestItems/Gallows/Interlude/IceTusksSkillBook": "Book of Specialisation",
+        "Metadata/Items/QuestItems/Gallows/Interlude/InterludePart2SkillBook": "Book of Specialisation",
+        "Metadata/Items/QuestItems/Gallows/Interlude/InterludeFinalSkillBook": "Book of Specialisation",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric1": "Crystalline Core of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric3": "Crystalline Core of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric6": "Crystalline Core of Knowledge",
@@ -585,7 +590,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/Gallows/Act3/SnakeLadyPotionConsumable4": "Venom Draught of Stone",
         "Metadata/Items/QuestItems/Gallows/Act3/SnakeLadyPotionConsumable5": "Venom Draught of the Veil",
         "Metadata/Items/QuestItems/Gallows/Act3/SnakeLadyPotionConsumable6": "Venom Draught of Clarity",
-        "Metadata/Items/QuestItems/Gallows/Act4/BlindBeastSkillBook": "Book of Specialisation",
         # =================================================================
         # Misc
         # =================================================================
@@ -700,11 +704,14 @@ class ItemsParser(SkillParserShared):
             # =================================================================
             # Quest items
             # =================================================================
-            # "Metadata/Items/QuestItems/Gallows/Act1/CrowbellSkillBook": " (Crowbell)",
-            # "Metadata/Items/QuestItems/Gallows/Act1/UnaSkillBook": " (Una)",
-            # "Metadata/Items/QuestItems/Gallows/Act2/SerpentClanCasterBossDrop": " (Serpent)",
-            # "Metadata/Items/QuestItems/Gallows/Act2/FinalLetterSkillBook": " (Final Letter)",
-            # "Metadata/Items/QuestItems/Gallows/Act3/QuadrillaSkillBook": " (Quadrilla)",
+            "Metadata/Items/QuestItems/Gallows/Act1/CrowbellSkillBook": " (The Crowbell)",
+            "Metadata/Items/QuestItems/Gallows/Act1/UnaSkillBook": " (The Lost Lute)",
+            "Metadata/Items/QuestItems/Gallows/Act2/SerpentClanCasterBossDrop": " (Kabala, Constrictor Queen)",
+            "Metadata/Items/QuestItems/Gallows/Act2/FinalLetterSkillBook": " (Tradition's Toll)",
+            "Metadata/Items/QuestItems/Gallows/Act3/QuadrillaSkillBook": " (Mighty Silverfist)",
+            "Metadata/Items/QuestItems/Gallows/Interlude/IceTusksSkillBook": " (Howling Winds)",
+            "Metadata/Items/QuestItems/Gallows/Interlude/InterludePart2SkillBook": " (Clearing the Way)",
+            "Metadata/Items/QuestItems/Gallows/Interlude/InterludeFinalSkillBook": " (Interlude)",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDrop": "",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": " (Cruel)",
             # =================================================================
