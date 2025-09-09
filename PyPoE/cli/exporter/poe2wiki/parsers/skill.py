@@ -741,12 +741,14 @@ class SkillParserShared(parser.BaseParser):
                 values=[v / lowest for v in row["StatsValuesPermille"]],
                 full_result=True,
                 lang=config.get_option("language"),
+                restriction="gem_quality",
             )
             q40_tr = tf.get_translation(
                 tags=stat_ids,
                 values=[v / 25 for v in row["StatsValuesPermille"]],
                 full_result=True,
                 lang=config.get_option("language"),
+                restriction="gem_quality",
             )
 
             # Use the translation that shows the most values

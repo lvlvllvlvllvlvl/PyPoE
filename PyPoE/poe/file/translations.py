@@ -360,7 +360,9 @@ class TranslationLanguage(TranslationReprMixin):
             _diff_list(self.strings, other.strings)
 
     def get_string(
-        self, values: Union[List[int], List[Tuple[int, int]]]
+        self,
+        values: Union[List[int], List[Tuple[int, int]]],
+        restriction: Union[str, None],
     ) -> Tuple[Union["TranslationString", None], Union[List[bool], None], Union[List[int], None]]:
         """
         Formats the string according with the given values and returns the
@@ -371,6 +373,8 @@ class TranslationLanguage(TranslationReprMixin):
         ----------
         values
             A list of values to be used for substitution
+        restriction
+            Restriction to look for in translation lines
 
         Returns
         -------
@@ -405,8 +409,19 @@ class TranslationLanguage(TranslationReprMixin):
             #   raise Exception('mismatch %s' % ts.range)
 
             if ts.restrictions:
-                # only known restriction is 'table_only' which is not currently needed
-                continue
+                # only known restrictions are 'table_only' and 'gem_quality'
+                if restriction is None:
+                    continue
+
+                # Explicit handling of known restrictions
+                if restriction == "gem_quality":
+                    if "gem_quality" in ts.restrictions:
+                        pass
+                    else:
+                        # continue?? Not sure...
+                        pass
+                else:
+                    continue
 
             match = ts.match_range(test_values)
             temp.append((match, ts))
@@ -1837,6 +1852,7 @@ class TranslationFile(AbstractFileReadOnly):
         values: Union[Dict, List],
         full_result: Literal[True],
         lang: str | None = "English",
+        restriction: str = None,
         use_placeholder: Union[bool, Callable, None] = False,
     ) -> TranslationResult: ...
 
@@ -1847,6 +1863,7 @@ class TranslationFile(AbstractFileReadOnly):
         values: Union[Dict[str, StatValue], List[StatValue]],
         only_values: Literal[True],
         lang: str | None = "English",
+        restriction: str = None,
         use_placeholder: Union[bool, Callable, None] = False,
     ) -> Dict[str, Tuple[str, str]]: ...
 
@@ -1856,6 +1873,7 @@ class TranslationFile(AbstractFileReadOnly):
         tags: List[str],
         values: Union[Dict, List],
         lang: str | None = "English",
+        restriction: str = None,
         use_placeholder: Union[bool, Callable, None] = False,
     ) -> List[str]: ...
 
@@ -1864,6 +1882,7 @@ class TranslationFile(AbstractFileReadOnly):
         tags: List[str],
         values: Union[Dict[str, StatValue], List[StatValue]],
         lang: str = "English",
+        restriction: str = None,
         full_result: bool = False,
         use_placeholder: Union[bool, Callable] = False,
         only_values: bool = False,
@@ -1889,6 +1908,8 @@ class TranslationFile(AbstractFileReadOnly):
         lang
             Language to use. If it doesn't exist, English will be used as
             fallback.
+        restriction
+            Restriction to look for in translation lines
         full_result
             If true, a :class:`TranslationResult` object will  be returned
         use_placeholder
@@ -1981,7 +2002,7 @@ class TranslationFile(AbstractFileReadOnly):
         formatted_values = {}
         for i, tr in enumerate(trans_found):
             tl = tr.get_language(lang)
-            ts, short_values, is_range = tl.get_string(trans_found_values[i])
+            ts, short_values, is_range = tl.get_string(trans_found_values[i], restriction)
             if ts:
                 string_instances.append(ts)
                 result = ts.format_string(short_values, is_range, use_placeholder)

@@ -1187,7 +1187,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemExsanguinate",
         "Metadata/Items/Gems/SupportGemFerociousRoar",
         "Metadata/Items/Gems/SkillGemFuriousSlam",
-        "Metadata/Items/Gems/SkillGemGalvanicField",
         "Metadata/Items/Gem/SkillGemHydra",
         "Metadata/Items/Gems/SkillGemLightningStorm",
         "Metadata/Items/Gems/SkillGemBearMaul",
