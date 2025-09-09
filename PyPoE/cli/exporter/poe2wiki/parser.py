@@ -2012,6 +2012,7 @@ _KEYWORD_LINK_MAP = {
         ("Fully Breaking Armour", "Fully Breaking Armour"),
         ("Fully Broken", "Fully Broken"),
         ("Break", "Break"),
+        ("", "Armour Break"),
     ],
     "ArmouredShield": [
         ("Armoured Shield", "Shield"),

@@ -418,8 +418,7 @@ class TranslationLanguage(TranslationReprMixin):
                     if "gem_quality" in ts.restrictions:
                         pass
                     else:
-                        # continue?? Not sure...
-                        pass
+                        continue
                 else:
                     continue
 
@@ -439,6 +438,7 @@ class TranslationLanguage(TranslationReprMixin):
         values: Union[List[int], List[Tuple[int, int]]],
         use_placeholder: Union[bool, Callable[[int], Any]] = False,
         only_values: bool = False,
+        restriction: str = None,
     ) -> Tuple[Union[str, List[int]], List[int], List[int], Dict[str, str]]:
         """
         Formats the string according with the given values and
@@ -464,6 +464,8 @@ class TranslationLanguage(TranslationReprMixin):
             string to use as placeholder.
         only_values
             Whether to return formatted values instead of the formatted string.
+        restriction
+            Restriction to look for in translation lines
 
 
         Returns
@@ -471,7 +473,7 @@ class TranslationLanguage(TranslationReprMixin):
             Returns the formatted string. See
             :meth:`TranslationString:format_string` for details.
         """
-        ts, short_values, is_range = self.get_string(values)
+        ts, short_values, is_range = self.get_string(values, restriction)
 
         if ts is None:
             return None
