@@ -1999,6 +1999,10 @@ _KEYWORD_LINK_MAP = {
     "ArcaneSurge": [
         ("Arcane Surge", "Arcane Surge"),
     ],
+    "Archon": [
+        ("Archon", "Archon"),
+        ("", "Archon"),
+    ],
     "ArmourBreak": [
         ("Armour Break", "Armour Break"),
         ("Armour Broken", "Armour Broken"),
@@ -2066,6 +2070,9 @@ _KEYWORD_LINK_MAP = {
     "Conditional": [
         ("Condition", "Condition"),
     ],
+    "ConsecratedGround": [
+        ("Consecrated Ground", "Consecrated Ground"),
+    ],
     "ContainsDelirium": [
         ("Delirium", "Delirium"),
     ],
@@ -2077,8 +2084,9 @@ _KEYWORD_LINK_MAP = {
     "CorruptedBlood": [
         ("Corrupted Blood", "Corrupted Blood"),
     ],
-    "ConsecratedGround": [
-        ("Consecrated Ground", "Consecrated Ground"),
+    "Conversion": [
+        ("Conversion", "Conversion"),
+        ("", "Conversion"),
     ],
     "Critical": [
         ("Critical Hit Chance", "Critical Hit Chance"),
@@ -2190,6 +2198,10 @@ _KEYWORD_LINK_MAP = {
         ("Flask", "Flask"),
         ("flask", "flask"),
     ],
+    "FlameArchon": [
+        ("Flame Archon", "Flame Archon"),
+        ("", "Flame Archon"),
+    ],
     "ForksCrit": [
         ("", "Critical"),
     ],
@@ -2210,6 +2222,10 @@ _KEYWORD_LINK_MAP = {
         ("Hit Damage", "Hit Damage"),
         ("Hit", "Hit"),
         ("", "Hit"),
+    ],
+    "IceArchon": [
+        ("Ice Archon", "Ice Archon"),
+        ("", "Ice Archon"),
     ],
     "IceCrystals": [
         ("Ice Crystal", "Ice Crystal"),
@@ -2255,7 +2271,11 @@ _KEYWORD_LINK_MAP = {
         ("Leech", "Leech"),
     ],
     "LifeLoss": [
-        ("", "Life Lose"),
+        ("", "Life Loss"),
+    ],
+    "LightningArchon": [
+        ("Lightning Archon", "Lightning Archon"),
+        ("", "Lightning Archon"),
     ],
     "LightStun": [
         ("Light Stun", "Light Stun"),
@@ -2339,12 +2359,23 @@ _KEYWORD_LINK_MAP = {
     ],
     "PrimedElectrocution": [
         ("Primed for Electrocution", "Primed for Electrocution"),
+        ("", "Primed for Electrocution"),
+    ],
+    "PrimedFreeze": [
+        ("Primed for Electrocution", "Primed for Freeze"),
+        ("", "Primed for Freeze"),
     ],
     "PrimedPin": [
-        ("Primed for Pinning", "Pinned"),
+        ("Primed for Pin", "Primed for Pin"),
+        ("", "Primed for Pin"),
     ],
     "PrimedStun": [
         ("Primed for Stun", "Primed for Stun"),
+        ("", "Primed for Stun"),
+    ],
+    "PurpleFlamesOfChayula": [
+        ("Purple Flames of Chayul", "Purple Flames of Chayula"),
+        ("", "Purple Flames of Chayula"),
     ],
     "Quality": [
         ("Quality", "Quality"),
@@ -2387,6 +2418,14 @@ _KEYWORD_LINK_MAP = {
     ],
     "SkillSpeed": [
         ("Skill Speed", "Skill Speed"),
+    ],
+    "SoulEater": [
+        ("Soul Eater", "Soul Eater"),
+        ("", "Soul Eater"),
+    ],
+    "SoulEaterMonster": [
+        ("Soul Eater", "Soul Eater"),
+        ("", "Soul Eater"),
     ],
     "SpiritOfTheBearPossessedPlayer": [
         ("", "Azmerian wisp"),

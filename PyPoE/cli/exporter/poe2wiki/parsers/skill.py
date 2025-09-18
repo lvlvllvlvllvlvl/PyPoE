@@ -470,7 +470,15 @@ class SkillParserShared(parser.BaseParser):
             stat_order[stat] = -1
         return stats_output
 
-    def _skill(self, gra_eff, infobox: OrderedDict, parsed_args, max_level=None, msg_name=None):
+    def _skill(
+        self,
+        gra_eff,
+        infobox: OrderedDict,
+        parsed_args,
+        max_level=None,
+        msg_name=None,
+        skill_gem=None,
+    ):
         if msg_name is None:
             msg_name = gra_eff["Id"]
 
@@ -923,6 +931,66 @@ class SkillParserShared(parser.BaseParser):
                 break
             prefix = "level%s" % (i + 1)
             infobox[prefix] = "True"
+            prefix += "_"
+
+            if not gra_eff["IsSupport"]:
+                if "ItemExperienceType" not in self.rr["ItemExperiencePerLevel.dat64"].index:
+                    self.rr["ItemExperiencePerLevel.dat64"].build_index("ItemExperienceType")
+
+                try:
+                    req_levels = self.rr["ItemExperiencePerLevel.dat64"].index[
+                        "ItemExperienceType"
+                    ][skill_gem["ItemExperienceType"]]
+                except KeyError:
+                    return True
+
+                infobox[prefix + "level_requirement"] = req_levels[i]["Level"]
+
+                if skill_gem:
+                    # TODO:Remove:Do proper calculation (temporary)
+                    def _skill_temporary_attr(skill_gem, level):
+                        infobox = OrderedDict()
+                        _attribute_map = OrderedDict(
+                            (
+                                ("Str", "strength"),
+                                ("Dex", "dexterity"),
+                                ("Int", "intelligence"),
+                            )
+                        )
+                        # fmt: off
+                        ranges = {
+                            100: [
+                                0, 9, 14, 21, 28, 35, 41, 48, 57, 65,
+                                74, 82, 92, 103, 113, 116, 126, 137, 147, 157,
+                            ],
+                            75: [
+                                0, 8, 12, 17, 22, 28, 33, 38, 45, 51,
+                                58, 64, 72, 80, 88, 91, 98, 106, 114, 122,
+                            ],
+                            50: [
+                                0, 0, 9, 13, 17, 20, 24, 28, 32, 37,
+                                41, 46, 51, 57, 62, 64, 70, 75, 80, 86,
+                            ],
+                            25: [
+                                0, 0, 0, 9, 11, 13, 15, 17, 19, 22,
+                                24, 26, 29, 32, 35, 36, 39, 42, 45, 48,
+                            ],
+                        }
+                        # fmt: on
+
+                        for attr_short, attr_long in _attribute_map.items():
+                            if not skill_gem[attr_short]:
+                                continue
+
+                            if skill_gem[attr_short] in ranges:
+                                infobox[f"{attr_long}_requirement"] = ranges[skill_gem[attr_short]][
+                                    i
+                                ]
+
+                        return infobox
+
+                    for req, value in _skill_temporary_attr(skill_gem, i).items():
+                        infobox[prefix + req] = value
 
             # Column handling
             for column, column_data in self._SKILL_COLUMN_MAP:

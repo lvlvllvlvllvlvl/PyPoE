@@ -1717,7 +1717,7 @@ class TranslationFile(AbstractFileReadOnly):
                             ts_match.group("quantifier"),
                         )
 
-                    if not [s for s in tl.strings if not s.restrictions]:
+                    if not [s for s in tl.strings if not s.restrictions] and language == "English":
                         all_strings_restricted = True
                     offset = offset_next_lang
 

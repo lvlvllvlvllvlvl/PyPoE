@@ -428,8 +428,30 @@ class ItemsParser(SkillParserShared):
 
     _DROP_DISABLED_ITEMS_BY_ID = {}
 
+    # For some reason these items have different drop level in game and in BaseItemTypes.dat
+    _DROP_LEVEL_BY_ID = {
+        # =================================================================
+        # Amulets
+        # =================================================================
+        "Metadata/Items/Amulets/FourAmulet8": 22,
+        # =================================================================
+        # Sceptres
+        # =================================================================
+        "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre6a": 24,
+        "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre6b": 24,
+        "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre6c": 24,
+        "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptreUnique1": 24,
+    }
+
     _REQUIRED_LEVEL_BY_ID = {
+        # =================================================================
+        # Amulets
+        # =================================================================
         "Metadata/Items/Amulets/FourAmulet8": 24,
+        # =================================================================
+        # Staves
+        # =================================================================
+        "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff3": 1,
     }
 
     _FORCE_INVENTORY_ICON_BY_ID = {
@@ -483,7 +505,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemPurityOfIce": "Item",
         "Metadata/Items/Gems/SkillGemPurityOfLightning": "Item",
         "Metadata/Items/Gem/SkillGemShieldBlock": "Item",
-        "Metadata/Items/Gem/SkillGemScavengedPlating": "Item",
         "Metadata/Items/Gems/SkillGemSigilOfPower": "Item",
         "Metadata/Items/Gems/SkillGemSkeletalWarriorWeaponSkill": "Item",
         "Metadata/Items/Gem/SkillGemPlayerDefaultSpearThrow": "Item",
@@ -1170,6 +1191,7 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Skill Gems
         # =================================================================
+        "Metadata/Items/Gem/SkillGemAscendancyUnleash",  # beacuse have the same skill_id as staff one
         "Metadata/Items/Gem/SkillGemUnusable",
         "Metadata/Items/Gems/SkillGemSummonBeast",
         "Metadata/Items/Gems/SkillGemSummonSpectre",
@@ -1216,6 +1238,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gem/SkillGemIceFragments",
         "Metadata/Items/Gems/SkillGemGraveCommand",
         "Metadata/Items/Gems/SkillGemDarkTempest",
+        "Metadata/Items/Gems/SkillGemCastCurseOnBlock",
         # Weapon default attacks
         "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe",
         "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe",
@@ -2328,68 +2351,11 @@ class ItemsParser(SkillParserShared):
             parsed_args=self._parsed_args,
             msg_name=base_item_type["Name"],
             max_level=max_level,
+            skill_gem=skill_gem,
         )
 
         for k, v in primary.items():
             infobox[k] = v
-
-        # Requirements
-        if not ge["IsSupport"]:
-            if "ItemExperienceType" not in self.rr["ItemExperiencePerLevel.dat64"].index:
-                self.rr["ItemExperiencePerLevel.dat64"].build_index("ItemExperienceType")
-
-            try:
-                req_levels = self.rr["ItemExperiencePerLevel.dat64"].index["ItemExperienceType"][
-                    skill_gem["ItemExperienceType"]
-                ]
-            except KeyError:
-                return True
-
-            # TODO:Remove:Do proper calculation (temporary)
-            attrdic = OrderedDict()
-            self._skill_temporary_attr(attrdic, base_item_type, skill_gem, gem_type)
-
-            for i in range(1, len(req_levels) + 1):
-                prefix = "level%s_" % (i)
-                infobox[prefix + "level_requirement"] = req_levels[i - 1]["Level"]
-
-                for req in attrdic[i]:
-                    infobox[req[0]] = req[1]
-
-        return True
-
-    # TODO:Remove:Do proper calculation (temporary)
-    def _skill_temporary_attr(self, infobox: OrderedDict, base_item_type, skill_gem, gem_type):
-        # fmt: off
-        ranges = {
-            100: [
-                0, 9, 14, 21, 28, 35, 41, 48, 57, 65,
-                74, 82, 92, 103, 113, 116, 126, 137, 147, 157,
-            ],
-            75: [
-                0, 8, 12, 17, 22, 28, 33, 38, 45, 51,
-                58, 64, 72, 80, 88, 91, 98, 106, 114, 122,
-            ],
-            50: [
-                0, 0, 9, 13, 17, 20, 24, 28, 32, 37,
-                41, 46, 51, 57, 62, 64, 70, 75, 80, 86,
-            ],
-            25: [
-                0, 0, 0, 9, 11, 13, 15, 17, 19, 22,
-                24, 26, 29, 32, 35, 36, 39, 42, 45, 48,
-            ],
-        }
-        # fmt: on
-
-        for i in range(1, 21):
-            infobox[i] = []
-            for attr_short, attr_long in self._attribute_map.items():
-                if not skill_gem[attr_short]:
-                    continue
-
-                parameter = f"level{str(i)}_{attr_long}_requirement"
-                if skill_gem[attr_short] in ranges:
-                    infobox[i].append((parameter, ranges[skill_gem[attr_short]][i - 1]))
 
         return True
 
@@ -2428,7 +2394,6 @@ class ItemsParser(SkillParserShared):
 
     def _type_level(self, infobox, base_item_type):
         if base_item_type["Id"] in self._REQUIRED_LEVEL_BY_ID:
-            infobox["drop_level"] = self._REQUIRED_LEVEL_BY_ID[base_item_type["Id"]]
             infobox["required_level"] = self._REQUIRED_LEVEL_BY_ID[base_item_type["Id"]]
         else:
             infobox["required_level"] = base_item_type["DropLevel"]
@@ -3010,9 +2975,9 @@ class ItemsParser(SkillParserShared):
             target = process_keywords(mod["TargetItemCategory"]["Text"])
             desc = mod["Text"]
 
-            # Extract from Mod1 or Mod2 if no explicit text
+            # Extract from Mod or DisplayMod if no explicit text
             if not desc:
-                for mod_key in ("Mod1", "Mod2"):
+                for mod_key in ("Mod", "DisplayMod"):
                     if mod[mod_key]:
                         stats = self._get_stats(mod=mod[mod_key])
                         desc = "<br>".join(stats)
@@ -3442,7 +3407,10 @@ class ItemsParser(SkillParserShared):
             )
 
         if base_item_type["ItemClassesKey"]["Id"] not in self._IGNORE_DROP_LEVEL_CLASSES:
-            infobox["drop_level"] = base_item_type["DropLevel"]
+            if base_item_type["Id"] in self._DROP_LEVEL_BY_ID:
+                infobox["drop_level"] = self._DROP_LEVEL_BY_ID[base_item_type["Id"]]
+            else:
+                infobox["drop_level"] = base_item_type["DropLevel"]
 
         base_ot = ITFile(parent_or_file_system=self.file_system)
         base_ot.read(self.file_system.get_file(base_item_type["InheritsFrom"] + ".it"))
@@ -3477,7 +3445,7 @@ class ItemsParser(SkillParserShared):
                 )
             )
 
-        # TODO: unnote when modifiers will be done
+        # TODO:Remove: Unnote when modifiers will be done/exported
         # for i, mod in enumerate(base_item_type["Implicit_Mods"]):
         #    infobox["implicit%s" % (i + 1)] = mod["Id"]
 
@@ -3502,7 +3470,8 @@ class ItemsParser(SkillParserShared):
             infobox["name"] = name
         if appendix is not None:
             name += appendix
-            infobox["inventory_icon"] = name
+            if appendix != "":
+                infobox["inventory_icon"] = name
         elif appendix_2 is not None:
             name += appendix_2
         else:
