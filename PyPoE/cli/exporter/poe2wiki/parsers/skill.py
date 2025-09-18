@@ -33,6 +33,7 @@ See PyPoE/LICENSE
 
 # Python
 import os
+import posixpath
 import traceback
 import warnings
 from collections import OrderedDict, defaultdict
@@ -510,8 +511,17 @@ class SkillParserShared(parser.BaseParser):
             tf = self.tc[file]
 
             if parsed_args.store_images and act_skill["Icon_DDSFile"]:
+                file_path = act_skill["Icon_DDSFile"]
+                file_path_4k = posixpath.join(
+                    posixpath.dirname(file_path), "4k", posixpath.basename(file_path)
+                )
+                try:
+                    data = self.file_system.get_file(file_path_4k)
+                except FileNotFoundError:
+                    data = self.file_system.get_file(file_path)
+
                 self._write_dds(
-                    data=self.file_system.get_file(act_skill["Icon_DDSFile"]),
+                    data=data,
                     out_path=os.path.join(self._img_path, "%s skill icon.dds" % msg_name),
                     parsed_args=parsed_args,
                 )
