@@ -519,6 +519,10 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemVileDisruption": "Item",
         "Metadata/Items/Gems/SkillGemScatteringCalamity": "Item",
         "Metadata/Items/Gems/SkillGemHisWinnowingFlame": "Item",
+        "Metadata/Items/Gem/SkillGemSpellslinger": "Item",
+        "Metadata/Items/Gem/SkillGemGeminiSurge": "Item",
+        "Metadata/Items/Gems/SkillGemValakosCharge": "Item",
+        "Metadata/Items/Gem/SkillGemPhantasmalArrow": "Item",
         # Weapon default attacks
         "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe": "Item",
         "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe": "Item",
@@ -1191,7 +1195,7 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Skill Gems
         # =================================================================
-        "Metadata/Items/Gem/SkillGemAscendancyUnleash",  # beacuse have the same skill_id as staff one
+        "Metadata/Items/Gem/SkillGemAscendancyUnleash",  # because have the same skill_id as staff one
         "Metadata/Items/Gem/SkillGemUnusable",
         "Metadata/Items/Gems/SkillGemSummonBeast",
         "Metadata/Items/Gems/SkillGemSummonSpectre",
@@ -3267,7 +3271,10 @@ class ItemsParser(SkillParserShared):
         # Map fragments from Act 4
         if qid.startswith("Act4/MapFragment"):
             qid = qid[-1]
-            return f"{base_item_type["Name"]} ({qid} of 4)"
+            return "%s (%s)" % (
+                base_item_type["Name"],
+                self._LANG[language]["of"] % (qid, 4),
+            )
 
         return
 

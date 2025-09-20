@@ -1978,12 +1978,15 @@ _KEYWORD_LINK_MAP = {
     ],
     "Accuracy": [
         ("Accurate", "Accurate"),
+        ("", "Accurate"),
     ],
     "Ailments": [
         ("Ailment", "Ailment"),
+        ("", "Ailment"),
     ],
     "AilmentSpread": [
         ("Spread", "Spread"),
+        ("", "Spread"),
     ],
     "AilmentThreshold": [
         ("Ailment Threshold", "Ailment Threshold"),
@@ -1991,13 +1994,16 @@ _KEYWORD_LINK_MAP = {
     ],
     "Allies": [
         ("Allied", "Allied"),
+        ("", "Allied"),
     ],
     "AncestralBoost": [
         ("Ancestrally Boosted", "Ancestrally Boosted"),
         ("Ancestral Boost", "Ancestral Boost"),
+        ("", "Ancestral Boost"),
     ],
     "ArcaneSurge": [
         ("Arcane Surge", "Arcane Surge"),
+        ("", "Arcane Surge"),
     ],
     "Archon": [
         ("Archon", "Archon"),
@@ -2024,57 +2030,75 @@ _KEYWORD_LINK_MAP = {
     ],
     "ArtificersOrb": [
         ("Artificer's Orb", "Artificer's Orb"),
+        ("", "Artificer's Orb"),
     ],
     "Attributes": [
         ("Attribute", "Attribute"),
         ("attribute", "attribute"),
+        ("", "Attribute"),
     ],
     "AzmeriSpirit": [
         ("Azmeri Spirit", "Azmeri Spirit"),
+        ("", "Azmeri Spirit"),
     ],
     "Bleeding": [
         ("Bleed", "Bleed"),
+        ("", "Bleed"),
     ],
     "BloodLoss": [
         ("Blood Loss", "Blood Loss"),
+        ("", "Blood Loss"),
     ],
     "BooleanDamageRoll": [
         ("", "Damage"),
+    ],
+    "BrokenStance": [
+        ("Broken Stance", "Broken Stance"),
+        ("", "Broken Stance"),
     ],
     "BuffEffect": [
         ("", "Buff"),
     ],
     "BuffMagnitude": [
         ("Magnitude", "Magnitude"),
+        ("", "Magnitude"),
     ],
     "Burning": [
         ("Burn", "Burn"),
+        ("", "Burn"),
     ],
     "Channelling": [
         ("Channelled", "Channelled"),
         ("Channelling", "Channelling"),
         ("Channel", "Channelling"),
+        ("", "Channelling"),
     ],
     "ChaosOrb": [
         ("ChaosOrb", "Chaos Orb"),
+        ("", "Chaos Orb"),
     ],
     "Charges": [
         ("Power Charge", "Power Charge"),
         ("Frenzy Charge", "Frenzy Charge"),
         ("Endurance Charge", "Endurance Charge"),
         ("Charge", "Charge"),
+        ("", "Charge"),
     ],
     "ChilledGround": [
         ("Chilled Ground", "Chilled Ground"),
+        ("", "Chilled Ground"),
     ],
     "Conditional": [
         ("Condition", "Condition"),
+        ("", "Condition"),
     ],
     "ConsecratedGround": [
         ("Consecrated Ground", "Consecrated Ground"),
+        ("", "Consecrated Ground"),
     ],
     "ContainsDelirium": [
         ("Delirium", "Delirium"),
+        ("", "Delirium"),
     ],
     "CooldownRecovery": [
         ("Cooldown Recovery Rate", "Cooldown Recovery Rate"),
@@ -2083,6 +2107,7 @@ _KEYWORD_LINK_MAP = {
     ],
     "CorruptedBlood": [
         ("Corrupted Blood", "Corrupted Blood"),
+        ("", "Corrupted Blood"),
     ],
     "Conversion": [
         ("Conversion", "Conversion"),
@@ -2095,15 +2120,19 @@ _KEYWORD_LINK_MAP = {
         ("Critical Hit", "Critical Hit"),
         ("Critical hit", "Critical hit"),
         ("Critical", "Critical"),
+        ("", "Critical"),
     ],
     "CriticalDamageBonus": [
         ("Critical Damage Bonus", "Critical Damage Bonus"),
+        ("", "Critical Damage Bonus"),
     ],
     "CriticalWeakness": [
         ("Critical Weakness", "Critical Weakness"),
+        ("", "Critical Weakness"),
     ],
     "CrushingBlow": [
         ("Crushing Blow", "Crushing Blow"),
+        ("", "Crushing Blow"),
     ],
     "CullingStrike": [
         ("Culling Strike", "Culling Strike"),
@@ -2122,14 +2151,17 @@ _KEYWORD_LINK_MAP = {
     ],
     "Defences": [
         ("Defence", "Defence"),
+        ("", "Defence"),
     ],
     "DetonationTime": [
         ("Detonation Time", "Detonation Time"),
         ("Detonation", "Detonation"),
         ("Detonate", "Detonate"),
+        ("", "Detonate"),
     ],
     "DistilledEmotion": [
         ("Liquid Emotion", "Liquid Emotion"),
+        ("", "Liquid Emotion"),
     ],
     "DualWield": [
         ("Dual Wielding", "Dual Wielding"),
@@ -2137,11 +2169,13 @@ _KEYWORD_LINK_MAP = {
     ],
     "EasyTargetDebuff": [
         ("Easy Target", "Easy Target"),
+        ("", "Easy Target"),
     ],
     "ElementalAilments": [
         ("Elemental Ailment", "Elemental Ailment"),
         ("Elemental ailment", "Elemental ailment"),
         ("Ailment", "Elemental ailment"),
+        ("", "Elemental ailment"),
     ],
     "ElementalDamage": [
         ("Elemental Hit Damage", "Elemental Hit Damage"),
@@ -2162,13 +2196,16 @@ _KEYWORD_LINK_MAP = {
     ],
     "Empowered": [
         ("Empower", "Empower"),
+        ("", "Empower"),
     ],
     "EnergyShield": [
         ("Energy Shield", "Energy Shield"),
+        ("", "Energy Shield"),
     ],
     "EnergyShieldLeech": [
         ("Energy Shield Leech", "Energy Shield Leech"),
         ("Leech", "Leech"),
+        ("", "Leech"),
     ],
     "EquipArmour": [
         ("", "Armour (equipment)"),
@@ -2193,10 +2230,12 @@ _KEYWORD_LINK_MAP = {
     ],
     "FinalStrike": [
         ("Final Strike", "Final Strike"),
+        ("", "Final Strike"),
     ],
     "Flask": [
         ("Flask", "Flask"),
         ("flask", "flask"),
+        ("", "Flask"),
     ],
     "FlameArchon": [
         ("Flame Archon", "Flame Archon"),
@@ -2207,14 +2246,17 @@ _KEYWORD_LINK_MAP = {
     ],
     "Freeze": [
         ("Freezing", "Freezing"),
+        ("", "Freeze"),
     ],
     "HeavyStun": [
         ("Heavily Stun", "Heavily Stun"),
         ("Heavy Stun", "Heavy Stun"),
+        ("", "Heavy Stun"),
     ],
     "HeavyStunPlayer": [
         ("Heavily Stun", "Heavily Stun"),
         ("Heavy Stun", "Heavy Stun"),
+        ("", "Heavy Stun"),
     ],
     "HitDamage": [
         ("Damaging Hit", "Damaging Hit"),
@@ -2233,15 +2275,18 @@ _KEYWORD_LINK_MAP = {
     ],
     "Ignite": [
         ("Igniting", "Igniting"),
+        ("", "Ignite"),
     ],
     "IgnitedGround": [
         ("Ignited Ground", "Ignited Ground"),
+        ("", "Ignited Ground"),
     ],
     "IgnoreResistances": [
         ("", "Resistance"),
     ],
     "Invoke": [
         ("Invoking", "Invoking"),
+        ("", "Invoke"),
     ],
     "ItemDefences": [
         ("", "Defences"),
@@ -2255,10 +2300,12 @@ _KEYWORD_LINK_MAP = {
     ],
     "JaggedGround": [
         ("Jagged Ground", "Jagged Ground"),
+        ("", "Jagged Ground"),
     ],
     "KillingBlow": [
         ("Killing Blow", "Killing Blow"),
         ("Kill", "Kill"),
+        ("", "Kill"),
     ],
     "Knockback": [
         ("Knocking Back", "Knocking Back"),
@@ -2269,6 +2316,7 @@ _KEYWORD_LINK_MAP = {
     "LifeLeech": [
         ("Life Leech", "Life Leech"),
         ("Leech", "Leech"),
+        ("", "Leech"),
     ],
     "LifeLoss": [
         ("", "Life Loss"),
@@ -2283,13 +2331,16 @@ _KEYWORD_LINK_MAP = {
     ],
     "LowLife": [
         ("Low Life", "Low Life"),
+        ("", "Low Life"),
     ],
     "ManaLeech": [
         ("Mana Leech", "Mana Leech"),
         ("Leech", "Leech"),
+        ("", "Leech"),
     ],
     "MarkofAbyssalLord": [
         ("Mark of the Abyssal Lord", "Mark of the Abyssal Lord"),
+        ("", "Mark of the Abyssal Lord"),
     ],
     "MartialWeapon": [
         ("Martial Weapon", "Martial Weapon"),
@@ -2305,12 +2356,14 @@ _KEYWORD_LINK_MAP = {
         ("Maximum Resistance", "Maximum Resistance"),
         ("", "Maximum Resistance"),
     ],
+    "MinionDeath": [("", "Minion death")],
     "MonsterCategory": [
         ("Monster category", "Monster category"),
         ("", "Monster category"),
     ],
     "MonsterModifiers": [
         ("Modifier", "Modifier"),
+        ("", "Modifier"),
     ],
     "NonDamagingAilments": [
         ("Non-Damaging Ailment", "Non-Damaging Ailment"),
@@ -2318,15 +2371,19 @@ _KEYWORD_LINK_MAP = {
     ],
     "OrbOfAlchemy": [
         ("Orb of Alchemy", "Orb of Alchemy"),
+        ("", "Orb of Alchemy"),
     ],
     "OrbOfAlteration": [
         ("Orb of Alteration", "Orb of Alteration"),
+        ("", "Orb of Alteration"),
     ],
     "OrbOfChance": [
         ("Orb of Chance", "Orb of Chance"),
+        ("", "Orb of Chance"),
     ],
     "OrbOfTransmutation": [
         ("Orb of Transmutation", "Orb of Transmutation"),
+        ("", "Orb of Transmutation"),
     ],
     "OvercapChance": [
         ("Overcap Chance", "Overcap Chance"),
@@ -2342,6 +2399,7 @@ _KEYWORD_LINK_MAP = {
     ],
     "Penetration": [
         ("Penetrate", "Penetrate"),
+        ("", "Penetrate"),
     ],
     "PerfectionBuff": [
         ("Perfection Buff", "Perfection Buff"),
@@ -2350,9 +2408,11 @@ _KEYWORD_LINK_MAP = {
     "PerfectTiming": [
         ("Perfect Timing", "Perfect Timing"),
         ("Perfectly Timing", "Perfectly Timing"),
+        ("", "Perfectly Timing"),
     ],
     "Physical": [
         ("Physical Damage", "Physical Damage"),
+        ("", "Physical Damage"),
     ],
     "PlayerPossessed": [
         ("", "Azmerian wisp"),
@@ -2380,6 +2440,7 @@ _KEYWORD_LINK_MAP = {
     "Quality": [
         ("Quality", "Quality"),
         ("quality", "quality"),
+        ("", "Quality"),
     ],
     "Rarity": [
         ("Normal", "Normal"),
@@ -2390,6 +2451,7 @@ _KEYWORD_LINK_MAP = {
     ],
     "RegalOrb": [
         ("Regal Orb", "Regal Orb"),
+        ("", "Regal Orb"),
     ],
     "Resistances": [
         ("Fire Resistance", "Fire Resistance"),
@@ -2397,27 +2459,34 @@ _KEYWORD_LINK_MAP = {
         ("Lightning Resistance", "Lightning Resistance"),
         ("Chaos Resistance", "Chaos Resistance"),
         ("Resistance", "Resistance"),
+        ("", "Resistance"),
     ],
     "ResistedBy": [
         ("", "Resistance"),
     ],
     "Resonance": [
         ("Resonance", "Resonance (buff)"),
+        ("", "Resonance (buff)"),
     ],
     "Reviving": [
         ("Revived", "Revived"),
+        ("", "Revived"),
     ],
     "RogueExile": [
         ("Rogue Exile", "Rogue Exile"),
+        ("", "Rogue Exile"),
     ],
     "RunicInscription": [
         ("Runic Inscriptions", "Runic Inscriptions"),
+        ("", "Runic Inscriptions"),
     ],
     "ShockedGround": [
         ("Shocked Ground", "Shocked Ground"),
+        ("", "Shocked Ground"),
     ],
     "SkillSpeed": [
         ("Skill Speed", "Skill Speed"),
+        ("", "Skill Speed"),
     ],
     "SoulEater": [
         ("Soul Eater", "Soul Eater"),
@@ -2461,6 +2530,7 @@ _KEYWORD_LINK_MAP = {
     ],
     "StunThreshold": [
         ("Stun Threshold", "Stun Threshold"),
+        ("", "Stun Threshold"),
     ],
     "ThornsRetaliation": [
         ("Retaliate with Thorns", "Thorns"),
