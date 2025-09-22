@@ -1977,10 +1977,12 @@ _KEYWORD_LINK_MAP = {
         ("", "Desecrate"),
     ],
     "Accuracy": [
+        ("Accuracy", "Accuracy"),
         ("Accurate", "Accurate"),
-        ("", "Accurate"),
+        ("", "Accuracy"),
     ],
     "Ailments": [
+        ("Ailments", "Ailments"),
         ("Ailment", "Ailment"),
         ("", "Ailment"),
     ],
@@ -1993,8 +1995,9 @@ _KEYWORD_LINK_MAP = {
         ("", "Ailment"),
     ],
     "Allies": [
+        ("Allies", "Allies"),
         ("Allied", "Allied"),
-        ("", "Allied"),
+        ("", "Allies"),
     ],
     "AncestralBoost": [
         ("Ancestrally Boosted", "Ancestrally Boosted"),
@@ -2033,6 +2036,8 @@ _KEYWORD_LINK_MAP = {
         ("", "Artificer's Orb"),
     ],
     "Attributes": [
+        ("Attributes", "Attributes"),
+        ("attributes", "attributes"),
         ("Attribute", "Attribute"),
         ("attribute", "attribute"),
         ("", "Attribute"),
@@ -2042,6 +2047,7 @@ _KEYWORD_LINK_MAP = {
         ("", "Azmeri Spirit"),
     ],
     "Bleeding": [
+        ("Bleeding", "Bleeding"),
         ("Bleed", "Bleed"),
         ("", "Bleed"),
     ],
@@ -2195,6 +2201,7 @@ _KEYWORD_LINK_MAP = {
         ("", "Infusion"),
     ],
     "Empowered": [
+        ("Empowered", "Empowered"),
         ("Empower", "Empower"),
         ("", "Empower"),
     ],
@@ -2222,6 +2229,9 @@ _KEYWORD_LINK_MAP = {
         ("Evasion Rating", "Evasion Rating"),
         ("", "Evasion"),
     ],
+    "ExpectedKnockback": [
+        ("", "Knockback"),
+    ],
     "Exposure": [
         ("", "Exposure"),
     ],
@@ -2240,6 +2250,13 @@ _KEYWORD_LINK_MAP = {
     "FlameArchon": [
         ("Flame Archon", "Flame Archon"),
         ("", "Flame Archon"),
+    ],
+    "FlamesOfChayula": [
+        ("Flames Of Chayula", "Flames Of Chayula"),
+        ("Flames of Chayula", "Flames of Chayula"),
+        ("Flame Of Chayula", "Flame Of Chayula"),
+        ("Flame of Chayula", "Flame of Chayula"),
+        ("", "Flame Of Chayula"),
     ],
     "ForksCrit": [
         ("", "Critical"),
@@ -2272,6 +2289,10 @@ _KEYWORD_LINK_MAP = {
     "IceCrystals": [
         ("Ice Crystal", "Ice Crystal"),
         ("", "Ice Crystal"),
+    ],
+    "IceFragment": [
+        ("Ice Fragment", "Ice Fragment"),
+        ("", "Ice Fragment"),
     ],
     "Ignite": [
         ("Igniting", "Igniting"),
@@ -2321,6 +2342,11 @@ _KEYWORD_LINK_MAP = {
     "LifeLoss": [
         ("", "Life Loss"),
     ],
+    "LightningAilment": [
+        ("Lightning Ailment", "Lightning Ailment"),
+        ("Lightning ailment", "Lightning ailment"),
+        ("", "Lightning Ailment"),
+    ],
     "LightningArchon": [
         ("Lightning Archon", "Lightning Archon"),
         ("", "Lightning Archon"),
@@ -2356,7 +2382,13 @@ _KEYWORD_LINK_MAP = {
         ("Maximum Resistance", "Maximum Resistance"),
         ("", "Maximum Resistance"),
     ],
-    "MinionDeath": [("", "Minion death")],
+    "MinionDeath": [
+        ("", "Minion death"),
+    ],
+    "MoltenFissure": [
+        ("Molten Fissure", "Molten Fissure"),
+        ("", "Molten Fissure"),
+    ],
     "MonsterCategory": [
         ("Monster category", "Monster category"),
         ("", "Monster category"),
@@ -2368,6 +2400,10 @@ _KEYWORD_LINK_MAP = {
     "NonDamagingAilments": [
         ("Non-Damaging Ailment", "Non-Damaging Ailment"),
         ("", "Ailment"),
+    ],
+    "OilGround": [
+        ("Oil Ground", "Oil Ground"),
+        ("", "Oil Ground"),
     ],
     "OrbOfAlchemy": [
         ("Orb of Alchemy", "Orb of Alchemy"),
@@ -2411,11 +2447,19 @@ _KEYWORD_LINK_MAP = {
         ("", "Perfectly Timing"),
     ],
     "Physical": [
+        ("Physical", "Physical"),
         ("Physical Damage", "Physical Damage"),
-        ("", "Physical Damage"),
+        ("", "Physical"),
     ],
     "PlayerPossessed": [
         ("", "Azmerian wisp"),
+    ],
+    "PrecursorTablet": [
+        ("Precursor Tablets", "Precursor Tablets"),
+        ("Precursor tablets", "Precursor tablets"),
+        ("Precursor Tablet", "Precursor Tablet"),
+        ("Precursor tablet", "Precursor tablet"),
+        ("", "Precursor tablet"),
     ],
     "PrimedElectrocution": [
         ("Primed for Electrocution", "Primed for Electrocution"),
@@ -2441,6 +2485,11 @@ _KEYWORD_LINK_MAP = {
         ("Quality", "Quality"),
         ("quality", "quality"),
         ("", "Quality"),
+    ],
+    "RageLeech": [
+        ("Leech Rage", "Leech Rage"),
+        ("Leech", "Leech"),
+        ("", "Leech"),
     ],
     "Rarity": [
         ("Normal", "Normal"),
@@ -2469,8 +2518,13 @@ _KEYWORD_LINK_MAP = {
         ("", "Resonance (buff)"),
     ],
     "Reviving": [
+        ("Reviving", "Reviving"),
         ("Revived", "Revived"),
         ("", "Revived"),
+    ],
+    "RivenArmour": [
+        ("Riven Armour", "Riven Armour"),
+        ("", "Riven Armour"),
     ],
     "RogueExile": [
         ("Rogue Exile", "Rogue Exile"),
@@ -2532,6 +2586,10 @@ _KEYWORD_LINK_MAP = {
         ("Stun Threshold", "Stun Threshold"),
         ("", "Stun Threshold"),
     ],
+    "SunderedArmour": [
+        ("Sundered Armour", "Sundered Armour"),
+        ("", "Sundered Armour"),
+    ],
     "ThornsRetaliation": [
         ("Retaliate with Thorns", "Thorns"),
         ("", "Thorns"),
@@ -2555,6 +2613,11 @@ _KEYWORD_LINK_MAP = {
     "WeaponSetPassiveSkillPoints": [
         ("Weapon Set Passive Skill Points", "Weapon Set Passive Skill Points"),
         ("", "Weapon set#Weapon set passive skill points"),
+    ],
+    "WeaponSets": [
+        ("Weapon Sets", "Weapon Sets"),
+        ("Weapon Set", "Weapon Set"),
+        ("", "Weapon Set"),
     ],
     "Wells": [
         ("Well", "Well"),
@@ -2607,6 +2670,8 @@ def process_keywords(text: str):
                             return f"[[{link}]]{suffix}"
                         elif "" not in _KEYWORD_LINK_MAP[base][-1][1]:
                             return f"[[{link}|{display}]]"
+            else:
+                console(f"Missing keyword handling for: {raw}", msg=Msg.error)
 
         # Default case: no pipe, regular keyword
         else:

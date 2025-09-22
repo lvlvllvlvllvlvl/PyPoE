@@ -486,6 +486,10 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gem/SkillGemAscendancyTimeSnap": "Ascendancy",
         "Metadata/Items/Gem/SkillGemAscendancyUnboundAvatar": "Ascendancy",
         "Metadata/Items/Gem/SkillGemAscendancyUnleash": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemTriggeredAbyssalApparition": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendanyMetaDeadeyeMarks": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyInevitableAgony": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyTemperWeapon": "Ascendancy",
         # Item granted
         "Metadata/Items/Gem/SkillGemBoneBlast": "Item",
         "Metadata/Items/Gems/SkillGemCastOnBlock": "Item",
@@ -519,10 +523,19 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemVileDisruption": "Item",
         "Metadata/Items/Gems/SkillGemScatteringCalamity": "Item",
         "Metadata/Items/Gems/SkillGemHisWinnowingFlame": "Item",
+        "Metadata/Items/Gem/SkillGemCrossbowRequiem": "Item",
         "Metadata/Items/Gem/SkillGemSpellslinger": "Item",
         "Metadata/Items/Gem/SkillGemGeminiSurge": "Item",
         "Metadata/Items/Gems/SkillGemValakosCharge": "Item",
         "Metadata/Items/Gem/SkillGemPhantasmalArrow": "Item",
+        "Metadata/Items/Gems/SkillGemCracklingPalm": "Item",
+        "Metadata/Items/Gems/SkillGemEnervatingNova": "Item",
+        "Metadata/Items/Gem/SkillGemFeastOfFlesh": "Item",
+        "Metadata/Items/Gem/SkillGemFulmination": "Item",
+        "Metadata/Items/Gems/SkillGemFuturePast": "Item",
+        "Metadata/Items/Gems/SkillGemGalvanicField": "Item",
+        "Metadata/Items/Gems/SkillGemImpurity": "Item",
+        "Metadata/Items/Gem/SkillGemPinnacleOfPower": "Item",
         # Weapon default attacks
         "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe": "Item",
         "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe": "Item",
@@ -618,7 +631,6 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Misc
         # =================================================================
-        "Metadata/Items/Gems/SkillGemUncutQuest": "Uncut Skill Gem",
         "Metadata/Items/TowerAugment/GenericAugment": "Precursor Tablet",
     }
 
@@ -661,20 +673,20 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/Gem/SkillGemBlinkSandPlayer": " (Sands of Silk)",
             "Metadata/Items/Gem/SkillGemBlink": "",
             # Weapon attacks
-            "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe": "",
-            "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe": " (two handed)",
-            "Metadata/Items/Gem/SkillGemPlayerDefaultAxeAxe": " (dual handed)",
-            "Metadata/Items/Gem/SkillGemPlayerDefault1HSword": "",
-            "Metadata/Items/Gem/SkillGemPlayerDefault2HSword": " (two handed)",
-            "Metadata/Items/Gem/SkillGemPlayerDefaultSwordSword": " (dual handed)",
-            "Metadata/Items/Gem/SkillGemPlayerDefault1HMace": "",
-            "Metadata/Items/Gem/SkillGemPlayerDefault2HMace": " (two handed)",
-            "Metadata/Items/Gem/SkillGemPlayerDefaultMaceMace": " (dual handed)",
+            "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe": " (one hand)",
+            "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe": " (two hand)",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultAxeAxe": " (dual wield)",
+            "Metadata/Items/Gem/SkillGemPlayerDefault1HSword": " (one hand)",
+            "Metadata/Items/Gem/SkillGemPlayerDefault2HSword": " (two hand)",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultSwordSword": " (dual wield)",
+            "Metadata/Items/Gem/SkillGemPlayerDefault1HMace": " (one hand)",
+            "Metadata/Items/Gem/SkillGemPlayerDefault2HMace": " (two hand)",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultMaceMace": " (dual wield)",
             "Metadata/Items/Gem/SkillGemPlayerDefaultSpear": "",
             "Metadata/Items/Gem/SkillGemPlayerDefaultDagger": "",
-            "Metadata/Items/Gem/SkillGemPlayerDefaultDaggerDagger": " (dual handed)",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultDaggerDagger": " (dual wield)",
             "Metadata/Items/Gem/SkillGemPlayerDefaultClaw": "",
-            "Metadata/Items/Gem/SkillGemPlayerDefaultClawClaw": " (dual handed)",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultClawClaw": " (dual wield)",
             # =================================================================
             # Support Gems
             # =================================================================
@@ -1243,6 +1255,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemGraveCommand",
         "Metadata/Items/Gems/SkillGemDarkTempest",
         "Metadata/Items/Gems/SkillGemCastCurseOnBlock",
+        "Metadata/Items/Gems/SkillGemSoulCrystal",
         # Weapon default attacks
         "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe",
         "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe",
@@ -1250,8 +1263,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gem/SkillGemPlayerDefault1HSword",
         "Metadata/Items/Gem/SkillGemPlayerDefault2HSword",
         "Metadata/Items/Gem/SkillGemPlayerDefaultSwordSword",
-        "Metadata/Items/Gem/SkillGemPlayerDefault2HMace",
-        "Metadata/Items/Gem/SkillGemPlayerDefaultMaceMace",
         "Metadata/Items/Gem/SkillGemPlayerDefaultFlail",
         "Metadata/Items/Gem/SkillGemPlayerDefaultDagger",
         "Metadata/Items/Gem/SkillGemPlayerDefaultDaggerDagger",
@@ -1586,6 +1597,9 @@ class ItemsParser(SkillParserShared):
         # New 0.3.0
         "Metadata/Items/QuestItems/Gallows/Interlude/QimarWaterVial_02",
         "Metadata/Items/QuestItems/Gallows/Interlude/QimarWaterVial_03",
+        "Metadata/Items/QuestItems/Gallows/Act4/PrisonerRegeneratingLiver",
+        "Metadata/Items/QuestItems/Gallows/Act4/HalfDigestedSulphite",
+        "Metadata/Items/QuestItems/Gallows/Act4/ScourgeOfTheSkiesTalons",
         # Old from PoE1
         "Metadata/Items/QuestItems/SkillBooks/DelevelBook",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookElder",
