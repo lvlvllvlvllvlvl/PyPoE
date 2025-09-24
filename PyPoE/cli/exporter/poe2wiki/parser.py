@@ -2070,6 +2070,7 @@ _KEYWORD_LINK_MAP = {
         ("", "Magnitude"),
     ],
     "Burning": [
+        ("Burning", "Burning"),
         ("Burn", "Burn"),
         ("", "Burn"),
     ],
@@ -2147,15 +2148,19 @@ _KEYWORD_LINK_MAP = {
         ("", "Cull"),
     ],
     "DamageTypes": [
+        ("Damage Types", "Damage Types"),
+        ("Damage types", "Damage types"),
         ("Damage Type", "Damage Type"),
         ("Damage type", "Damage type"),
         ("", "Damage Type"),
     ],
     "DamagingAilments": [
+        ("Damaging Ailments", "Damaging Ailments"),
         ("Damaging Ailment", "Damaging Ailment"),
         ("", "Damaging Ailment"),
     ],
     "Defences": [
+        ("Defences", "Defences"),
         ("Defence", "Defence"),
         ("", "Defence"),
     ],
@@ -2444,7 +2449,7 @@ _KEYWORD_LINK_MAP = {
     "PerfectTiming": [
         ("Perfect Timing", "Perfect Timing"),
         ("Perfectly Timing", "Perfectly Timing"),
-        ("", "Perfectly Timing"),
+        ("", "Perfect Timing"),
     ],
     "Physical": [
         ("Physical", "Physical"),
@@ -2503,10 +2508,12 @@ _KEYWORD_LINK_MAP = {
         ("", "Regal Orb"),
     ],
     "Resistances": [
+        ("Elemental Resistance", "Elemental Resistance"),
         ("Fire Resistance", "Fire Resistance"),
         ("Cold Resistance", "Cold Resistance"),
         ("Lightning Resistance", "Lightning Resistance"),
         ("Chaos Resistance", "Chaos Resistance"),
+        ("Resistances", "Resistances"),
         ("Resistance", "Resistance"),
         ("", "Resistance"),
     ],
@@ -2682,10 +2689,10 @@ def process_keywords(text: str):
                         return f"[[{key}]]"
                     elif variant == "":
                         return f"[[{link}|{key}]]"
-                    elif variant.startswith(key):
-                        suffix = variant[len(key) :]
-                        if "'" not in suffix and " " not in suffix:
-                            return f"[[{link}|{key}]]"
+                    elif key.startswith(variant):
+                        suffix = key[len(variant) :]
+                        if variant == link and "'" not in suffix and " " not in suffix:
+                            return f"[[{link}]]{suffix}"
 
         return f"[[{raw}]]"
 
