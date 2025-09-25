@@ -53,9 +53,10 @@ __all__ = []
 
 class MonsterWikiCondition(parser.WikiCondition):
     COPY_KEYS = (
+        "screenshot_ext",
         "main_page",
         "release_version",
-        "screenshot_ext",
+        "removal_version",
     )
     COPY_CONDITIONS = {
         "tags": parser.WikiCondition.tagsets_equal,
@@ -168,49 +169,49 @@ class MonsterParser(parser.BaseParser):
                 },
             ),
             (
-                "MonsterTypesKey",
+                "MonsterType",
                 {
                     "template": "monster_type_id",
                     "format": lambda v: v["Id"],
                 },
             ),
+            # (
+            #    "Mods",
+            #    {
+            #        "template": "mod_ids",
+            #        "format": lambda v: ", ".join([r["Id"] for r in v]),
+            #    },
+            # ),
+            # (
+            #    "Part1_Mods",
+            #    {
+            #        "template": "part1_mod_ids",
+            #        "format": lambda v: ", ".join([r["Id"] for r in v]),
+            #    },
+            # ),
+            # (
+            #    "Part2_Mods",
+            #    {
+            #        "template": "part2_mod_ids",
+            #        "format": lambda v: ", ".join([r["Id"] for r in v]),
+            #    },
+            # ),
+            # (
+            #    "Endgame_Mods",
+            #    {
+            #        "template": "endgame_mod_ids",
+            #        "format": lambda v: ", ".join([r["Id"] for r in v]),
+            #    },
+            # ),
             (
-                "ModsKeys",
-                {
-                    "template": "mod_ids",
-                    "format": lambda v: ", ".join([r["Id"] for r in v]),
-                },
-            ),
-            (
-                "Part1_ModsKeys",
-                {
-                    "template": "part1_mod_ids",
-                    "format": lambda v: ", ".join([r["Id"] for r in v]),
-                },
-            ),
-            (
-                "Part2_ModsKeys",
-                {
-                    "template": "part2_mod_ids",
-                    "format": lambda v: ", ".join([r["Id"] for r in v]),
-                },
-            ),
-            (
-                "Endgame_ModsKeys",
-                {
-                    "template": "endgame_mod_ids",
-                    "format": lambda v: ", ".join([r["Id"] for r in v]),
-                },
-            ),
-            (
-                "TagsKeys",
+                "Tags",
                 {
                     "template": "tags",
                     "format": lambda v: ", ".join([r["Id"] for r in v]),
                 },
             ),
             (
-                "GrantedEffectsKeys",
+                "GrantedEffects",
                 {
                     "template": "skill_ids",
                     "format": lambda v: ", ".join([r["Id"] for r in v]),
@@ -220,6 +221,14 @@ class MonsterParser(parser.BaseParser):
                 "Name",
                 {
                     "template": "name",
+                },
+            ),
+            (
+                "MonsterCategory",
+                {
+                    "template": "category",
+                    "condition": lambda v: v is not None,
+                    "format": lambda v: v["Name"],
                 },
             ),
             (
@@ -268,13 +277,13 @@ class MonsterParser(parser.BaseParser):
                     "format": lambda v: v / 100,
                 },
             ),
-            (
-                "CriticalStrikeChance",
-                {
-                    "template": "critical_strike_chance",
-                    "format": lambda v: v / 100,
-                },
-            ),
+            # (
+            #    "CriticalStrikeChance",
+            #    {
+            #        "template": "critical_strike_chance",
+            #        "format": lambda v: v / 100,
+            #    },
+            # ),
             (
                 "AttackSpeed",
                 {
@@ -335,8 +344,7 @@ class MonsterParser(parser.BaseParser):
             for row_key, copy_data in self._COPY_KEYS.items():
                 value = monster[row_key]
 
-                condition = copy_data.get("condition")
-                if condition is not None and not condition(monster):
+                if copy_data.get("condition") and not copy_data["condition"](value):
                     continue
 
                 fmt = copy_data.get("format")
