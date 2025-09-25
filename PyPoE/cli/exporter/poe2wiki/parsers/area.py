@@ -67,6 +67,7 @@ class WikiCondition(parser.WikiCondition):
         "screenshot_ext",
         "main_page",
         "release_version",
+        "removal_version",
     )
 
     NAME = "Area"
@@ -175,6 +176,20 @@ class AreaParser(parser.BaseParser):
         error_msg="Several areas have not been found:\n%s",
     )
 
+    # Unreleased or disabled areas to avoid exporting to the wiki
+    _SKIP_AREAS_BY_ID = [
+        "NULL",
+        "G1_10",
+        "G2_3s",
+        "G2_8a",
+        "G2_11",
+        "G3_15",
+        "G4_6",
+        "G4_9_",
+        "G4_12",
+        "G4_14",
+    ]
+
     _COPY_KEYS = OrderedDict(
         (
             (
@@ -243,7 +258,13 @@ class AreaParser(parser.BaseParser):
                 {
                     "template": "connection_ids",
                     "format": lambda value: ", ".join(
-                        OrderedDict.fromkeys([area["Id"] for area in value]).keys()
+                        OrderedDict.fromkeys(
+                            [
+                                area["Id"]
+                                for area in value
+                                if area["Id"] not in AreaParser._SKIP_AREAS_BY_ID
+                            ]
+                        ).keys()
                     ),
                     "default": [],
                 },
@@ -431,7 +452,11 @@ class AreaParser(parser.BaseParser):
         self.rr["MapPins.dat64"].build_index("WorldAreasKeys")
         self.rr["EndgameMaps.dat64"].build_index("WorldArea")
 
-        console("Found %s areas. Processing..." % len(areas))
+        console("Found %s areas. Removing disabled areas..." % len(areas))
+        areas = [area for area in areas if area["Id"] not in self._SKIP_AREAS_BY_ID]
+        console("%s areas left for processing." % len(areas))
+
+        # console("Found %s areas. Processing..." % len(areas))
 
         for area in areas:
             # if "[DNT]" in area["Name"] or "[DNT-UNUSED]" in area["Name"]:
@@ -441,8 +466,7 @@ class AreaParser(parser.BaseParser):
             for row_key, copy_data in self._COPY_KEYS.items():
                 value = area[row_key]
 
-                condition = copy_data.get("condition")
-                if condition is not None and not condition(area):
+                if copy_data.get("condition") and not copy_data["condition"](value):
                     continue
 
                 # Skip default values to reduce size of template
