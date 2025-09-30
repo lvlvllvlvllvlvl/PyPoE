@@ -148,10 +148,8 @@ __all__ = [
     "install_data_dependant_quantifiers",
 ]
 
-CUSTOM_TRANSLATION_FILE = os.path.join(DATA_DIR, os.environ.get("WIKI"), "custom_descriptions.txt")
-HARDCODED_TRANSLATION_FILE = os.path.join(
-    DATA_DIR, os.environ.get("WIKI"), "hardcoded_descriptions.txt"
-)
+CUSTOM_TRANSLATION_FILE = os.path.join(DATA_DIR, "custom_descriptions.txt")
+HARDCODED_TRANSLATION_FILE = os.path.join(DATA_DIR, "hardcoded_descriptions.txt")
 
 regex_translation_string = re.compile(
     r"^"
@@ -2131,7 +2129,8 @@ class TranslationFileCache(AbstractFileCache[TranslationFile]):
         if merge_with_custom_file is None or merge_with_custom_file is False:
             self._custom_file = None
         elif merge_with_custom_file is True:
-            self._custom_file = get_custom_translation_file()
+            wiki = "wiki" if sequel == 1 else "poe2wiki"
+            self._custom_file = get_custom_translation_file(wiki=wiki)
         elif isinstance(merge_with_custom_file, TranslationFile):
             self._custom_file = merge_with_custom_file
         else:
@@ -2254,11 +2253,17 @@ def _diff_dict(self, other):
             print('Key "%s": Value "%s"' % (key, other[key]))
 
 
-def get_custom_translation_file() -> TranslationFile:
+def get_custom_translation_file(wiki="wiki") -> TranslationFile:
     """
     Returns the currently loaded custom translation file.
 
     Loads the default file if none is loaded.
+
+    Parameters
+    ----------
+    wiki : str
+        Should use poe1 or poe2 files?
+        Accepts "wiki" and "poe2wiki".
 
     Returns
     -------
@@ -2267,11 +2272,11 @@ def get_custom_translation_file() -> TranslationFile:
     """
     global _custom_translation_file
     if _custom_translation_file is None:
-        set_custom_translation_file()
+        set_custom_translation_file(wiki=wiki)
     return _custom_translation_file
 
 
-def set_custom_translation_file(file: Union[str, None] = None):
+def set_custom_translation_file(file: Union[str, None] = None, wiki="wiki"):
     """
     Sets the custom translation file.
 
@@ -2280,9 +2285,16 @@ def set_custom_translation_file(file: Union[str, None] = None):
     file : str
         Path where the custom translation file is located. If None,
         the default file will be loaded
+
+    wiki : str
+        Should use poe1 or poe2 files?
+        Accepts "wiki" and "poe2wiki".
     """
     global _custom_translation_file
-    _custom_translation_file = TranslationFile(file_path=file or CUSTOM_TRANSLATION_FILE)
+    custom_file = os.path.join(
+        os.path.dirname(CUSTOM_TRANSLATION_FILE), wiki, os.path.basename(CUSTOM_TRANSLATION_FILE)
+    )
+    _custom_translation_file = TranslationFile(file_path=file or custom_file)
 
 
 custom_translation_file = property(
@@ -2291,11 +2303,17 @@ custom_translation_file = property(
 )
 
 
-def get_hardcoded_translation_file() -> TranslationFile:
+def get_hardcoded_translation_file(wiki="wiki") -> TranslationFile:
     """
     Returns the currently loaded hardcoded translation file.
 
     Loads the default file if none is loaded.
+
+    Parameters
+    ----------
+    wiki : str
+        Should use poe1 or poe2 files?
+        Accepts "wiki" and "poe2wiki".
 
     Returns
     -------
@@ -2304,11 +2322,11 @@ def get_hardcoded_translation_file() -> TranslationFile:
     """
     global _hardcoded_translation_file
     if _hardcoded_translation_file is None:
-        set_hardcoded_translation_file()
+        set_hardcoded_translation_file(wiki=wiki)
     return _hardcoded_translation_file
 
 
-def set_hardcoded_translation_file(file: Union[str, None] = None):
+def set_hardcoded_translation_file(file: Union[str, None] = None, wiki="wiki"):
     """
     Sets the hardcoded translation file.
 
@@ -2317,9 +2335,18 @@ def set_hardcoded_translation_file(file: Union[str, None] = None):
     file : str
         Path where the hardcoded translation file is located. If None,
         the default file will be loaded
+
+    wiki : str
+        Should use poe1 or poe2 files?
+        Accepts "wiki" and "poe2wiki".
     """
     global _hardcoded_translation_file
-    _hardcoded_translation_file = TranslationFile(file_path=file or HARDCODED_TRANSLATION_FILE)
+    hardcoded_file = os.path.join(
+        os.path.dirname(HARDCODED_TRANSLATION_FILE),
+        wiki,
+        os.path.basename(HARDCODED_TRANSLATION_FILE),
+    )
+    _hardcoded_translation_file = TranslationFile(file_path=file or hardcoded_file)
 
 
 hardcoded_translation_file = property(

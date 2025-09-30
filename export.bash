@@ -5,7 +5,7 @@ ARGS=()
 IMG=()
 export ALL_EXPORTERS=(gem-skills items passives skills mastery-effects mastery-groups mods monsters areas maps incursion-rooms modules atlas-icons)
 EXPORTERS=()
-export WIKI=wiki
+WIKI=wiki
 
 # check if value is in array
 # https://stackoverflow.com/a/68702551/2063518
