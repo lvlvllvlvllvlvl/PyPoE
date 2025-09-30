@@ -33,6 +33,7 @@ See PyPoE/LICENSE
 
 # Python
 import os
+import posixpath
 import traceback
 import warnings
 from collections import OrderedDict, defaultdict
@@ -206,16 +207,7 @@ class SkillParserShared(parser.BaseParser):
         "BaseMultiplier",
     )
 
-    # def CostTypeHelper(d):
-    #     print('yep', d)
-    #     return d['Cost_TypesKeys']['Id']
-
     _SKILL_COLUMN_MAP = (
-        # ('ManaCost', {
-        #     'template': 'mana_cost',
-        #     'default': 0,
-        #     'format': lambda v: '{0:n}'.format(v),
-        # }),
         (
             "CostAmounts",
             {
@@ -223,15 +215,6 @@ class SkillParserShared(parser.BaseParser):
                 "default": [],
                 "condition": lambda v: v and v[0] is not None,
                 "format": lambda v: ",".join(map(str, v)),
-            },
-        ),
-        (
-            "CostTypes",
-            {
-                "template": "cost_types",
-                "default": [],
-                "condition": lambda v: v and v[0] is not None,
-                "format": lambda v: ",".join(r["Id"] for r in v),
             },
         ),
         (
@@ -488,7 +471,15 @@ class SkillParserShared(parser.BaseParser):
             stat_order[stat] = -1
         return stats_output
 
-    def _skill(self, gra_eff, infobox: OrderedDict, parsed_args, max_level=None, msg_name=None):
+    def _skill(
+        self,
+        gra_eff,
+        infobox: OrderedDict,
+        parsed_args,
+        max_level=None,
+        msg_name=None,
+        skill_gem=None,
+    ):
         if msg_name is None:
             msg_name = gra_eff["Id"]
 
@@ -515,20 +506,22 @@ class SkillParserShared(parser.BaseParser):
 
         act_skill = gra_eff["ActiveSkill"]
         if act_skill:
-            try:
-                base_skill_id = (
-                    act_skill["TransfigureBase"]["Id"]
-                    if act_skill["TransfigureBase"]
-                    else act_skill["Id"]
-                )
-                tf = self.tc[self.skill_stat_filter.skills[base_skill_id].translation_file_path]
-            except KeyError as e:
-                warnings.warn("Missing active skill in stat files: %s" % e.args[0])
-                tf = self.tc["skill_stat_descriptions.txt"]
+            file = act_skill["StatDescription"]
+            file = file.removeprefix("Metadata/StatDescriptions/").removesuffix("/") + ".txt"
+            tf = self.tc[file]
 
             if parsed_args.store_images and act_skill["Icon_DDSFile"]:
+                file_path = act_skill["Icon_DDSFile"]
+                file_path_4k = posixpath.join(
+                    posixpath.dirname(file_path), "4k", posixpath.basename(file_path)
+                )
+                try:
+                    data = self.file_system.get_file(file_path_4k)
+                except FileNotFoundError:
+                    data = self.file_system.get_file(file_path)
+
                 self._write_dds(
-                    data=self.file_system.get_file(act_skill["Icon_DDSFile"]),
+                    data=data,
                     out_path=os.path.join(self._img_path, "%s skill icon.dds" % msg_name),
                     parsed_args=parsed_args,
                 )
@@ -698,9 +691,27 @@ class SkillParserShared(parser.BaseParser):
         if act_skill:
             infobox["gem_description"] = process_keywords(act_skill["Description"])
             infobox["active_skill_name"] = act_skill["DisplayedName"]
-            # Need to get info from ActiveSkillWeaponRequirement.json and WieldableClasses.json
-            # if act_skill["WeaponRequirements"]:
-            #    infobox["item_class_id_restriction"] =
+
+            if act_skill["WeaponRequirements"]:
+                wieldable_classes = act_skill["WeaponRequirements"]["WieldableClasses"]
+                infobox["item_class_id_restriction"] = ", ".join(
+                    [wc["ItemClass"]["Id"] for wc in wieldable_classes]
+                )
+
+                # Text displayed in gem
+                reqiured_eq = ""
+                if act_skill["WeaponRequirements"]["String"]:
+                    reqiured_eq = act_skill["WeaponRequirements"]["String"]["Text"]
+                else:
+                    wieldable = []
+                    for wc in wieldable_classes:
+                        if wc["ItemClass"]["ItemClassCategory"]:
+                            wieldable.append(wc["ItemClass"]["ItemClassCategory"]["Text"])
+                        else:
+                            break
+                    reqiured_eq = ", ".join(wieldable)
+
+                infobox["equipment_requirement"] = process_keywords(reqiured_eq)
 
         # From Projectile.dat64 if available
         # TODO - remap
@@ -716,6 +727,11 @@ class SkillParserShared(parser.BaseParser):
 
         if not gra_eff["IsSupport"]:
             infobox["cast_time"] = gra_eff["CastTime"] / 1000
+
+        if len(gra_eff["CostTypes"]) > 0:
+            infobox["static_cost_types"] = ",".join(ct["Id"] for ct in gra_eff["CostTypes"])
+            # cost_types are static so no need for 'static_'?
+            # infobox["cost_types"] = ",".join(ct["Id"] for ct in gra_eff["CostTypes"])
 
         #
         # Quality stats
@@ -743,12 +759,14 @@ class SkillParserShared(parser.BaseParser):
                 values=[v / lowest for v in row["StatsValuesPermille"]],
                 full_result=True,
                 lang=config.get_option("language"),
+                restriction="gem_quality",
             )
             q40_tr = tf.get_translation(
                 tags=stat_ids,
                 values=[v / 25 for v in row["StatsValuesPermille"]],
                 full_result=True,
                 lang=config.get_option("language"),
+                restriction="gem_quality",
             )
 
             # Use the translation that shows the most values
@@ -918,18 +936,71 @@ class SkillParserShared(parser.BaseParser):
 
         # Body
         for i, row in enumerate(level_data):
+            # Break for now (only up to lvl 20) TODO: Remove
+            if i == 20:
+                break
             prefix = "level%s" % (i + 1)
             infobox[prefix] = "True"
-
-            # Required levels per skill level (temporary)
-            req_lvl = [0, 3, 6, 10, 14, 18, 22, 26, 31, 36, 41, 46, 52, 58, 64, 66, 72, 78, 84, 90]
-
             prefix += "_"
-            if act_skill:
-                if i < 20:
-                    infobox[prefix + "level_requirement"] = req_lvl[i]
-                else:
-                    infobox[prefix + "level_requirement"] = req_lvl[19]
+
+            if not gra_eff["IsSupport"]:
+                if "ItemExperienceType" not in self.rr["ItemExperiencePerLevel.dat64"].index:
+                    self.rr["ItemExperiencePerLevel.dat64"].build_index("ItemExperienceType")
+
+                try:
+                    req_levels = self.rr["ItemExperiencePerLevel.dat64"].index[
+                        "ItemExperienceType"
+                    ][skill_gem["ItemExperienceType"]]
+                except KeyError:
+                    return True
+
+                infobox[prefix + "level_requirement"] = req_levels[i]["Level"]
+
+                if skill_gem:
+                    # TODO:Remove:Do proper calculation (temporary)
+                    def _skill_temporary_attr(skill_gem, level):
+                        infobox = OrderedDict()
+                        _attribute_map = OrderedDict(
+                            (
+                                ("Str", "strength"),
+                                ("Dex", "dexterity"),
+                                ("Int", "intelligence"),
+                            )
+                        )
+                        # fmt: off
+                        ranges = {
+                            100: [
+                                0, 9, 14, 21, 28, 35, 41, 48, 57, 65,
+                                74, 82, 92, 103, 113, 116, 126, 137, 147, 157,
+                            ],
+                            75: [
+                                0, 8, 12, 17, 22, 28, 33, 38, 45, 51,
+                                58, 64, 72, 80, 88, 91, 98, 106, 114, 122,
+                            ],
+                            50: [
+                                0, 0, 9, 13, 17, 20, 24, 28, 32, 37,
+                                41, 46, 51, 57, 62, 64, 70, 75, 80, 86,
+                            ],
+                            25: [
+                                0, 0, 0, 9, 11, 13, 15, 17, 19, 22,
+                                24, 26, 29, 32, 35, 36, 39, 42, 45, 48,
+                            ],
+                        }
+                        # fmt: on
+
+                        for attr_short, attr_long in _attribute_map.items():
+                            if not skill_gem[attr_short]:
+                                continue
+
+                            if skill_gem[attr_short] in ranges:
+                                infobox[f"{attr_long}_requirement"] = ranges[skill_gem[attr_short]][
+                                    i
+                                ]
+
+                        return infobox
+
+                    for req, value in _skill_temporary_attr(skill_gem, i).items():
+                        infobox[prefix + req] = value
 
             # Column handling
             for column, column_data in self._SKILL_COLUMN_MAP:

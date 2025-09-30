@@ -282,7 +282,7 @@ class WikiCondition(parser.WikiCondition):
         "quest_reward4_act",
         "quest_reward4_class_ids",
         "quest_reward4_npc",
-        # Temporary for jewels TODO: remove when mods will be done
+        # TODO:Remove: When mods will be done, temporary for jewels and some other items
         "extra_stat1_id",
         "extra_stat1_min",
         "extra_stat1_max",
@@ -291,10 +291,12 @@ class WikiCondition(parser.WikiCondition):
         "extra_stat2_max",
     )
     COPY_MATCH = re.compile(
-        r"^(recipe|sell_price|implicit[0-9]+_(?:text|random_list)).*", re.UNICODE
+        r"^(recipe|sell_price|inherent_skill[0-9]+_(?:min|max)_level|implicit[0-9]+_(?:text|random_list)).*",
+        re.UNICODE,
     )
     COPY_MATCH = re.compile(
-        r"^(recipe|sell_price|implicit[0-9]+_(?:text|random_list)).*", re.UNICODE
+        r"^(recipe|sell_price|inherent_skill[0-9]+_(?:min|max)_level|implicit[0-9]+_(?:text|random_list)).*",
+        re.UNICODE,
     )
 
     NAME = "Item"
@@ -418,7 +420,6 @@ class ItemsParser(SkillParserShared):
 
     _IGNORE_DROP_LEVEL_CLASSES = (
         "Active Skill Gem",
-        "Support Skill Gem",
         "Meta Skill Gem",
         "HideoutDoodad",
         "Microtransaction",
@@ -426,6 +427,32 @@ class ItemsParser(SkillParserShared):
     )
 
     _DROP_DISABLED_ITEMS_BY_ID = {}
+
+    # For some reason these items have different drop level in game and in BaseItemTypes.dat
+    _DROP_LEVEL_BY_ID = {
+        # =================================================================
+        # Amulets
+        # =================================================================
+        "Metadata/Items/Amulets/FourAmulet8": 22,
+        # =================================================================
+        # Sceptres
+        # =================================================================
+        "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre6a": 24,
+        "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre6b": 24,
+        "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre6c": 24,
+        "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptreUnique1": 24,
+    }
+
+    _REQUIRED_LEVEL_BY_ID = {
+        # =================================================================
+        # Amulets
+        # =================================================================
+        "Metadata/Items/Amulets/FourAmulet8": 24,
+        # =================================================================
+        # Staves
+        # =================================================================
+        "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff3": 1,
+    }
 
     _FORCE_INVENTORY_ICON_BY_ID = {
         # =================================================================
@@ -459,6 +486,10 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gem/SkillGemAscendancyTimeSnap": "Ascendancy",
         "Metadata/Items/Gem/SkillGemAscendancyUnboundAvatar": "Ascendancy",
         "Metadata/Items/Gem/SkillGemAscendancyUnleash": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemTriggeredAbyssalApparition": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendanyMetaDeadeyeMarks": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyInevitableAgony": "Ascendancy",
+        "Metadata/Items/Gem/SkillGemAscendancyTemperWeapon": "Ascendancy",
         # Item granted
         "Metadata/Items/Gem/SkillGemBoneBlast": "Item",
         "Metadata/Items/Gems/SkillGemCastOnBlock": "Item",
@@ -469,9 +500,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemDiscipline": "Item",
         "Metadata/Items/Gems/SkillGemFirebolt": "Item",
         "Metadata/Items/Gems/SkillGemFreezingShards": "Item",
-        "Metadata/Items/Gems/SkillGemLightningBolt": "Item",
         "Metadata/Items/Gems/SkillGemLightningSpellOnHit": "Item",
-        "Metadata/Items/Gem/SkillGemLivingBombPlayer": "Item",
         "Metadata/Items/Gem/SkillGemMalice": "Item",
         "Metadata/Items/Gem/SkillGemManaDrain": "Item",
         "Metadata/Items/Gem/SkillGemParry": "Item",
@@ -480,11 +509,33 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemPurityOfIce": "Item",
         "Metadata/Items/Gems/SkillGemPurityOfLightning": "Item",
         "Metadata/Items/Gem/SkillGemShieldBlock": "Item",
-        "Metadata/Items/Gem/SkillGemScavengedPlating": "Item",
         "Metadata/Items/Gems/SkillGemSigilOfPower": "Item",
         "Metadata/Items/Gems/SkillGemSkeletalWarriorWeaponSkill": "Item",
         "Metadata/Items/Gem/SkillGemPlayerDefaultSpearThrow": "Item",
         "Metadata/Items/Gems/SkillGemVolatileDead": "Item",
+        "Metadata/items/Gems/SkillGemStaffUnleash": "Item",
+        "Metadata/Items/Gem/SkillGemBlinkSandPlayer": "Item",
+        "Metadata/Items/Gem/SkillGemUniqueBreachLightningBolt": "Item",
+        "Metadata/Items/Gems/SkillGemLightningBolt": "Item",
+        "Metadata/Items/Gem/SkillGemSolarOrb": "Item",
+        "Metadata/items/Gems/SkillGemStaffConsecrate": "Item",
+        "Metadata/Items/Gems/SkillGemHisFoulEmergence": "Item",
+        "Metadata/Items/Gems/SkillGemVileDisruption": "Item",
+        "Metadata/Items/Gems/SkillGemScatteringCalamity": "Item",
+        "Metadata/Items/Gems/SkillGemHisWinnowingFlame": "Item",
+        "Metadata/Items/Gem/SkillGemCrossbowRequiem": "Item",
+        "Metadata/Items/Gem/SkillGemSpellslinger": "Item",
+        "Metadata/Items/Gem/SkillGemGeminiSurge": "Item",
+        "Metadata/Items/Gems/SkillGemValakosCharge": "Item",
+        "Metadata/Items/Gem/SkillGemPhantasmalArrow": "Item",
+        "Metadata/Items/Gems/SkillGemCracklingPalm": "Item",
+        "Metadata/Items/Gems/SkillGemEnervatingNova": "Item",
+        "Metadata/Items/Gem/SkillGemFeastOfFlesh": "Item",
+        "Metadata/Items/Gem/SkillGemFulmination": "Item",
+        "Metadata/Items/Gems/SkillGemFuturePast": "Item",
+        "Metadata/Items/Gems/SkillGemGalvanicField": "Item",
+        "Metadata/Items/Gems/SkillGemImpurity": "Item",
+        "Metadata/Items/Gem/SkillGemPinnacleOfPower": "Item",
         # Weapon default attacks
         "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe": "Item",
         "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe": "Item",
@@ -529,6 +580,11 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/Gallows/Act2/SerpentClanCasterBossDrop": "Book of Specialisation",
         "Metadata/Items/QuestItems/Gallows/Act2/FinalLetterSkillBook": "Book of Specialisation",
         "Metadata/Items/QuestItems/Gallows/Act3/QuadrillaSkillBook": "Book of Specialisation",
+        "Metadata/Items/QuestItems/Gallows/Act4/BlindBeastSkillBook": "Book of Specialisation",
+        "Metadata/Items/QuestItems/Gallows/Interlude/FrozenPrisonerSkillBook": "Book of Specialisation",
+        "Metadata/Items/QuestItems/Gallows/Interlude/IceTusksSkillBook": "Book of Specialisation",
+        "Metadata/Items/QuestItems/Gallows/Interlude/InterludePart2SkillBook": "Book of Specialisation",
+        "Metadata/Items/QuestItems/Gallows/Interlude/InterludeFinalSkillBook": "Book of Specialisation",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric1": "Crystalline Core of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric3": "Crystalline Core of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric6": "Crystalline Core of Knowledge",
@@ -575,7 +631,6 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Misc
         # =================================================================
-        "Metadata/Items/Gems/SkillGemUncutQuest": "Uncut Skill Gem",
         "Metadata/Items/TowerAugment/GenericAugment": "Precursor Tablet",
     }
 
@@ -584,6 +639,9 @@ class ItemsParser(SkillParserShared):
     # Override also name in infobox (temporary, maybe)
     _NAME_OVERRIDE_BY_ID_2 = {
         "English": {
+            # =================================================================
+            # Quest Items
+            # =================================================================
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric1": "Crystalline Core of Knowledge",
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookUniqueMaps1": "Book of Unique Knowledge",
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookPinnacle1": "Arbiter's Book of Knowledge",
@@ -592,6 +650,13 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookRitual1": "Ritualistic Book of Knowledge",
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition1": "Runic Book of Knowledge",
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss1": "Vanquisher's Book of Knowledge",
+            # =================================================================
+            # Uncut Gems
+            # =================================================================
+            "Metadata/Items/Gems/SkillGemUncut1": "Uncut Skill Gem",
+            "Metadata/Items/Gems/SupportGemUncut1": "Uncut Support Gem",
+            "Metadata/Items/Gems/ReservationGemUncut4": "Uncut Spirit Gem",
+            "Metadata/Items/Gems/SkillGemUncutQuest1": "Uncut Skill Gem",
         }
     }
 
@@ -600,56 +665,58 @@ class ItemsParser(SkillParserShared):
             # =================================================================
             # Skill Gems
             # =================================================================
-            "Metadata/Items/Gem/SkillGemAscendancyUnleash": " (skill)",
+            "Metadata/Items/Gem/SkillGemAscendancyUnleash": " (Chronomancer skill)",
+            "Metadata/items/Gems/SkillGemStaffUnleash": " (skill)",
+            "Metadata/Items/Gems/SkillGemFlammability": " (curse)",
+            "Metadata/Items/Gem/SkillGemUniqueBreachLightningBolt": " (triggered skill)",
+            "Metadata/Items/Gems/SkillGemLightningBolt": "",
+            "Metadata/Items/Gem/SkillGemBlinkSandPlayer": " (Sands of Silk)",
+            "Metadata/Items/Gem/SkillGemBlink": "",
             # Weapon attacks
-            "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe": "",
-            "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe": " (two handed)",
-            "Metadata/Items/Gem/SkillGemPlayerDefaultAxeAxe": " (dual handed)",
-            "Metadata/Items/Gem/SkillGemPlayerDefault1HSword": "",
-            "Metadata/Items/Gem/SkillGemPlayerDefault2HSword": " (two handed)",
-            "Metadata/Items/Gem/SkillGemPlayerDefaultSwordSword": " (dual handed)",
-            "Metadata/Items/Gem/SkillGemPlayerDefault1HMace": "",
-            "Metadata/Items/Gem/SkillGemPlayerDefault2HMace": " (two handed)",
-            "Metadata/Items/Gem/SkillGemPlayerDefaultMaceMace": " (dual handed)",
+            "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe": " (one hand)",
+            "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe": " (two hand)",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultAxeAxe": " (dual wield)",
+            "Metadata/Items/Gem/SkillGemPlayerDefault1HSword": " (one hand)",
+            "Metadata/Items/Gem/SkillGemPlayerDefault2HSword": " (two hand)",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultSwordSword": " (dual wield)",
+            "Metadata/Items/Gem/SkillGemPlayerDefault1HMace": " (one hand)",
+            "Metadata/Items/Gem/SkillGemPlayerDefault2HMace": " (two hand)",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultMaceMace": " (dual wield)",
             "Metadata/Items/Gem/SkillGemPlayerDefaultSpear": "",
             "Metadata/Items/Gem/SkillGemPlayerDefaultDagger": "",
-            "Metadata/Items/Gem/SkillGemPlayerDefaultDaggerDagger": " (dual handed)",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultDaggerDagger": " (dual wield)",
             "Metadata/Items/Gem/SkillGemPlayerDefaultClaw": "",
-            "Metadata/Items/Gem/SkillGemPlayerDefaultClawClaw": " (dual handed)",
+            "Metadata/Items/Gem/SkillGemPlayerDefaultClawClaw": " (dual wield)",
             # =================================================================
             # Support Gems
             # =================================================================
-            "Metadata/Items/Gems/SupportGemAftershock": " (support gem)",
             "Metadata/Items/Gems/SupportGemArcaneSurge": " (support gem)",
-            "Metadata/Items/Gems/SupportGemBlind": " (support gem)",
-            "Metadata/Items/Gems/SupportGemChain": " (support gem)",
-            "Metadata/Items/Gem/SupportGemCullingStrike": " (support gem)",
             "Metadata/Items/Gems/SupportGemElectrocute": " (support gem)",
             "Metadata/Items/Gems/SupportGemFork": " (support gem)",
+            "Metadata/Items/Gems/SupportGemGlaciation": " (support gem)",
             "Metadata/Items/Gem/SupportGemHinder": " (support gem)",
             "Metadata/Items/Gem/SupportGemImpale": " (support gem)",
-            "Metadata/Items/Gems/SupportGemIngenuity": " (support gem)",
-            "Metadata/Items/Gems/SupportGemJaggedGround": " (support gem)",
+            "Metadata/Items/Gems/SupportGemBludgeon": " (support gem)",
             "Metadata/Items/Gems/SupportGemMaim": " (support gem)",
-            "Metadata/Items/Gems/SupportGemPierce": " (support gem)",
-            "Metadata/Items/Gems/SupportGemRage": " (support gem)",
+            "Metadata/Items/Gems/SupportGemConduction": " (support gem)",
             "Metadata/Items/Gem/SupportGemVolatility": " (support gem)",
             "Metadata/Items/Gems/SupportGemUnleash": "",
             # =================================================================
             # Uncut Gems
             # =================================================================
-            "Metadata/Items/Gems/SkillGemUncut": "",  # Because of quest item
+            "Metadata/Items/Gems/SkillGemUncutQuest1": " (quest item)",
             # =================================================================
             # Body armours
             # =================================================================
             "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4aEndgame": " (Fire)",
             "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4bEndgame": " (Cold)",
             "Metadata/Items/Armours/BodyArmours/FourBodyStrDex4cEndgame": " (Lightning)",
+            "Metadata/Items/Armours/BodyArmours/FourBodyStrDex12a": " (Fire)",
+            "Metadata/Items/Armours/BodyArmours/FourBodyStrDex12b": " (Cold)",
+            "Metadata/Items/Armours/BodyArmours/FourBodyStrDex12c": " (Lightning)",
             # =================================================================
             # Gloves
             # =================================================================
-            "Metadata/Items/Armours/Gloves/FourGlovesInt3Cruel": "",
-            "Metadata/Items/Armours/Gloves/FourGlovesInt7": " (unique only)",
             # =================================================================
             # Bucklers
             # =================================================================
@@ -674,14 +741,16 @@ class ItemsParser(SkillParserShared):
             # =================================================================
             # Quest items
             # =================================================================
-            # "Metadata/Items/QuestItems/Gallows/Act1/CrowbellSkillBook": " (Crowbell)",
-            # "Metadata/Items/QuestItems/Gallows/Act1/UnaSkillBook": " (Una)",
-            # "Metadata/Items/QuestItems/Gallows/Act2/SerpentClanCasterBossDrop": " (Serpent)",
-            # "Metadata/Items/QuestItems/Gallows/Act2/FinalLetterSkillBook": " (Final Letter)",
-            # "Metadata/Items/QuestItems/Gallows/Act3/QuadrillaSkillBook": " (Quadrilla)",
+            "Metadata/Items/QuestItems/Gallows/Act1/CrowbellSkillBook": " (The Crowbell)",
+            "Metadata/Items/QuestItems/Gallows/Act1/UnaSkillBook": " (The Lost Lute)",
+            "Metadata/Items/QuestItems/Gallows/Act2/SerpentClanCasterBossDrop": " (Kabala, Constrictor Queen)",
+            "Metadata/Items/QuestItems/Gallows/Act2/FinalLetterSkillBook": " (Tradition's Toll)",
+            "Metadata/Items/QuestItems/Gallows/Act3/QuadrillaSkillBook": " (Mighty Silverfist)",
+            "Metadata/Items/QuestItems/Gallows/Interlude/IceTusksSkillBook": " (Howling Winds)",
+            "Metadata/Items/QuestItems/Gallows/Interlude/InterludePart2SkillBook": " (Clearing the Way)",
+            "Metadata/Items/QuestItems/Gallows/Interlude/InterludeFinalSkillBook": " (Interlude)",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDrop": "",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": " (Cruel)",
-            "Metadata/Items/Gems/SkillGemUncutQuest": " (quest item)",
             # =================================================================
             # Hideout decorations
             # =================================================================
@@ -1046,6 +1115,16 @@ class ItemsParser(SkillParserShared):
         },
     }
 
+    # Apped name without changing inventory icon
+    _NAME_APPENDIX_BY_ID_2 = {
+        "English": {
+            # =================================================================
+            # Map fragments
+            # =================================================================
+            "Metadata/Items/MapFragments/CurrencyAfflictionFragment": " (map fragment)",
+        },
+    }
+
     _LANG = {
         "English": {
             "Low": "Low Tier",
@@ -1104,6 +1183,9 @@ class ItemsParser(SkillParserShared):
         "GiftBox",
         "ConventionTreasure",
         "SkillGemToken",
+        "UncutSkillGem_OLD",
+        "UncutSupportGem_OLD",
+        "UncutReservationGem_OLD",
         # Not released yet
         "Dagger",
         "Claw",
@@ -1113,6 +1195,7 @@ class ItemsParser(SkillParserShared):
         "Two Hand Sword",
         "One Hand Axe",
         "Two Hand Axe",
+        "DivinationCard",
         # Skills are not supported yet
         "Active Skill Gem",
         "Meta Skill Gem",
@@ -1124,6 +1207,7 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Skill Gems
         # =================================================================
+        "Metadata/Items/Gem/SkillGemAscendancyUnleash",  # because have the same skill_id as staff one
         "Metadata/Items/Gem/SkillGemUnusable",
         "Metadata/Items/Gems/SkillGemSummonBeast",
         "Metadata/Items/Gems/SkillGemSummonSpectre",
@@ -1141,15 +1225,11 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemExsanguinate",
         "Metadata/Items/Gems/SupportGemFerociousRoar",
         "Metadata/Items/Gems/SkillGemFuriousSlam",
-        "Metadata/Items/Gems/SkillGemGalvanicField",
         "Metadata/Items/Gem/SkillGemHydra",
         "Metadata/Items/Gems/SkillGemLightningStorm",
         "Metadata/Items/Gems/SkillGemBearMaul",
         "Metadata/Items/Gems/SkillGemBearRampage",
-        "Metadata/Items/Gems/SkillGemReap",
         "Metadata/Items/Gems/SkillGemRollingMagma",
-        "Metadata/Items/Gem/SkillGemShieldingCry",
-        "Metadata/Items/Gems/SkillGemShockNova",
         "Metadata/Items/Gems/SkillGemShroud",
         "Metadata/Items/Gems/SkillGemSoulrend",
         "Metadata/Items/Gems/SkillGemSpinningInferno",
@@ -1163,17 +1243,31 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gem/SkillGemPlayerDefaultSpearOffHand",
         # Item granted versions
         "Metadata/Items/Gems/SkillGemSkeletalWarrior",
-        "Metadata/items/Gems/SkillGemStaffUnleash",
         "Metadata/Items/Gems/SkillGemCorpsewadeCorpseCloud",
-        "Metadata/Items/Gem/SkillGemBlinkSandPlayer",
         "Metadata/Items/Gem/SkillGemUniqueDuskVigilTriggeredBlazingCluster",
         "Metadata/Items/Gem/SkillGemUniqueEarthboundTriggeredSpark",
-        "Metadata/Items/Gem/SkillGemUniqueBreachLightningBolt",
         "Metadata/Items/Gems/UniqueSkillGemHeraldOfAsh",
         "Metadata/Items/Gems/UniqueSkillGemHeraldOfIce",
         "Metadata/Items/Gems/UniqueSkillGemHeraldOfThunder",
         "Metadata/Items/Gems/UniqueSkillGemWitheringPresence",
-        "Metadata/items/Gems/SkillGemStaffConsecrate",
+        # New 0.3.0
+        "Metadata/Items/Gem/SkillGemIceFragments",
+        "Metadata/Items/Gems/SkillGemGraveCommand",
+        "Metadata/Items/Gems/SkillGemDarkTempest",
+        "Metadata/Items/Gems/SkillGemCastCurseOnBlock",
+        "Metadata/Items/Gems/SkillGemSoulCrystal",
+        # Weapon default attacks
+        "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe",
+        "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultAxeAxe",
+        "Metadata/Items/Gem/SkillGemPlayerDefault1HSword",
+        "Metadata/Items/Gem/SkillGemPlayerDefault2HSword",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultSwordSword",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultFlail",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultDagger",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultDaggerDagger",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultClaw",
+        "Metadata/Items/Gem/SkillGemPlayerDefaultClawClaw",
         # =================================================================
         # Support Gems
         # =================================================================
@@ -1189,6 +1283,22 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gem/SupportGemUndermine",
         "Metadata/Items/Gem/SupportGemHoarfrost",
         "Metadata/Items/Gems/SupportGemShockSiphon",
+        # New 0.3.0
+        "Metadata/Items/Gem/SupportGemAdhereThree",
+        "Metadata/Items/Gems/SupportGemAftershockThree",
+        "Metadata/Items/Gem/SupportGemAncestralCallThree",
+        "Metadata/Items/Gems/SupportGemDiscombobulate",  # Daze
+        "Metadata/Items/Gem/SupportGemBloodintheEyes",  # Hobble
+        "Metadata/Items/Gems/SupportGemOverabundanceThree",
+        "Metadata/Items/Gems/SupportGemPersistenceThree",
+        "Metadata/Items/Gem/SupportGemGrudge",
+        # =================================================================
+        # Uncut Gems
+        # =================================================================
+        # =================================================================
+        # Amulets
+        # =================================================================
+        "Metadata/Items/Amulets/FourAmuletDelirium1",
         # =================================================================
         # Rings
         # =================================================================
@@ -1198,18 +1308,16 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         "Metadata/Items/Belts/BeltDemigods1",
         # =================================================================
+        # Charms
+        # =================================================================
+        "Metadata/Items/Flasks/FourCharm13",
+        # =================================================================
         # Body armours
         # =================================================================
         "Metadata/Items/Armours/BodyArmours/BodyDemigods1",
         "Metadata/Items/Armours/BodyArmours/FourBodyDemigod",
-        "Metadata/Items/Armours/BodyArmours/FourBodyDexInt7",
         "Metadata/Items/Armours/BodyArmours/FourBodyDexInt8",
-        "Metadata/Items/Armours/BodyArmours/FourBodyStrDex8",
-        "Metadata/Items/Armours/BodyArmours/FourBodyDex9",
-        "Metadata/Items/Armours/BodyArmours/FourBodyStr9",
         "Metadata/Items/Armours/BodyArmours/FourBodyDexInt9",
-        "Metadata/Items/Armours/BodyArmours/FourBodyStr10",
-        "Metadata/Items/Armours/BodyArmours/FourBodyInt10",
         "Metadata/Items/Armours/BodyArmours/FourBodyDexInt10",
         "Metadata/Items/Armours/BodyArmours/FourBodyStrDex10",
         "Metadata/Items/Armours/BodyArmours/FourBodyStrInt10",
@@ -1219,20 +1327,21 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Armours/BodyArmours/FourBodyStrInt11",
         "Metadata/Items/Armours/BodyArmours/FourBodyDex12",
         "Metadata/Items/Armours/BodyArmours/FourBodyDexInt12",
+        "Metadata/Items/Armours/BodyArmours/FourBodyStrDex12a",
+        "Metadata/Items/Armours/BodyArmours/FourBodyStrDex12b",
+        "Metadata/Items/Armours/BodyArmours/FourBodyStrDex12c",
         "Metadata/Items/Armours/BodyArmours/FourBodyDex13",
         "Metadata/Items/Armours/BodyArmours/FourBodyStr13",
         "Metadata/Items/Armours/BodyArmours/FourBodyDexInt13",
         "Metadata/Items/Armours/BodyArmours/FourBodyStrDex13",
         "Metadata/Items/Armours/BodyArmours/FourBodyStrInt13",
         "Metadata/Items/Armours/BodyArmours/FourBodyDex14",
-        "Metadata/Items/Armours/BodyArmours/FourBodyInt15",
         "Metadata/Items/Armours/BodyArmours/FourBodyStr15",
         # =================================================================
         # Helmets
         # =================================================================
         "Metadata/Items/Armours/Helmets/HelmetWreath1",
         "Metadata/Items/Armours/Helmets/HelmetDemigods1",
-        "Metadata/Items/Armours/Helmets/FourHelmetStr7",
         "Metadata/Items/Armours/Helmets/FourHelmetDexInt7",
         "Metadata/Items/Armours/Helmets/FourHelmetStrInt7",
         "Metadata/Items/Armours/Helmets/FourHelmetStrDex8",
@@ -1247,10 +1356,7 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         "Metadata/Items/Armours/Gloves/GlovesDemigods1",
         "Metadata/Items/Armours/Gloves/FourGlovesDemigod",
-        "Metadata/Items/Armours/Gloves/FourGlovesDexInt4",
         "Metadata/Items/Armours/Gloves/FourGlovesStrInt5",
-        "Metadata/Items/Armours/Gloves/FourGlovesStr6",
-        "Metadata/Items/Armours/Gloves/FourGlovesDexInt6",
         "Metadata/Items/Armours/Gloves/FourGlovesStrInt6",
         "Metadata/Items/Armours/Gloves/FourGlovesDex7",
         "Metadata/Items/Armours/Gloves/FourGlovesDex8",
@@ -1261,14 +1367,8 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         "Metadata/Items/Armours/Boots/BootsDemigods1",
         "Metadata/Items/Armours/Boots/FourBootsDemigod",
-        "Metadata/Items/Armours/Boots/FourBootsDexInt4",
-        "Metadata/Items/Armours/Boots/FourBootsStrDex4",
-        "Metadata/Items/Armours/Boots/FourBootsStrInt4",
         "Metadata/Items/Armours/Boots/FourBootsStrDex5",
         "Metadata/Items/Armours/Boots/FourBootsStrInt5",
-        "Metadata/Items/Armours/Boots/FourBootsDex6",
-        "Metadata/Items/Armours/Boots/FourBootsStr6",
-        "Metadata/Items/Armours/Boots/FourBootsInt6",
         "Metadata/Items/Armours/Boots/FourBootsStrDex6",
         "Metadata/Items/Armours/Boots/FourBootsDexInt6",
         "Metadata/Items/Armours/Boots/FourBootsStrInt6",
@@ -1283,13 +1383,8 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         "Metadata/Items/Armours/Shields/ShieldDemigods",
         "Metadata/Items/Armours/Shields/FourShieldDemigod",
-        "Metadata/Items/Armours/Shields/FourShieldStrDex7",
-        "Metadata/Items/Armours/Shields/FourShieldStrInt7",
-        "Metadata/Items/Armours/Shields/FourShieldStrDex8",
-        "Metadata/Items/Armours/Shields/FourShieldStrInt8",
         "Metadata/Items/Armours/Shields/FourShieldStrDex9",
         "Metadata/Items/Armours/Shields/FourShieldStrInt9",
-        "Metadata/Items/Armours/Shields/FourShieldStr10",
         "Metadata/Items/Armours/Shields/FourShieldStrDex10",
         "Metadata/Items/Armours/Shields/FourShieldStrInt10",
         "Metadata/Items/Armours/Shields/FourShieldStr11",
@@ -1299,37 +1394,28 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Bucklers
         # =================================================================
-        "Metadata/Items/Armours/Shields/FourShieldDex9",
-        "Metadata/Items/Armours/Shields/FourShieldDex10",
         "Metadata/Items/Armours/Shields/FourShieldDex13",
         # =================================================================
         # Foci
         # =================================================================
-        "Metadata/Items/Armours/Focii/FourFocus9",
-        "Metadata/Items/Armours/Focii/FourFocus10",
         "Metadata/Items/Armours/Focii/FourFocus11",
         "Metadata/Items/Armours/Focii/FourFocus12",
         "Metadata/Items/Armours/Focii/FourFocus13",
         # =================================================================
         # Bows
         # =================================================================
-        "Metadata/Items/Weapons/TwoHandWeapons/Bows/FourBow9",
-        "Metadata/Items/Weapons/TwoHandWeapons/Bows/FourBow10",
+        "Metadata/Items/Weapons/TwoHandWeapons/Bows/FourBow9Endgame",
         "Metadata/Items/Weapons/TwoHandWeapons/Bows/FourBow11",
         "Metadata/Items/Weapons/TwoHandWeapons/Bows/FourBow12",
         # =================================================================
         # Crossbows
         # =================================================================
-        "Metadata/Items/Weapons/TwoHandWeapons/Crossbows/FourCrossbow9",
-        "Metadata/Items/Weapons/TwoHandWeapons/Crossbows/FourCrossbow10",
         "Metadata/Items/Weapons/TwoHandWeapons/Crossbows/FourCrossbow11",
         "Metadata/Items/Weapons/TwoHandWeapons/Crossbows/FourCrossbow12",
         "Metadata/Items/Weapons/TwoHandWeapons/Crossbows/FourCrossbow13",
         # =================================================================
         # Quarterstaves
         # =================================================================
-        "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourQuarterstaff9",
-        "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourQuarterstaff10",
         "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourQuarterstaff11",
         "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourQuarterstaff12",
         # =================================================================
@@ -1337,21 +1423,16 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff4",
         "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff7",
-        "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff8",
         "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff9",
-        "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff10",
-        "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff11",
-        "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff12",
         "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff13",
+        "Metadata/Items/Weapons/TwoHandWeapons/Staves/FourStaff14",
         # =================================================================
         # Wands
         # =================================================================
-        "Metadata/Items/Weapons/OneHandWeapons/Wands/FourWand6",
         "Metadata/Items/Weapons/OneHandWeapons/Wands/FourWand9",
         "Metadata/Items/Weapons/OneHandWeapons/Wands/FourWand10",
         "Metadata/Items/Weapons/OneHandWeapons/Wands/FourWand11",
         "Metadata/Items/Weapons/OneHandWeapons/Wands/FourWand12",
-        "Metadata/Items/Weapons/OneHandWeapons/Wands/FourWand13",
         # =================================================================
         # Sceptres
         # =================================================================
@@ -1360,17 +1441,13 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre7",
         "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre8",
         "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre9",
-        "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre10",
         "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre11",
         "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre12",
         "Metadata/Items/Weapons/OneHandWeapons/Sceptres/FourSceptre13",
         # =================================================================
         # Maces
         # =================================================================
-        "Metadata/Items/Weapons/OneHandWeapons/OneHandMaces/FourOneHandMace9",
-        "Metadata/Items/Weapons/OneHandWeapons/OneHandMaces/FourOneHandMace10",
         "Metadata/Items/Weapons/OneHandWeapons/OneHandMaces/FourOneHandMace11",
-        "Metadata/Items/Weapons/TwoHandWeapons/TwoHandMaces/FourTwoHandMace10",
         "Metadata/Items/Weapons/TwoHandWeapons/TwoHandMaces/FourTwoHandMace11",
         "Metadata/Items/Weapons/TwoHandWeapons/TwoHandMaces/FourTwoHandMace12",
         # =================================================================
@@ -1389,7 +1466,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Currency/CurrencyRerollMagic",
         "Metadata/Items/Currency/CurrencyRerollMagicShard",
         "Metadata/Items/Currency/CurrencyRerollRareShard",
-        "Metadata/Items/Currency/CurrencyRerollRareVeiled",
         "Metadata/Items/Currency/CurrencyRerollUnique",
         "Metadata/Items/Currency/CurrencyRerollUniqueShard",
         "Metadata/Items/Currency/CurrencyAddModToRareShard",
@@ -1469,7 +1545,7 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Quest items
         # =================================================================
-        # Books merged into 1 (most of this can be handled in name_conflict)
+        # Books merged into 1
         "Metadata/Items/QuestItems/Gallows/Act1/UnaSkillBook",
         "Metadata/Items/QuestItems/Gallows/Act2/SerpentClanCasterBossDrop",
         "Metadata/Items/QuestItems/Gallows/Act2/FinalLetterSkillBook",
@@ -1518,6 +1594,12 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/Gallows/Act2/DjinnFlaskEmpty",
         "Metadata/Items/QuestItems/Gallows/Act2/DjinnFlaskFull",
         "Metadata/Items/QuestItems/Gallows/Act2/MaggotHusk",
+        # New 0.3.0
+        "Metadata/Items/QuestItems/Gallows/Interlude/QimarWaterVial_02",
+        "Metadata/Items/QuestItems/Gallows/Interlude/QimarWaterVial_03",
+        "Metadata/Items/QuestItems/Gallows/Act4/PrisonerRegeneratingLiver",
+        "Metadata/Items/QuestItems/Gallows/Act4/HalfDigestedSulphite",
+        "Metadata/Items/QuestItems/Gallows/Act4/ScourgeOfTheSkiesTalons",
         # Old from PoE1
         "Metadata/Items/QuestItems/SkillBooks/DelevelBook",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookElder",
@@ -1534,6 +1616,11 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/Act11/TangleMapDeviceAlteration",
         "Metadata/Items/QuestItems/Act11/CleansingFireMapDeviceAlteration",
         "Metadata/Items/QuestItems/Sentinel/Controller",
+        # =================================================================
+        # Instance items
+        # =================================================================
+        "Metadata/Items/QuestItems/Gallows/Act4/PrisonKey",
+        "Metadata/Items/QuestItems/Gallows/Act4/Shovel",
         # =================================================================
         # Misc
         # =================================================================
@@ -2091,6 +2178,15 @@ class ItemsParser(SkillParserShared):
         "Support Skill Gem": {
             r"SupportGemUnknown",
         },
+        "UncutSkillGemStackable": {
+            r"SkillGemUncut(?!1$)\d+",
+        },
+        "UncutSupportGemStackable": {
+            r"SupportGemUncut(?!1$)\d+",
+        },
+        "UncutReservationGemStackable": {
+            r"ReservationGemUncut(?!4$)\d+",
+        },
         "StackableCurrency": {
             r"CurrencyEldritch",
             r"ScoutingReports",
@@ -2203,7 +2299,7 @@ class ItemsParser(SkillParserShared):
 
     def _skill_gem_type(self, infobox: OrderedDict, base_item_type, skill_gem, gem_type):
         name = gem_type["Name"]
-        if "[DNT]" in name:
+        if "[DNT]" in name or "[DNT-UNUSED]" in name:
             return False
         if skill_gem["IsVaalVariant"]:
             infobox["is_vaal_skill_gem"] = "true"
@@ -2234,20 +2330,46 @@ class ItemsParser(SkillParserShared):
         if additional:
             infobox["additional_skill_ids"] = ", ".join(a["Id"] for a in additional)
 
-        max_level = 20
+        max_level = 19
 
         # Active skills descriptions come from ActiveSkill.dat
-        if ge["IsSupport"] and gem_type["SupportText"]:
-            infobox["gem_description"] = process_keywords(gem_type["SupportText"])
+        if ge["IsSupport"]:
             max_level = 1
+
+            if "SkillGem" not in self.rr["SupportGems.dat64"].index:
+                self.rr["SupportGems.dat64"].build_index("SkillGem")
+
+            try:
+                supportGem = self.rr["SupportGems.dat64"].index["SkillGem"][skill_gem.rowid]
+            except KeyError:
+                return False
+
+            infobox["support_gem_category"] = ", ".join(f["Text"] for f in supportGem["Family"])
+
+            if supportGem["FlavourText"]:
+                infobox["flavour_text"] = parser.parse_and_handle_description_tags(
+                    rr=self.rr,
+                    text=supportGem["FlavourText"]["Text"],
+                )
+
+            # Only lineage supports have required level
+            if supportGem["IsLineage"]:
+                infobox["required_level"] = skill_gem["MinLevelReq"]
+            else:
+                infobox.pop("required_level")
+                infobox.pop("drop_level")
+
+            if gem_type["SupportText"]:
+                infobox["gem_description"] = process_keywords(gem_type["SupportText"])
 
         primary = OrderedDict()
         self._skill(
             gra_eff=ge,
             infobox=primary,
             parsed_args=self._parsed_args,
-            msg_name=gem_type["Name"],
+            msg_name=base_item_type["Name"],
             max_level=max_level,
+            skill_gem=skill_gem,
         )
 
         for k, v in primary.items():
@@ -2255,8 +2377,44 @@ class ItemsParser(SkillParserShared):
 
         return True
 
+    def _type_inherent_skill(self, infobox, base_item_type):
+        if "BaseItemType" not in self.rr["ItemInherentSkills.dat64"].index:
+            self.rr["ItemInherentSkills.dat64"].build_index("BaseItemType")
+
+        try:
+            item = self.rr["ItemInherentSkills.dat64"].index["BaseItemType"][base_item_type.rowid]
+        except KeyError:
+            # Allow spear for spear throw
+            if base_item_type["ItemClass"]["Id"] == "Spear":
+                item = {"SkillsGranted": []}  # Fake it
+            else:
+                return True
+
+        skills = []
+
+        for skill in item["SkillsGranted"]:
+            skills.append(skill["GemEffects"][0]["GrantedEffect"]["Id"])
+
+        # Spear throw
+        if base_item_type["ItemClass"]["Id"] == "Spear":
+            skills.append("SpearThrowPlayer")
+
+        i = 0
+        while i < len(skills):
+            infobox[f"inherent_skill{i+1}_id"] = skills[i]
+            # Level 0 by default
+            if skills[i] in {"ShieldBlockPlayer", "ParryPlayer", "SpearThrowPlayer"}:
+                infobox[f"inherent_skill{i+1}_min_level"] = 0
+                infobox[f"inherent_skill{i+1}_max_level"] = 0
+            i = i + 1
+
+        return True
+
     def _type_level(self, infobox, base_item_type):
-        infobox["required_level"] = base_item_type["DropLevel"]
+        if base_item_type["Id"] in self._REQUIRED_LEVEL_BY_ID:
+            infobox["required_level"] = self._REQUIRED_LEVEL_BY_ID[base_item_type["Id"]]
+        else:
+            infobox["required_level"] = base_item_type["DropLevel"]
         return True
 
     _type_attribute = _type_factory(
@@ -2573,6 +2731,22 @@ class ItemsParser(SkillParserShared):
         fail_condition=True,
     )
 
+    _type_tiered_currency = _type_factory(
+        data_file="TieredCurrency.dat64",
+        data_mapping=(
+            (
+                "MinimumModLevel",
+                {
+                    "template": "crafting_mod_level_min",
+                    "condition": lambda v: v,
+                },
+            ),
+        ),
+        row_index=True,
+        fail_condition=True,
+        skip_warning=True,
+    )
+
     _COSMETIC_NAME_MAP = {
         "English": {
             "Skin Transfer": {"cosmetic_type": "Consumable"},
@@ -2781,6 +2955,17 @@ class ItemsParser(SkillParserShared):
         row_index=True,
     )
 
+    def _type_map_extra(self, infobox, base_item_type, waystone):
+        if "Tier" not in self.rr["MapTiers.dat64"].index:
+            self.rr["MapTiers.dat64"].build_index("Tier")
+
+        for map_tier in self.rr["MapTiers.dat64"]:
+            if map_tier["Tier"] == waystone["Tier"]:
+                infobox["map_area_level"] = map_tier["Level"]
+                break
+
+        return True
+
     _type_map = _type_factory(
         data_file="Maps.dat64",
         data_mapping=(
@@ -2791,26 +2976,42 @@ class ItemsParser(SkillParserShared):
                 },
             ),
         ),
+        function=_type_map_extra,
         row_index=True,
     )
+
+    def _type_essence_extra(self, infobox, base_item_type, essence):
+        if "Essence" not in self.rr["EssenceMods.dat64"].index:
+            self.rr["EssenceMods.dat64"].build_index("Essence")
+
+        essence_mods = self.rr["EssenceMods.dat64"].index["Essence"][essence]
+        if len(essence_mods) == 0:
+            return True
+
+        results = []
+        for mod in essence_mods:
+            target = process_keywords(mod["TargetItemCategory"]["Text"])
+            desc = mod["Text"]
+
+            # Extract from Mod or DisplayMod if no explicit text
+            if not desc:
+                for mod_key in ("Mod", "DisplayMod"):
+                    if mod[mod_key]:
+                        stats = self._get_stats(mod=mod[mod_key])
+                        desc = "<br>".join(stats)
+                        break
+
+            results.append((target, process_keywords(desc)))
+
+        # Append results to infobox
+        for target, desc in results:
+            infobox["description"] += f"<br>{target}: {desc}"
+
+        return True
 
     _type_essence = _type_factory(
         data_file="Essences.dat64",
         data_mapping=(
-            (
-                "Tier",
-                {
-                    "template": "essence_level",
-                },
-            ),
-            (
-                "CraftTag",
-                {
-                    "template": "craft_tag",
-                    "condition": lambda v: v,
-                    "format": lambda v: v["DisplayString"],
-                },
-            ),
             (
                 "MonsterMod",
                 {
@@ -2820,53 +3021,64 @@ class ItemsParser(SkillParserShared):
             ),
         ),
         row_index=True,
+        function=_type_essence_extra,
         fail_condition=True,
         skip_warning=True,
     )
 
-    # TODO: Make mods in proper way when the wiki will support it
-    def _type_distilled_emotion_extra(self, infobox, base_item_type, emotions):
-        stats = [emotions["EnchantedMod"]["Stat1"]["Id"]]
-        values = [[emotions["EnchantedMod"]["Stat1Min"], emotions["EnchantedMod"]["Stat1Max"]]]
-        if emotions["EnchantedMod"]["Stat2"]:
-            stats.append(emotions["EnchantedMod"]["Stat2"]["Id"])
-            values.append(
-                [emotions["EnchantedMod"]["Stat2Min"], emotions["EnchantedMod"]["Stat2Max"]]
-            )
-
-        tr = self.tc["stat_descriptions.txt"].get_translation(
-            stats,
-            values,
-            full_result=True,
-            lang=self._language,
+    # TODO:Remove: When liquid emotions mods will be supported on wiki and mods will be exported
+    def _type_liquid_emotion_extra(self, infobox, base_item_type, emotions):
+        stats = self._get_stats(
+            mod=emotions["EnchantedMod"], translation_file="atlas_stat_descriptions.txt"
         )
-        desc = process_keywords(
-            "<br>".join([parser.make_inter_wiki_links(line) for line in tr.lines])
-        )
+        desc = process_keywords("<br>".join(stats))
         infobox["implicit1_text"] = "{{c|enchanted|" + desc + "}}"
 
         return True
 
-    _type_distilled_emotion = _type_factory(
+    _type_liquid_emotion = _type_factory(
         data_file="BlightCraftingItems.dat64",
         data_mapping=(
             (
                 "Tier",
                 {
-                    "template": "distilled_emotion_tier",
+                    "template": "liquid_emotion_tier",
                 },
             ),
-            # (
-            #    "EnchantedMod",
-            #    {
-            #        "template": "distilled_emotion_mod",
-            #        "condition": lambda v: v,
-            #        "format": lambda v: v["Id"],
-            #    },
-            # ),
+            (
+                "EnchantedMod",
+                {
+                    "template": "liquid_emotion_mod",
+                    "condition": lambda v: v,
+                    "format": lambda v: v["Id"],
+                },
+            ),
         ),
         row_index=True,
-        function=_type_distilled_emotion_extra,
+        function=_type_liquid_emotion_extra,
+        fail_condition=True,
+        skip_warning=True,
+    )
+
+    _type_abyss_bones = _type_factory(
+        data_file="AbyssBenchTicketTypes.dat64",
+        data_mapping=(
+            (
+                "MinimumModLevel",
+                {
+                    "template": "crafting_mod_level_min",
+                    "condition": lambda v: v,
+                },
+            ),
+            (
+                "MaximumItemLevel",
+                {
+                    "template": "crafting_item_level_max",
+                    "condition": lambda v: v,
+                },
+            ),
+        ),
+        row_index=True,
         fail_condition=True,
         skip_warning=True,
     )
@@ -2877,114 +3089,94 @@ class ItemsParser(SkillParserShared):
             self.rr["SoulCores.dat64"].build_index("BaseItemType")
 
         try:
-            soulCore = self.rr["SoulCores.dat64"].index["BaseItemType"][base_item_type.rowid]
+            soulcore = self.rr["SoulCores.dat64"].index["BaseItemType"][base_item_type.rowid]
         except KeyError:
             return False
 
         if infobox.get("description"):
             infobox.pop("description")
 
-        # infobox["soulcore_rank"] = soulCore["Rank"]
+        if soulcore["RequiredLevel"]:
+            infobox["required_level"] = soulcore["RequiredLevel"]
+        else:
+            infobox.pop("required_level")
 
-        socket_types = [
-            # stats, values, text
+        sc_stat_map = [
+            # stats/values key, target text key
             (
-                "StatsMartialWeapon",
-                "StatsValuesMartialWeapon",
-                "Martial Weapons",
+                "MartialWeapon",
+                "SoulCoreCategoryWeapons",
             ),
             (
-                "StatsArmour",
-                "StatsValuesArmour",
                 "Armour",
+                "SoulCoreCategoryArmour",
             ),
             (
-                "StatsCasterWeapon",
-                "StatsValuesCasterWeapon",
-                "Wand or Staff",
+                "CasterWeapon",
+                "SoulCoreCategoryCasterWeapons",
             ),
             (
-                "StatsAllEquipment",
-                "StatsValuesAllEquipment",
-                "All Equipment",
+                "AllEquipment",
+                "SoulCoreCategoryAllEquipment",
             ),
         ]
 
-        for st in socket_types:
-            if soulCore[st[0]]:
-                stats = [s["Id"] for s in soulCore[st[0]]]
-                values = soulCore[st[1]]
-                tr = self.tc["stat_descriptions.txt"].get_translation(
-                    stats,
-                    values,
-                    full_result=True,
-                    lang=self._language,
-                )
-                desc = process_keywords(
-                    "<br>".join([parser.make_inter_wiki_links(line) for line in tr.lines])
+        results = []
+        for stat_key, target in sc_stat_map:
+            if soulcore["Stats" + stat_key]:
+                stats = [s["Id"] for s in soulcore[f"Stats{stat_key}"]]
+                values = soulcore[f"StatsValues{stat_key}"]
+                stats = self._get_stats(
+                    stats=stats, values=values, translation_file="stat_descriptions.txt"
                 )
 
-                if infobox.get("description"):
-                    infobox["description"] += "<br>" + st[2] + ": " + desc
-                else:
-                    infobox["description"] = st[2] + ": " + desc
+                desc = "<br>".join(stats)
+                target = self.rr["ClientStrings.dat64"].index["Id"][target]["Text"]
+
+                results.append((process_keywords(target), process_keywords(desc)))
 
         # Per class SoulCores
         if "BaseItemType" not in self.rr["SoulCoresPerClass.dat64"].index:
             self.rr["SoulCoresPerClass.dat64"].build_index("BaseItemType")
 
-        try:
-            soulCorePC = self.rr["SoulCoresPerClass.dat64"].index["BaseItemType"][base_item_type]
-        except KeyError:
-            return True
+        soulcore_pc = self.rr["SoulCoresPerClass.dat64"].index["BaseItemType"][base_item_type]
 
-        for sc in soulCorePC:
+        for sc in soulcore_pc:
             stats = [s["Id"] for s in sc["Stats"]]
             values = sc["StatsValues"]
-            tr = self.tc["stat_descriptions.txt"].get_translation(
-                stats,
-                values,
-                full_result=True,
-                lang=self._language,
-            )
-            desc = process_keywords(
-                "<br>".join([parser.make_inter_wiki_links(line) for line in tr.lines])
+            stats = self._get_stats(
+                stats=stats, values=values, translation_file="stat_descriptions.txt"
             )
 
-            if infobox.get("description"):
-                infobox["description"] += "<br>" + sc["ItemClass"]["Name"] + ": " + desc
-            else:
-                infobox["description"] = sc["ItemClass"]["Name"] + ": " + desc
+            desc = "<br>".join(stats)
+            target = sc["ItemClass"]["Name"]
+
+            results.append((target, process_keywords(desc)))
+
+        # Append results to infobox
+        infobox["description"] = "<br>".join(f"{target}: {desc}" for target, desc in results)
 
         return True
 
     def _type_uncutgem(self, infobox, base_item_type):
-        if base_item_type["ItemClass"]["Id"] == "UncutSkillGem" and "Quest" in base_item_type["Id"]:
-            desc = (
-                self.rr["ClientStrings.dat64"]
-                .index["Id"]["SkillGemBlueTextLevelOne"]["Text"]
-                .replace("{0}", "1")
-            )
-        elif base_item_type["ItemClass"]["Id"] == "UncutSkillGem":
-            desc = (
-                self.rr["ClientStrings.dat64"]
-                .index["Id"]["SkillGemBlueText"]["Text"]
-                .replace("{0}", "#")
-            )
-        elif base_item_type["ItemClass"]["Id"] == "UncutSupportGem":
-            desc = (
-                self.rr["ClientStrings.dat64"]
-                .index["Id"]["SupportGemBlueText"]["Text"]
-                .replace("{0}", "#")
-            )
-        elif base_item_type["ItemClass"]["Id"] == "UncutReservationGem":
-            desc = (
-                self.rr["ClientStrings.dat64"]
-                .index["Id"]["PersistentBuffSkillGemBlueText"]["Text"]
-                .replace("{0}", "#")
-            )
+        class_id = base_item_type["ItemClass"]["Id"]
+        if class_id == "UncutSkillGemStackable":
+            if "Quest" in base_item_type["Id"]:
+                desc_text = "SkillGemBlueTextNoLevel"
+            else:
+                desc_text = "SkillGemBlueText"
+            help_text = "ItemDescriptionUncutSkillGem"
+        elif class_id == "UncutSupportGemStackable":
+            desc_text = "SupportGemBlueTextNoLevel"
+            help_text = "ItemDescriptionUncutSupportGem"
+        elif class_id == "UncutReservationGemStackable":
+            desc_text = "PersistentBuffSkillGemBlueText"
+            help_text = "ItemDescriptionUncutBuffGem"
 
-        infobox["description"] = desc
+        infobox["help_text"] = self.rr["ClientStrings.dat64"].index["Id"][help_text]["Text"]
+        infobox["description"] = (
+            self.rr["ClientStrings.dat64"].index["Id"][desc_text]["Text"].replace("{0}", "#")
+        )
 
         return True
 
@@ -2993,136 +3185,67 @@ class ItemsParser(SkillParserShared):
     """
     _cls_map = {
         # Jewellery
-        "Amulet": (_type_level,),
-        "Ring": (_type_level,),
-        "Belt": (_type_level,),
+        "Amulet": (_type_inherent_skill, _type_level),
+        "Ring": (_type_inherent_skill, _type_level),
+        "Belt": (_type_inherent_skill, _type_level),
         # Armour types
-        "Gloves": (
-            _type_level,
-            _type_attribute,
-            _type_armour,
-        ),
-        "Boots": (
-            _type_level,
-            _type_attribute,
-            _type_armour,
-        ),
-        "Body Armour": (
-            _type_level,
-            _type_attribute,
-            _type_armour,
-        ),
-        "Helmet": (
-            _type_level,
-            _type_attribute,
-            _type_armour,
-        ),
-        "Shield": (_type_level, _type_attribute, _type_armour, _type_shield),
-        "Buckler": (_type_level, _type_attribute, _type_armour, _type_shield),
-        "Focus": (
-            _type_level,
-            _type_attribute,
-            _type_armour,
-        ),
+        "Gloves": (_type_inherent_skill, _type_level, _type_attribute, _type_armour),
+        "Boots": (_type_inherent_skill, _type_level, _type_attribute, _type_armour),
+        "Body Armour": (_type_inherent_skill, _type_level, _type_attribute, _type_armour),
+        "Helmet": (_type_inherent_skill, _type_level, _type_attribute, _type_armour),
+        "Shield": (_type_inherent_skill, _type_level, _type_attribute, _type_armour, _type_shield),
+        "Buckler": (_type_inherent_skill, _type_level, _type_attribute, _type_armour, _type_shield),
+        "Focus": (_type_inherent_skill, _type_level, _type_attribute, _type_armour),
         # Martial weapons
-        "Claw": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "Dagger": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "One Hand Sword": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "One Hand Axe": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "One Hand Mace": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "Bow": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "Two Hand Sword": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "Two Hand Axe": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "Two Hand Mace": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "FishingRod": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "Warstaff": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "Spear": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "Crossbow": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "Flail": (
-            _type_level,
-            _type_attribute,
-            _type_weapon,
-        ),
-        "Quiver": (_type_level,),
+        "Claw": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "Dagger": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "One Hand Sword": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "One Hand Axe": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "One Hand Mace": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "Bow": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "Two Hand Sword": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "Two Hand Axe": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "Two Hand Mace": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "FishingRod": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "Warstaff": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "Spear": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "Crossbow": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "Flail": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "Quiver": (_type_inherent_skill, _type_level),
         # Caster weapons
-        "Sceptre": (
-            _type_level,
-            _type_spirit,
-        ),
-        "Wand": (_type_level,),
-        "Staff": (_type_level,),
-        "TrapTool": (_type_level,),
+        "Sceptre": (_type_inherent_skill, _type_level, _type_spirit),
+        "Wand": (_type_inherent_skill, _type_level),
+        "Staff": (_type_inherent_skill, _type_level),
+        "TrapTool": (_type_inherent_skill, _type_level),
         # Flasks
         "LifeFlask": (_type_level, _type_flask, _type_flask_charges),
         "ManaFlask": (_type_level, _type_flask, _type_flask_charges),
         "UtilityFlask": (_type_level, _type_flask, _type_flask_charges),  # Aka charm
         # Gems
         "Active Skill Gem": (_skill_gem,),
-        "Support Skill Gem": (_skill_gem,),
+        "Support Skill Gem": (
+            _type_level,
+            _skill_gem,
+        ),  # _type_level to make it in one place for all items (lineage)
         "Meta Skill Gem": (_skill_gem,),
         # Uncut gems
-        "UncutSkillGem": (_type_uncutgem,),
-        "UncutSupportGem": (_type_uncutgem,),
-        "UncutReservationGem": (_type_uncutgem,),
+        "UncutSkillGemStackable": (_type_uncutgem,),
+        "UncutSupportGemStackable": (_type_uncutgem,),
+        "UncutReservationGemStackable": (_type_uncutgem,),
         # Currency-like items
-        "Currency": (_type_currency,),
-        "StackableCurrency": (_type_currency, _type_essence, _type_distilled_emotion),
+        "Currency": (_type_currency),
+        "StackableCurrency": (
+            _type_currency,
+            _type_tiered_currency,
+            _type_essence,
+            _type_liquid_emotion,
+            _type_abyss_bones,
+        ),
         "SoulCore": (
+            _type_level,
             _type_currency,
             _type_soulcore,
-        ),
+        ),  # _type_level to make it in one place for all items
         "Omen": (_type_currency,),
         "HideoutDoodad": (_type_currency, _type_hideout_doodad),
         "Microtransaction": (_type_currency, _type_microtransaction),
@@ -3157,6 +3280,16 @@ class ItemsParser(SkillParserShared):
             return base_item_type["Name"]
 
     def _conflict_quest_items(self, infobox, base_item_type, rr, language):
+        qid = base_item_type["Id"].replace("Metadata/Items/QuestItems/Gallows/", "")
+
+        # Map fragments from Act 4
+        if qid.startswith("Act4/MapFragment"):
+            qid = qid[-1]
+            return "%s (%s)" % (
+                base_item_type["Name"],
+                self._LANG[language]["of"] % (qid, 4),
+            )
+
         return
 
     def _conflict_hideout_doodad(self, infobox, base_item_type, rr, language):
@@ -3295,7 +3428,10 @@ class ItemsParser(SkillParserShared):
             )
 
         if base_item_type["ItemClassesKey"]["Id"] not in self._IGNORE_DROP_LEVEL_CLASSES:
-            infobox["drop_level"] = base_item_type["DropLevel"]
+            if base_item_type["Id"] in self._DROP_LEVEL_BY_ID:
+                infobox["drop_level"] = self._DROP_LEVEL_BY_ID[base_item_type["Id"]]
+            else:
+                infobox["drop_level"] = base_item_type["DropLevel"]
 
         base_ot = ITFile(parent_or_file_system=self.file_system)
         base_ot.read(self.file_system.get_file(base_item_type["InheritsFrom"] + ".it"))
@@ -3330,7 +3466,7 @@ class ItemsParser(SkillParserShared):
                 )
             )
 
-        # TODO: unnote when modifiers will be done
+        # TODO:Remove: Unnote when modifiers will be done/exported
         # for i, mod in enumerate(base_item_type["Implicit_Mods"]):
         #    infobox["implicit%s" % (i + 1)] = mod["Id"]
 
@@ -3345,17 +3481,20 @@ class ItemsParser(SkillParserShared):
         override = self._NAME_OVERRIDE_BY_ID[language].get(m_id)
         override_2 = self._NAME_OVERRIDE_BY_ID_2[language].get(m_id)
         appendix = self._NAME_APPENDIX_BY_ID[language].get(m_id)
+        appendix_2 = self._NAME_APPENDIX_BY_ID_2[language].get(m_id)
 
         if override is not None:
             name = override
             infobox["inventory_icon"] = name
         if override_2 is not None:
             name = override_2
-            infobox["name"] = override_2
-            infobox["inventory_icon"] = name
+            infobox["name"] = name
         if appendix is not None:
             name += appendix
-            infobox["inventory_icon"] = name
+            if appendix != "":
+                infobox["inventory_icon"] = name
+        elif appendix_2 is not None:
+            name += appendix_2
         else:
             items = [
                 item
@@ -3419,7 +3558,7 @@ class ItemsParser(SkillParserShared):
         self.num_processed = 0
 
         for base_item_type in items:
-            if "[DNT]" in base_item_type["Name"]:
+            if "[DNT]" in base_item_type["Name"] or "[DNT-UNUSED]" in base_item_type["Name"]:
                 continue
 
             name = base_item_type["Name"]
@@ -3538,9 +3677,9 @@ class ItemsParser(SkillParserShared):
         if comp == 1:  # Flask
 
             def flask_icon_process(img: Image):
-                layer1 = img.crop((78, 0, 156, 156))
-                layer2 = img.crop((156, 0, 234, 156))
-                layer3 = img.crop((0, 0, 78, 156))
+                layer1 = img.crop((105, 0, 210, 212))
+                layer2 = img.crop((210, 0, 315, 212))
+                layer3 = img.crop((0, 0, 105, 212))
                 return Image.alpha_composite(layer1, Image.alpha_composite(layer2, layer3))
 
             return flask_icon_process
@@ -3549,8 +3688,8 @@ class ItemsParser(SkillParserShared):
 
         def resize(img: Image):
             max_dimension = max(img.size)
-            if max_dimension > 156:
-                scale = 156 / max_dimension
+            if max_dimension > 420:
+                scale = 420 / max_dimension
                 return img.resize(
                     (int(img.size[0] * scale), int(img.size[1] * scale)), Image.Resampling.LANCZOS
                 )

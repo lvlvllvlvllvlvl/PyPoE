@@ -358,7 +358,9 @@ class TranslationLanguage(TranslationReprMixin):
             _diff_list(self.strings, other.strings)
 
     def get_string(
-        self, values: Union[List[int], List[Tuple[int, int]]]
+        self,
+        values: Union[List[int], List[Tuple[int, int]]],
+        restriction: Union[str, None],
     ) -> Tuple[Union["TranslationString", None], Union[List[bool], None], Union[List[int], None]]:
         """
         Formats the string according with the given values and returns the
@@ -369,6 +371,8 @@ class TranslationLanguage(TranslationReprMixin):
         ----------
         values
             A list of values to be used for substitution
+        restriction
+            Restriction to look for in translation lines
 
         Returns
         -------
@@ -403,8 +407,18 @@ class TranslationLanguage(TranslationReprMixin):
             #   raise Exception('mismatch %s' % ts.range)
 
             if ts.restrictions:
-                # only known restriction is 'table_only' which is not currently needed
-                continue
+                # only known restrictions are 'table_only' and 'gem_quality'
+                if restriction is None:
+                    continue
+
+                # Explicit handling of known restrictions
+                if restriction == "gem_quality":
+                    if "gem_quality" in ts.restrictions:
+                        pass
+                    else:
+                        continue
+                else:
+                    continue
 
             match = ts.match_range(test_values)
             temp.append((match, ts))
@@ -422,6 +436,7 @@ class TranslationLanguage(TranslationReprMixin):
         values: Union[List[int], List[Tuple[int, int]]],
         use_placeholder: Union[bool, Callable[[int], Any]] = False,
         only_values: bool = False,
+        restriction: str = None,
     ) -> Tuple[Union[str, List[int]], List[int], List[int], Dict[str, str]]:
         """
         Formats the string according with the given values and
@@ -447,6 +462,8 @@ class TranslationLanguage(TranslationReprMixin):
             string to use as placeholder.
         only_values
             Whether to return formatted values instead of the formatted string.
+        restriction
+            Restriction to look for in translation lines
 
 
         Returns
@@ -454,7 +471,7 @@ class TranslationLanguage(TranslationReprMixin):
             Returns the formatted string. See
             :meth:`TranslationString:format_string` for details.
         """
-        ts, short_values, is_range = self.get_string(values)
+        ts, short_values, is_range = self.get_string(values, restriction)
 
         if ts is None:
             return None
@@ -1698,7 +1715,7 @@ class TranslationFile(AbstractFileReadOnly):
                             ts_match.group("quantifier"),
                         )
 
-                    if not [s for s in tl.strings if not s.restrictions]:
+                    if not [s for s in tl.strings if not s.restrictions] and language == "English":
                         all_strings_restricted = True
                     offset = offset_next_lang
 
@@ -1835,6 +1852,7 @@ class TranslationFile(AbstractFileReadOnly):
         values: Union[Dict, List],
         full_result: Literal[True],
         lang: str | None = "English",
+        restriction: str = None,
         use_placeholder: Union[bool, Callable, None] = False,
     ) -> TranslationResult: ...
 
@@ -1845,6 +1863,7 @@ class TranslationFile(AbstractFileReadOnly):
         values: Union[Dict[str, StatValue], List[StatValue]],
         only_values: Literal[True],
         lang: str | None = "English",
+        restriction: str = None,
         use_placeholder: Union[bool, Callable, None] = False,
     ) -> Dict[str, Tuple[str, str]]: ...
 
@@ -1854,6 +1873,7 @@ class TranslationFile(AbstractFileReadOnly):
         tags: List[str],
         values: Union[Dict, List],
         lang: str | None = "English",
+        restriction: str = None,
         use_placeholder: Union[bool, Callable, None] = False,
     ) -> List[str]: ...
 
@@ -1862,6 +1882,7 @@ class TranslationFile(AbstractFileReadOnly):
         tags: List[str],
         values: Union[Dict[str, StatValue], List[StatValue]],
         lang: str = "English",
+        restriction: str = None,
         full_result: bool = False,
         use_placeholder: Union[bool, Callable] = False,
         only_values: bool = False,
@@ -1887,6 +1908,8 @@ class TranslationFile(AbstractFileReadOnly):
         lang
             Language to use. If it doesn't exist, English will be used as
             fallback.
+        restriction
+            Restriction to look for in translation lines
         full_result
             If true, a :class:`TranslationResult` object will  be returned
         use_placeholder
@@ -1979,7 +2002,7 @@ class TranslationFile(AbstractFileReadOnly):
         formatted_values = {}
         for i, tr in enumerate(trans_found):
             tl = tr.get_language(lang)
-            ts, short_values, is_range = tl.get_string(trans_found_values[i])
+            ts, short_values, is_range = tl.get_string(trans_found_values[i], restriction)
             if ts:
                 string_instances.append(ts)
                 result = ts.format_string(short_values, is_range, use_placeholder)
@@ -2106,7 +2129,8 @@ class TranslationFileCache(AbstractFileCache[TranslationFile]):
         if merge_with_custom_file is None or merge_with_custom_file is False:
             self._custom_file = None
         elif merge_with_custom_file is True:
-            self._custom_file = get_custom_translation_file()
+            wiki = "wiki" if sequel == 1 else "poe2wiki"
+            self._custom_file = get_custom_translation_file(wiki=wiki)
         elif isinstance(merge_with_custom_file, TranslationFile):
             self._custom_file = merge_with_custom_file
         else:
@@ -2229,11 +2253,17 @@ def _diff_dict(self, other):
             print('Key "%s": Value "%s"' % (key, other[key]))
 
 
-def get_custom_translation_file() -> TranslationFile:
+def get_custom_translation_file(wiki="wiki") -> TranslationFile:
     """
     Returns the currently loaded custom translation file.
 
     Loads the default file if none is loaded.
+
+    Parameters
+    ----------
+    wiki : str
+        Should use poe1 or poe2 files?
+        Accepts "wiki" and "poe2wiki".
 
     Returns
     -------
@@ -2242,11 +2272,11 @@ def get_custom_translation_file() -> TranslationFile:
     """
     global _custom_translation_file
     if _custom_translation_file is None:
-        set_custom_translation_file()
+        set_custom_translation_file(wiki=wiki)
     return _custom_translation_file
 
 
-def set_custom_translation_file(file: Union[str, None] = None):
+def set_custom_translation_file(file: Union[str, None] = None, wiki="wiki"):
     """
     Sets the custom translation file.
 
@@ -2255,9 +2285,16 @@ def set_custom_translation_file(file: Union[str, None] = None):
     file : str
         Path where the custom translation file is located. If None,
         the default file will be loaded
+
+    wiki : str
+        Should use poe1 or poe2 files?
+        Accepts "wiki" and "poe2wiki".
     """
     global _custom_translation_file
-    _custom_translation_file = TranslationFile(file_path=file or CUSTOM_TRANSLATION_FILE)
+    custom_file = os.path.join(
+        os.path.dirname(CUSTOM_TRANSLATION_FILE), wiki, os.path.basename(CUSTOM_TRANSLATION_FILE)
+    )
+    _custom_translation_file = TranslationFile(file_path=file or custom_file)
 
 
 custom_translation_file = property(
@@ -2266,11 +2303,17 @@ custom_translation_file = property(
 )
 
 
-def get_hardcoded_translation_file() -> TranslationFile:
+def get_hardcoded_translation_file(wiki="wiki") -> TranslationFile:
     """
     Returns the currently loaded hardcoded translation file.
 
     Loads the default file if none is loaded.
+
+    Parameters
+    ----------
+    wiki : str
+        Should use poe1 or poe2 files?
+        Accepts "wiki" and "poe2wiki".
 
     Returns
     -------
@@ -2279,11 +2322,11 @@ def get_hardcoded_translation_file() -> TranslationFile:
     """
     global _hardcoded_translation_file
     if _hardcoded_translation_file is None:
-        set_hardcoded_translation_file()
+        set_hardcoded_translation_file(wiki=wiki)
     return _hardcoded_translation_file
 
 
-def set_hardcoded_translation_file(file: Union[str, None] = None):
+def set_hardcoded_translation_file(file: Union[str, None] = None, wiki="wiki"):
     """
     Sets the hardcoded translation file.
 
@@ -2292,9 +2335,18 @@ def set_hardcoded_translation_file(file: Union[str, None] = None):
     file : str
         Path where the hardcoded translation file is located. If None,
         the default file will be loaded
+
+    wiki : str
+        Should use poe1 or poe2 files?
+        Accepts "wiki" and "poe2wiki".
     """
     global _hardcoded_translation_file
-    _hardcoded_translation_file = TranslationFile(file_path=file or HARDCODED_TRANSLATION_FILE)
+    hardcoded_file = os.path.join(
+        os.path.dirname(HARDCODED_TRANSLATION_FILE),
+        wiki,
+        os.path.basename(HARDCODED_TRANSLATION_FILE),
+    )
+    _hardcoded_translation_file = TranslationFile(file_path=file or hardcoded_file)
 
 
 hardcoded_translation_file = property(

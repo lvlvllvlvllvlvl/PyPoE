@@ -2162,8 +2162,8 @@ class BaseParser:
             path_or_file_system=self.file_system,
         )
 
-        self.custom = get_custom_translation_file()
-        self.hardcoded = get_hardcoded_translation_file()
+        self.custom = get_custom_translation_file(wiki="wiki")
+        self.hardcoded = get_hardcoded_translation_file(wiki="wiki")
 
         self._img_path = None
         self.lang = config.get_option("language")
