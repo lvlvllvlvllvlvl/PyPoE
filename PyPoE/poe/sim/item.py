@@ -47,7 +47,7 @@ import re
 from enum import Enum
 
 # self
-from PyPoE.poe import constants
+from PyPoE.poe import poe1constants as constants
 
 # 3rd-party
 

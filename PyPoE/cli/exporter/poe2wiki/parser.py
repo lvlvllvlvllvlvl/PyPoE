@@ -72,7 +72,7 @@ from dds import decode_dds
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.util import fix_path, get_content_path
-from PyPoE.poe import constants
+from PyPoE.poe import poe2constants as constants
 from PyPoE.poe.file.dat import RelationalReader
 from PyPoE.poe.file.file_system import FileSystem
 from PyPoE.poe.file.it import ITFileCache
@@ -1521,7 +1521,7 @@ class BaseParser:
                     "Can not automatically determine translation file if mod is not set"
                 )
             else:
-                translation_file = get_translation_file_from_domain(mod["Domain"])
+                translation_file = get_translation_file_from_domain(mod["Domain"], constants)
         if stats is None or values is None:
             if mod is None:
                 raise ValueError("Mod must be set if any of stats or values aren't set")

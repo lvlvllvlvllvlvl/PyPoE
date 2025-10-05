@@ -49,11 +49,8 @@ Documentation
 
 # Python
 
-# 3rd-party
-
-from PyPoE.poe import constants
-
 # self
+from PyPoE.poe import poe1constants
 from PyPoE.poe.file.dat import DatRecord
 
 # =============================================================================
@@ -68,24 +65,6 @@ __all__ = [
     "get_translation",
     "get_translation_file_from_domain",
 ]
-
-_translation_map = {
-    constants.MOD_DOMAIN.MONSTER: "monster_stat_descriptions.txt",
-    constants.MOD_DOMAIN.CHEST: "chest_stat_descriptions.txt",
-    constants.MOD_DOMAIN.AREA: "map_stat_descriptions.txt",
-    constants.MOD_DOMAIN.ATLAS: "atlas_stat_descriptions.txt",
-    constants.MOD_DOMAIN.LEAGUESTONE: "leaguestone_stat_descriptions.txt",
-    constants.MOD_DOMAIN.DELVE_AREA: "map_stat_descriptions.txt",
-    constants.MOD_DOMAIN.MAP_DEVICE: "map_stat_descriptions.txt",
-    # To properly support zana's innate IIQ
-    constants.MOD_DOMAIN.CRAFTED: "map_stat_descriptions.txt",
-    constants.MOD_DOMAIN.HEIST_NPC: "heist_equipment_stat_descriptions.txt",
-    constants.MOD_DOMAIN.PRIMORDIAL_ALTAR: "primordial_altar_stat_descriptions.txt",
-    constants.MOD_DOMAIN.SENTINEL: "sentinel_stat_descriptions.txt",
-    constants.MOD_DOMAIN.TEMPLAR_RELIC: "sanctum_relic_stat_descriptions.txt",
-    constants.MOD_DOMAIN.TINCTURE: "tincture_stat_descriptions.txt",
-    constants.MOD_DOMAIN.MAP_RELIC: "atlas_relic_stat_descriptions.txt",
-}
 
 # =============================================================================
 # Classes
@@ -237,7 +216,7 @@ class SpawnChanceCalculator:
 # =============================================================================
 
 
-def get_translation_file_from_domain(domain) -> str:
+def get_translation_file_from_domain(domain, constants) -> str:
     """
     Returns the likely stat translation file for a given mod domain.
 
@@ -245,6 +224,7 @@ def get_translation_file_from_domain(domain) -> str:
     ----------
     domain : int
         Id of the domain
+    constants : poe1constants | poe2constants
 
     Returns
     -------
@@ -252,7 +232,7 @@ def get_translation_file_from_domain(domain) -> str:
         name of the stat translation file
     """
     try:
-        return _translation_map[domain]
+        return constants.MOD_TRANSLATION_MAP[domain]
     except KeyError:
         return "stat_descriptions.txt"
 
@@ -279,6 +259,7 @@ def get_translation(mod, translation_cache, translation_file=None, **kwargs):
     TranslationResult
 
     """
+    constants = mod.parent.specification.constants
     stats = []
     for i in constants.MOD_STATS_RANGE:
         stat = mod["StatsKey%s" % i]
@@ -293,7 +274,7 @@ def get_translation(mod, translation_cache, translation_file=None, **kwargs):
         ids.append(stat["Id"])
 
     if translation_file is None:
-        tf_name = get_translation_file_from_domain(mod["Domain"])
+        tf_name = get_translation_file_from_domain(mod["Domain"], constants)
     else:
         tf_name = translation_file
 
@@ -392,10 +373,10 @@ def generate_spawnable_mod_list(
         if domain is not a valid MOD_DOMAIN constant
         if generation_type is not a valid MOD_GENERATION_TYPE constant
     """
-    if not isinstance(domain, constants.MOD_DOMAIN):
+    if not isinstance(domain, poe1constants.MOD_DOMAIN):
         raise TypeError("domain must be a MOD_DOMAIN instance.")
 
-    if not isinstance(generation_type, constants.MOD_GENERATION_TYPE):
+    if not isinstance(generation_type, poe1constants.MOD_GENERATION_TYPE):
         raise TypeError("generation_type must be a MOD_GENERATION_TYPE instance.")
 
     mods = []

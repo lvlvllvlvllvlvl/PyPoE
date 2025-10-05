@@ -231,6 +231,7 @@ class Specification(dict[str, "File"]):
 
     def __init__(self, sequel: int, *args, **kwargs):
         self.sequel = sequel
+        self.constants = constants.sequel(sequel)
         super().__init__(*args, **kwargs)
 
     def validate(self):
@@ -286,7 +287,7 @@ class Specification(dict[str, "File"]):
                                 "field": field_name,
                             },
                         )
-                    if not hasattr(constants, field.enum):
+                    if not hasattr(self.constants, field.enum):
                         raise SpecificationError(
                             SpecificationError.ERRORS.INVALID_ENUM_NAME,
                             "%(dat_file)s->%(field)s->enum: Invalid constant enum "

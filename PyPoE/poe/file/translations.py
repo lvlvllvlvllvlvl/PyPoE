@@ -125,7 +125,6 @@ from typing import Any, Callable, Dict, List, Literal, Tuple, TypeVar, Union, ov
 
 # self
 from PyPoE import DATA_DIR
-from PyPoE.poe import constants
 from PyPoE.poe.file.dat import DatRecord, RelationalReader
 from PyPoE.poe.file.shared import AbstractFileReadOnly, ParserError, ParserWarning
 from PyPoE.poe.file.shared.cache import AbstractFileCache
@@ -2365,6 +2364,8 @@ def install_data_dependant_quantifiers(relational_reader: RelationalReader):
         :class:`RelationalReader` instance to read the required game data
         files from.
     """
+
+    constants = relational_reader.specification.constants
 
     TQReminderString(relational_reader=relational_reader)
 

@@ -660,6 +660,25 @@ class MOD_DOMAIN(IntEnumOverride):
     JEWEL = MISC
 
 
+MOD_TRANSLATION_MAP = {
+    MOD_DOMAIN.MONSTER: "monster_stat_descriptions.txt",
+    MOD_DOMAIN.CHEST: "chest_stat_descriptions.txt",
+    MOD_DOMAIN.AREA: "map_stat_descriptions.txt",
+    MOD_DOMAIN.ATLAS: "atlas_stat_descriptions.txt",
+    MOD_DOMAIN.LEAGUESTONE: "leaguestone_stat_descriptions.txt",
+    MOD_DOMAIN.DELVE_AREA: "map_stat_descriptions.txt",
+    MOD_DOMAIN.MAP_DEVICE: "map_stat_descriptions.txt",
+    # To properly support zana's innate IIQ
+    MOD_DOMAIN.CRAFTED: "map_stat_descriptions.txt",
+    MOD_DOMAIN.HEIST_NPC: "heist_equipment_stat_descriptions.txt",
+    MOD_DOMAIN.PRIMORDIAL_ALTAR: "primordial_altar_stat_descriptions.txt",
+    MOD_DOMAIN.SENTINEL: "sentinel_stat_descriptions.txt",
+    MOD_DOMAIN.TEMPLAR_RELIC: "sanctum_relic_stat_descriptions.txt",
+    MOD_DOMAIN.TINCTURE: "tincture_stat_descriptions.txt",
+    MOD_DOMAIN.MAP_RELIC: "atlas_relic_stat_descriptions.txt",
+}
+
+
 class MOD_GENERATION_TYPE(IntEnumOverride):
     """
     Representation of mod generation types.

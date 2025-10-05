@@ -48,7 +48,8 @@ from PyPoE.cli.exporter.poe2wiki.parser import (
 )
 
 # Self
-from PyPoE.poe import constants, text
+from PyPoE.poe import poe2constants as constants
+from PyPoE.poe import text
 from PyPoE.shared.decorators import deprecated
 
 # =============================================================================

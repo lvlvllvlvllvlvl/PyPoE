@@ -50,7 +50,7 @@ from PyPoE.cli.exporter.wiki.handler import WIKIS, ExporterHandler, add_parser_a
 from PyPoE.cli.exporter.wiki.parser import BaseParser
 
 # self
-from PyPoE.poe import constants
+from PyPoE.poe import poe1constants as constants
 from PyPoE.poe.file.dat import RelationalReader
 
 # =============================================================================

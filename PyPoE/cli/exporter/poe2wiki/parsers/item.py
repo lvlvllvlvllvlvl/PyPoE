@@ -54,7 +54,7 @@ from PyPoE.cli.exporter.poe2wiki.parser import process_keywords, strip_keywords
 from PyPoE.cli.exporter.poe2wiki.parsers.skill import SkillParserShared
 
 # Self
-from PyPoE.poe import constants
+from PyPoE.poe import poe2constants as constants
 from PyPoE.poe.file.dat import DatReader, DatRecord, RelationalReader
 from PyPoE.poe.file.it import ITFile
 

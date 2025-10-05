@@ -46,7 +46,8 @@ from PyPoE.cli.exporter.wiki.handler import ExporterHandler, ExporterResult
 from PyPoE.cli.exporter.wiki.parser import BaseParser, WikiCondition
 
 # Self
-from PyPoE.poe import constants, text
+from PyPoE.poe import poe1constants as constants
+from PyPoE.poe import text
 from PyPoE.shared.decorators import deprecated
 
 # =============================================================================
