@@ -125,7 +125,7 @@ from typing import Any, Callable, Dict, List, Literal, Tuple, TypeVar, Union, ov
 
 # self
 from PyPoE import DATA_DIR
-from PyPoE.poe.constants import MOD_GENERATION_TYPE
+from PyPoE.poe import constants
 from PyPoE.poe.file.dat import DatRecord, RelationalReader
 from PyPoE.poe.file.shared import AbstractFileReadOnly, ParserError, ParserWarning
 from PyPoE.poe.file.shared.cache import AbstractFileCache
@@ -2379,7 +2379,7 @@ def install_data_dependant_quantifiers(relational_reader: RelationalReader):
         id="tempest_mod_text",
         relational_reader=relational_reader,
         table="Mods.dat64",
-        predicate=("GenerationType", MOD_GENERATION_TYPE.TEMPEST),
+        predicate=("GenerationType", constants.MOD_GENERATION_TYPE.TEMPEST),
         placeholder="&lt;random Tempest modifier&gt;",
     )
 

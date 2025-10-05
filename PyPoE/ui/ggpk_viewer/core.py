@@ -38,7 +38,7 @@ from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 
 # Package Imports
-from PyPoE.poe.constants import VERSION
+from PyPoE.poe import constants
 from PyPoE.poe.file import dat, ggpk
 from PyPoE.ui.ggpk_viewer.menu import *
 from PyPoE.ui.ggpk_viewer.toolbar import *
@@ -262,16 +262,16 @@ class SettingDDS(BoolSetting):
 
 class SettingVersion(ComboBoxSetting):
     KEY = "version"
-    DEFAULT = VERSION.DEFAULT
+    DEFAULT = constants.VERSION.DEFAULT
 
     def __init__(self, parent, settings, row, *args, **kwargs):
         super().__init__(parent, settings, *args, **kwargs)
         self._set_data(
             OrderedDict(
                 (
-                    ("Stable", VERSION.STABLE),
-                    ("Beta", VERSION.BETA),
-                    ("Alpha", VERSION.ALPHA),
+                    ("Stable", constants.VERSION.STABLE),
+                    ("Beta", constants.VERSION.BETA),
+                    ("Alpha", constants.VERSION.ALPHA),
                 )
             )
         )
@@ -280,7 +280,7 @@ class SettingVersion(ComboBoxSetting):
         parent.layout.addWidget(self.combobox, row, 2)
 
     def _get_cast(self, value):
-        return getattr(VERSION, value)
+        return getattr(constants.VERSION, value)
 
     def _set_cast(self, value):
         # Change VERSION.STABLE into STABLE

@@ -51,7 +51,7 @@ Documentation
 
 # 3rd-party
 
-from PyPoE.poe.constants import MOD_DOMAIN, MOD_GENERATION_TYPE, MOD_STATS_RANGE
+from PyPoE.poe import constants
 
 # self
 from PyPoE.poe.file.dat import DatRecord
@@ -70,21 +70,21 @@ __all__ = [
 ]
 
 _translation_map = {
-    MOD_DOMAIN.MONSTER: "monster_stat_descriptions.txt",
-    MOD_DOMAIN.CHEST: "chest_stat_descriptions.txt",
-    MOD_DOMAIN.AREA: "map_stat_descriptions.txt",
-    MOD_DOMAIN.ATLAS: "atlas_stat_descriptions.txt",
-    MOD_DOMAIN.LEAGUESTONE: "leaguestone_stat_descriptions.txt",
-    MOD_DOMAIN.DELVE_AREA: "map_stat_descriptions.txt",
-    MOD_DOMAIN.MAP_DEVICE: "map_stat_descriptions.txt",
+    constants.MOD_DOMAIN.MONSTER: "monster_stat_descriptions.txt",
+    constants.MOD_DOMAIN.CHEST: "chest_stat_descriptions.txt",
+    constants.MOD_DOMAIN.AREA: "map_stat_descriptions.txt",
+    constants.MOD_DOMAIN.ATLAS: "atlas_stat_descriptions.txt",
+    constants.MOD_DOMAIN.LEAGUESTONE: "leaguestone_stat_descriptions.txt",
+    constants.MOD_DOMAIN.DELVE_AREA: "map_stat_descriptions.txt",
+    constants.MOD_DOMAIN.MAP_DEVICE: "map_stat_descriptions.txt",
     # To properly support zana's innate IIQ
-    MOD_DOMAIN.CRAFTED: "map_stat_descriptions.txt",
-    MOD_DOMAIN.HEIST_NPC: "heist_equipment_stat_descriptions.txt",
-    MOD_DOMAIN.PRIMORDIAL_ALTAR: "primordial_altar_stat_descriptions.txt",
-    MOD_DOMAIN.SENTINEL: "sentinel_stat_descriptions.txt",
-    MOD_DOMAIN.TEMPLAR_RELIC: "sanctum_relic_stat_descriptions.txt",
-    MOD_DOMAIN.TINCTURE: "tincture_stat_descriptions.txt",
-    MOD_DOMAIN.MAP_RELIC: "atlas_relic_stat_descriptions.txt",
+    constants.MOD_DOMAIN.CRAFTED: "map_stat_descriptions.txt",
+    constants.MOD_DOMAIN.HEIST_NPC: "heist_equipment_stat_descriptions.txt",
+    constants.MOD_DOMAIN.PRIMORDIAL_ALTAR: "primordial_altar_stat_descriptions.txt",
+    constants.MOD_DOMAIN.SENTINEL: "sentinel_stat_descriptions.txt",
+    constants.MOD_DOMAIN.TEMPLAR_RELIC: "sanctum_relic_stat_descriptions.txt",
+    constants.MOD_DOMAIN.TINCTURE: "tincture_stat_descriptions.txt",
+    constants.MOD_DOMAIN.MAP_RELIC: "atlas_relic_stat_descriptions.txt",
 }
 
 # =============================================================================
@@ -280,7 +280,7 @@ def get_translation(mod, translation_cache, translation_file=None, **kwargs):
 
     """
     stats = []
-    for i in MOD_STATS_RANGE:
+    for i in constants.MOD_STATS_RANGE:
         stat = mod["StatsKey%s" % i]
         if stat:
             stats.append(stat)
@@ -392,10 +392,10 @@ def generate_spawnable_mod_list(
         if domain is not a valid MOD_DOMAIN constant
         if generation_type is not a valid MOD_GENERATION_TYPE constant
     """
-    if not isinstance(domain, MOD_DOMAIN):
+    if not isinstance(domain, constants.MOD_DOMAIN):
         raise TypeError("domain must be a MOD_DOMAIN instance.")
 
-    if not isinstance(generation_type, MOD_GENERATION_TYPE):
+    if not isinstance(generation_type, constants.MOD_GENERATION_TYPE):
         raise TypeError("generation_type must be a MOD_GENERATION_TYPE instance.")
 
     mods = []

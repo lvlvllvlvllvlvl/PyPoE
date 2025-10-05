@@ -72,7 +72,7 @@ from dds import decode_dds
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.util import fix_path, get_content_path
-from PyPoE.poe.constants import MOD_DOMAIN, MOD_STATS_RANGE, WORDLISTS
+from PyPoE.poe import constants
 from PyPoE.poe.file.dat import RelationalReader
 from PyPoE.poe.file.file_system import FileSystem
 from PyPoE.poe.file.it import ITFileCache
@@ -1528,7 +1528,7 @@ class BaseParser:
             else:
                 stats = []
                 values = []
-                for i in MOD_STATS_RANGE:
+                for i in constants.MOD_STATS_RANGE:
                     k = mod["StatsKey%s" % i]
                     if k is None:
                         continue
@@ -1550,7 +1550,7 @@ class BaseParser:
             stats, values, full_result=True, lang=self.lang
         )
 
-        if mod and mod["Domain"] == MOD_DOMAIN.MONSTER:
+        if mod and mod["Domain"] == constants.MOD_DOMAIN.MONSTER:
             default = self.tc["stat_descriptions.txt"].get_translation(
                 result.source_ids, result.source_values, full_result=True, lang=self.lang
             )
@@ -1760,7 +1760,7 @@ class TagHandler:
 
     def _unique_handler(self, hstr, parameter):
         words = self.rr["Words.dat64"].index["Text"][hstr]
-        if words and words[0]["WordlistsKey"] == WORDLISTS.UNIQUE_ITEM:
+        if words and words[0]["WordlistsKey"] == constants.WORDLISTS.UNIQUE_ITEM:
             # Check whether unique item name clashes with base item name
             items = self.rr["BaseItemTypes.dat64"].index["Name"][hstr]
             if len(items) > 0:

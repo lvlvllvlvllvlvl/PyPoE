@@ -24,7 +24,7 @@ import importlib
 from importlib.machinery import SourceFileLoader
 
 # self
-from PyPoE.poe.constants import VERSION
+from PyPoE.poe import constants
 
 # 3rd-party
 
@@ -40,7 +40,7 @@ __all__ = ["load"]
 # =============================================================================
 
 
-def load(path=None, version=VERSION.DEFAULT, reload=False, validate=None):
+def load(path=None, version=constants.VERSION.DEFAULT, reload=False, validate=None):
     """
     Loads a specification from a python module that can be used for the dat
     files.
@@ -88,11 +88,11 @@ def load(path=None, version=VERSION.DEFAULT, reload=False, validate=None):
             validate = False
 
         if version in (
-            VERSION.STABLE,
-            VERSION.BETA,
-            VERSION.ALPHA,
-            VERSION.GENERATED,
-            VERSION.POE2,
+            constants.VERSION.STABLE,
+            constants.VERSION.BETA,
+            constants.VERSION.ALPHA,
+            constants.VERSION.GENERATED,
+            constants.VERSION.POE2,
         ):
             module = importlib.import_module(
                 "PyPoE.poe.file.specification.data.%s" % version.name.lower()

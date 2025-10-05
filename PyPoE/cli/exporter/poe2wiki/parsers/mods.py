@@ -48,8 +48,7 @@ from PyPoE.cli.exporter.poe2wiki.parser import (
 )
 
 # Self
-from PyPoE.poe import text
-from PyPoE.poe.constants import MOD_DOMAIN, MOD_GENERATION_TYPE, MOD_STATS_RANGE
+from PyPoE.poe import constants, text
 from PyPoE.shared.decorators import deprecated
 
 # =============================================================================
@@ -94,7 +93,7 @@ class ModsHandler(ExporterHandler):
             "--domain",
             dest="domain",
             help="Mod domain",
-            choices=[k.name for k in MOD_DOMAIN],
+            choices=[k.name for k in constants.MOD_DOMAIN],
         )
 
         parser.add_argument(
@@ -102,7 +101,7 @@ class ModsHandler(ExporterHandler):
             "--type",
             dest="generation_type",
             help="Mod domain",
-            choices=[k.name for k in MOD_GENERATION_TYPE],
+            choices=[k.name for k in constants.MOD_GENERATION_TYPE],
         )
 
         self.add_default_parsers(
@@ -182,7 +181,7 @@ class ModParser(BaseParser):
             filters.append(
                 {
                     "column": "Domain",
-                    "comp": getattr(MOD_DOMAIN, args.domain),
+                    "comp": getattr(constants.MOD_DOMAIN, args.domain),
                 }
             )
 
@@ -190,7 +189,7 @@ class ModParser(BaseParser):
             filters.append(
                 {
                     "column": "GenerationType",
-                    "comp": getattr(MOD_GENERATION_TYPE, args.generation_type),
+                    "comp": getattr(constants.MOD_GENERATION_TYPE, args.generation_type),
                 }
             )
 
@@ -259,7 +258,7 @@ class ModParser(BaseParser):
             stats = []
             values = []
             buffstats = mod["BuffTemplate"]["StatsKey"] if mod["BuffTemplate"] else []
-            for i in MOD_STATS_RANGE:
+            for i in constants.MOD_STATS_RANGE:
                 k = mod["StatsKey%s" % i]
                 if k is None or k in buffstats:
                     continue
@@ -339,7 +338,7 @@ class ModParser(BaseParser):
                 continue
 
             stats = []
-            for i in MOD_STATS_RANGE:
+            for i in constants.MOD_STATS_RANGE:
                 stat = mod["StatsKey%s" % i]
                 if stat:
                     stats.append(stat)

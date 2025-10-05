@@ -42,7 +42,7 @@ Internal API
 from collections.abc import Iterable
 
 # self
-from PyPoE.poe.constants import RARITY
+from PyPoE.poe import constants
 from PyPoE.poe.file.dat import RelationalReader
 from PyPoE.poe.file.ot import OTFileCache
 
@@ -132,15 +132,15 @@ class MonsterFactory:
             self.rr[fn]
 
         self.rarity_mods = {
-            RARITY.NORMAL: [],
+            constants.RARITY.NORMAL: [],
         }
         for mod in self.rr["Mods.dat"]:
             if mod["Id"].startswith("MonsterMagic"):
-                self.rarity_mods[RARITY.MAGIC] = mod
+                self.rarity_mods[constants.RARITY.MAGIC] = mod
             elif mod["Id"].startswith("MonsterRare"):
-                self.rarity_mods[RARITY.RARE] = mod
+                self.rarity_mods[constants.RARITY.RARE] = mod
             elif mod["Id"].startswith("MonsterUnique"):
-                self.rarity_mods[RARITY.UNIQUE] = mod
+                self.rarity_mods[constants.RARITY.UNIQUE] = mod
 
     def monster(self, rowid=None, metaid=None, name=None, *args, **kwargs):
         """

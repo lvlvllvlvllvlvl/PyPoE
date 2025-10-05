@@ -63,7 +63,7 @@ from PyPoE.cli.exporter.wiki.parsers.itemconstants import (
 from PyPoE.cli.exporter.wiki.parsers.skill import SkillParserShared
 
 # Self
-from PyPoE.poe.constants import RARITY
+from PyPoE.poe import constants
 from PyPoE.poe.file.dat import DatReader, RelationalReader
 from PyPoE.poe.file.it import ITFile
 from PyPoE.poe.sim.formula import GemTypes, gem_stat_requirement
@@ -3688,7 +3688,7 @@ class ItemsParser(SkillParserShared):
         return False
 
     def _process_purchase_costs(self, source, infobox):
-        for rarity in RARITY:
+        for rarity in constants.RARITY:
             if rarity.id >= 5:
                 break
             # for i, (item, cost) in enumerate(

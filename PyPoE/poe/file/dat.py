@@ -1234,7 +1234,7 @@ class RelationalReader(AbstractFileCache[DatFile]):
                             },
                         )
             elif spec_row.enum:
-                const_enum = getattr(constants, spec_row.enum)
+                const_enum = getattr(constants.sequel(self.specification.sequel), spec_row.enum)
                 index = df.reader.table_columns[key]["index"]
                 for i, row in enumerate(df.reader.table_data):
                     df.reader.table_data[i][index] = vf(
