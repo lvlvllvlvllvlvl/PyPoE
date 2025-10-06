@@ -2085,9 +2085,13 @@ _KEYWORD_LINK_MAP = {
         ("", "Chaos Orb"),
     ],
     "Charges": [
+        ("Power Charges", "Power Charges"),
         ("Power Charge", "Power Charge"),
+        ("Frenzy Charges", "Frenzy Charges"),
         ("Frenzy Charge", "Frenzy Charge"),
+        ("Endurance Charges", "Endurance Charges"),
         ("Endurance Charge", "Endurance Charge"),
+        ("Charges", "Charges"),
         ("Charge", "Charge"),
         ("", "Charge"),
     ],
@@ -2216,6 +2220,7 @@ _KEYWORD_LINK_MAP = {
     ],
     "EnergyShieldLeech": [
         ("Energy Shield Leech", "Energy Shield Leech"),
+        ("Leech Energy Shield", "Leech Energy Shield"),
         ("Leech", "Leech"),
         ("", "Leech"),
     ],
@@ -2341,6 +2346,7 @@ _KEYWORD_LINK_MAP = {
     ],
     "LifeLeech": [
         ("Life Leech", "Life Leech"),
+        ("Leech Life", "Leech Life"),
         ("Leech", "Leech"),
         ("", "Leech"),
     ],
@@ -2366,6 +2372,7 @@ _KEYWORD_LINK_MAP = {
     ],
     "ManaLeech": [
         ("Mana Leech", "Mana Leech"),
+        ("Leech Mana", "Leech Mana"),
         ("Leech", "Leech"),
         ("", "Leech"),
     ],
@@ -2492,6 +2499,7 @@ _KEYWORD_LINK_MAP = {
         ("", "Quality"),
     ],
     "RageLeech": [
+        ("Rage Leech", "Rage Leech"),
         ("Leech Rage", "Leech Rage"),
         ("Leech", "Leech"),
         ("", "Leech"),
@@ -2508,6 +2516,7 @@ _KEYWORD_LINK_MAP = {
         ("", "Regal Orb"),
     ],
     "Resistances": [
+        ("Elemental Resistances", "Elemental Resistances"),
         ("Elemental Resistance", "Elemental Resistance"),
         ("Fire Resistance", "Fire Resistance"),
         ("Cold Resistance", "Cold Resistance"),
