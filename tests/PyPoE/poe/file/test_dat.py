@@ -44,7 +44,7 @@ import struct
 import pytest
 
 # self
-from PyPoE.poe.constants import MOD_DOMAIN
+from PyPoE.poe import constants
 from PyPoE.poe.file import dat
 from PyPoE.poe.file.specification import load
 
@@ -496,7 +496,7 @@ class TestRelationalReader:
                 assert row[column] == expected, "Testing against expected row"
 
     enums_expected = {
-        "ConstTest": (MOD_DOMAIN(1), MOD_DOMAIN(2), MOD_DOMAIN(3)),
+        "ConstTest": (constants.MOD_DOMAIN(1), constants.MOD_DOMAIN(2), constants.MOD_DOMAIN(3)),
     }
 
     @pytest.mark.parametrize("use_dat_value", (True, False))

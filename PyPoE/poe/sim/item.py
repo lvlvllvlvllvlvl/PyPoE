@@ -47,7 +47,7 @@ import re
 from enum import Enum
 
 # self
-from PyPoE.poe.constants import RARITY, SOCKET_COLOUR
+from PyPoE.poe import poe1constants as constants
 
 # 3rd-party
 
@@ -516,7 +516,7 @@ class ItemParser:
                 raise ValueError("No rarity found in the item header")
 
             rarity = rarity.group("rarity")
-            for rarity_const in RARITY:
+            for rarity_const in constants.RARITY:
                 if rarity_const.name_lower == rarity.lower():
                     self.rarity = rarity_const
                     self._type = ITEM_TYPES.ITEM
@@ -529,7 +529,7 @@ class ItemParser:
                     self._type = ITEM_TYPES.CURRENCY
                 else:
                     raise ValueError('Unsupported value for "Rarity": %s' % rarity)
-            elif self.rarity == RARITY.MAGIC:
+            elif self.rarity == constants.RARITY.MAGIC:
                 self.prefix = None
                 self.suffix = None
 
@@ -583,7 +583,7 @@ class ItemParser:
             for i, char in enumerate(self._re_sockets_split.split(match.group("sockets"))):
                 if i % 2 == 0:
                     found = False
-                    for socket_colour in SOCKET_COLOUR:
+                    for socket_colour in constants.SOCKET_COLOUR:
                         if socket_colour.char == char:
                             found = True
                             break
@@ -646,7 +646,9 @@ class ItemParser:
             last_sec -= 1
 
         # Flavour text
-        if (self._type == ITEM_TYPES.ITEM and self.rarity == RARITY.UNIQUE) or is_vaal_fragment:
+        if (
+            self._type == ITEM_TYPES.ITEM and self.rarity == constants.RARITY.UNIQUE
+        ) or is_vaal_fragment:
             self.flavour_text = section(index=last_sec)
             # Unidentified uniques don't have a flavour text, I think setting
             # "Unidentifed" is appropriate, but still have to make sure not to
@@ -666,7 +668,7 @@ class ItemParser:
                 self.stats = self._re_split_newline.split(section(offset=1))
             elif remaining == 1:
                 # Normal items can't have explicit stats
-                if self.rarity == RARITY.NORMAL:
+                if self.rarity == constants.RARITY.NORMAL:
                     self.implicit_stats = self._re_split_newline.split(section())
                     self.stats = []
                 # And magic/rare/unique items MUST have stats
@@ -691,7 +693,7 @@ class ItemParser:
         # Do a final pass on the prefix for magic items
         if (
             self._type == ITEM_TYPES.ITEM
-            and self.rarity == RARITY.MAGIC
+            and self.rarity == constants.RARITY.MAGIC
             and (
                 (self.suffix is None and len(self.stats) >= 1)
                 or (self.suffix is not None and len(self.stats) >= 2)

@@ -10,7 +10,7 @@ from argparse import ArgumentParser, BooleanOptionalAction
 from collections import defaultdict
 from types import SimpleNamespace
 
-from PyPoE.poe.constants import VERSION
+from PyPoE.poe import constants
 from PyPoE.poe.file import specification
 from PyPoE.poe.file.specification.fields import VirtualField
 from PyPoE.poe.file.specification.generation.column_naming import (
@@ -65,7 +65,7 @@ def main():
     virtual_fields = defaultdict(dict)
 
     for version in args.adapt_version:
-        _adapt_to_spec(VERSION[version.upper()], input_spec, virtual_fields)
+        _adapt_to_spec(constants.VERSION[version.upper()], input_spec, virtual_fields)
 
     output_spec = _convert_tables(input_spec, virtual_fields, sequel)
     _write_spec(output_spec, args.output or (DESTINATION2 if args.poe2 else DESTINATION))
@@ -196,7 +196,7 @@ _TYPE_MAP = {
 
 
 def _adapt_to_spec(
-    version: VERSION,
+    version: constants.VERSION,
     schema: list,
     virtual_fields: dict[str, dict[str, VirtualField]],
 ):

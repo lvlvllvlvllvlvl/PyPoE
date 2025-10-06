@@ -71,7 +71,6 @@ from collections.abc import Iterable
 from enum import IntEnum
 from io import BytesIO
 
-from PyPoE.poe import constants
 from PyPoE.poe.file.shared import AbstractFileReadOnly
 from PyPoE.poe.file.shared.cache import AbstractFileCache
 from PyPoE.poe.file.specification.data import stable
@@ -573,6 +572,7 @@ class DatReader(ReprMixin):
                 SpecificationError.ERRORS.RUNTIME_MISSING_SPECIFICATION,
                 'No specification for "%s"' % file_name,
             )
+        self.constants = specification.constants
         self.specification = specification[_file_name]
 
         # Prepare the casts
@@ -1234,7 +1234,7 @@ class RelationalReader(AbstractFileCache[DatFile]):
                             },
                         )
             elif spec_row.enum:
-                const_enum = getattr(constants, spec_row.enum)
+                const_enum = getattr(self.specification.constants, spec_row.enum)
                 index = df.reader.table_columns[key]["index"]
                 for i, row in enumerate(df.reader.table_data):
                     df.reader.table_data[i][index] = vf(

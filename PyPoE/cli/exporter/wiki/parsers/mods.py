@@ -46,14 +46,8 @@ from PyPoE.cli.exporter.wiki.handler import ExporterHandler, ExporterResult
 from PyPoE.cli.exporter.wiki.parser import BaseParser, WikiCondition
 
 # Self
+from PyPoE.poe import poe1constants as constants
 from PyPoE.poe import text
-from PyPoE.poe.constants import (
-    GAME_MODES,
-    MOD_DOMAIN,
-    MOD_GENERATION_TYPE,
-    MOD_SELL_PRICES,
-    MOD_STATS_RANGE,
-)
 from PyPoE.shared.decorators import deprecated
 
 # =============================================================================
@@ -98,7 +92,7 @@ class ModsHandler(ExporterHandler):
             "--domain",
             dest="domain",
             help="Filter by mod domain",
-            choices=[k.name for k in MOD_DOMAIN],
+            choices=[k.name for k in constants.MOD_DOMAIN],
         )
 
         parser.add_argument(
@@ -106,14 +100,14 @@ class ModsHandler(ExporterHandler):
             "--type",
             dest="generation_type",
             help="Filter by mod generation type",
-            choices=[k.name for k in MOD_GENERATION_TYPE],
+            choices=[k.name for k in constants.MOD_GENERATION_TYPE],
         )
 
         parser.add_argument(
             "--game-mode",
             dest="game_mode",
             help="Filter by game mode",
-            choices=[k.name for k in GAME_MODES],
+            choices=[k.name for k in constants.GAME_MODES],
         )
 
         self.add_default_parsers(
@@ -193,7 +187,7 @@ class ModParser(BaseParser):
             filters.append(
                 {
                     "column": "Domain",
-                    "comp": getattr(MOD_DOMAIN, args.domain),
+                    "comp": getattr(constants.MOD_DOMAIN, args.domain),
                     "func": lambda m, c: m == c,
                 }
             )
@@ -202,7 +196,7 @@ class ModParser(BaseParser):
             filters.append(
                 {
                     "column": "GenerationType",
-                    "comp": getattr(MOD_GENERATION_TYPE, args.generation_type),
+                    "comp": getattr(constants.MOD_GENERATION_TYPE, args.generation_type),
                     "func": lambda m, c: m == c,
                 }
             )
@@ -211,7 +205,7 @@ class ModParser(BaseParser):
             filters.append(
                 {
                     "column": "GameMode",
-                    "comp": getattr(GAME_MODES, args.game_mode),
+                    "comp": getattr(constants.GAME_MODES, args.game_mode),
                     "func": lambda m, c: c == 0 or m in (c, 0),
                 }
             )
@@ -283,7 +277,7 @@ class ModParser(BaseParser):
             stats = []
             values = []
             buffstats = mod["BuffTemplate"]["StatsKey"] if mod["BuffTemplate"] else []
-            for i in MOD_STATS_RANGE:
+            for i in constants.MOD_STATS_RANGE:
                 k = mod["StatsKey%s" % i]
                 if k is None or k in buffstats:
                     continue
@@ -346,9 +340,9 @@ class ModParser(BaseParser):
                 sell_price = defaultdict(int)
             for msp in mod["ModTypeKey"]["ModSellPriceTypesKeys"]:
                 if mod["ModTypeKey"]["Name"] != "SellPriceIsWisdomFragment":
-                    if msp["Id"] in MOD_SELL_PRICES:
+                    if msp["Id"] in constants.MOD_SELL_PRICES:
                         for i, (item_id, amount) in enumerate(
-                            MOD_SELL_PRICES[msp["Id"]].items(), start=1
+                            constants.MOD_SELL_PRICES[msp["Id"]].items(), start=1
                         ):
                             # print(mod['ModTypeKey']['Name'])
                             data["sell_price%s_name" % i] = self.rr["BaseItemTypes.dat64"].index[
@@ -392,7 +386,7 @@ class ModParser(BaseParser):
                 continue
 
             stats = []
-            for i in MOD_STATS_RANGE:
+            for i in constants.MOD_STATS_RANGE:
                 stat = mod["StatsKey%s" % i]
                 if stat:
                     stats.append(stat)

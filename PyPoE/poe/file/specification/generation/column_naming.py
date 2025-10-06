@@ -1,6 +1,6 @@
 import re
 
-from PyPoE.poe.constants import VERSION
+from PyPoE.poe import constants
 
 
 class UnknownColumnNameGenerator:
@@ -39,4 +39,4 @@ def StableToGeneratedNameMapping(name: str):
             yield m.group(1).removesuffix(suffix) + m.group(2)
 
 
-name_mappings = {VERSION.STABLE: StableToGeneratedNameMapping}
+name_mappings = {constants.VERSION.STABLE: StableToGeneratedNameMapping}

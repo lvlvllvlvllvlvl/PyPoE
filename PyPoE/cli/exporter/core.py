@@ -51,7 +51,7 @@ from PyPoE.cli.exporter.dat import DatHandler
 from PyPoE.cli.exporter.poe2wiki.core import WikiHandler as WikiHandler2
 from PyPoE.cli.exporter.wiki.core import WikiHandler
 from PyPoE.cli.handler import ConfigHandler, SetupHandler
-from PyPoE.poe.constants import DISTRIBUTOR, VERSION
+from PyPoE.poe import constants
 
 # self
 from PyPoE.shared.config.validator import IntEnumValidator
@@ -73,16 +73,18 @@ def setup_config():
     config.validator.functions.update(
         {
             "is_version": IntEnumValidator(
-                enum=VERSION,
+                enum=constants.VERSION,
             ),
             "is_distributor": IntEnumValidator(
-                enum=DISTRIBUTOR,
+                enum=constants.DISTRIBUTOR,
             ),
         }
     )
 
-    config.add_option("version", "is_version(default=%s)" % VERSION.DEFAULT.value)
-    config.add_option("distributor", "is_distributor(default=%s)" % DISTRIBUTOR.DEFAULT.value)
+    config.add_option("version", "is_version(default=%s)" % constants.VERSION.DEFAULT.value)
+    config.add_option(
+        "distributor", "is_distributor(default=%s)" % constants.DISTRIBUTOR.DEFAULT.value
+    )
     config.add_option(
         "ggpk_path", 'is_directory(default="", exists=True, allow_empty=True, allow_http=True)'
     )

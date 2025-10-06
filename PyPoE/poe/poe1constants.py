@@ -31,8 +31,6 @@ Documentation
 
 .. autoclass:: DELVE_UPGRADE_TYPE
 
-.. autoclass:: DISTRIBUTOR
-
 .. autoclass:: MAP_FRAGMENT_FAMILIES
 
 .. autoclass:: MOD_DOMAIN
@@ -47,8 +45,6 @@ Documentation
 
 .. autoclass:: STAT_INTERPOLATION_TYPES
 
-.. autoclass:: VERSION
-
 .. autoclass:: WORDLISTS
 """
 
@@ -60,8 +56,6 @@ Documentation
 
 from enum import Enum, EnumMeta, IntEnum
 
-from PyPoE.poe import poe1constants, poe2constants
-
 # 3rd-party
 
 # self
@@ -70,15 +64,23 @@ from PyPoE.poe import poe1constants, poe2constants
 # Globals
 # =============================================================================
 
-__all__ = ["DISTRIBUTOR", "VERSION", "sequel"]
-
-
-def sequel(version):
-    if version == 1:
-        return poe1constants
-    else:
-        return poe2constants
-
+__all__ = [
+    "BETRAYAL_UPGRADE_SLOTS",
+    "DELVE_UPGRADE_TYPE",
+    "MAP_FRAGMENT_FAMILIES",
+    "MOD_DOMAIN",
+    "MOD_GENERATION_TYPE",
+    "RARITY",
+    "SHOP_PACKAGE_PLATFORM",
+    "SOCKET_COLOUR",
+    "STAT_INTERPOLATION_TYPES",
+    "WORDLISTS",
+    "MOD_MAX_STATS",
+    "MOD_STATS_RANGE",
+    "MOD_SELL_PRICES",
+    "PASSIVE_TYPES",
+    "GAME_MODES",
+]
 
 MOD_MAX_STATS = 6
 MOD_STATS_RANGE = range(1, MOD_MAX_STATS + 1)
@@ -395,86 +397,6 @@ class BETRAYAL_UPGRADE_SLOTS(IntEnumOverride):
     NONE = 5
 
 
-class VERSION(IntEnumOverride):
-    """
-    Used to differentiate between the different release versions of the game,
-    i.e. between delpoyment (live/stable) version and temporary betas for
-    example.
-
-    This constant is primarily virtual and has no direct relevance to the game
-    files, but it is used in context of accounting for differences between the
-    released versions of available Path of Exile clients.
-
-    Attributes
-    ----------
-    STABLE
-        The stable version of Path of Exile. This will refer to the currently
-        playable, public version.
-    BETA
-        Beta version of Path of Exile.
-        As of currently, there is no beta running and this was only used
-        for the Awakening Beta.
-    ALPHA
-        Alpha version of Path of Exile.
-    GENERATED
-        Schema generated from https://github.com/poe-tool-dev/dat-schema
-    ALL
-        All registered version types.
-    DEFAULT
-        Default version (i.e. stable variants). For most use cases this is the
-        preferred and default selection.
-
-    """
-
-    STABLE = 1
-    BETA = 2
-    ALPHA = 4
-    GENERATED = 8
-    POE2 = 16
-    POE2_STABLE = 32
-
-    ALL = STABLE | BETA | ALPHA | GENERATED
-
-    DEFAULT = STABLE
-
-
-class DISTRIBUTOR(IntEnumOverride):
-    """
-    Used to differentiate between the different distributors of the clients.
-
-    This constant is primarily virtual and has no direct relevance to the game
-    files, but it is used in context of accounting for differences between the
-    released versions of available Path of Exile clients.
-
-    Attributes
-    ----------
-    GGG
-        The standalone client
-    STEAM
-        The international steam client
-    GARENA
-        Garena client
-    INTERNATIONAL
-        The international client(s). This generally refers to the clients
-        GGG is maintaining itself and share the same realm (i.e. currently
-        the standalone and steam client)
-    ALL
-        All clients
-    DEFAULT
-        Default selection for clients, i.e. all.
-    """
-
-    GGG = 1
-    STEAM = 2
-    GARENA = 4
-
-    INTERNATIONAL = GGG | STEAM
-
-    ALL = GGG | STEAM | GARENA
-
-    DEFAULT = ALL
-
-
 class SHOP_PACKAGE_PLATFORM(IntEnumOverride):
     """
     ShopPackagePlatform.dat
@@ -736,6 +658,25 @@ class MOD_DOMAIN(IntEnumOverride):
     # legacy names
     MASTER = CRAFTED
     JEWEL = MISC
+
+
+MOD_TRANSLATION_MAP = {
+    MOD_DOMAIN.MONSTER: "monster_stat_descriptions.txt",
+    MOD_DOMAIN.CHEST: "chest_stat_descriptions.txt",
+    MOD_DOMAIN.AREA: "map_stat_descriptions.txt",
+    MOD_DOMAIN.ATLAS: "atlas_stat_descriptions.txt",
+    MOD_DOMAIN.LEAGUESTONE: "leaguestone_stat_descriptions.txt",
+    MOD_DOMAIN.DELVE_AREA: "map_stat_descriptions.txt",
+    MOD_DOMAIN.MAP_DEVICE: "map_stat_descriptions.txt",
+    # To properly support zana's innate IIQ
+    MOD_DOMAIN.CRAFTED: "map_stat_descriptions.txt",
+    MOD_DOMAIN.HEIST_NPC: "heist_equipment_stat_descriptions.txt",
+    MOD_DOMAIN.PRIMORDIAL_ALTAR: "primordial_altar_stat_descriptions.txt",
+    MOD_DOMAIN.SENTINEL: "sentinel_stat_descriptions.txt",
+    MOD_DOMAIN.TEMPLAR_RELIC: "sanctum_relic_stat_descriptions.txt",
+    MOD_DOMAIN.TINCTURE: "tincture_stat_descriptions.txt",
+    MOD_DOMAIN.MAP_RELIC: "atlas_relic_stat_descriptions.txt",
+}
 
 
 class MOD_GENERATION_TYPE(IntEnumOverride):

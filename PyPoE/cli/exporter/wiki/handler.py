@@ -162,7 +162,15 @@ class WikiHandler:
         page_found = False
         new = False
         for pdata in pages:
-            page = self.site.pages[pdata["page"]]
+            try:
+                page = self.site.pages[pdata["page"]]
+            except mwclient.errors.InvalidPageTitle:
+                console(
+                    f"Invalid page name {pdata['page']}. Skipping",
+                    msg=Msg.warning,
+                )
+                continue
+
             if not page.can("edit"):
                 console(
                     f"Cannot edit {pdata['page']}. Skipping",

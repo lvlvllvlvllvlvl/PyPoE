@@ -41,7 +41,7 @@ from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.wiki import parser
 
 # self
-from PyPoE.poe.constants import MOD_STATS_RANGE
+from PyPoE.poe import constants
 from PyPoE.poe.text import parse_description_tags
 
 # =============================================================================
@@ -223,7 +223,7 @@ class TestBaseParser:
 
         stats = []
         values = []
-        for i in MOD_STATS_RANGE:
+        for i in constants.MOD_STATS_RANGE:
             k = mod["StatsKey%s" % i]
             if k is None:
                 continue

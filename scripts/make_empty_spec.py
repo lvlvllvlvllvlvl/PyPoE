@@ -41,7 +41,7 @@ import os
 import struct
 
 # self
-from PyPoE.poe.constants import DISTRIBUTOR, VERSION
+from PyPoE.poe import constants
 from PyPoE.poe.file import dat, specification
 from PyPoE.poe.file.bundle import Index
 from PyPoE.poe.file.ggpk import GGPKFile
@@ -92,8 +92,10 @@ def spec_unknown(size, i=0):
 def run():
     out = []
 
-    path = PoEPath(version=VERSION.STABLE, distributor=DISTRIBUTOR.GGG).get_installation_paths()[0]
-    existing_set = set(specification.load(VERSION.STABLE).keys())
+    path = PoEPath(
+        version=constants.VERSION.STABLE, distributor=constants.DISTRIBUTOR.GGG
+    ).get_installation_paths()[0]
+    existing_set = set(specification.load(constants.VERSION.STABLE).keys())
 
     ggpk = GGPKFile()
     ggpk.read(os.path.join(path, "content.ggpk"))

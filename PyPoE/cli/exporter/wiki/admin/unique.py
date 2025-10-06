@@ -50,7 +50,7 @@ from PyPoE.cli.exporter.wiki.handler import WIKIS, ExporterHandler, add_parser_a
 from PyPoE.cli.exporter.wiki.parser import BaseParser
 
 # self
-from PyPoE.poe.constants import WORDLISTS
+from PyPoE.poe import poe1constants as constants
 from PyPoE.poe.file.dat import RelationalReader
 
 # =============================================================================
@@ -168,7 +168,7 @@ class UniqueCopy(BaseParser):
         console("Creating lookup cache...")
         self.words = []
         for row in self.rr_english["Words.dat"]:
-            if row["WordlistsKey"] == WORDLISTS.UNIQUE_ITEM:
+            if row["WordlistsKey"] == constants.WORDLISTS.UNIQUE_ITEM:
                 self.words.append(row)
 
         self.cache = defaultdict(BaseItemCacheInstance)

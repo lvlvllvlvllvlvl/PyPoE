@@ -1,10 +1,10 @@
 from collections import defaultdict
 
-from PyPoE.poe.constants import VERSION
+from PyPoE.poe import constants
 from PyPoE.poe.file.specification.fields import Alias, VirtualField, Zip
 
 virtual_fields_mappings = {
-    VERSION.STABLE: defaultdict(
+    constants.VERSION.STABLE: defaultdict(
         list[VirtualField],
         {
             "BlightCraftingItems": [

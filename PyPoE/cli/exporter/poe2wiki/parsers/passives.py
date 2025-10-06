@@ -48,7 +48,7 @@ from functools import partialmethod
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
-from PyPoE.poe.file.psg import PSGFile
+from PyPoE.poe.file.psg2 import PSGFile
 
 # 3rd-party
 
@@ -76,7 +76,7 @@ class WikiCondition(parser.WikiCondition):
 
 
 def normalize(id):
-    return (2**16 + id) % 2**16
+    return id
 
 
 class PassiveSkillCommandHandler(ExporterHandler):
@@ -321,8 +321,12 @@ class PassiveSkillParser(parser.BaseParser):
                 node_index[normalize(node.passive_skill)] = node
         # Connections are one-way, make them two way
         for psg_id, node in node_index.items():
-            for other_psg_id in node.connections:
-                node_index[normalize(other_psg_id)].connections.append(psg_id)
+            for other_psg in node.connections:
+                if other_psg in node_index:
+                    if psg_id not in node_index[other_psg].connections:
+                        node_index[normalize(other_psg)].connections.append(psg_id)
+                else:
+                    console(f"Missing connection {other_psg} for {psg_id}")
 
         self.rr["PassiveSkills.dat64"].build_index("PassiveSkillGraphId")
 

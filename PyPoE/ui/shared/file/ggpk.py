@@ -47,7 +47,7 @@ from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 
 # self
-from PyPoE.poe.constants import DISTRIBUTOR, VERSION
+from PyPoE.poe import constants
 from PyPoE.poe.file.ggpk import GGPKFile
 from PyPoE.poe.path import PoEPath
 
@@ -71,7 +71,7 @@ class GGPKOpenAction(QAction):
         self.triggered.connect(self._open_ggpk)
 
     def _get_version(self):
-        return VERSION.DEFAULT
+        return constants.VERSION.DEFAULT
 
     def _open_ggpk(self):
         """
@@ -83,7 +83,7 @@ class GGPKOpenAction(QAction):
         """
         # TODO replace with config / last path
         paths = PoEPath(
-            version=self._get_version(), distributor=DISTRIBUTOR.GGG
+            version=self._get_version(), distributor=constants.DISTRIBUTOR.GGG
         ).get_installation_paths()
 
         # Use the first found path
