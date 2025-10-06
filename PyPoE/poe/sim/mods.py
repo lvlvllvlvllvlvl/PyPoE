@@ -259,7 +259,7 @@ def get_translation(mod, translation_cache, translation_file=None, **kwargs):
     TranslationResult
 
     """
-    constants = mod.parent.specification.constants
+    constants = mod.parent.constants
     stats = []
     for i in constants.MOD_STATS_RANGE:
         stat = mod["StatsKey%s" % i]

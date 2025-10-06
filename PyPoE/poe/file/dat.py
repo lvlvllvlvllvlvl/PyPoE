@@ -572,6 +572,7 @@ class DatReader(ReprMixin):
                 SpecificationError.ERRORS.RUNTIME_MISSING_SPECIFICATION,
                 'No specification for "%s"' % file_name,
             )
+        self.constants = specification.constants
         self.specification = specification[_file_name]
 
         # Prepare the casts
