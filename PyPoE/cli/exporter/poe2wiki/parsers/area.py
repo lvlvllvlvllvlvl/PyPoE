@@ -64,6 +64,7 @@ class WikiCondition(parser.WikiCondition):
     COPY_KEYS = (
         "is_underground",
         "entry_text",  # temp
+        "screenshot",
         "screenshot_ext",
         "main_page",
         "release_version",
@@ -178,16 +179,21 @@ class AreaParser(parser.BaseParser):
 
     # Unreleased or disabled areas to avoid exporting to the wiki
     _SKIP_AREAS_BY_ID = [
-        "NULL",
+        "NULL",  # 0.1.0
+        "BlackTest",  # 0.3.1
+        "Design",  # 0.3.1
+        "Design_Lite",  # 0.3.1
+        "Programming",  # 0.3.1
+        "Programming_Lite",  # 0.3.1
         "G1_10",
         "G2_3s",
         "G2_8a",
         "G2_11",
         "G3_15",
-        "G4_6",
-        "G4_9_",
-        "G4_12",
-        "G4_14",
+        "G4_6",  # 0.3.0
+        "G4_9_",  # 0.3.0
+        "G4_12",  # 0.3.0
+        "G4_14",  # 0.3.0
     ]
 
     _COPY_KEYS = OrderedDict(
@@ -536,7 +542,7 @@ class AreaParser(parser.BaseParser):
             seen.add(ml["Id"])
 
             biomes.extend(b["Name"] for b in ml["Biomes"])
-            adjacent_biomes.extend(b["Name"] for b in ml["AdjecentBiomes"])
+            adjacent_biomes.extend(b["Name"] for b in ml["AdjacentBiomes"])
 
         # Remove duplicate biomes
         if biomes:
