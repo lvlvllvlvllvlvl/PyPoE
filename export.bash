@@ -179,17 +179,27 @@ pypoe_exporter $QUIET $WIKI items maps "${IMG[@]}" "${ARGS[@]}" "$@" --store-ima
 exporting incursion-rooms &&
 pypoe_exporter $QUIET $WIKI incursion rooms rowid "${ARGS[@]}" "$@"
 exporting modules && {
-  pypoe_exporter $QUIET $WIKI lua bestiary "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET $WIKI lua blight "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET $WIKI lua crafting_bench "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET $WIKI lua delve "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET $WIKI lua harvest "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET $WIKI lua heist "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET $WIKI lua monster "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET $WIKI lua pantheon "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET $WIKI lua synthesis "${ARGS[@]}" "$@"
+  if [ "$WIKI" = "wiki" ]; then
+    # Run only for poe1
+    pypoe_exporter $QUIET $WIKI lua bestiary "${ARGS[@]}" "$@"
+    pypoe_exporter $QUIET $WIKI lua blight "${ARGS[@]}" "$@"
+    pypoe_exporter $QUIET $WIKI lua crafting_bench "${ARGS[@]}" "$@"
+    pypoe_exporter $QUIET $WIKI lua delve "${ARGS[@]}" "$@"
+    pypoe_exporter $QUIET $WIKI lua harvest "${ARGS[@]}" "$@"
+    pypoe_exporter $QUIET $WIKI lua heist "${ARGS[@]}" "$@"
+    pypoe_exporter $QUIET $WIKI lua monster "${ARGS[@]}" "$@"
+    pypoe_exporter $QUIET $WIKI lua pantheon "${ARGS[@]}" "$@"
+    pypoe_exporter $QUIET $WIKI lua synthesis "${ARGS[@]}" "$@"
+    pypoe_exporter $QUIET $WIKI lua minimap "${ARGS[@]}" "$@"
+  elif [ "$WIKI" = "poe2wiki" ]; then
+    # Run only for poe2
+    pypoe_exporter $QUIET $WIKI lua keywords "${ARGS[@]}" "$@"
+  fi
+  # Run for both
   pypoe_exporter $QUIET $WIKI lua ot "${ARGS[@]}" "$@"
-  pypoe_exporter $QUIET $WIKI lua minimap "${ARGS[@]}" "$@"
+  # For now only poe1 (need check/rework)
+  # pypoe_exporter $QUIET $WIKI lua monster "${ARGS[@]}" "$@"
+  # pypoe_exporter $QUIET $WIKI lua minimap "${ARGS[@]}" "$@"
   # pypoe_exporter $QUIET $WIKI lua packs "${ARGS[@]}" "$@"
 }
 exporting atlas-icons &&
