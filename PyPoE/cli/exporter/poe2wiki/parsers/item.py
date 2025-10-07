@@ -640,6 +640,10 @@ class ItemsParser(SkillParserShared):
     _NAME_OVERRIDE_BY_ID_2 = {
         "English": {
             # =================================================================
+            # Skill Gems
+            # =================================================================
+            "Metadata/Items/Gem/SupportGemLivingLightning": "Living Lightning I",
+            # =================================================================
             # Quest Items
             # =================================================================
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookGeneric1": "Crystalline Core of Knowledge",
@@ -1292,6 +1296,8 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SupportGemOverabundanceThree",
         "Metadata/Items/Gems/SupportGemPersistenceThree",
         "Metadata/Items/Gem/SupportGemGrudge",
+        # New 0.3.1
+        "Metadata/Items/Gem/SupportGemFlamePillar",
         # =================================================================
         # Uncut Gems
         # =================================================================

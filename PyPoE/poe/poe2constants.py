@@ -628,17 +628,17 @@ class MOD_DOMAIN(IntEnumOverride):
     CHEST = 4
     UNKNOWN1 = 5
     AREA = 6
-    # 7 is unused.
+    # 7 is unused
     SANCTUM_RELIC = 8
-    # 9 is unused.
+    # 9 is unused
     CRAFTED = 10
     MISC = 11
     ATLAS = 12
     LEAGUESTONE = 13
-    # 14 is unused.
+    # 14 is unused
     MAP_DEVICE = 15
     DUMMY = 16
-    # 17 is unused.
+    # 17 is unused
     DELVE_AREA = 18
     SYNTHESIS_A = 19
     SYNTHESIS_GLOBALS = 20
@@ -647,14 +647,14 @@ class MOD_DOMAIN(IntEnumOverride):
     HEIST_AREA = 23
     HEIST_NPC = 24
     HEIST_TRINKET = 25
-    UNUSED5 = 26
+    # 26 is unused
     VEILED = 27
     DESECRATED = 28
     EXPEDITION_RELIC = 29
-    # 30 is unused.
+    # 30 is unused
     SENTINEL = 31
     MEMORY_LINE = 32
-    # 33 is unused.
+    # 33 is unused
     TABLET = 34
     ULTIMATUM_KEY = 35
 
@@ -741,22 +741,29 @@ class MOD_GENERATION_TYPE(IntEnumOverride):
     TORMENT = 7
     TEMPEST = 8
     TALISMAN = 9
-    # 10 is unused.
+    # 10 is unused
     ESSENCE = 11
-    # 12 is unused.
+    # 12 is unused
     BESTIARY = 13
     DELVE_AREA = 14
     SYNTHESIS_A = 15
     SYNTHESIS_GLOBALS = 16
     SYNTHESIS_BONUS = 17
     BLIGHT = 18
-    # 19 is unused.
+    # 19 is unused
     MONSTER_AFFLICTION = 20
-    # 21 and 22 are unused.
+    # 21 is unused
+    # 22 is unused
     EXPEDITION_LOGBOOK = 23
-    # 24 and 25 are unused.
+    # 24 is unused
+    # 25 is unused
     SCOURGE_GIMMICK = 26
-    # 27 to 32 are unused.
+    # 27 is unused
+    # 28 is unused
+    # 29 is unused
+    # 30 is unused
+    # 31 is unused
+    # 32 is unused
     INSTILLED = 33
     AZMERI_EMPOWERED_MONSTER = 34
 
