@@ -37,10 +37,11 @@ import re
 from collections import OrderedDict, defaultdict
 from functools import partial
 
+# Self
+from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
 from PyPoE.cli.exporter.poe2wiki.parser import BaseParser, TagHandler
-
-# Self
+from PyPoE.cli.exporter.poe2wiki.parsers.luaconstants import KEYWORD_LINK_MAP
 from PyPoE.poe.text import parse_description_tags
 
 # =============================================================================
@@ -77,11 +78,9 @@ class LuaFormatter:
         pass
 
     @classmethod
-    def format_module(self, data, indent=0, newline=True, br=True):
+    def format_module(self, data, indent=0, br=True):
         out = []
-        out.append(
-            "local data = %s" % self.format_value(data, indent=indent + 1, newline=newline, br=br)
-        )
+        out.append("local data = %s" % self.format_value(data, indent=indent + 1, br=br))
         out.append("\n")
         out.append("return data")
 
@@ -93,54 +92,56 @@ class LuaFormatter:
             key = str(key)
 
         if not key.isidentifier():
-            return '["%s"]' % key
+            return "['%s']" % key
 
         return key
 
     @classmethod
-    def format_value(self, value, indent=2, newline=True, br=True):
+    def format_value(self, value, indent=2, br=True, prev=None):
         if isinstance(value, (int, float)):
+            s = str(value)
+            if prev == "list":
+                s = ("\t" * (indent - 1)) + s
             if isinstance(value, bool):
-                return str(value).lower()
-            return str(value)
+                return s.lower()
+            return s
+
         elif isinstance(value, (tuple, set, list)):
             values = []
             for v in value:
-                values.append(self.format_value(v, indent=indent + 1, newline=newline, br=br))
-            if newline:
-                join = ",\n"
+                values.append(self.format_value(v, indent=indent + 1, br=br, prev="list"))
+            if prev == "list":
+                return "%s{\n%s\n%s}" % (
+                    "\t" * (indent - 1),
+                    ",\n".join(values),
+                    "\t" * (indent - 1),
+                )
             else:
-                join = ", "
-            return "{%s}" % (join.join(values))
+                return "{\n%s\n%s}" % (",\n".join(values), "\t" * (indent - 1))
+
         elif isinstance(value, dict):
             values = []
-            if newline:
-                fmt = "%s%%s = %%s, " % ("\t" * indent)
-            else:
-                fmt = "%s = %s"
+            fmt = "%s%%s = %%s," % ("\t" * indent)
             for k, v in value.items():
                 values.append(
                     fmt
                     % (
                         self.format_key(k),
-                        self.format_value(v, indent=indent + 1, newline=newline, br=br),
+                        self.format_value(v, indent=indent + 1, br=br),
                     )
                 )
+            fmt = "%(indent)s{\n%%s\n%(indent)s}" % {
+                "indent": "\t" * (indent - 1),
+            }
+            return fmt % "\n".join(values)
 
-            if newline:
-                fmt = "%(indent)s{\n%%s\n%(indent)s}" % {
-                    "indent": "\t" * (indent - 1),
-                }
-                join = "\n"
-            else:
-                fmt = "{%s}"
-                join = ""
-
-            return fmt % join.join(values)
         elif isinstance(value, str):
-            return '"%s"' % value.replace('"', '\\"').replace(
-                "\n", "<br>" if br else "\\n"
-            ).replace("\r", "")
+            s = "'%s'" % value.replace("'", "\\'").replace("\n", "<br>" if br else "\\n").replace(
+                "\r", ""
+            )
+            if prev == "list":
+                s = ("\t" * (indent - 1)) + s
+            return s
         else:
             return '"%s"' % value
 
@@ -311,6 +312,16 @@ class LuaHandler(ExporterHandler):
             parser=parser,
             cls=MinimapIconsParser,
             func=MinimapIconsParser.main,
+        )
+
+        parser = lua_sub.add_parser(
+            "keywords",
+            help="Extract keywords information",
+        )
+        self.add_default_parsers(
+            parser=parser,
+            cls=KeywordParser,
+            func=KeywordParser.main,
         )
 
 
@@ -2038,6 +2049,77 @@ class MonsterPackParser(GenericLuaParser):
                 wiki_page=[
                     {
                         "page": f"Module:{key}/data",
+                        "condition": None,
+                    }
+                ],
+            )
+
+        return r
+
+
+class KeywordParser(GenericLuaParser):
+    _files = [
+        "KeywordPopups.datc64",
+    ]
+
+    _COPY_KEYS_KEYWORDS = (
+        (
+            "Id",
+            {
+                "key": "id",
+            },
+        ),
+        (
+            "Term",
+            {
+                "key": "title",
+            },
+        ),
+        (
+            "Definition",
+            {
+                "key": "desc",
+            },
+        ),
+    )
+
+    def main(self, parsed_args):
+        keywords = []
+        keywords_lookup = OrderedDict()
+
+        for row in self.rr["KeywordPopups.dat64"]:
+            self._copy_from_keys(row, self._COPY_KEYS_KEYWORDS, keywords)
+
+            # Lua starts offsets at 1
+            keywords_lookup[row["Id"]] = row.rowid + 1
+
+        # Add links
+        for key, values in KEYWORD_LINK_MAP.items():
+            if key not in keywords_lookup:
+                console(
+                    f"Links were provided for keyword '{key}', but there is no keyword with this ID",
+                    msg=Msg.warning,
+                )
+                continue
+
+            row = keywords_lookup[key] - 1
+
+            for k, v in values.items():
+                if isinstance(v, list):
+                    keywords[row][k] = []
+                    for val in v:
+                        keywords[row][k].append(val)
+                else:
+                    keywords[row][k] = v
+
+        r = ExporterResult()
+        for k in ("keywords", "keywords_lookup"):
+            r.add_result(
+                text=LuaFormatter.format_module(locals()[k]),
+                out_file="%s.lua" % k,
+                wiki_page=[
+                    {
+                        "page": "Module:Keyword/%s" % k,
                         "condition": None,
                     }
                 ],
