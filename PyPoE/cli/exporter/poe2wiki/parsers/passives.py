@@ -39,6 +39,7 @@ Internal API
 import os.path
 
 # Python
+import posixpath
 import re
 import warnings
 from collections import OrderedDict
@@ -48,6 +49,8 @@ from functools import partialmethod
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
+from PyPoE.cli.exporter.poe2wiki.parser import process_keywords
+from PyPoE.poe.file.dat import DatRecord
 from PyPoE.poe.file.psg2 import PSGFile
 
 # 3rd-party
@@ -124,9 +127,6 @@ class PassiveSkillCommandHandler(ExporterHandler):
         )
 
 
-CLASS_PASSIVES = [f"AscendancySpecialEldritch{i}" for i in range(1, 6)] + ["AscendancyTrickster14"]
-
-
 class PassiveSkillParser(parser.BaseParser):
     _files = [
         "PassiveSkills.datc64",
@@ -160,101 +160,148 @@ class PassiveSkillParser(parser.BaseParser):
                 "template": "name",
             },
         ),
+        (  # icon handled not here
+            "Icon_DDSFile",
+            {
+                "template": "icon",
+                "default": "",
+            },
+        ),
         (
             "FlavourText",
             {
                 "template": "flavour_text",
-                "default": "",
+                "format": lambda v: v.replace("\n", "<br>").replace("\r", ""),
+                "condition": lambda v: v is not None,
             },
         ),
         (
-            "ReminderTextKeys",
+            "ReminderStrings",
             {
                 "template": "reminder_text",
-                "format": lambda value: "<br>".join([x["Text"] for x in value]),
-                "default": "",
-                "condition": lambda passive: passive["ReminderTextKeys"],
+                "condition": lambda v: v is not None,
+                "format": lambda v: "<br>".join([x["Text"] for x in v]),
             },
         ),
+        # Atlas related
         (
-            "PassiveSkillBuffsKeys",
+            "AtlasSubTree",
             {
-                "template": "buff_id",
-                "format": lambda value: ",".join([x["BuffDefinitionsKey"]["Id"] for x in value]),
-                "condition": lambda passive: passive["PassiveSkillBuffsKeys"],
+                "template": "is_atlas_passive",
+                "condition": lambda v: v is not None,
+                "format": lambda v: True,
             },
         ),
         (
-            "SkillPointsGranted",
+            "AtlasSubTree",
             {
-                "template": "skill_points",
-                "default": 0,
+                "template": "atlas_sub_tree",
+                "condition": lambda v: v is not None,
+                "format": lambda v: v["Id"],
             },
         ),
-        # icon handled not here
         (
-            "AscendancyKey",
+            "IsRootOfAtlasTree",
+            {
+                "template": "is_atlas_sub_tree_starting_node",
+                "condition": lambda v: v is True,
+            },
+        ),
+        # Ascendancy related
+        (
+            "Ascendancy",
             {
                 "template": "ascendancy_class",
-                "format": lambda value: value["Name"],
-            },
-        ),
-        (
-            # Overwrite ascendancy class with character class for forbidden-jewel-only passives
-            "AscendancyKey",
-            {
-                "template": "ascendancy_class",
-                "format": lambda value: value["CharactersKey"][0]["Name"],
-                "condition": lambda passive: passive["Id"] in CLASS_PASSIVES,
-            },
-        ),
-        (
-            "IsKeystone",
-            {
-                "template": "is_keystone",
-                "default": False,
-            },
-        ),
-        (
-            "IsNotable",
-            {
-                "template": "is_notable",
-                "default": False,
-            },
-        ),
-        (
-            "IsMultipleChoiceOption",
-            {
-                "template": "is_multiple_choice_option",
-                "default": False,
-            },
-        ),
-        (
-            "IsMultipleChoice",
-            {
-                "template": "is_multiple_choice",
-                "default": False,
-            },
-        ),
-        (
-            "IsJustIcon",
-            {
-                "template": "is_icon_only",
-                "default": False,
-            },
-        ),
-        (
-            "IsJewelSocket",
-            {
-                "template": "is_jewel_socket",
-                "default": False,
+                "condition": lambda v: v is not None,
+                "format": lambda v: v["Name"],
             },
         ),
         (
             "IsAscendancyStartingNode",
             {
                 "template": "is_ascendancy_starting_node",
-                "default": False,
+                "condition": lambda v: v is True,
+            },
+        ),
+        # Stat related
+        (
+            "PassiveSkillBuffs",
+            {
+                "template": "buff_id",
+                "condition": lambda v: v is not None,
+                "format": lambda v: ",".join([x["BuffDefinitionsKey"]["Id"] for x in v]),
+            },
+        ),
+        (
+            "SkillPointsGranted",
+            {
+                "template": "skill_points",
+                "condition": lambda v: v > 0,
+            },
+        ),
+        (
+            "GrantedSkill",
+            {
+                "template": "granted_skill",
+                "condition": lambda v: v is not None,
+                "format": lambda v: v["GemEffects"][0]["GrantedEffect"]["Id"],
+            },
+        ),
+        # Booleans
+        (
+            "IsKeystone",
+            {
+                "template": "is_keystone",
+                "condition": lambda v: v is True,
+            },
+        ),
+        (
+            "IsNotable",
+            {
+                "template": "is_notable",
+                "condition": lambda v: v is True,
+            },
+        ),
+        (
+            "IsAttribute",
+            {
+                "template": "is_attribute",
+                "condition": lambda v: v is True,
+            },
+        ),
+        (
+            "IsMultipleChoice",
+            {
+                "template": "is_multiple_choice",
+                "condition": lambda v: v is True,
+            },
+        ),
+        (
+            "IsMultipleChoiceOption",
+            {
+                "template": "is_multiple_choice_option",
+                "condition": lambda v: v is True,
+            },
+        ),
+        (
+            "IsJustIcon",
+            {
+                "template": "is_icon_only",
+                "condition": lambda v: v is True,
+            },
+        ),
+        (
+            "IsJewelSocket",
+            {
+                "template": "is_jewel_socket",
+                "condition": lambda v: v is True,
+            },
+        ),
+        (
+            "IsFree",
+            {
+                "template": "is_free",
+                "condition": lambda v: v is True,
             },
         ),
     )
@@ -335,7 +382,10 @@ class PassiveSkillParser(parser.BaseParser):
         console("Found %s, parsing..." % len(passives))
 
         for passive in passives:
-            data = OrderedDict()
+            if "[DNT" in passive["Name"]:
+                continue
+
+            infobox = OrderedDict()
             # Print out the row number every 100 rows, and every 1/100th of completion,
             # with a minimum increment of 1
             print_increment = max(len(passives) // 100, 1)
@@ -343,104 +393,30 @@ class PassiveSkillParser(parser.BaseParser):
                 console(f"Processing passive {passive['Id']} at {passive.rowid}")
 
             # Copy over simple fields from the .dat64
-            for row_key, copy_data in self._COPY_KEYS:
-                value = passive[row_key]
-
-                condition = copy_data.get("condition")
-                if condition is not None and not condition(passive):
-                    continue
-
-                # Skip default values to reduce size of template
-                if value == copy_data.get("default"):
-                    continue
-
-                fmt = copy_data.get("format")
-                if fmt:
-                    value = fmt(value)
-                data[copy_data["template"]] = value
-
-            # Flag if it's an atlas skill
-            if passive["Id"].startswith("atlas"):
-                data["is_atlas_passive"] = True
+            apply_column_map(infobox, self._COPY_KEYS, passive)
 
             # Handle icon paths
-            if passive["Icon_DDSFile"]:
-                icon = passive["Icon_DDSFile"].split("/")
-                if passive["Icon_DDSFile"].startswith("Art/2DArt/SkillIcons/passives/"):
-                    if icon[-2] == "passives":
-                        data["icon"] = icon[-1]
-                    else:
-                        data["icon"] = "%s (%s)" % (icon[-1], icon[-2])
-                else:
-                    data["icon"] = icon[-1]
-            # atlas_start_node doesn't have an icon path
-            else:
-                data["icon"] = ""
-                warnings.warn(f"Icon path file not found for {passive['Id']}: {passive['Name']}")
+            self.handle_icon(infobox, passive)
 
-            data["icon"] = data["icon"].replace(".dds", "")
-
-            # Handle Stats
-            stat_ids = []
-            values = []
-
+            # Handle stats
             j = 0
-            for i in range(0, self._MAX_STAT_ID):
-                try:
-                    stat = passive["StatsKeys"][i]
-                except IndexError:
-                    break
-                j = i + 1
-                stat_ids.append(stat["Id"])
-                data["stat%s_id" % j] = stat["Id"]
-                values.append(passive["Stat%sValue" % j])
-                data["stat%s_value" % j] = passive["Stat%sValue" % j]
-
-            data["stat_text"] = "<br>".join(
-                self._get_stats(
-                    stat_ids, values, translation_file=get_translation_file(passive["Id"])
-                )
-            )
-
+            stat_text, j = self.get_stat_text(infobox, j, passive)
             # For now this is being added to the stat text
-            for ps_buff in passive["PassiveSkillBuffsKeys"]:
-                buff_defs = ps_buff["BuffDefinitionsKey"]
-                if buff_defs["Binary_StatsKeys"]:
-                    stat_ids = [stat["Id"] for stat in buff_defs["Binary_StatsKeys"]]
-                    values = [1 for _ in stat_ids]
-                else:
-                    stat_ids = [stat["Id"] for stat in buff_defs["StatsKeys"]]
-                    values = ps_buff["Buff_StatValues"]
+            buff_stat_text, j = self.get_buff_stat_text(infobox, j, passive)
 
-                for i, (sid, val) in enumerate(zip(stat_ids, values)):
-                    j += 1
-                    data["stat%s_id" % j] = sid
-                    data["stat%s_value" % j] = val
+            if stat_text and buff_stat_text:
+                infobox["stat_text"] = stat_text + "<br>" + buff_stat_text
+            elif stat_text:
+                infobox["stat_text"] = stat_text
+            elif buff_stat_text:
+                infobox["stat_text"] = buff_stat_text
+            else:
+                infobox["stat_text"] = ""
 
-                text = "<br>".join(
-                    self._get_stats(
-                        stat_ids,
-                        values,
-                        translation_file="passive_skill_aura_stat_descriptions.txt",
-                    )
-                )
-
-                if ps_buff["AuraRadius"]:
-                    radius = ps_buff["AuraRadius"] / 10
-                    text = re.sub(
-                        r"\[\[Nearby\|?([^]]*)]]",
-                        lambda match: f"{{{{Radius|{match.group(1)}|{radius}m}}}}",
-                        text,
-                    )
-
-                if data["stat_text"]:
-                    data["stat_text"] += "<br>" + text
-                else:
-                    data["stat_text"] = text
-
+            # Handle connections
             node = node_index.get(normalize(passive["PassiveSkillGraphId"]))
             if node and node.connections:
-                data["connections"] = ",".join(
+                infobox["connections"] = ", ".join(
                     [
                         self.rr["PassiveSkills.dat64"].index["PassiveSkillGraphId"][
                             normalize(psg_id)
@@ -449,29 +425,17 @@ class PassiveSkillParser(parser.BaseParser):
                     ]
                 )
 
-            # extract icons if specified
-            if parsed_args.store_images and data["icon"] != "":
-                fn = data["icon"] + " passive skill icon"
-                dds = os.path.join(self._img_path, fn + ".dds")
-                png = os.path.join(self._img_path, fn + ".png")
-                if not (os.path.exists(dds) or os.path.exists(png)):
-                    self._write_dds(
-                        data=self.file_system.get_file(passive["Icon_DDSFile"]),
-                        out_path=dds,
-                        parsed_args=parsed_args,
-                    )
-
             cond = WikiCondition(
-                data=data,
+                data=infobox,
                 cmdargs=parsed_args,
             )
 
             r.add_result(
                 text=cond,
-                out_file="passive_skill_%s.txt" % data["id"],
+                out_file="passive_skill_%s.txt" % infobox["id"],
                 wiki_page=[
                     {
-                        "page": "Passive Skill:" + self._format_wiki_title(data["id"]),
+                        "page": "Passive Skill:" + self._format_wiki_title(infobox["id"]),
                         "condition": cond,
                     },
                 ],
@@ -480,21 +444,162 @@ class PassiveSkillParser(parser.BaseParser):
 
         return r
 
+    # =============================================================================
+    # Functions
+    # =============================================================================
+
+    def get_stat_text(self, infobox, j, passive: DatRecord):
+        """
+        Handle regular stats, adds stat ids and values to infobox
+        """
+        stat_ids = []
+        values = []
+
+        for i in range(0, self._MAX_STAT_ID):
+            try:
+                stat = passive["Stats"][i]
+            except IndexError:
+                break
+            j = i + 1
+            stat_ids.append(stat["Id"])
+            infobox["stat%s_id" % j] = stat["Id"]
+            values.append(passive["Stat%sValue" % j])
+            infobox["stat%s_value" % j] = passive["Stat%sValue" % j]
+
+        stat_text = process_keywords(
+            "<br>".join(
+                self._get_stats(
+                    stats=stat_ids,
+                    values=values,
+                    translation_file=get_translation_file(bool(passive["AtlasSubTree"])),
+                )
+            )
+        )
+
+        return stat_text, j
+
+    def get_buff_stat_text(self, infobox, j, passive: DatRecord):
+        """
+        Handle buff stats, adds stat ids and values to infobox
+        For now this is being added to the stat text
+        """
+        stat_text = None
+        for ps_buff in passive["PassiveSkillBuffs"]:
+            buff_defs = ps_buff["BuffDefinition"]
+            # if buff_defs["Binary_StatsKeys"]:
+            #    stat_ids = [stat["Id"] for stat in buff_defs["Binary_StatsKeys"]]
+            #    values = [1 for _ in stat_ids]
+            # else:
+            stat_ids = [stat["Id"] for stat in buff_defs["Stats"]]
+            values = ps_buff["Buff_StatValues"]
+
+            for i, (sid, val) in enumerate(zip(stat_ids, values)):
+                j += 1
+                infobox["stat%s_id" % j] = sid
+                infobox["stat%s_value" % j] = val
+
+            buff_stat_text = process_keywords(
+                "<br>".join(
+                    self._get_stats(
+                        stats=stat_ids,
+                        values=values,
+                        translation_file="passive_skill_aura_stat_descriptions.txt",
+                    )
+                )
+            )
+
+            if ps_buff["AuraRadius"]:
+                radius = ps_buff["AuraRadius"] / 10
+                buff_stat_text = re.sub(
+                    r"\[\[Nearby\|?([^]]*)]]",
+                    lambda match: f"{{{{Radius|{match.group(1)}|{radius}m}}}}",
+                    buff_stat_text,
+                )
+
+            if stat_text:
+                stat_text += "<br>" + buff_stat_text
+            else:
+                stat_text = buff_stat_text
+
+        return stat_text, j
+
+    def handle_icon(self, infobox, passive):
+        if passive["Icon_DDSFile"]:
+            file_path = passive["Icon_DDSFile"]
+            file_path_4k = posixpath.join(
+                posixpath.dirname(file_path), "4k", posixpath.basename(file_path)
+            )
+            try:
+                data = self.file_system.get_file(file_path_4k)
+            except FileNotFoundError:
+                data = self.file_system.get_file(file_path)
+
+            infobox["icon"] = posixpath.basename(passive["Icon_DDSFile"]).replace(".dds", "")
+
+            # Extract icons if specified
+            if self.parsed_args.store_images:
+                if bool(passive["AtlasSubTree"]):
+                    icon = "%s atlas" % infobox["icon"]
+                elif bool(passive["Ascendancy"]):
+                    icon = "%s %s" % (infobox["icon"], passive["Ascendancy"]["Id"])
+                else:
+                    icon = infobox["icon"]
+                self._write_dds(
+                    data=data,
+                    out_path=os.path.join(self._img_path, "%s passive skill icon.dds" % icon),
+                    parsed_args=self.parsed_args,
+                )
+        # atlas_start_node doesn't have an icon path
+        else:
+            warnings.warn(f"Icon path file not found for {passive['Id']}: {passive['Name']}")
+
 
 # =============================================================================
 # Functions
 # =============================================================================
 
 
-def get_translation_file(passive_id: str):
+def apply_column_map(
+    infobox, column_map: tuple[tuple[str, dict], ...], list_object: DatRecord | list[DatRecord]
+):
     """
-    Determines which translation file should be used based on the passive skill ID.
+    Copy over simple fields from the .dat64
 
     Parameters
     ----------
-    passive_id: the Id of the passive skill
+    infobox: Dictionary in which values should be added
+    column_map: Map to apply
+    list_object: File to search for keys
     """
-    if passive_id.startswith("atlas"):
+    if not isinstance(list_object, DatRecord):
+        list_object = list_object[0]
+
+    for k, data in column_map:
+        value = list_object[k]
+        if data.get("condition") and not data["condition"](value):
+            continue
+
+        if data.get("format"):
+            value = data["format"](value)
+
+        if data.get("default") and not value:
+            infobox[data["template"]] = data["default"]
+            continue
+
+        if value:
+            infobox[data["template"]] = value
+
+
+def get_translation_file(is_atlas_passive: bool):
+    """
+    Determines which translation file should be used
+    based on whether the passive skill has an "AtlasSubTree" key
+
+    Parameters
+    ----------
+    is_atlas_passive: the boolean based on "AtlasSubTree" key
+    """
+    if is_atlas_passive:
         return "atlas_stat_descriptions.txt"
     else:
         return "passive_skill_stat_descriptions.txt"
