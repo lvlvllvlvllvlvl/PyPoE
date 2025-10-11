@@ -334,6 +334,9 @@ KEYWORD_LINK_MAP = {
             "Energy Shield Recharge Rate",
         ],
     },
+    "Essence": {
+        "default": "Essence (encounter)",
+    },
     "Evasion": {
         "links": [
             "Evasion Rating",
@@ -651,6 +654,9 @@ KEYWORD_LINK_MAP = {
         ],
     },
     "RunicInscription": {},
+    "Sacrifice": {
+        "default": "Sacrifice (keyword)",
+    },
     "ShockedGround": {},
     "SkillSpeed": {},
     "SoulEater": {},
