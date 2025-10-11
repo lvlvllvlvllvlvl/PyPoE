@@ -39,6 +39,7 @@ from functools import partialmethod
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
+from PyPoE.poe.file.dat import DatRecord
 
 # =============================================================================
 # Globals
@@ -341,18 +342,8 @@ class MonsterParser(parser.BaseParser):
         for monster in monsters:
             data = OrderedDict()
 
-            for row_key, copy_data in self._COPY_KEYS.items():
-                value = monster[row_key]
-
-                if copy_data.get("condition") and not copy_data["condition"](value):
-                    continue
-
-                fmt = copy_data.get("format")
-                if fmt:
-                    value = fmt(value)
-
-                if value:
-                    data[copy_data["template"]] = value
+            # Copy over simple fields from the .dat64
+            apply_column_map(data, self._COPY_KEYS, monster)
 
             cond = MonsterWikiCondition(
                 data=data,
@@ -377,3 +368,34 @@ class MonsterParser(parser.BaseParser):
 # =============================================================================
 # Functions
 # =============================================================================
+
+
+def apply_column_map(
+    infobox, column_map: tuple[tuple[str, dict], ...], list_object: DatRecord | list[DatRecord]
+):
+    """
+    Copy over simple fields from the .dat64
+
+    Parameters
+    ----------
+    infobox: Dictionary in which values should be added
+    column_map: Map to apply
+    list_object: File to search for keys
+    """
+    if not isinstance(list_object, DatRecord):
+        list_object = list_object[0]
+
+    for k, data in column_map:
+        value = list_object[k]
+        if data.get("condition") and not data["condition"](value):
+            continue
+
+        if data.get("format"):
+            value = data["format"](value)
+
+        if data.get("default") and not value:
+            infobox[data["template"]] = data["default"]
+            continue
+
+        if value:
+            infobox[data["template"]] = value

@@ -45,6 +45,7 @@ from functools import partialmethod
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
+from PyPoE.poe.file.dat import DatRecord
 
 # 3rd-party
 
@@ -469,23 +470,8 @@ class AreaParser(parser.BaseParser):
             #    continue
             data = OrderedDict()
 
-            for row_key, copy_data in self._COPY_KEYS.items():
-                value = area[row_key]
-
-                if copy_data.get("condition") and not copy_data["condition"](value):
-                    continue
-
-                # Skip default values to reduce size of template
-                if value == copy_data.get("default"):
-                    continue
-                """default = copy_data.get('default')
-                if default is not None and value == default:
-                        continue"""
-
-                fmt = copy_data.get("format")
-                if fmt:
-                    value = fmt(value)
-                data[copy_data["template"]] = value
+            # Copy over simple fields from the .dat64
+            apply_column_map(data, self._COPY_KEYS, area)
 
             # for i, (tag, value) in enumerate(
             #    zip(area["SpawnWeight_TagsKeys"], area["SpawnWeight_Values"]), start=1
@@ -524,30 +510,63 @@ class AreaParser(parser.BaseParser):
 
         return r
 
-    # =============================================================================
-    # Functions
-    # =============================================================================
 
-    def _get_endgame_map_biomes(self, endgame_map):
-        result = OrderedDict()
+# =============================================================================
+# Functions
+# =============================================================================
 
-        seen = set()
-        biomes = []
-        adjacent_biomes = []
 
-        for ml in endgame_map["MapLocations"]:
-            # Skip duplicate map locations
-            if ml["Id"] in seen:
-                continue
-            seen.add(ml["Id"])
+def apply_column_map(
+    infobox, column_map: tuple[tuple[str, dict], ...], list_object: DatRecord | list[DatRecord]
+):
+    """
+    Copy over simple fields from the .dat64
 
-            biomes.extend(b["Name"] for b in ml["Biomes"])
-            adjacent_biomes.extend(b["Name"] for b in ml["AdjacentBiomes"])
+    Parameters
+    ----------
+    infobox: Dictionary in which values should be added
+    column_map: Map to apply
+    list_object: File to search for keys
+    """
+    if not isinstance(list_object, DatRecord):
+        list_object = list_object[0]
 
-        # Remove duplicate biomes
-        if biomes:
-            result["biomes"] = ", ".join(OrderedDict.fromkeys(biomes))
-        if adjacent_biomes:
-            result["adjacent_biomes"] = ", ".join(OrderedDict.fromkeys(adjacent_biomes))
+    for k, data in column_map:
+        value = list_object[k]
+        if data.get("condition") and not data["condition"](value):
+            continue
 
-        return result
+        if data.get("format"):
+            value = data["format"](value)
+
+        if data.get("default") and not value:
+            infobox[data["template"]] = data["default"]
+            continue
+
+        if value:
+            infobox[data["template"]] = value
+
+
+def _get_endgame_map_biomes(endgame_map):
+    result = OrderedDict()
+
+    seen = set()
+    biomes = []
+    adjacent_biomes = []
+
+    for ml in endgame_map["MapLocations"]:
+        # Skip duplicate map locations
+        if ml["Id"] in seen:
+            continue
+        seen.add(ml["Id"])
+
+        biomes.extend(b["Name"] for b in ml["Biomes"])
+        adjacent_biomes.extend(b["Name"] for b in ml["AdjacentBiomes"])
+
+    # Remove duplicate biomes
+    if biomes:
+        result["biomes"] = ", ".join(OrderedDict.fromkeys(biomes))
+    if adjacent_biomes:
+        result["adjacent_biomes"] = ", ".join(OrderedDict.fromkeys(adjacent_biomes))
+
+    return result
