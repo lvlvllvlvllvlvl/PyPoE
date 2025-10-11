@@ -468,40 +468,40 @@ class AreaParser(parser.BaseParser):
         for area in areas:
             # if "[DNT]" in area["Name"] or "[DNT-UNUSED]" in area["Name"]:
             #    continue
-            data = OrderedDict()
+            infobox = OrderedDict()
 
             # Copy over simple fields from the .dat64
-            apply_column_map(data, self._COPY_KEYS, area)
+            apply_column_map(infobox, self._COPY_KEYS, area)
 
             # for i, (tag, value) in enumerate(
             #    zip(area["SpawnWeight_TagsKeys"], area["SpawnWeight_Values"]), start=1
             # ):
-            #    data["spawn_weight%s_tag" % i] = tag["Id"]
-            #    data["spawn_weight%s_value" % i] = value
+            #    infobox["spawn_weight%s_tag" % i] = tag["Id"]
+            #    infobox["spawn_weight%s_value" % i] = value
 
             map_pin = self.rr["MapPins.dat64"].index["WorldAreasKeys"].get(area)
             if map_pin:
-                data["flavour_text"] = map_pin[0]["FlavourText"]
+                infobox["flavour_text"] = map_pin[0]["FlavourText"]
 
             endgame_map = self.rr["EndgameMaps.dat64"].index["WorldArea"].get(area)
             if endgame_map:
-                data["flavour_text"] = endgame_map["FlavourText"]
+                infobox["flavour_text"] = endgame_map["FlavourText"]
 
                 biomes = self._get_endgame_map_biomes(endgame_map)
                 for k, v in biomes.items():
-                    data[k] = v
+                    infobox[k] = v
 
             cond = WikiCondition(
-                data=data,
+                data=infobox,
                 cmdargs=parsed_args,
             )
 
             r.add_result(
                 text=cond,
-                out_file="area_%s.txt" % data["id"],
+                out_file="area_%s.txt" % infobox["id"],
                 wiki_page=[
                     {
-                        "page": "Area:" + self._format_wiki_title(data["id"]),
+                        "page": "Area:" + self._format_wiki_title(infobox["id"]),
                         "condition": cond,
                     },
                 ],

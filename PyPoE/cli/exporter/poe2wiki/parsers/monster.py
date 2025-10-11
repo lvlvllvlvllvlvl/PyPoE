@@ -340,22 +340,22 @@ class MonsterParser(parser.BaseParser):
         console("Accessing additional data...")
 
         for monster in monsters:
-            data = OrderedDict()
+            infobox = OrderedDict()
 
             # Copy over simple fields from the .dat64
-            apply_column_map(data, self._COPY_KEYS, monster)
+            apply_column_map(infobox, self._COPY_KEYS, monster)
 
             cond = MonsterWikiCondition(
-                data=data,
+                data=infobox,
                 cmdargs=parsed_args,
             )
 
             r.add_result(
                 text=cond,
-                out_file="monster_%s.txt" % data["metadata_id"].replace("/", "_"),
+                out_file="monster_%s.txt" % infobox["metadata_id"].replace("/", "_"),
                 wiki_page=[
                     {
-                        "page": "Monster:" + self._format_wiki_title(data["metadata_id"]),
+                        "page": "Monster:" + self._format_wiki_title(infobox["metadata_id"]),
                         "condition": cond,
                     },
                 ],
