@@ -536,7 +536,7 @@ class TestTranslationString:
 
 
 def test_custom_file():
-    translations.get_custom_translation_file(wiki="wiki")
+    translations.get_custom_translation_file()
 
 
 """def test_tag1_value1():

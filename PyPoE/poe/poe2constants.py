@@ -3,7 +3,7 @@ Overview
 ===============================================================================
 
 +----------+------------------------------------------------------------------+
-| Path     | PyPoE/poe/constants.py                                           |
+| Path     | PyPoE/poe/poe2constants.py                                       |
 +----------+------------------------------------------------------------------+
 | Version  | 1.0.0a0                                                          |
 +----------+------------------------------------------------------------------+
@@ -15,7 +15,7 @@ Overview
 Description
 ===============================================================================
 
-Global constants for Path of Exile, such as version or distributor for use in
+Global constants for Path of Exile 2, such as version or distributor for use in
 the functions.
 
 Agreement
@@ -563,21 +563,20 @@ class MOD_DOMAIN(IntEnumOverride):
     ITEM
         Generic item domain (but excluding items that have their own domain)
     FLASK
-        Flask domain
+        Flask and charm domain
     MONSTER
         Monster domain
     CHEST
         Chest domain, i.e. strongboxes or other type of chest-like
         containers
-    AREA
-        Area domain, i.e. for the various zones of Path of Exile
     UNKNOWN1
-    UNKNOWN2
-    UNKNOWN3
-    MASTER
-        See CRAFTED
+        Seems to be for strongboxes? ^CHEST for regular chests?
+    AREA
+        Area domain, i.e. for the various zones of Path of Exile 2
+    SANCTUM_RELIC
+        Domain for sanctum relicts
     CRAFTED
-        Domain for crafted mods (previously MASTER)
+        Domain for crafted mods
     MISC
         Miscellaneous domain for jewel stuff, item limits, corruptions, etc
     ATLAS
@@ -585,15 +584,15 @@ class MOD_DOMAIN(IntEnumOverride):
         atlas
     LEAGUESTONE
         Leaguestone domain for modifiers that appear on league stones
-    ABYSS_JEWEL
-        Domain for modifiers that appear on Abyss jewels
     MAP_DEVICE
         For implicit modifiers that can be applied through the map device
         For example, vaal fragments or soul flasks
-    DELVE
-        For delve modifiers
+    DUMMY
+        TODO
     DELVE_AREA
         For modifiers appearing on delve areas
+    SYNTHESIS_A
+        TODO
     SYNTHESIS_GLOBALS
         Synthesis global modifiers for areas
     SYNTHESIS_BONUS
@@ -606,58 +605,61 @@ class MOD_DOMAIN(IntEnumOverride):
         TODO
     HEIST_TRINKET
         TODO
-    UNKNOWN4
+    VEILED
         TODO
+    DESECRATED
+        Domain for abyss desecrated modifiers
+    EXPEDITION_RELIC
+        TODO
+    SENTINEL
+        TODO
+    MEMORY_LINE
+        TODO
+    TABLET
+        Domain for tablets
+    ULTIMATUM_KEY
+        Domain for ultimatum keys
     UNDEFINED
-        TODO
     """
 
     ITEM = 1
     FLASK = 2
     MONSTER = 3
     CHEST = 4
-    AREA = 5
-    UNKNOWN1 = 6
-    TEMPLAR_RELIC = 7
-    UNKNOWN3 = 8
-    CRAFTED = 9
-    # Corruptions, item limits, jewel mods, other stuff?
-    MISC = 10
-    ATLAS = 11
-    LEAGUESTONE = 12
-    ABYSS_JEWEL = 13
-    MAP_DEVICE = 14
-    DUMMY = 15
-    DELVE = 16
-    DELVE_AREA = 17
-    SYNTHESIS_A = 18
-    SYNTHESIS_GLOBALS = 19
-    SYNTHESIS_BONUS = 20
-    AFFLICTION_JEWEL = 21
-    HEIST_AREA = 22
-    HEIST_NPC = 23
-    HEIST_TRINKET = 24
-    WATCHSTONE = 25
-    VEILED = 26
-    EXPEDITION_RELIC = 27
-    UNVEILED = 28
-    PRIMORDIAL_ALTAR = 29
-    SENTINEL = 30
-    MEMORY_LINES = 31
-    SANCTUM_RELIC = 32
-    CRUCIBLE_REMNANT = 33
-    TINCTURE = 34
-    AFFLICTION_CHARM = 35
-    NECROPOLIS_MONSTER = 36
-    UBER_MAP = 37
-    MAP_RELIC = 38
+    UNKNOWN1 = 5
+    AREA = 6
+    # 7 is unused
+    SANCTUM_RELIC = 8
+    # 9 is unused
+    CRAFTED = 10
+    MISC = 11
+    ATLAS = 12
+    LEAGUESTONE = 13
+    # 14 is unused
+    MAP_DEVICE = 15
+    DUMMY = 16
+    # 17 is unused
+    DELVE_AREA = 18
+    SYNTHESIS_A = 19
+    SYNTHESIS_GLOBALS = 20
+    SYNTHESIS_BONUS = 21
+    AFFLICTION_JEWEL = 22
+    HEIST_AREA = 23
+    HEIST_NPC = 24
+    HEIST_TRINKET = 25
+    # 26 is unused
+    VEILED = 27
+    DESECRATED = 28
+    EXPEDITION_RELIC = 29
+    # 30 is unused
+    SENTINEL = 31
+    MEMORY_LINE = 32
+    # 33 is unused
+    TABLET = 34
+    ULTIMATUM_KEY = 35
 
     # Items that can't have mods (may need to increase the number when new values are added)
-    MODS_DISALLOWED = 39
-
-    # legacy names
-    MASTER = CRAFTED
-    JEWEL = MISC
+    MODS_DISALLOWED = 36
 
 
 MOD_TRANSLATION_MAP = {
@@ -668,14 +670,10 @@ MOD_TRANSLATION_MAP = {
     MOD_DOMAIN.LEAGUESTONE: "leaguestone_stat_descriptions.txt",
     MOD_DOMAIN.DELVE_AREA: "map_stat_descriptions.txt",
     MOD_DOMAIN.MAP_DEVICE: "map_stat_descriptions.txt",
-    # To properly support zana's innate IIQ
     MOD_DOMAIN.CRAFTED: "map_stat_descriptions.txt",
     MOD_DOMAIN.HEIST_NPC: "heist_equipment_stat_descriptions.txt",
-    MOD_DOMAIN.PRIMORDIAL_ALTAR: "primordial_altar_stat_descriptions.txt",
     MOD_DOMAIN.SENTINEL: "sentinel_stat_descriptions.txt",
-    MOD_DOMAIN.TEMPLAR_RELIC: "sanctum_relic_stat_descriptions.txt",
-    MOD_DOMAIN.TINCTURE: "tincture_stat_descriptions.txt",
-    MOD_DOMAIN.MAP_RELIC: "atlas_relic_stat_descriptions.txt",
+    MOD_DOMAIN.TABLET: "tablet_stat_descriptions.txt",
 }
 
 
@@ -708,8 +706,6 @@ class MOD_GENERATION_TYPE(IntEnumOverride):
         For 'tempest' mods that can appear on areas
     TALISMAN
         For 'talisman' mods that can appear on monsters
-    ENCHANTMENT
-        For the ascendancy/labyrinth enchantment mods that can appear on items
     ESSENCE
         For 'essence' mods that can appear on monsters
     BESTIARY
@@ -726,6 +722,14 @@ class MOD_GENERATION_TYPE(IntEnumOverride):
         TODO
     MONSTER_AFFLICTION
         TODO
+    EXPEDITION_LOGBOOK
+        TODO
+    SCOURGE_GIMMICK
+        TODO
+    INSTILLED
+        TODO
+    AZMERI_EMPOWERED_MONSTER
+        TODO
     """
 
     PREFIX = 1
@@ -737,32 +741,31 @@ class MOD_GENERATION_TYPE(IntEnumOverride):
     TORMENT = 7
     TEMPEST = 8
     TALISMAN = 9
-    ENCHANTMENT = 10
+    # 10 is unused
     ESSENCE = 11
+    # 12 is unused
     BESTIARY = 13
     DELVE_AREA = 14
     SYNTHESIS_A = 15
     SYNTHESIS_GLOBALS = 16
     SYNTHESIS_BONUS = 17
     BLIGHT = 18
-    BLIGHT_TOWER = 19
+    # 19 is unused
     MONSTER_AFFLICTION = 20
-    FLASK_ENCHANTMENT_ENKINDLING = 21
-    FLASK_ENCHANTMENT_INSTILLING = 22
+    # 21 is unused
+    # 22 is unused
     EXPEDITION_LOGBOOK = 23
-    SCOURGE_BENEFIT = 24
-    SCOURGE_DETRIMENT = 25
+    # 24 is unused
+    # 25 is unused
     SCOURGE_GIMMICK = 26
-    # 27 is unused.
-    ARCHNEMESIS = 28
-    SEARING_EXARCH_IMPLICIT = 29
-    EATER_OF_WORLDS_IMPLICIT = 30
-    CRUCIBLE_TREE = 31
-    CRUCIBLE_UNIQUE_TREE = 32
-    AZMERI_EMPOWERED_MONSTER = 33
-    NECROPOLIS_MONSTER = 34
-    NECROPOLIS_DEVOTED_MONSTER = 35
-    MEMORY_ALTAR = 36
+    # 27 is unused
+    # 28 is unused
+    # 29 is unused
+    # 30 is unused
+    # 31 is unused
+    # 32 is unused
+    INSTILLED = 33
+    AZMERI_EMPOWERED_MONSTER = 34
 
 
 class WORDLISTS(IntEnumOverride):

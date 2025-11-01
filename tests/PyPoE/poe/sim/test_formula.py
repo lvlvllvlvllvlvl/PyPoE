@@ -38,7 +38,7 @@ TODO
 import pytest
 
 # self
-from PyPoE.poe.sim import formula
+from PyPoE.poe.sim import poe1formula
 
 # =============================================================================
 # Test Data
@@ -46,7 +46,7 @@ from PyPoE.poe.sim import formula
 
 gems = {
     "Herald of Ice": {
-        "gtype": formula.GemTypes.active,
+        "gtype": poe1formula.GemTypes.active,
         "multi": [60, 40],
         # gem level, level requirement, dex, int
         "result": [
@@ -73,7 +73,7 @@ gems = {
         ],
     },
     "Freezing Pulse": {
-        "gtype": formula.GemTypes.active,
+        "gtype": poe1formula.GemTypes.active,
         "multi": [100],
         # gem level, level requirement, int
         "result": [
@@ -100,7 +100,7 @@ gems = {
         ],
     },
     "Additional Accuracy": {
-        "gtype": formula.GemTypes.support,
+        "gtype": poe1formula.GemTypes.support,
         "multi": [40, 60],
         # gem level, level requirement, str, dex
         "result": [
@@ -128,7 +128,7 @@ gems = {
         ],
     },
     "Stun": {
-        "gtype": formula.GemTypes.support,
+        "gtype": poe1formula.GemTypes.support,
         "multi": [100],
         # gem level, level requirement, str
         "result": [
@@ -177,19 +177,19 @@ for gem in gems:
 
 @pytest.mark.parametrize("lvl,gtype,multi,result", cmp_tests)
 def test_stat_requirement(lvl, gtype, multi, result):
-    r = formula.gem_stat_requirement(level=lvl, gtype=gtype, multi=multi)
+    r = poe1formula.gem_stat_requirement(level=lvl, gtype=gtype, multi=multi)
     assert r == result, 'Result mismatch "%s" vs expected "%s"' % (r, result)
     # print("%s %.2f (%d) %s" % (round(r)==result, r, round(r), result))
 
 
 def test_stat_requirement_invalid_gtype():
     with pytest.raises(ValueError):
-        formula.gem_stat_requirement(1, 5, 100)
+        poe1formula.gem_stat_requirement(1, 5, 100)
 
 
 def test_stat_requirement_invalid_multi():
     with pytest.raises(ValueError):
-        formula.gem_stat_requirement(1, formula.GemTypes.active, -1)
+        poe1formula.gem_stat_requirement(1, poe1formula.GemTypes.active, -1)
 
 
 """import numpy

@@ -45,6 +45,7 @@ from functools import partialmethod
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
+from PyPoE.poe.file.dat import DatRecord
 
 # 3rd-party
 
@@ -64,6 +65,7 @@ class WikiCondition(parser.WikiCondition):
     COPY_KEYS = (
         "is_underground",
         "entry_text",  # temp
+        "screenshot",
         "screenshot_ext",
         "main_page",
         "release_version",
@@ -178,16 +180,21 @@ class AreaParser(parser.BaseParser):
 
     # Unreleased or disabled areas to avoid exporting to the wiki
     _SKIP_AREAS_BY_ID = [
-        "NULL",
+        "NULL",  # 0.1.0
+        "BlackTest",  # 0.3.1
+        "Design",  # 0.3.1
+        "Design_Lite",  # 0.3.1
+        "Programming",  # 0.3.1
+        "Programming_Lite",  # 0.3.1
         "G1_10",
         "G2_3s",
         "G2_8a",
         "G2_11",
         "G3_15",
-        "G4_6",
-        "G4_9_",
-        "G4_12",
-        "G4_14",
+        "G4_6",  # 0.3.0
+        "G4_9_",  # 0.3.0
+        "G4_12",  # 0.3.0
+        "G4_14",  # 0.3.0
     ]
 
     _COPY_KEYS = OrderedDict(
@@ -461,55 +468,40 @@ class AreaParser(parser.BaseParser):
         for area in areas:
             # if "[DNT]" in area["Name"] or "[DNT-UNUSED]" in area["Name"]:
             #    continue
-            data = OrderedDict()
+            infobox = OrderedDict()
 
-            for row_key, copy_data in self._COPY_KEYS.items():
-                value = area[row_key]
-
-                if copy_data.get("condition") and not copy_data["condition"](value):
-                    continue
-
-                # Skip default values to reduce size of template
-                if value == copy_data.get("default"):
-                    continue
-                """default = copy_data.get('default')
-                if default is not None and value == default:
-                        continue"""
-
-                fmt = copy_data.get("format")
-                if fmt:
-                    value = fmt(value)
-                data[copy_data["template"]] = value
+            # Copy over simple fields from the .dat64
+            apply_column_map(infobox, self._COPY_KEYS, area)
 
             # for i, (tag, value) in enumerate(
             #    zip(area["SpawnWeight_TagsKeys"], area["SpawnWeight_Values"]), start=1
             # ):
-            #    data["spawn_weight%s_tag" % i] = tag["Id"]
-            #    data["spawn_weight%s_value" % i] = value
+            #    infobox["spawn_weight%s_tag" % i] = tag["Id"]
+            #    infobox["spawn_weight%s_value" % i] = value
 
             map_pin = self.rr["MapPins.dat64"].index["WorldAreasKeys"].get(area)
             if map_pin:
-                data["flavour_text"] = map_pin[0]["FlavourText"]
+                infobox["flavour_text"] = map_pin[0]["FlavourText"]
 
             endgame_map = self.rr["EndgameMaps.dat64"].index["WorldArea"].get(area)
             if endgame_map:
-                data["flavour_text"] = endgame_map["FlavourText"]
+                infobox["flavour_text"] = endgame_map["FlavourText"]
 
                 biomes = self._get_endgame_map_biomes(endgame_map)
                 for k, v in biomes.items():
-                    data[k] = v
+                    infobox[k] = v
 
             cond = WikiCondition(
-                data=data,
+                data=infobox,
                 cmdargs=parsed_args,
             )
 
             r.add_result(
                 text=cond,
-                out_file="area_%s.txt" % data["id"],
+                out_file="area_%s.txt" % infobox["id"],
                 wiki_page=[
                     {
-                        "page": "Area:" + self._format_wiki_title(data["id"]),
+                        "page": "Area:" + self._format_wiki_title(infobox["id"]),
                         "condition": cond,
                     },
                 ],
@@ -518,30 +510,63 @@ class AreaParser(parser.BaseParser):
 
         return r
 
-    # =============================================================================
-    # Functions
-    # =============================================================================
 
-    def _get_endgame_map_biomes(self, endgame_map):
-        result = OrderedDict()
+# =============================================================================
+# Functions
+# =============================================================================
 
-        seen = set()
-        biomes = []
-        adjacent_biomes = []
 
-        for ml in endgame_map["MapLocations"]:
-            # Skip duplicate map locations
-            if ml["Id"] in seen:
-                continue
-            seen.add(ml["Id"])
+def apply_column_map(
+    infobox, column_map: tuple[tuple[str, dict], ...], list_object: DatRecord | list[DatRecord]
+):
+    """
+    Copy over simple fields from the .dat64
 
-            biomes.extend(b["Name"] for b in ml["Biomes"])
-            adjacent_biomes.extend(b["Name"] for b in ml["AdjecentBiomes"])
+    Parameters
+    ----------
+    infobox: Dictionary in which values should be added
+    column_map: Map to apply
+    list_object: File to search for keys
+    """
+    if not isinstance(list_object, DatRecord):
+        list_object = list_object[0]
 
-        # Remove duplicate biomes
-        if biomes:
-            result["biomes"] = ", ".join(OrderedDict.fromkeys(biomes))
-        if adjacent_biomes:
-            result["adjacent_biomes"] = ", ".join(OrderedDict.fromkeys(adjacent_biomes))
+    for k, data in column_map:
+        value = list_object[k]
+        if data.get("condition") and not data["condition"](value):
+            continue
 
-        return result
+        if data.get("format"):
+            value = data["format"](value)
+
+        if data.get("default") and not value:
+            infobox[data["template"]] = data["default"]
+            continue
+
+        if value:
+            infobox[data["template"]] = value
+
+
+def _get_endgame_map_biomes(endgame_map):
+    result = OrderedDict()
+
+    seen = set()
+    biomes = []
+    adjacent_biomes = []
+
+    for ml in endgame_map["MapLocations"]:
+        # Skip duplicate map locations
+        if ml["Id"] in seen:
+            continue
+        seen.add(ml["Id"])
+
+        biomes.extend(b["Name"] for b in ml["Biomes"])
+        adjacent_biomes.extend(b["Name"] for b in ml["AdjacentBiomes"])
+
+    # Remove duplicate biomes
+    if biomes:
+        result["biomes"] = ", ".join(OrderedDict.fromkeys(biomes))
+    if adjacent_biomes:
+        result["adjacent_biomes"] = ", ".join(OrderedDict.fromkeys(adjacent_biomes))
+
+    return result

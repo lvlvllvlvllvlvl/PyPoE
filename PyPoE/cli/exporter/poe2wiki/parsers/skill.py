@@ -47,6 +47,7 @@ from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
 from PyPoE.cli.exporter.poe2wiki.parser import process_keywords, strip_keywords
 from PyPoE.poe.file.stat_filters import StatFilterFile
 from PyPoE.poe.file.translations import StatValue, TranslationFile
+from PyPoE.poe.sim.poe2formula import gem_stat_requirement
 
 # =============================================================================
 # Globals
@@ -943,6 +944,7 @@ class SkillParserShared(parser.BaseParser):
             infobox[prefix] = "True"
             prefix += "_"
 
+            # Level and attribute requirements
             if not gra_eff["IsSupport"]:
                 if "ItemExperienceType" not in self.rr["ItemExperiencePerLevel.dat64"].index:
                     self.rr["ItemExperiencePerLevel.dat64"].build_index("ItemExperienceType")
@@ -956,51 +958,18 @@ class SkillParserShared(parser.BaseParser):
 
                 infobox[prefix + "level_requirement"] = req_levels[i]["Level"]
 
+                # attributes
                 if skill_gem:
-                    # TODO:Remove:Do proper calculation (temporary)
-                    def _skill_temporary_attr(skill_gem, level):
-                        infobox = OrderedDict()
-                        _attribute_map = OrderedDict(
-                            (
-                                ("Str", "strength"),
-                                ("Dex", "dexterity"),
-                                ("Int", "intelligence"),
+                    attr_map = {
+                        "Str": "strength_requirement",
+                        "Int": "intelligence_requirement",
+                        "Dex": "dexterity_requirement",
+                    }
+                    for attr in ("Str", "Dex", "Int"):
+                        if skill_gem[attr]:
+                            infobox[prefix + attr_map[attr]] = gem_stat_requirement(
+                                req_levels[i]["Level"], skill_gem[attr]
                             )
-                        )
-                        # fmt: off
-                        ranges = {
-                            100: [
-                                0, 9, 14, 21, 28, 35, 41, 48, 57, 65,
-                                74, 82, 92, 103, 113, 116, 126, 137, 147, 157,
-                            ],
-                            75: [
-                                0, 8, 12, 17, 22, 28, 33, 38, 45, 51,
-                                58, 64, 72, 80, 88, 91, 98, 106, 114, 122,
-                            ],
-                            50: [
-                                0, 0, 9, 13, 17, 20, 24, 28, 32, 37,
-                                41, 46, 51, 57, 62, 64, 70, 75, 80, 86,
-                            ],
-                            25: [
-                                0, 0, 0, 9, 11, 13, 15, 17, 19, 22,
-                                24, 26, 29, 32, 35, 36, 39, 42, 45, 48,
-                            ],
-                        }
-                        # fmt: on
-
-                        for attr_short, attr_long in _attribute_map.items():
-                            if not skill_gem[attr_short]:
-                                continue
-
-                            if skill_gem[attr_short] in ranges:
-                                infobox[f"{attr_long}_requirement"] = ranges[skill_gem[attr_short]][
-                                    i
-                                ]
-
-                        return infobox
-
-                    for req, value in _skill_temporary_attr(skill_gem, i).items():
-                        infobox[prefix + req] = value
 
             # Column handling
             for column, column_data in self._SKILL_COLUMN_MAP:

@@ -66,7 +66,7 @@ from PyPoE.cli.exporter.wiki.parsers.skill import SkillParserShared
 from PyPoE.poe import poe1constants as constants
 from PyPoE.poe.file.dat import DatReader, RelationalReader
 from PyPoE.poe.file.it import ITFile
-from PyPoE.poe.sim.formula import GemTypes, gem_stat_requirement
+from PyPoE.poe.sim.poe1formula import GemTypes, gem_stat_requirement
 
 # =============================================================================
 # Functions

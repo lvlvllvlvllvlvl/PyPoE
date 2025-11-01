@@ -2128,8 +2128,7 @@ class TranslationFileCache(AbstractFileCache[TranslationFile]):
         if merge_with_custom_file is None or merge_with_custom_file is False:
             self._custom_file = None
         elif merge_with_custom_file is True:
-            wiki = "wiki" if sequel == 1 else "poe2wiki"
-            self._custom_file = get_custom_translation_file(wiki=wiki)
+            self._custom_file = get_custom_translation_file(sequel=sequel)
         elif isinstance(merge_with_custom_file, TranslationFile):
             self._custom_file = merge_with_custom_file
         else:
@@ -2252,7 +2251,7 @@ def _diff_dict(self, other):
             print('Key "%s": Value "%s"' % (key, other[key]))
 
 
-def get_custom_translation_file(wiki="wiki") -> TranslationFile:
+def get_custom_translation_file(sequel) -> TranslationFile:
     """
     Returns the currently loaded custom translation file.
 
@@ -2260,9 +2259,9 @@ def get_custom_translation_file(wiki="wiki") -> TranslationFile:
 
     Parameters
     ----------
-    wiki : str
+    sequel : int
         Should use poe1 or poe2 files?
-        Accepts "wiki" and "poe2wiki".
+        default to poe1
 
     Returns
     -------
@@ -2271,11 +2270,11 @@ def get_custom_translation_file(wiki="wiki") -> TranslationFile:
     """
     global _custom_translation_file
     if _custom_translation_file is None:
-        set_custom_translation_file(wiki=wiki)
+        set_custom_translation_file(sequel=sequel)
     return _custom_translation_file
 
 
-def set_custom_translation_file(file: Union[str, None] = None, wiki="wiki"):
+def set_custom_translation_file(file: Union[str, None] = None, sequel=1):
     """
     Sets the custom translation file.
 
@@ -2285,11 +2284,13 @@ def set_custom_translation_file(file: Union[str, None] = None, wiki="wiki"):
         Path where the custom translation file is located. If None,
         the default file will be loaded
 
-    wiki : str
+    sequel : int
         Should use poe1 or poe2 files?
-        Accepts "wiki" and "poe2wiki".
+        default to poe1
     """
     global _custom_translation_file
+    wiki = "wiki" if sequel == 1 else "poe2wiki"
+
     custom_file = os.path.join(
         os.path.dirname(CUSTOM_TRANSLATION_FILE), wiki, os.path.basename(CUSTOM_TRANSLATION_FILE)
     )
@@ -2302,7 +2303,7 @@ custom_translation_file = property(
 )
 
 
-def get_hardcoded_translation_file(wiki="wiki") -> TranslationFile:
+def get_hardcoded_translation_file(sequel) -> TranslationFile:
     """
     Returns the currently loaded hardcoded translation file.
 
@@ -2310,9 +2311,9 @@ def get_hardcoded_translation_file(wiki="wiki") -> TranslationFile:
 
     Parameters
     ----------
-    wiki : str
+    sequel : int
         Should use poe1 or poe2 files?
-        Accepts "wiki" and "poe2wiki".
+        default to poe1
 
     Returns
     -------
@@ -2321,11 +2322,11 @@ def get_hardcoded_translation_file(wiki="wiki") -> TranslationFile:
     """
     global _hardcoded_translation_file
     if _hardcoded_translation_file is None:
-        set_hardcoded_translation_file(wiki=wiki)
+        set_hardcoded_translation_file(sequel=sequel)
     return _hardcoded_translation_file
 
 
-def set_hardcoded_translation_file(file: Union[str, None] = None, wiki="wiki"):
+def set_hardcoded_translation_file(file: Union[str, None] = None, sequel=1):
     """
     Sets the hardcoded translation file.
 
@@ -2335,11 +2336,13 @@ def set_hardcoded_translation_file(file: Union[str, None] = None, wiki="wiki"):
         Path where the hardcoded translation file is located. If None,
         the default file will be loaded
 
-    wiki : str
+    sequel : int
         Should use poe1 or poe2 files?
-        Accepts "wiki" and "poe2wiki".
+        default to poe1
     """
     global _hardcoded_translation_file
+    wiki = "wiki" if sequel == 1 else "poe2wiki"
+
     hardcoded_file = os.path.join(
         os.path.dirname(HARDCODED_TRANSLATION_FILE),
         wiki,
