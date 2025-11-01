@@ -325,7 +325,9 @@ class PassiveSkillParser(parser.BaseParser):
         console("Accessing additional data...")
 
         skill_trees = {
-            row["Id"]: self._build_psg(row["PassiveSkillGraph"] + ".psg")
+            re.sub(r"(?<!^)(?=[A-Z])", "_", row["Id"]).lower(): self._build_psg(
+                row["PassiveSkillGraph"] + ".psg"
+            )
             for row in self.rr["PassiveSkillTrees.dat64"]
         }
 
@@ -454,6 +456,7 @@ class PassiveSkillParser(parser.BaseParser):
                         for psg_id in node.connections
                     ]
                 )
+                data[tree + "_connections"] = data["connections"]
             if found_trees:
                 data["trees"] = ",".join(found_trees)
 
