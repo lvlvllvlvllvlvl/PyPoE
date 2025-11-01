@@ -745,88 +745,76 @@ class DatReader(ReprMixin):
     def _cast_from_spec(
         self, specification, casts, parent=None, offset=None, data=None, queue_data=None
     ):
-        if casts[0][0] in (
-            self.CastTypes.VALUE,
-            self.CastTypes.POINTER_SELF,
-            self.CastTypes.POINTER_OUT,
-        ):
-            ivalue = (
-                data[0]
-                if data
-                else struct.unpack(
-                    "<" + casts[0][2], self._file_raw[offset : offset + casts[0][1]]
-                )[0]
-            )
-
-            if ivalue in (
-                -0x1010102,
-                0xFEFEFEFE,
-                -0x101010101010102,
-                0xFEFEFEFEFEFEFEFE,
-                0xFFFFFFFF,
+        try:
+            if casts[0][0] in (
+                self.CastTypes.VALUE,
+                self.CastTypes.POINTER_SELF,
+                self.CastTypes.POINTER_OUT,
             ):
-                ivalue = None
-
-            if self.use_dat_value:
-                value = DatValue(ivalue, offset, casts[0][1], parent, specification)
-            else:
-                value = ivalue
-        elif casts[0][0] == self.CastTypes.STRING:
-            # Beginning of the sequence, +1 to adjust for it
-            offset_new = self._file_raw.find(b"\x00\x00\x00\x00", offset)
-            # Account for 0 size strings
-            if offset == offset_new:
-                string = ""
-            else:
-                # It's possible that a string ends in \x00 and the next starts
-                # with \x00
-                # UTF-16 must be at least a multiple of 2
-                while (offset_new - offset) % 2:
-                    offset_new = self._file_raw.find(b"\x00\x00\x00\x00", offset_new + 1)
-                string = self._file_raw[offset:offset_new].decode("utf-16")
-            # Store the offset including the null terminator
-            if self.use_dat_value:
-                value = DatValue(string, offset, offset_new - offset + 4, parent, specification)
-            else:
-                value = string
-
-        elif casts[0][0] in (self.CastTypes.POINTER_LIST, self.CastTypes.POINTER):
-            data = (
-                data
-                if data
-                else struct.unpack("<" + casts[0][2], self._file_raw[offset : offset + casts[0][1]])
-            )
-            data_offset = data[-1] + self.data_offset
-
-            # Instance..
-            if self.use_dat_value:
-                value = DatValue(
-                    data[0] if casts[0][0] == 4 else data,
-                    offset,
-                    casts[0][1],
-                    parent,
-                    specification,
+                ivalue = (
+                    data[0]
+                    if data
+                    else struct.unpack(
+                        "<" + casts[0][2], self._file_raw[offset : offset + casts[0][1]]
+                    )[0]
                 )
 
-                if casts[0][0] == self.CastTypes.POINTER_LIST:
-                    value.children = []
-                    for i in range(0, data[0]):
-                        value.children.append(
-                            self._cast_from_spec(
-                                specification, casts[1:], value, data_offset + i * casts[1:][0][1]
-                            )
-                        )
-                elif casts[0][0] == self.CastTypes.POINTER:
-                    value.child = self._cast_from_spec(specification, casts[1:], value, data_offset)
-                self.data_parsed.append(value)
-            else:
-                if casts[0][0] == self.CastTypes.POINTER_LIST:
-                    value = []
-                    for i in range(0, data[0]):
-                        if casts[1:][0][1] is None:
-                            return None
-                        else:
-                            value.append(
+                if ivalue in (
+                    -0x1010102,
+                    0xFEFEFEFE,
+                    -0x101010101010102,
+                    0xFEFEFEFEFEFEFEFE,
+                    0xFFFFFFFF,
+                ):
+                    ivalue = None
+
+                if self.use_dat_value:
+                    value = DatValue(ivalue, offset, casts[0][1], parent, specification)
+                else:
+                    value = ivalue
+            elif casts[0][0] == self.CastTypes.STRING:
+                # Beginning of the sequence, +1 to adjust for it
+                offset_new = self._file_raw.find(b"\x00\x00\x00\x00", offset)
+                # Account for 0 size strings
+                if offset == offset_new:
+                    string = ""
+                else:
+                    # It's possible that a string ends in \x00 and the next starts
+                    # with \x00
+                    # UTF-16 must be at least a multiple of 2
+                    while (offset_new - offset) % 2:
+                        offset_new = self._file_raw.find(b"\x00\x00\x00\x00", offset_new + 1)
+                    string = self._file_raw[offset:offset_new].decode("utf-16")
+                # Store the offset including the null terminator
+                if self.use_dat_value:
+                    value = DatValue(string, offset, offset_new - offset + 4, parent, specification)
+                else:
+                    value = string
+
+            elif casts[0][0] in (self.CastTypes.POINTER_LIST, self.CastTypes.POINTER):
+                data = (
+                    data
+                    if data
+                    else struct.unpack(
+                        "<" + casts[0][2], self._file_raw[offset : offset + casts[0][1]]
+                    )
+                )
+                data_offset = data[-1] + self.data_offset
+
+                # Instance..
+                if self.use_dat_value:
+                    value = DatValue(
+                        data[0] if casts[0][0] == 4 else data,
+                        offset,
+                        casts[0][1],
+                        parent,
+                        specification,
+                    )
+
+                    if casts[0][0] == self.CastTypes.POINTER_LIST:
+                        value.children = []
+                        for i in range(0, data[0]):
+                            value.children.append(
                                 self._cast_from_spec(
                                     specification,
                                     casts[1:],
@@ -834,14 +822,37 @@ class DatReader(ReprMixin):
                                     data_offset + i * casts[1:][0][1],
                                 )
                             )
-                elif casts[0][0] == self.CastTypes.POINTER:
-                    value = self._cast_from_spec(specification, casts[1:], None, data_offset)
-        # TODO:
-        # if parent:
-        #    self._data_offset_current = offset
-        #    self.data_parsed.append(value)
+                    elif casts[0][0] == self.CastTypes.POINTER:
+                        value.child = self._cast_from_spec(
+                            specification, casts[1:], value, data_offset
+                        )
+                    self.data_parsed.append(value)
+                else:
+                    if casts[0][0] == self.CastTypes.POINTER_LIST:
+                        value = []
+                        for i in range(0, data[0]):
+                            if casts[1:][0][1] is None:
+                                return None
+                            else:
+                                value.append(
+                                    self._cast_from_spec(
+                                        specification,
+                                        casts[1:],
+                                        value,
+                                        data_offset + i * casts[1:][0][1],
+                                    )
+                                )
+                    elif casts[0][0] == self.CastTypes.POINTER:
+                        value = self._cast_from_spec(specification, casts[1:], None, data_offset)
+            # TODO:
+            # if parent:
+            #    self._data_offset_current = offset
+            #    self.data_parsed.append(value)
 
-        return value
+            return value
+        except Exception:
+            warnings.warn(f"Failed to cast {casts[0]} at offset {offset} in {self.file_name}")
+            raise
 
     def _process_row(self, rowid):
         offset = 4 + rowid * self.table_record_length

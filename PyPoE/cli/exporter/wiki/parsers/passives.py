@@ -73,7 +73,9 @@ class WikiCondition(parser.WikiCondition):
 
 
 def normalize(id):
-    return (2**16 + id) % 2**16
+    if id < 0 or id > 2**16:
+        raise ValueError(f"id {id} not normal")
+    return id
 
 
 class PassiveSkillCommandHandler(ExporterHandler):
@@ -201,7 +203,7 @@ class PassiveSkillParser(parser.BaseParser):
             "AscendancyKey",
             {
                 "template": "ascendancy_class",
-                "format": lambda value: value["CharactersKey"][0]["Name"],
+                "format": lambda value: value["CharactersKey"]["Name"],
                 "condition": lambda passive: passive["Id"] in CLASS_PASSIVES,
             },
         ),
@@ -322,10 +324,10 @@ class PassiveSkillParser(parser.BaseParser):
 
         console("Accessing additional data...")
 
-        node_index = [
-            self._build_psg("Metadata/PassiveSkillGraph.psg"),
-            self._build_psg("Metadata/AtlasSkillGraphs/AtlasSkillGraph.psg"),
-        ]
+        skill_trees = {
+            row["Id"]: self._build_psg(row["PassiveSkillGraph"] + ".psg")
+            for row in self.rr["PassiveSkillTrees.dat64"]
+        }
 
         self.rr["PassiveSkills.dat64"].build_index("PassiveSkillGraphId")
 
@@ -438,8 +440,12 @@ class PassiveSkillParser(parser.BaseParser):
                 else:
                     data["stat_text"] = text
 
-            node = node_index[skill_type].get(normalize(passive["PassiveSkillGraphId"]))
-            if node and node.connections:
+            found_trees = []
+            for tree, node_index in skill_trees.items():
+                node = node_index.get(normalize(passive["PassiveSkillGraphId"]))
+                if not node:
+                    continue
+                found_trees.append(tree)
                 data["connections"] = ",".join(
                     [
                         self.rr["PassiveSkills.dat64"].index["PassiveSkillGraphId"][
@@ -448,6 +454,8 @@ class PassiveSkillParser(parser.BaseParser):
                         for psg_id in node.connections
                     ]
                 )
+            if found_trees:
+                data["trees"] = ",".join(found_trees)
 
             # extract icons if specified
             if parsed_args.store_images and data["icon"] != "":

@@ -1477,13 +1477,6 @@ class MonsterParser(GenericLuaParser):
                     },
                 ),
                 (
-                    "EnergyShieldFromLife",
-                    {
-                        "key": "energy_shield_multiplier",
-                        "value": lambda v: v / 100,
-                    },
-                ),
-                (
                     "DamageSpread",
                     {
                         "key": "damage_spread",
