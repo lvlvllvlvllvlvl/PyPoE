@@ -319,6 +319,10 @@ _inter_wiki_map = {
         ("(?<=ll is )Intensity", {"link": "Intensity (passive skill)"}),
         ("(?<=ll is )(?!a Jewel).+", {"link": "{text}"}),
         #
+        # Crucible notables
+        #
+        ("(?<=Allocates ).+", {"link": "{text}"}),
+        #
         # Enchantment skills
         #
         ("Commandment of Blades", {"link": "Commandment of Blades"}),
@@ -1186,6 +1190,7 @@ _inter_wiki_map = {
         ("Amulet(?:|s)", {"link": "Amulet"}),
         ("Belt(?:|s)", {"link": "Belt"}),
         ("(?<!small |edium |large |ssive )Ring(?:|s)", {"link": "Ring"}),
+        ("Jewellery", {"link": "Jewellery"}),
         # Jewels
         ("Murderous Eye Jewel(?:|s)", {"link": "Murderous Eye Jewel"}),
         ("Ghastly Eye Jewel(?:|s)", {"link": "Ghastly Eye Jewel"}),
@@ -1220,6 +1225,43 @@ _inter_wiki_map = {
         ("Ultimatum Scarab(?:|s)", {"link": "Ultimatum Scarab (disambiguation)"}),
         ("Horned Scarab(?:|s)", {"link": "Horned Scarab"}),
         ("Scarab(?:|s)", {"link": "Scarab"}),
+        # Currency items
+        ("Lifeforce", {"link": "Lifeforce"}),
+        ("Remnant(?:|s) of Corruption", {"link": "Remnant of Corruption"}),
+        ("Cartographer's Chisel(?:|s)", {"link": "Cartographer's Chisel"}),
+        ("Glassblower's Bauble(?:|s)", {"link": "Glassblower's Bauble"}),
+        ("Gemcutter's Prism(?:|s)", {"link": "Gemcutter's Prism"}),
+        ("Eldritch Chaos Orb(?:|s)", {"link": "Eldritch Chaos Orb"}),
+        ("Eldritch Orb(?:|s) of Annulment", {"link": "Eldritch Orb of Annulment"}),
+        ("Eldritch Exalted Orb(?:|s)", {"link": "Eldritch Exalted Orb"}),
+        ("Divine Orb(?:|s)", {"link": "Divine Orb"}),
+        ("Exalted Orb(?:|s)", {"link": "Exalted Orb"}),
+        ("Regal Orb(?:|s)", {"link": "Regal Orb"}),
+        ("Chaos Orb(?:|s)", {"link": "Chaos Orb"}),
+        ("Orb(?:|s) of Alteration", {"link": "Orb of Alteration"}),
+        ("Orb(?:|s) of Scouring", {"link": "Orb of Scouring"}),
+        ("Blessed Orb(?:|s)", {"link": "Blessed Orb"}),
+        ("Chromatic Orb(?:|s)", {"link": "Chromatic Orb"}),
+        ("Orb(?:|s) of Fusing", {"link": "Orb of Fusing"}),
+        ("Jeweller's Orb(?:|s)", {"link": "Jeweller's Orb"}),
+        ("Orb(?:|s) of Horizons", {"link": "Orb of Horizons"}),
+        ("Orb(?:|s) of Binding", {"link": "Orb of Binding"}),
+        ("Orb(?:|s) of Unmaking", {"link": "Orb of Unmaking"}),
+        ("Orb(?:|s) of Annulment", {"link": "Orb of Annulment"}),
+        ("Vaal Orb(?:|s)", {"link": "Vaal Orb"}),
+        ("Instilling Orb(?:|s)", {"link": "Instilling Orb"}),
+        ("Enkindling Orb(?:|s)", {"link": "Enkindling Orb"}),
+        ("Orb(?:|s) of Regret", {"link": "Orb of Regret"}),
+        ("Lesser Eldritch Ember(?:|s)", {"link": "Lesser Eldritch Ember"}),
+        ("Greater Eldritch Ember(?:|s)", {"link": "Greater Eldritch Ember"}),
+        ("Grand Eldritch Ember(?:|s)", {"link": "Grand Eldritch Ember"}),
+        ("Exceptional Eldritch Ember(?:|s)", {"link": "Exceptional Eldritch Ember"}),
+        ("Lesser Eldritch Ichor(?:|s)", {"link": "Lesser Eldritch Ichor"}),
+        ("Greater Eldritch Ichor(?:|s)", {"link": "Greater Eldritch Ichor"}),
+        ("Grand Eldritch Ichor(?:|s)", {"link": "Grand Eldritch Ichor"}),
+        ("Exceptional Eldritch Ichor(?:|s)", {"link": "Exceptional Eldritch Ichor"}),
+        ("Basic Currency(?: Item(?:|s))?", {"link": "Basic Currency"}),
+        ("Currency(?: Item(?:|s))?", {"link": "Currency"}),
         # Other
         ("Quiver(?:|s)", {"link": "Quiver"}),
         ("Flask(?:|s)", {"link": "Flask"}),
@@ -1229,9 +1271,6 @@ _inter_wiki_map = {
         ("Map(?:|s)", {"link": "Map"}),
         ("Breach Splinter(?:|s)", {"link": "Breach Splinter"}),
         ("Breachstone(?:|s)", {"link": "Breachstone"}),
-        ("Lifeforce", {"link": "Lifeforce"}),
-        ("Remnant(?:|s) of Corruption", {"link": "Remnant of Corruption"}),
-        ("Currency(?: Item(?:|s))?", {"link": "Currency"}),
         ("Rogue(?:|'s) Marker(?:|s)", {"link": "Rogue's Marker"}),
         ("Contract(?:|s)", {"link": "Contract"}),
         ("Blueprint(?:|s)", {"link": "Blueprint"}),
@@ -1245,6 +1284,7 @@ _inter_wiki_map = {
         ("Skill Gem(?:|s)", {"link": "Skill Gem"}),
         ("Improved Offering to the Goddess", {"link": "Improved Offering to the Goddess"}),
         ("Offering to the Goddess", {"link": "Offering to the Goddess"}),
+        ("Forbidden Tome(?:|s)", {"link": "Forbidden Tome"}),
         #
         # Ailments
         #
@@ -1330,6 +1370,8 @@ _inter_wiki_map = {
         ("Trigger(?:|s|ed)", {"link": "Trigger"}),
         ("Linked(?= Targ| Play)", {"link": "Link skill"}),
         ("Stance", {"link": "Stance"}),
+        ("Banner(?:|s)(?: Skill(?:|s))?", {"link": "Banner"}),
+        ("Offering(?:|s)(?: Skill(?:|s))?", {"link": "Offering"}),
         ("Projectile(?:|s)", {"link": "Projectile"}),
         ("Pierce(?:|d)|Piercing", {"link": "Pierce"}),
         ("Chain(?:|ed|ing)", {"link": "Chain"}),
@@ -1354,11 +1396,13 @@ _inter_wiki_map = {
         ("Skill(?:|s)", {"link": "Skill"}),
         ("Buff(?:|s)", {"link": "Buff"}),
         ("Duration", {"link": "Duration"}),
+        ("Implicit Modifier(?:|s)", {"link": "Implicit Modifier"}),
         ("Modifier(?:|s)", {"link": "Modifier"}),
         ("Corrupted", {"link": "Corrupted"}),
         ("Reflect(?:|s|ed)", {"link": "Reflect"}),
         ("Penetrate(?:|s)", {"link": "Penetrate"}),
         ("PvP", {"link": "PvP"}),
+        ("Quality", {"link": "Quality"}),
         #
         # Late matching
         #

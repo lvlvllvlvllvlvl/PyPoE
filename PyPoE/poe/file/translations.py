@@ -2376,7 +2376,7 @@ def install_data_dependant_quantifiers(relational_reader: RelationalReader):
         id="mod_value_to_item_class",
         relational_reader=relational_reader,
         table="ItemClasses.dat64",
-        placeholder="&lt;random item type&gt;",
+        placeholder="&lt;random item class&gt;",
     )
 
     TQRelationalData(
