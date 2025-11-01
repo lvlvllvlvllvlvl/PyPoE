@@ -488,6 +488,7 @@ class ItemsParser(SkillParserShared):
         "Necropolis": "3.24.0",
         "Settlers": "3.25.0",
         "Mercenaries": "3.26.0",
+        "Keepers": "3.27.0",
     }
 
     _IGNORE_DROP_LEVEL_CLASSES = (
