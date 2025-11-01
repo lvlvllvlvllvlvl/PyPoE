@@ -2251,7 +2251,7 @@ def _diff_dict(self, other):
             print('Key "%s": Value "%s"' % (key, other[key]))
 
 
-def get_custom_translation_file(sequel) -> TranslationFile:
+def get_custom_translation_file(sequel=1) -> TranslationFile:
     """
     Returns the currently loaded custom translation file.
 
@@ -2303,7 +2303,7 @@ custom_translation_file = property(
 )
 
 
-def get_hardcoded_translation_file(sequel) -> TranslationFile:
+def get_hardcoded_translation_file(sequel=1) -> TranslationFile:
     """
     Returns the currently loaded hardcoded translation file.
 

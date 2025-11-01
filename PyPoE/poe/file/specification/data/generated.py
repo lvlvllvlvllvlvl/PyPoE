@@ -18912,6 +18912,10 @@ specification = Specification(
                     name="SecretsTier",
                     type="int",
                 ),
+                Field(
+                    name="KeepersTier",
+                    type="int",
+                ),
             ),
             virtual_fields=(
                 VirtualField(

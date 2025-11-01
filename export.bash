@@ -3,7 +3,7 @@
 QUIET=
 ARGS=()
 IMG=()
-export ALL_EXPORTERS=(gem-skills items passives skills mastery-effects mastery-groups mods monsters areas maps incursion-rooms modules atlas-icons)
+export ALL_EXPORTERS=(gem-skills items passives skills masteries mods monsters areas maps incursion-rooms modules atlas-icons)
 EXPORTERS=()
 WIKI=wiki
 
@@ -166,10 +166,8 @@ exporting passives &&
 pypoe_exporter $QUIET $WIKI passive rowid "${IMG[@]}" "${ARGS[@]}" "$@"
 exporting skills &&
 pypoe_exporter $QUIET $WIKI skill by_name "${IMG[@]}" "${ARGS[@]}" "$@"
-exporting mastery-effects &&
-pypoe_exporter $QUIET $WIKI mastery effects rowid "${ARGS[@]}" "$@"
-exporting mastery-groups &&
-pypoe_exporter $QUIET $WIKI mastery groups rowid "${ARGS[@]}" "$@"
+exporting masteries &&
+pypoe_exporter $QUIET $WIKI mastery rowid "${ARGS[@]}" "$@"
 exporting monsters &&
 pypoe_exporter $QUIET $WIKI monster rowid "${ARGS[@]}" "$@"
 exporting areas &&
