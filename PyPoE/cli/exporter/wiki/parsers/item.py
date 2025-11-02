@@ -497,20 +497,7 @@ class ItemsParser(SkillParserShared):
         "InstanceLocalItem",
     )
 
-    _DROP_DISABLED_ITEMS_BY_ID = {
-        "Metadata/Items/Quivers/Quiver1",
-        "Metadata/Items/Quivers/Quiver2",
-        "Metadata/Items/Quivers/Quiver3",
-        "Metadata/Items/Quivers/Quiver4",
-        "Metadata/Items/Quivers/Quiver5",
-        "Metadata/Items/Quivers/QuiverDescent",
-        "Metadata/Items/Rings/RingVictor1",
-        # Eternal Orb
-        "Metadata/Items/Currency/CurrencyImprintOrb",
-        # Demigod items
-        "Metadata/Items/Belts/BeltDemigods1",
-        "Metadata/Items/Rings/RingDemigods1",
-    }
+    _DROP_DISABLED_ITEMS_BY_ID = {}
 
     _EXCLUDE_CLASSES = {
         "Map",
@@ -3337,6 +3324,16 @@ class ItemsParser(SkillParserShared):
         row_index=True,
     )
 
+    def _type_graft(self, infobox, base_item_type):
+        if "BaseItemType" not in self.rr["BrequelGraftTypes.dat64"].index:
+            self.rr["BrequelGraftTypes.dat64"].build_index("BaseItemType")
+        graft = self.rr["BrequelGraftTypes.dat64"].index["BaseItemType"][base_item_type.rowid]
+        if graft["SkillGem"]:
+            for gem_effect in graft["SkillGem"]["GemEffects"]:
+                infobox["graft_skill_id"] = gem_effect["GrantedEffect"]["Id"]
+                break
+        return True
+
     _cls_map = dict()
     """
     This defines the expected data elements for an item class.
@@ -3501,6 +3498,8 @@ class ItemsParser(SkillParserShared):
         ),
         "Gold": (_type_currency,),
         "SentinelDrone": (_type_sentinel,),
+        "BrequelFruit": (_type_currency,),
+        "BrequelGraft": (_type_graft,),
     }
 
     _conflict_active_skill_gems_map = {
