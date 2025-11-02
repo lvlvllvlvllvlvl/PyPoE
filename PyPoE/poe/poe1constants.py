@@ -649,8 +649,8 @@ class MOD_DOMAIN(IntEnumOverride):
     TINCTURE = 34
     AFFLICTION_CHARM = 35
     NECROPOLIS_MONSTER = 36
-    UBER_MAP = 37
-    MAP_RELIC = 38
+    MAP_RELIC = 37
+    BREQUEL_GRAFT = 38
 
     # Items that can't have mods (may need to increase the number when new values are added)
     MODS_DISALLOWED = 39
@@ -676,6 +676,7 @@ MOD_TRANSLATION_MAP = {
     MOD_DOMAIN.TEMPLAR_RELIC: "sanctum_relic_stat_descriptions.txt",
     MOD_DOMAIN.TINCTURE: "tincture_stat_descriptions.txt",
     MOD_DOMAIN.MAP_RELIC: "atlas_relic_stat_descriptions.txt",
+    MOD_DOMAIN.BREQUEL_GRAFT: "graft_stat_descriptions.txt",
 }
 
 

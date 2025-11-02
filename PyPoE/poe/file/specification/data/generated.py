@@ -5242,6 +5242,42 @@ specification = Specification(
                 ),
             ),
         ),
+        "BrequelGraftTypes.dat": File(
+            fields=(
+                Field(
+                    name="BaseItemType",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                    unique=True,
+                ),
+                Field(
+                    name="LeftArm",
+                    type="ref|string",
+                ),
+                Field(
+                    name="RightArm",
+                    type="ref|string",
+                ),
+                Field(
+                    name="SkillGem",
+                    type="ref|out",
+                    key="SkillGems.dat",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="SkillAnimation",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Achievement",
+                    type="ref|out",
+                    key="AchievementItems.dat",
+                ),
+            ),
+        ),
         "BuffDefinitions.dat": File(
             fields=(
                 Field(
@@ -6391,6 +6427,10 @@ specification = Specification(
                     name="Unknown9",
                     type="float",
                 ),
+                Field(
+                    name="Key8",
+                    type="ref|out",
+                ),
             ),
         ),
         "ChatIcons.dat": File(
@@ -7277,6 +7317,10 @@ specification = Specification(
                     type="ref|list|ref|out",
                     key="Tags.dat",
                 ),
+                Field(
+                    name="Data2",
+                    type="ref|list|int",
+                ),
             ),
             virtual_fields=(
                 VirtualField(
@@ -7645,6 +7689,10 @@ specification = Specification(
                 ),
                 Field(
                     name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag1",
                     type="bool",
                 ),
             ),
@@ -8054,6 +8102,10 @@ specification = Specification(
                 ),
                 Field(
                     name="Armour",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown6",
                     type="int",
                 ),
             ),
@@ -8859,31 +8911,31 @@ specification = Specification(
         "Descendancy.dat": File(
             fields=(
                 Field(
-                    name="Unknown0",
+                    name="Id",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown1",
+                    name="Name",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown2",
+                    name="BackgroundImage",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown3",
+                    name="FlavourText",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown4",
+                    name="CoordinateRect",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown5",
+                    name="RGBFlavourTextColour",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown6",
+                    name="UnlockCondition",
                     type="ref|string",
                 ),
                 Field(
@@ -8892,6 +8944,19 @@ specification = Specification(
                 ),
                 Field(
                     name="Key1",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="UIArt",
+                    type="ref|out",
+                    key="PassiveSkillTreeUIArtAscendancy.dat",
+                ),
+                Field(
+                    name="Key2",
                     type="ref|out",
                 ),
             ),
@@ -14952,6 +15017,10 @@ specification = Specification(
                 Field(
                     name="Key3",
                     type="ref|out",
+                ),
+                Field(
+                    name="Flag1",
+                    type="bool",
                 ),
             ),
         ),
@@ -24462,6 +24531,10 @@ specification = Specification(
                     name="Flag1",
                     type="bool",
                 ),
+                Field(
+                    name="Unknown2",
+                    type="int",
+                ),
             ),
         ),
         "NearbyMonsterConditions.dat": File(
@@ -25205,6 +25278,10 @@ specification = Specification(
                     name="Radius",
                     type="int",
                 ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
             ),
         ),
         "PassiveJewelSlots.dat": File(
@@ -25686,6 +25763,66 @@ specification = Specification(
                 ),
             ),
         ),
+        "PassiveSkillTreeUIArtAscendancy.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                ),
+                Field(
+                    name="StartNode",
+                    type="ref|string",
+                ),
+                Field(
+                    name="PassiveFrameNormal",
+                    type="ref|string",
+                ),
+                Field(
+                    name="PassiveFrameCanAllocate",
+                    type="ref|string",
+                ),
+                Field(
+                    name="PassiveFrameActive",
+                    type="ref|string",
+                ),
+                Field(
+                    name="PassiveFrameMask",
+                    type="ref|string",
+                ),
+                Field(
+                    name="NotableFrameNormal",
+                    type="ref|string",
+                ),
+                Field(
+                    name="NotableFrameCanAllocate",
+                    type="ref|string",
+                ),
+                Field(
+                    name="NotableFrameActive",
+                    type="ref|string",
+                ),
+                Field(
+                    name="NotableFrameMask",
+                    type="ref|string",
+                ),
+                Field(
+                    name="SocketFrameNormal",
+                    type="ref|string",
+                ),
+                Field(
+                    name="SocketFrameCanAllocate",
+                    type="ref|string",
+                ),
+                Field(
+                    name="SocketFrameActive",
+                    type="ref|string",
+                ),
+                Field(
+                    name="SocketFrameMask",
+                    type="ref|string",
+                ),
+            ),
+        ),
         "PassiveSkillTrees.dat": File(
             fields=(
                 Field(
@@ -25962,12 +26099,30 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
+                    name="DescendancyKey",
+                    type="ref|out",
+                    key="Descendancy.dat",
+                ),
+                Field(
                     name="Key0",
                     type="ref|out",
                 ),
                 Field(
-                    name="Key1",
+                    name="BrequelSubTree",
                     type="ref|out",
+                    key="brequelpassivesubtrees.dat",
+                ),
+                Field(
+                    name="Flag2",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag3",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag4",
+                    type="bool",
                 ),
             ),
             virtual_fields=(
@@ -31121,6 +31276,66 @@ specification = Specification(
                 ),
             ),
         ),
+        "UIArtAscendancy.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                ),
+                Field(
+                    name="AscendancyButtonNormal",
+                    type="ref|string",
+                ),
+                Field(
+                    name="AscendancyInfoPlate",
+                    type="ref|string",
+                ),
+                Field(
+                    name="ButtonBackground",
+                    type="ref|string",
+                ),
+                Field(
+                    name="ButtonBackgroundDouble",
+                    type="ref|string",
+                ),
+                Field(
+                    name="NameBackground",
+                    type="ref|string",
+                ),
+                Field(
+                    name="AscendancyButtonHighlight",
+                    type="ref|string",
+                ),
+                Field(
+                    name="AscendancyButtonPressed",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Color",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="RespcBGTop",
+                    type="ref|string",
+                ),
+                Field(
+                    name="RespcBGMiddle",
+                    type="ref|string",
+                ),
+                Field(
+                    name="RespcBGBottom",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+            ),
+        ),
         "UITalkText.dat": File(
             fields=(
                 Field(
@@ -32949,6 +33164,10 @@ specification = Specification(
                     type="ref|out",
                     key="QuestFlags.dat",
                 ),
+                Field(
+                    name="Unknown13",
+                    type="int",
+                ),
             ),
             virtual_fields=(
                 VirtualField(
@@ -33036,6 +33255,30 @@ specification = Specification(
                 Field(
                     name="Flag0",
                     type="bool",
+                ),
+            ),
+        ),
+        "brequelpassivesubtrees.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                    key="ClientStrings.dat",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                    key="ClientStrings.dat",
+                ),
+                Field(
+                    name="Key2",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
                 ),
             ),
         ),
