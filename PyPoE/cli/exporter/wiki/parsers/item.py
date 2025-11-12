@@ -1793,6 +1793,8 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Scarabs
         # =================================================================
+        "Metadata/Items/Scarabs/ScarabMisc6",
+        "Metadata/Items/Scarabs/ScarabMisc7",
         "Metadata/Items/Scarabs/ScarabMisc10",
         # =================================================================
         # Corpse items
@@ -2769,33 +2771,6 @@ class ItemsParser(SkillParserShared):
                 infobox
             )"""
 
-    # 3.15
-    # This is a hack and should be done better.
-    # TODO: properly parse map series
-
-    def MapSeriesHelper(d):
-        map_series = [
-            "Original",
-            "The Awakening",
-            "Atlas of Worlds",
-            "War for the Atlas",
-            "Betrayal",
-            "Synthesis",
-            "Legion",
-            "Blight",
-            "Metamorph",
-            "Delirium",
-            "Harvest",
-            "Heist",
-            "Ritual",
-            "Ultimatum",
-            "Expedition",
-            "Scourge",
-            "Archnemesis",
-        ]
-        # print('yep', map_series[d])
-        return map_series[d]
-
     _type_map = _type_factory(
         data_file="Maps.dat64",
         data_mapping=(
@@ -2842,7 +2817,6 @@ class ItemsParser(SkillParserShared):
                     "condition": lambda v: v is not None,
                 },
             ),
-            ("MapSeriesKey", {"template": "map_series", "format": MapSeriesHelper}),
         ),
         row_index=True,
         function=_maps_extra,
