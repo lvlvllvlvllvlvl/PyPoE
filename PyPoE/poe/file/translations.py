@@ -2680,7 +2680,7 @@ TQNumberFormat(
 
 TQNumberFormat(
     id="permyriad_per_minute_to_%_per_second",
-    divisor=6,
+    divisor=6000,
     dp=1,
 )
 
