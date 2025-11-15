@@ -2472,6 +2472,7 @@ class TagHandler:
     UNIQ_FORMATS = {
         "Grand Spectrum": "[[%s]]",
         "Precursor's Emblem": "[[%s]]",
+        "The Beachhead": "{{iil|The Beachhead (High Tier)|%s}}",
     }
 
     CUSTOM_LINKS = {
