@@ -1851,6 +1851,9 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestAdiyah3",
         "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestKurai2",
         "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestKurai3",
+        "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestWhakano3",
+        "Metadata/Items/Heist/QuestContracts/HeistContractQuestNenetRepeatable",
+        "Metadata/Items/Masters/PirateTreasureKey",
         # =================================================================
         # Misc
         # =================================================================
