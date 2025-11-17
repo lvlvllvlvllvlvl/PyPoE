@@ -37,6 +37,7 @@ import re
 from collections import OrderedDict, defaultdict
 from functools import partial
 
+from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.wiki.handler import ExporterHandler, ExporterResult
 from PyPoE.cli.exporter.wiki.parser import BaseParser, TagHandler
 
@@ -322,7 +323,11 @@ class LuaHandler(ExporterHandler):
             cls=MapSeriesParser,
             func=MapSeriesParser.main,
         )
+        parser.add_argument(
+            "--list", help="Export a list of all series with name and id", action="store_true"
+        )
         group = parser.add_mutually_exclusive_group(required=False)
+        group.add_argument("--latest", help="Export the latest map series", action="store_true")
         group.add_argument(
             "-ms",
             "--map-series",
@@ -340,19 +345,16 @@ class LuaHandler(ExporterHandler):
 
 
 class MapSeriesParser(GenericLuaParser):
-    _files = [
-        "MapSeries.datc64",
-        "MapSeriesTiers.datc64",
-        "AtlasNode.datc64",
-        "Maps.datc64",
-        "WorldAreas.datc64",
-        "BaseItemTypes.datc64",
-    ]
+    _files = ["MapSeries.datc64"]
 
     def has_tier_data(self, series_id):
         return f"{series_id}Tier" in self.rr["MapSeriesTiers.dat64"].specification.columns_all
 
     def main(self, parsed_args):
+
+        r = ExporterResult()
+        series = None
+
         if parsed_args.map_series_id:
             if not self.has_tier_data(parsed_args.map_series_id):
                 # should we bail out here or is there anything to export for Atlas of Worlds and before?
@@ -367,63 +369,81 @@ class MapSeriesParser(GenericLuaParser):
             if not self.has_tier_data(series_rows[0]["Id"]):
                 raise Exception(f"Tier data not available for {parsed_args.map_series}")
             series = series_rows[0]
-        else:
+        elif parsed_args.latest:
             series = self.rr["MapSeries.dat64"][-1]
+        elif not parsed_args.list:
+            console("Nothing to do - specify a series or --list", Msg.warning)
+            return r
 
         self.rr["AtlasNode.dat64"].build_index("WorldAreasKey")
 
-        r = ExporterResult()
-
-        series_id = series["Id"]
-
         output = []
 
-        for tier in self.rr["MapSeriesTiers.dat64"]:
-            tier_number = tier[f"{series_id}Tier"]
-            if tier_number == 0:
-                continue
-
-            map_base = tier["MapsKey"]
-
-            for world_area in (
-                map_base["Regular_WorldAreasKey"],
-                map_base["Unique_WorldAreasKey"],
-            ):
-                if not world_area:
-                    continue
-                node_data = {
-                    "world_area": world_area["Id"],
-                    "base_item": map_base["BaseItemTypesKey"]["Id"],
-                    "tier_0": tier_number,
-                }
-                output.append(node_data)
-
-                if series != self.rr["MapSeries.dat64"][-1]:
-                    # AtlasNode.dat only contains data for current series
+        if series:
+            series_id = series["Id"]
+            for tier in self.rr["MapSeriesTiers.dat64"]:
+                tier_number = tier[f"{series_id}Tier"]
+                if tier_number == 0:
                     continue
 
-                atlas_node = self.rr["AtlasNode.dat64"].index["WorldAreasKey"][world_area]
-                if atlas_node:
-                    atlas_node = atlas_node[0]
-                    for n in range(5):
-                        node_data[f"tier_{n}"] = atlas_node[f"Tier{n}"]
-                    node_data["connections"] = [
-                        conn["WorldAreasKey"]["Id"] for conn in atlas_node["AtlasNodeKeys"]
+                map_base = tier["MapsKey"]
+
+                for world_area in (
+                    map_base["Regular_WorldAreasKey"],
+                    map_base["Unique_WorldAreasKey"],
+                ):
+                    if not world_area:
+                        continue
+                    node_data = {
+                        "world_area": world_area["Id"],
+                        "base_item": map_base["BaseItemTypesKey"]["Id"],
+                        "tier_0": tier_number,
+                    }
+                    output.append(node_data)
+
+                    if series != self.rr["MapSeries.dat64"][-1]:
+                        # AtlasNode.dat only contains data for current series
+                        continue
+
+                    atlas_node = self.rr["AtlasNode.dat64"].index["WorldAreasKey"][world_area]
+                    if atlas_node:
+                        atlas_node = atlas_node[0]
+                        for n in range(5):
+                            node_data[f"tier_{n}"] = atlas_node[f"Tier{n}"]
+                        node_data["connections"] = [
+                            conn["WorldAreasKey"]["Id"] for conn in atlas_node["AtlasNodeKeys"]
+                        ]
+                        node_data["flavour_text"] = atlas_node["FlavourTextKey"]["Text"]
+                        node_data["not_on_atlas"] = atlas_node["NotOnAtlas"]
+                        node_data["div_cards"] = [card["Id"] for card in atlas_node["DivCards"]]
+
+            r.add_result(
+                text=LuaFormatter.format_module(sorted(output, key=lambda x: x["world_area"])),
+                out_file="map_series_%s.lua" % series_id,
+                wiki_page=[
+                    {
+                        "page": "Module:Map series/%s" % series_id,
+                        "condition": None,
+                    }
+                ],
+            )
+
+        if parsed_args.list:
+            r.add_result(
+                text=LuaFormatter.format_module(
+                    [
+                        {"ordinal": i, "id": tier["Id"], "name": tier["Name"]}
+                        for i, tier in enumerate(self.rr["MapSeries.dat64"], 1)
                     ]
-                    node_data["flavour_text"] = atlas_node["FlavourTextKey"]["Text"]
-                    node_data["not_on_atlas"] = atlas_node["NotOnAtlas"]
-                    node_data["div_cards"] = [card["Id"] for card in atlas_node["DivCards"]]
-
-        r.add_result(
-            text=LuaFormatter.format_module(sorted(output, key=lambda x: x["world_area"])),
-            out_file="map_series_%s.lua" % series_id,
-            wiki_page=[
-                {
-                    "page": "Module:MapSeries/%s" % series_id,
-                    "condition": None,
-                }
-            ],
-        )
+                ),
+                out_file="map_series.lua",
+                wiki_page=[
+                    {
+                        "page": "Module:Map series/map series",
+                        "condition": None,
+                    }
+                ],
+            )
 
         return r
 
