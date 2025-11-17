@@ -394,7 +394,7 @@ class MapSeriesParser(GenericLuaParser):
                 node_data = {
                     "world_area": world_area["Id"],
                     "base_item": map_base["BaseItemTypesKey"]["Id"],
-                    "tier": tier_number,
+                    "tier_0": tier_number,
                 }
                 output.append(node_data)
 
@@ -405,6 +405,8 @@ class MapSeriesParser(GenericLuaParser):
                 atlas_node = self.rr["AtlasNode.dat64"].index["WorldAreasKey"][world_area]
                 if atlas_node:
                     atlas_node = atlas_node[0]
+                    for n in range(5):
+                        node_data[f"tier_{n}"] = atlas_node[f"Tier{n}"]
                     node_data["connections"] = [
                         conn["WorldAreasKey"]["Id"] for conn in atlas_node["AtlasNodeKeys"]
                     ]
