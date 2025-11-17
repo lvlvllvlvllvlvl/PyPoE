@@ -313,6 +313,118 @@ class LuaHandler(ExporterHandler):
             func=MinimapIconsParser.main,
         )
 
+        parser = lua_sub.add_parser(
+            "map_series",
+            help="Extract map series information",
+        )
+        self.add_default_parsers(
+            parser=parser,
+            cls=MapSeriesParser,
+            func=MapSeriesParser.main,
+        )
+        group = parser.add_mutually_exclusive_group(required=False)
+        group.add_argument(
+            "-ms",
+            "--map-series",
+            "--filter-map-series",
+            help="Filter by map series name (localized)",
+            dest="map_series",
+        )
+        group.add_argument(
+            "-msid",
+            "--map-series-id",
+            "--filter-map-series-id",
+            help="Filter by internal map series id",
+            dest="map_series_id",
+        )
+
+
+class MapSeriesParser(GenericLuaParser):
+    _files = [
+        "MapSeries.datc64",
+        "MapSeriesTiers.datc64",
+        "AtlasNode.datc64",
+        "Maps.datc64",
+        "WorldAreas.datc64",
+        "BaseItemTypes.datc64",
+    ]
+
+    def has_tier_data(self, series_id):
+        return f"{series_id}Tier" in self.rr["MapSeriesTiers.dat64"].specification.columns_all
+
+    def main(self, parsed_args):
+        if parsed_args.map_series_id:
+            if not self.has_tier_data(parsed_args.map_series_id):
+                # should we bail out here or is there anything to export for Atlas of Worlds and before?
+                raise Exception(f"Tier data not available for {parsed_args.map_series}")
+            self.rr["MapSeries.dat64"].build_index("Id")
+            series = self.rr["MapSeries.dat64"].index["Id"][parsed_args.map_series_id]
+        elif parsed_args.map_series:
+            self.rr["MapSeries.dat64"].build_index("Name")
+            series_rows = self.rr["MapSeries.dat64"].index["Name"][parsed_args.map_series]
+            if not series_rows:
+                raise Exception(f"No tier found with name {parsed_args.map_series}")
+            if not self.has_tier_data(series_rows[0]["Id"]):
+                raise Exception(f"Tier data not available for {parsed_args.map_series}")
+            series = series_rows[0]
+        else:
+            series = self.rr["MapSeries.dat64"][-1]
+
+        self.rr["AtlasNode.dat64"].build_index("WorldAreasKey")
+
+        r = ExporterResult()
+
+        series_id = series["Id"]
+
+        output = []
+
+        for tier in self.rr["MapSeriesTiers.dat64"]:
+            tier_number = tier[f"{series_id}Tier"]
+            if tier_number == 0:
+                continue
+
+            map_base = tier["MapsKey"]
+
+            for world_area in (
+                map_base["Regular_WorldAreasKey"],
+                map_base["Unique_WorldAreasKey"],
+            ):
+                if not world_area:
+                    continue
+                node_data = {
+                    "world_area": world_area["Id"],
+                    "base_item": map_base["BaseItemTypesKey"]["Id"],
+                    "tier": tier_number,
+                }
+                output.append(node_data)
+
+                if series != self.rr["MapSeries.dat64"][-1]:
+                    # AtlasNode.dat only contains data for current series
+                    continue
+
+                atlas_node = self.rr["AtlasNode.dat64"].index["WorldAreasKey"][world_area]
+                if atlas_node:
+                    atlas_node = atlas_node[0]
+                    node_data["connections"] = [
+                        conn["WorldAreasKey"]["Id"] for conn in atlas_node["AtlasNodeKeys"]
+                    ]
+                    node_data["flavour_text"] = atlas_node["FlavourTextKey"]["Text"]
+                    node_data["not_on_atlas"] = atlas_node["NotOnAtlas"]
+                    node_data["div_cards"] = [card["Id"] for card in atlas_node["DivCards"]]
+
+        r.add_result(
+            text=LuaFormatter.format_module(sorted(output, key=lambda x: x["world_area"])),
+            out_file="map_series_%s.lua" % series_id,
+            wiki_page=[
+                {
+                    "page": "Module:MapSeries/%s" % series_id,
+                    "condition": None,
+                }
+            ],
+        )
+
+        return r
+
 
 class MinimapIconsParser(GenericLuaParser):
     _files = [

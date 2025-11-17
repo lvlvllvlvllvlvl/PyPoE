@@ -30,6 +30,7 @@ See PyPoE/LICENSE
 # =============================================================================
 
 import os
+import re
 import sys
 import time
 from collections.abc import Iterable
@@ -53,7 +54,7 @@ except Exception:
 from PyPoE import __version__
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
-from PyPoE.cli.exporter.util import fix_path
+from PyPoE.cli.exporter.util import fix_path, get_content_path
 from PyPoE.cli.handler import BaseHandler
 
 # =============================================================================
@@ -268,7 +269,10 @@ class WikiHandler:
                     response = page.save(
                         text=text,
                         summary="PyPoE/ExporterBot/%s: %s"
-                        % (__version__, self.cmdargs.wiki_message or row["wiki_message"]),
+                        % (
+                            self.get_version_string(),
+                            self.cmdargs.wiki_message or row["wiki_message"],
+                        ),
                     )
                 if response["result"] == "Success":
                     console(
@@ -291,6 +295,59 @@ class WikiHandler:
                 out_path = os.path.join(self.out_dir, "diff", fix_path(row["out_file"]))
                 with open(out_path + ".skip", "w") as f:
                     f.write("\n".join(p["page"] for p in pages))
+
+    def get_version_string(self) -> str:
+        if hasattr(self, "_version_string") and self._version_string:
+            return self._version_string
+
+        try:
+            import subprocess
+
+            status = subprocess.run(
+                ["git", "status", "--porcelain"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            if status.stdout.strip():
+                while True:
+                    ans = (
+                        input(
+                            "Uncommitted changes detected in the repository. "
+                            "Please do not update the wiki before merging your change into the main github repo. "
+                            "Continue? [y/n]: "
+                        )
+                        .strip()
+                        .lower()
+                    )
+                    if ans in ("y", "yes"):
+                        break
+                    if ans in ("n", "no"):
+                        raise SystemExit("Aborted due to uncommitted changes.")
+
+            self._version_string = subprocess.run(
+                ["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, check=True
+            ).stdout.strip()
+
+        except Exception as e:
+            console(f"Failed to get commit hash: {e}", msg=Msg.error)
+            self._version_string = __version__
+
+        try:
+            if self.cmdargs.game_version:
+                self._version_string += f" (game version {self.cmdargs.game_version})"
+            else:
+                ggpk_path = get_content_path(2)
+                if ggpk_path.startswith("https://"):
+                    pattern = re.compile(r"^\d+(?:\.\d+){2,}$")
+                    for seg in ggpk_path.split("/"):
+                        if pattern.match(seg):
+                            self._version_string += f" (game version {seg})"
+                            break
+        except Exception as e:
+            console(f"Failed to get game version: {e}", msg=Msg.error)
+
+        return self._version_string
 
     def handle(self, *a, mwclient, result, cmdargs, parser, out_dir):
         # First row is handled separately to prompt the user for his password
@@ -316,6 +373,9 @@ class WikiHandler:
         self.pages_to_recache = SimpleQueue()
         self.print_lock = Lock()
         self.write_lock = Lock()
+
+        if not cmdargs.dry_run:
+            console(f"Exporting wiki pages with comment `{self.get_version_string()}`")
 
         if cmdargs.wiki_threads > 1:
             console("Starting thread pool...")
@@ -678,6 +738,19 @@ def add_parser_arguments(parser):
         "--wiki-edit-message",
         dest="wiki_message",
         help="Override the default edit message",
+        action="store",
+        type=str,
+        default="",
+    )
+
+    parser.add_argument(
+        "-gv",
+        "--game-version",
+        dest="game_version",
+        help=(
+            "Specify the game version to include in the edit summary (e.g., 3.27.4.2). "
+            "If omitted, the version is inferred from the CDN URL when possible."
+        ),
         action="store",
         type=str,
         default="",

@@ -14880,9 +14880,9 @@ specification = Specification(
         "HideoutDoodads.dat": File(
             fields=(
                 Field(
-                    name="BaseItemTypesKey",
+                    name="MtxTypeGameSpecific",
                     type="ref|out",
-                    key="BaseItemTypes.dat",
+                    key="MtxTypeGameSpecific.dat",
                     unique=True,
                 ),
                 Field(
@@ -20016,10 +20016,15 @@ specification = Specification(
                 Field(
                     name="Id",
                     type="int",
+                    unique=True,
                 ),
                 Field(
                     name="Name",
                     type="ref|string",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
                 ),
             ),
         ),
@@ -23498,6 +23503,7 @@ specification = Specification(
                     name="Type",
                     type="ref|out",
                     key="MtxTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="HASH16",
@@ -23510,12 +23516,18 @@ specification = Specification(
                     file_ext=".dds",
                 ),
                 Field(
-                    name="Unknown0",
+                    name="Category",
                     type="int",
+                    key="MicrotransactionCategory.dat",
+                    key_id="Id",
                 ),
                 Field(
                     name="Data0",
                     type="ref|list|int",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
                 ),
             ),
         ),
@@ -23563,8 +23575,9 @@ specification = Specification(
                     type="ref|out",
                 ),
                 Field(
-                    name="Key2",
+                    name="ShopTag",
                     type="ref|out",
+                    key="ShopTag.dat",
                 ),
                 Field(
                     name="Unknown3",

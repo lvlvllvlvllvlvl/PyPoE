@@ -189,6 +189,7 @@ exporting modules && {
     pypoe_exporter $QUIET $WIKI lua pantheon "${ARGS[@]}" "$@"
     pypoe_exporter $QUIET $WIKI lua synthesis "${ARGS[@]}" "$@"
     pypoe_exporter $QUIET $WIKI lua minimap "${ARGS[@]}" "$@"
+    pypoe_exporter $QUIET $WIKI lua map_series "${ARGS[@]}" "$@"
   elif [ "$WIKI" = "poe2wiki" ]; then
     # Run only for poe2
     pypoe_exporter $QUIET $WIKI lua keywords "${ARGS[@]}" "$@"
