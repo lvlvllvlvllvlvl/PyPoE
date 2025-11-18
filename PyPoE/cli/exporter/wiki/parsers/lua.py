@@ -186,12 +186,25 @@ class LuaHandler(ExporterHandler):
 
         parser = lua_sub.add_parser(
             "atlas",
-            help="Extract atlas information not covered by maps (deprecated)",
+            help="Extract Atlas information not covered by maps",
         )
         self.add_default_parsers(
             parser=parser,
             cls=AtlasParser,
             func=AtlasParser.main,
+        )
+        group = parser.add_mutually_exclusive_group(required=False)
+        group.add_argument(
+            "-sn",
+            "--series-name",
+            help="Export Atlas nodes data for map series by name (localized)",
+            dest="series_name",
+        )
+        group.add_argument(
+            "-sid",
+            "--series-id",
+            help="Export Atlas nodes data for map series by internal ID",
+            dest="series_id",
         )
 
         parser = lua_sub.add_parser(
@@ -314,37 +327,8 @@ class LuaHandler(ExporterHandler):
             func=MinimapIconsParser.main,
         )
 
-        parser = lua_sub.add_parser(
-            "map_series",
-            help="Extract map series information",
-        )
-        self.add_default_parsers(
-            parser=parser,
-            cls=MapSeriesParser,
-            func=MapSeriesParser.main,
-        )
-        parser.add_argument(
-            "--list", help="Export a list of all series with name and id", action="store_true"
-        )
-        group = parser.add_mutually_exclusive_group(required=False)
-        group.add_argument("--latest", help="Export the latest map series", action="store_true")
-        group.add_argument(
-            "-ms",
-            "--map-series",
-            "--filter-map-series",
-            help="Filter by map series name (localized)",
-            dest="map_series",
-        )
-        group.add_argument(
-            "-msid",
-            "--map-series-id",
-            "--filter-map-series-id",
-            help="Filter by internal map series id",
-            dest="map_series_id",
-        )
 
-
-class MapSeriesParser(GenericLuaParser):
+class AtlasParser(GenericLuaParser):
     _files = ["MapSeries.datc64"]
 
     def has_tier_data(self, series_id):
@@ -355,25 +339,22 @@ class MapSeriesParser(GenericLuaParser):
         r = ExporterResult()
         series = None
 
-        if parsed_args.map_series_id:
-            if not self.has_tier_data(parsed_args.map_series_id):
+        if parsed_args.series_id:
+            if not self.has_tier_data(parsed_args.series_id):
                 # should we bail out here or is there anything to export for Atlas of Worlds and before?
-                raise Exception(f"Tier data not available for {parsed_args.map_series}")
+                raise Exception(f"Tier data not available for {parsed_args.series_id}")
             self.rr["MapSeries.dat64"].build_index("Id")
-            series = self.rr["MapSeries.dat64"].index["Id"][parsed_args.map_series_id]
-        elif parsed_args.map_series:
+            series = self.rr["MapSeries.dat64"].index["Id"][parsed_args.series_id]
+        elif parsed_args.series_name:
             self.rr["MapSeries.dat64"].build_index("Name")
-            series_rows = self.rr["MapSeries.dat64"].index["Name"][parsed_args.map_series]
+            series_rows = self.rr["MapSeries.dat64"].index["Name"][parsed_args.series_name]
             if not series_rows:
-                raise Exception(f"No tier found with name {parsed_args.map_series}")
+                raise Exception(f"No tier found with name {parsed_args.series_name}")
             if not self.has_tier_data(series_rows[0]["Id"]):
-                raise Exception(f"Tier data not available for {parsed_args.map_series}")
+                raise Exception(f"Tier data not available for {parsed_args.series_name}")
             series = series_rows[0]
-        elif parsed_args.latest:
+        else:
             series = self.rr["MapSeries.dat64"][-1]
-        elif not parsed_args.list:
-            console("Nothing to do - specify a series or --list", Msg.warning)
-            return r
 
         self.rr["AtlasNode.dat64"].build_index("WorldAreasKey")
 
@@ -419,31 +400,34 @@ class MapSeriesParser(GenericLuaParser):
 
             r.add_result(
                 text=LuaFormatter.format_module(sorted(output, key=lambda x: x["world_area"])),
-                out_file="map_series_%s.lua" % series_id,
+                out_file="atlas_nodes_%s.lua" % series_id,
                 wiki_page=[
                     {
-                        "page": "Module:Map series/%s" % series_id,
+                        "page": "Module:Atlas/nodes_%s" % series_id,
                         "condition": None,
                     }
                 ],
             )
 
-        if parsed_args.list:
-            r.add_result(
-                text=LuaFormatter.format_module(
-                    [
-                        {"ordinal": i, "id": tier["Id"], "name": tier["Name"]}
-                        for i, tier in enumerate(self.rr["MapSeries.dat64"], 1)
-                    ]
-                ),
-                out_file="map_series.lua",
-                wiki_page=[
+        r.add_result(
+            text=LuaFormatter.format_module(
+                [
                     {
-                        "page": "Module:Map series/map series",
-                        "condition": None,
+                        "ordinal": i,
+                        "id": tier["Id"],
+                        "name": tier["Name"]
                     }
-                ],
-            )
+                    for i, tier in enumerate(self.rr["MapSeries.dat64"], 1)
+                ]
+            ),
+            out_file="map_series.lua",
+            wiki_page=[
+                {
+                    "page": "Module:Atlas/map series",
+                    "condition": None,
+                }
+            ],
+        )
 
         return r
 
@@ -546,71 +530,6 @@ class OTStatsParser(GenericLuaParser):
                 wiki_page=[
                     {
                         "page": "Module:Data tables/%s_stats" % data["fn"],
-                        "condition": None,
-                    }
-                ],
-            )
-
-        return r
-
-
-class AtlasParser(GenericLuaParser):
-    _files = [
-        "AtlasBaseTypeDrops.datc64",
-        "AtlasRegions.datc64",
-    ]
-
-    _COPY_KEYS_ATLAS_REGIONS = (
-        (
-            "Id",
-            {
-                "key": "id",
-            },
-        ),
-        (
-            "Name",
-            {
-                "key": "name",
-            },
-        ),
-    )
-
-    _COPY_KEYS_ATLAS_BASE_TYPE_DROPS = (
-        (
-            "AtlasRegionsKey",
-            {
-                "key": "region_id",
-                "value": lambda v: v["Id"],
-            },
-        ),
-        (
-            "MinTier",
-            {
-                "key": "tier_min",
-            },
-        ),
-        (
-            "MaxTier",
-            {
-                "key": "tier_max",
-            },
-        ),
-    )
-
-    def main(self, parsed_args):
-        atlas_regions = []
-
-        for row in self.rr["AtlasRegions.dat64"]:
-            self._copy_from_keys(row, self._COPY_KEYS_ATLAS_REGIONS, atlas_regions)
-
-        r = ExporterResult()
-        for k in ("atlas_regions", "atlas_base_item_types"):
-            r.add_result(
-                text=LuaFormatter.format_module(locals()[k]),
-                out_file="%s.lua" % k,
-                wiki_page=[
-                    {
-                        "page": "Module:Atlas/%s" % k,
                         "condition": None,
                     }
                 ],
