@@ -426,14 +426,6 @@ class ItemsHandler(ExporterHandler):
             )
 
             self.add_image_arguments(parser)
-        elif type == "prophecy":
-            parser.add_argument(
-                "--allow-disabled",
-                help="Allows disabled prophecies to be exported",
-                action="store_true",
-                dest="allow_disabled",
-                default=False,
-            )
 
 
 class ItemsParser(SkillParserShared):
