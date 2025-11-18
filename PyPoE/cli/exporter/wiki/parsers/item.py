@@ -450,6 +450,9 @@ class ItemsParser(SkillParserShared):
         error_msg="Several items have not been found:\n%s",
     )
 
+    # Item inventory icons are scaled down so that this is the largest dimension
+    _ICON_MAX_DIMENSION = 312
+
     _MAP_COLORS = {
         "low tier": (248, 248, 248),
         "mid tier": (252, 159, 14),
@@ -3943,30 +3946,29 @@ class ItemsParser(SkillParserShared):
 
         return r
 
+    def _resize_icon(self, img: Image):
+        max_dimension = max(img.size)
+        if max_dimension > self._ICON_MAX_DIMENSION:
+            scale = self._ICON_MAX_DIMENSION / max_dimension
+            return img.resize(
+                (int(img.size[0] * scale), int(img.size[1] * scale)), Image.Resampling.LANCZOS
+            )
+        return img
+
     def _get_icon_process(self, infobox: dict[str, str], base_item_type):
         comp = base_item_type["ItemVisualIdentityKey"]["Composition"]
         if comp == 1:  # Flask
-
             def flask_icon_process(img: Image):
                 layer1 = img.crop((78, 0, 156, 156))
                 layer2 = img.crop((156, 0, 234, 156))
                 layer3 = img.crop((0, 0, 78, 156))
-                return Image.alpha_composite(layer1, Image.alpha_composite(layer2, layer3))
-
+                ico = Image.alpha_composite(layer1, Image.alpha_composite(layer2, layer3))
+                ico = self._resize_icon(ico)
+                return ico
             return flask_icon_process
         if comp == 3:  # Gem
             return self._get_gem_icon_process(infobox)
-
-        def resize(img: Image):
-            max_dimension = max(img.size)
-            if max_dimension > 156:
-                scale = 156 / max_dimension
-                return img.resize(
-                    (int(img.size[0] * scale), int(img.size[1] * scale)), Image.Resampling.LANCZOS
-                )
-            return img
-
-        return resize
+        return self._resize_icon
 
     def _get_gem_icon_process(self, infobox: dict[str, str]):
         if "gem_shader" not in infobox:
@@ -4041,7 +4043,9 @@ class ItemsParser(SkillParserShared):
             # * desaturate, but the parameter for that seems to be 1 so won't bother
             # 	return Desaturate(float4(final_rgb, 1.f) * original_a, saturation) * input.colour;
 
-            return Image.alpha_composite(shifted_base, adorn)
+            ico = Image.alpha_composite(shifted_base, adorn)
+            ico = self._resize_icon(ico)
+            return ico
 
         return process
 
