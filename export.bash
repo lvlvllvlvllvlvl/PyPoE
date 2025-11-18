@@ -179,6 +179,7 @@ pypoe_exporter $QUIET $WIKI incursion rooms rowid "${ARGS[@]}" "$@"
 exporting modules && {
   if [ "$WIKI" = "wiki" ]; then
     # Run only for poe1
+    pypoe_exporter $QUIET $WIKI lua atlas "${ARGS[@]}" "$@"
     pypoe_exporter $QUIET $WIKI lua bestiary "${ARGS[@]}" "$@"
     pypoe_exporter $QUIET $WIKI lua blight "${ARGS[@]}" "$@"
     pypoe_exporter $QUIET $WIKI lua crafting_bench "${ARGS[@]}" "$@"
@@ -189,7 +190,6 @@ exporting modules && {
     pypoe_exporter $QUIET $WIKI lua pantheon "${ARGS[@]}" "$@"
     pypoe_exporter $QUIET $WIKI lua synthesis "${ARGS[@]}" "$@"
     pypoe_exporter $QUIET $WIKI lua minimap "${ARGS[@]}" "$@"
-    pypoe_exporter $QUIET $WIKI lua map_series --latest --list "${ARGS[@]}" "$@"
   elif [ "$WIKI" = "poe2wiki" ]; then
     # Run only for poe2
     pypoe_exporter $QUIET $WIKI lua keywords "${ARGS[@]}" "$@"
