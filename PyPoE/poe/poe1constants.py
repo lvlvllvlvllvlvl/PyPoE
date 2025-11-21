@@ -31,7 +31,11 @@ Documentation
 
 .. autoclass:: DELVE_UPGRADE_TYPE
 
+.. autoclass:: GAME_MODES
+
 .. autoclass:: MAP_FRAGMENT_FAMILIES
+
+.. autoclass:: MAP_GENERATION
 
 .. autoclass:: MOD_DOMAIN
 
@@ -68,6 +72,7 @@ __all__ = [
     "BETRAYAL_UPGRADE_SLOTS",
     "DELVE_UPGRADE_TYPE",
     "MAP_FRAGMENT_FAMILIES",
+    "MAP_GENERATION",
     "MOD_DOMAIN",
     "MOD_GENERATION_TYPE",
     "RARITY",
@@ -550,6 +555,13 @@ class MAP_FRAGMENT_FAMILIES(IntEnumOverride):
 
     DEFAULT = REGULAR
     STANDARD = REGULAR
+
+
+class MAP_GENERATION(IntEnumOverride):
+    ORIGINAL = 1
+    THE_AWAKENING = 2
+    ATLAS_OF_WORLDS = 3
+    WAR_FOR_THE_ATLAS = 4
 
 
 class MOD_DOMAIN(IntEnumOverride):

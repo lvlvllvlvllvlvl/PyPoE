@@ -40,8 +40,11 @@ Documentation
 # Globals
 # =============================================================================
 
+MAPS_SKIP_EXPORT = {
+    "Metadata/Items/Maps/MapWorldsShapersRealm",
+}
 
-MAPS_IN_SERIES_BUT_NOT_ON_ATLAS = {
+MAPS_OFF_ATLAS = {
     "Metadata/Items/Maps/MapWorldsHarbingerUber",
     "Metadata/Items/Maps/MapWorldsHarbingerHigh",
     "Metadata/Items/Maps/MapWorldsHarbingerMid",
@@ -51,6 +54,17 @@ MAPS_IN_SERIES_BUT_NOT_ON_ATLAS = {
     "Metadata/Items/Maps/MapWorldsHydra",
     "Metadata/Items/Maps/MapWorldsMinotaur",
     "Metadata/Items/Maps/MapWorldsVaalTemple",
+    "Metadata/Items/Maps/MapWorldsSynthesisedWorld",
+    "Metadata/Items/Maps/MapWorldsTrialmaster",
+    "Metadata/Items/Maps/MapWorldsCourtyardOfWasting",
+    "Metadata/Items/Maps/MapWorldsChambersOfImpurity",
+    "Metadata/Items/Maps/MapWorldsTheatreOfLies",
+}
+
+MAPS_UBER_MEMORY = {
+    "Metadata/Items/Maps/MapWorldsCourtyardOfWasting",
+    "Metadata/Items/Maps/MapWorldsChambersOfImpurity",
+    "Metadata/Items/Maps/MapWorldsTheatreOfLies",
 }
 
 MAPS_TO_SKIP_COLORING = {
@@ -63,6 +77,11 @@ MAPS_TO_SKIP_COLORING = {
     "Metadata/Items/Maps/MapWorldsHydra",
     "Metadata/Items/Maps/MapWorldsMinotaur",
     "Metadata/Items/Maps/MapWorldsVaalTemple",
+    "Metadata/Items/Maps/MapWorldsSynthesisedWorld",
+    "Metadata/Items/Maps/MapWorldsTrialmaster",
+    "Metadata/Items/Maps/MapWorldsCourtyardOfWasting",
+    "Metadata/Items/Maps/MapWorldsChambersOfImpurity",
+    "Metadata/Items/Maps/MapWorldsTheatreOfLies",
 }
 
 MAPS_TO_SKIP_COMPOSITING = {
@@ -70,4 +89,6 @@ MAPS_TO_SKIP_COMPOSITING = {
     "Metadata/Items/Maps/MapWorldsHarbingerHigh",
     "Metadata/Items/Maps/MapWorldsHarbingerMid",
     "Metadata/Items/Maps/MapWorldsHarbingerLow",
+    "Metadata/Items/Maps/MapWorldsSynthesisedWorld",
+    "Metadata/Items/Maps/MapWorldsTrialmaster",
 }

@@ -16079,7 +16079,7 @@ specification = Specification(
         "ItemCostPerLevel.dat": File(
             fields=(
                 Field(
-                    name="Contract_BaseItemTypesKey",
+                    name="BaseItem",
                     type="ref|out",
                     key="BaseItemTypes.dat",
                 ),
@@ -16142,8 +16142,8 @@ specification = Specification(
                     type="ref|list|int",
                 ),
                 Field(
-                    name="Data0",
-                    type="ref|list|byte",
+                    name="RuthlessWithGold",
+                    type="ref|list|int",
                 ),
             ),
         ),
@@ -18754,8 +18754,9 @@ specification = Specification(
                     key="ItemCosts.dat",
                 ),
                 Field(
-                    name="Key0",
+                    name="CostHardmode",
                     type="ref|out",
+                    key="ItemCosts.dat",
                 ),
             ),
             virtual_fields=(
@@ -18873,13 +18874,13 @@ specification = Specification(
                     file_ext=".dds",
                 ),
                 Field(
-                    name="Unknown0",
+                    name="Memory_DDSFile",
                     type="ref|string",
                     file_path=True,
                     file_ext=".dds",
                 ),
                 Field(
-                    name="Unknown1",
+                    name="UberMemory_DDSFile",
                     type="ref|string",
                     file_path=True,
                     file_ext=".dds",
@@ -18892,6 +18893,7 @@ specification = Specification(
                     name="MapsKey",
                     type="ref|out",
                     key="Maps.dat",
+                    unique=True,
                 ),
                 Field(
                     name="MapWorldsTier",
@@ -18987,6 +18989,16 @@ specification = Specification(
                 ),
             ),
             virtual_fields=(
+                VirtualField(
+                    name="HellscapeTier",
+                    fields=("ScourgeTier",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="LakeTier",
+                    fields=("KalandraTier",),
+                    alias=True,
+                ),
                 VirtualField(
                     name="AncestralTier",
                     fields=("AncestorTier",),
@@ -19217,9 +19229,9 @@ specification = Specification(
                     key="Maps.dat",
                 ),
                 Field(
-                    name="MapSeriesKey",
+                    name="MapGeneration",
                     type="int",
-                    description="References MapSeries as an enum: i32, 1-based indexing",
+                    enum="MAP_GENERATION",
                 ),
                 Field(
                     name="Flag0",

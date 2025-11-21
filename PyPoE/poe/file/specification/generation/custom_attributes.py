@@ -39,6 +39,11 @@ custom_attributes = {
             enum="HARVEST_OBJECT_TYPES",
         ),
     },
+    "Maps.dat": {
+        "MapGeneration": CustomizedField(
+            enum="MAP_GENERATION",
+        ),
+    },
     "Mods.dat": {
         "Domain": CustomizedField(
             enum="MOD_DOMAIN",
