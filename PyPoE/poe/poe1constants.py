@@ -564,6 +564,14 @@ class MAP_GENERATION(IntEnumOverride):
     WAR_FOR_THE_ATLAS = 4
 
 
+MAP_SERIES_GENERATION_MAP = {
+    "Map": MAP_GENERATION.ORIGINAL,
+    "Map2": MAP_GENERATION.THE_AWAKENING,
+    "MapAtlas": MAP_GENERATION.ATLAS_OF_WORLDS,
+    "MapWorlds": MAP_GENERATION.WAR_FOR_THE_ATLAS,
+}
+
+
 class MOD_DOMAIN(IntEnumOverride):
     """
     Representation of mod domains.

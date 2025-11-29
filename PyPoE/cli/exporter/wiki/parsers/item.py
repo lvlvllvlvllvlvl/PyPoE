@@ -61,6 +61,7 @@ from PyPoE.cli.exporter.wiki.parsers.itemconstants import (
     MAPS_UBER_MEMORY,
     MAPS_TO_SKIP_COLORING,
     MAPS_TO_SKIP_COMPOSITING,
+    MAP_SERIES_TIERS_OVERRIDE,
 )
 from PyPoE.cli.exporter.wiki.parsers.skill import SkillParserShared
 
@@ -1817,6 +1818,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestKurai2",
         "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestKurai3",
         "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestWhakano3",
+        "Metadata/Items/Heist/QuestContracts/HeistContractQuestNenet1",
         "Metadata/Items/Heist/QuestContracts/HeistContractQuestNenetRepeatable",
         "Metadata/Items/Masters/PirateTreasureKey",
         # =================================================================
@@ -4048,7 +4050,7 @@ class ItemsParser(SkillParserShared):
             self.rr["MapSeries.dat64"].build_index("Id")
             try:
                 map_series = self.rr["MapSeries.dat64"].index["Id"][parsed_args.map_series_id]
-            except IndexError:
+            except KeyError:
                 console("Invalid map series id", msg=Msg.warning)
                 return False
         elif parsed_args.map_series is not None:
@@ -4065,6 +4067,97 @@ class ItemsParser(SkillParserShared):
                 msg=Msg.warning,
             )
         return map_series
+
+    def _get_map_generation(self, series_id):
+        for sid, gen in constants.MAP_SERIES_GENERATION_MAP.items():
+            if series_id == sid:
+                return gen
+        else:
+            return gen
+
+    def _get_map_tablet_images(self, parsed_args, map_series):
+        def process(img: Image):
+            img = img.crop((0, 0, 78, 78))
+            return img
+
+        tablet_image_map = {
+            "Base": {
+                "file": "BaseIcon_DDSFile",
+                "out": "Base.dds",
+            },
+            "Shaper": {
+                "file": "Shaper_DDSFile",
+                "out": "Shaper.dds",
+            },
+            "Purple": {
+                "file": "Purple_DDSFile",
+                "out": "Tier17.dds",
+            },
+            "UberMemory": {
+                "file": "UberMemory_DDSFile",
+                "out": "UberMemory.dds",
+            },
+        }
+
+        images = {}
+        for name, tablet in tablet_image_map.items():
+            file = map_series[tablet["file"]]
+            if file:
+                ico = os.path.join(self._img_path, tablet["out"])
+                self._write_dds(
+                    data=self.file_system.get_file(file),
+                    out_path=ico,
+                    parsed_args=parsed_args,
+                    process=process,
+                )
+                img = ico.replace(".dds", ".png")
+                images[name] = Image.open(img)
+            else:
+                images[name] = None
+        return images
+
+    def _get_map_icon_process(self, infobox, base_item, do_coloring = False, do_compositing = False, tablet_images: dict = {}):
+        tier = infobox["map_tier"]
+        
+        def process(img: Image):
+            # Recolor the map icon if appropriate and layer the map icon with the base icon.
+            if do_coloring:
+                color = None
+                if 5 < tier <= 10:
+                    color = self._MAP_COLORS["mid tier"]
+                if 10 < tier:
+                    color = self._MAP_COLORS["high tier"]
+                if 16 < tier:
+                    color = self._MAP_COLORS["purple tier"]
+
+                # This isn't quite how the game actually makes these map icons,
+                # so it isn't ideal, but it works.
+                if color:
+                    img = self._shade_sigil(img, color)
+
+            if do_compositing:
+                if base_item["Id"] in MAPS_UBER_MEMORY and tablet_images["UberMemory"]:
+                    plate_img = tablet_images["UberMemory"]
+                elif tier == 17 and tablet_images["Purple"]:
+                    plate_img = tablet_images["Purple"]
+                elif (
+                    "MapShaperInfluence" in [mod["Id"] for mod in base_item["Implicit_ModsKeys"]]
+                    and tablet_images["Shaper"]
+                ):
+                    plate_img = tablet_images["Shaper"]
+                else:
+                    plate_img = tablet_images["Base"]
+                canvas = Image.new(plate_img.mode, plate_img.size, (0, 0, 0, 0))
+                paste_origin = (
+                    (plate_img.size[0] - img.size[0]) // 2,
+                    (plate_img.size[1] - img.size[1]) // 2,
+                )
+                canvas.paste(img, paste_origin)
+                img = Image.alpha_composite(plate_img, canvas)
+
+            img = img.crop((0, 0, 78, 78))
+            return img
+        return process
 
     def _shade_sigil(self, tex, color):
         color = np.reshape(np.array(color + (255,)), (1, 1, 4)) / 255.0
@@ -4150,76 +4243,64 @@ class ItemsParser(SkillParserShared):
         map_series = self._get_map_series(parsed_args)
         if map_series is False:
             return r
-
-        if map_series.rowid < 4:
+        
+        has_tier_data = True
+        if not f"{map_series['Id']}Tier" in self.rr["MapSeriesTiers.dat64"].specification.columns_all:
             console(
-                "Only Betrayal and newer map series are supported by this function",
-                msg=Msg.error,
+                f"Unable to locate tier data for map series ID \"{map_series['Id']}\".",
+                msg=Msg.warning,
             )
-            return r
+            has_tier_data = False
 
         # Build list of maps to process
         if "MapsKey" not in self.rr["MapSeriesTiers.dat64"].index:
             self.rr["MapSeriesTiers.dat64"].build_index("MapsKey")
+        generation = self._get_map_generation(map_series["Id"])
         names = set(parsed_args.name)
         maps = []
         for row in self.rr["Maps.dat64"]:
-            if row["MapGeneration"] < constants.MAP_GENERATION.WAR_FOR_THE_ATLAS:
+            if row["MapGeneration"] != generation:
                 continue
             if row["BaseItemTypesKey"]["Id"] in MAPS_SKIP_EXPORT:
                 continue
             # Only include named maps, if filtering by name
             if names and row["BaseItemTypesKey"]["Name"] not in names:
                 continue
-            if row.rowid in self.rr["MapSeriesTiers.dat64"].index["MapsKey"]:
+            # T17 maps did not exist before Necropolis series
+            if map_series.rowid < 22 and row["Tier"] == 17:
+                continue
+            # Uber memory maps did not exist before Mercenaries series
+            if map_series.rowid < 24 and row["BaseItemTypesKey"]["Id"] in MAPS_UBER_MEMORY:
+                continue
+            if not has_tier_data:
+                maps.append(row)
+            elif row.rowid in self.rr["MapSeriesTiers.dat64"].index["MapsKey"]:
                 map_series_tiers = self.rr["MapSeriesTiers.dat64"].index["MapsKey"][row.rowid]
-                if map_series_tiers["%sTier" % map_series["Id"]] > 0:
+                if (
+                    map_series_tiers["%sTier" % map_series["Id"]] > 0
+                    or map_series["Id"] in MAP_SERIES_TIERS_OVERRIDE
+                    and row["BaseItemTypesKey"]["Id"] in MAP_SERIES_TIERS_OVERRIDE[map_series["Id"]]
+                ):
                     maps.append(row)
             elif row["BaseItemTypesKey"]["Id"] in MAPS_OFF_ATLAS:
                 maps.append(row)
+
         console(f"Processing {len(maps)} maps in {map_series['Name']} series...")
 
-        # Save off the base icons
         if parsed_args.store_images:
-            if not parsed_args.convert_images or parsed_args.convert_images != ".png":
-                console(
-                    "Map images need to be processed and require conversion option to be '.png'.",
-                    msg=Msg.error,
-                )
-                return r
-
             self._image_init(parsed_args)
 
-            base_ico = os.path.join(self._img_path, "Base.dds")
-            self._write_dds(
-                data=self.file_system.get_file(map_series["BaseIcon_DDSFile"]),
-                out_path=base_ico,
-                parsed_args=parsed_args,
-            )
-            base_ico = base_ico.replace(".dds", ".png")
-            base_img = Image.open(base_ico)
-
-            purple_img = base_img
-            if map_series["Purple_DDSFile"]:
-                purple_ico = os.path.join(self._img_path, "Tier17.dds")
-                self._write_dds(
-                    data=self.file_system.get_file(map_series["Purple_DDSFile"]),
-                    out_path=purple_ico,
-                    parsed_args=parsed_args,
-                )
-                purple_ico = purple_ico.replace(".dds", ".png")
-                purple_img = Image.open(purple_ico)
-
-            memory_img = base_img
-            if map_series["UberMemory_DDSFile"]:
-                memory_ico = os.path.join(self._img_path, "UberMemory.dds")
-                self._write_dds(
-                    data=self.file_system.get_file(map_series["UberMemory_DDSFile"]),
-                    out_path=memory_ico,
-                    parsed_args=parsed_args,
-                )
-                memory_ico = memory_ico.replace(".dds", ".png")
-                memory_img = Image.open(memory_ico)
+            # Save off the base icons
+            tablet_images = None
+            if has_tier_data:
+                if not parsed_args.convert_images or parsed_args.convert_images != ".png":
+                    console(
+                        "Map images need to be processed and require conversion option to be '.png'.",
+                        msg=Msg.error,
+                    )
+                    return r
+            
+                tablet_images = self._get_map_tablet_images(parsed_args, map_series)
 
         for row in maps:
             base_item = row["BaseItemTypesKey"]
@@ -4227,10 +4308,16 @@ class ItemsParser(SkillParserShared):
             name_series = self._format_map_name(base_item, map_series)
             tier = row["Tier"]
             if row.rowid in self.rr["MapSeriesTiers.dat64"].index["MapsKey"]:
-                map_series_tiers = self.rr["MapSeriesTiers.dat64"].index["MapsKey"][row.rowid]
-                ms_tier = map_series_tiers["%sTier" % map_series["Id"]]
-                if ms_tier > 0:
-                    tier = ms_tier
+                if (
+                    map_series["Id"] in MAP_SERIES_TIERS_OVERRIDE
+                    and row["BaseItemTypesKey"]["Id"] in MAP_SERIES_TIERS_OVERRIDE[map_series["Id"]]
+                ):
+                    tier = MAP_SERIES_TIERS_OVERRIDE[map_series["Id"]][row["BaseItemTypesKey"]["Id"]]
+                else:
+                    map_series_tiers = self.rr["MapSeriesTiers.dat64"].index["MapsKey"][row.rowid]
+                    ms_tier = map_series_tiers["%sTier" % map_series["Id"]]
+                    if ms_tier > 0:
+                        tier = ms_tier
 
             # Base info
             infobox = OrderedDict()
@@ -4288,46 +4375,13 @@ class ItemsParser(SkillParserShared):
                     continue
                 
                 map_ico = os.path.join(self._img_path, f"{icon_name} inventory icon.dds")
-
-                # Save off the map's icon, which still needs to be layered onto the base
+                do_coloring = has_tier_data and base_item["Id"] not in MAPS_TO_SKIP_COLORING
+                do_compositing = has_tier_data and base_item["Id"] not in MAPS_TO_SKIP_COMPOSITING
                 self._write_dds(
                     data=self.file_system.get_file(dds_file_path),
                     out_path=map_ico,
                     parsed_args=parsed_args,
+                    process=self._get_map_icon_process(infobox, base_item, do_coloring, do_compositing, tablet_images),
                 )
-                map_ico = map_ico.replace(".dds", ".png")
-                map_img = Image.open(map_ico)
-                map_img.save(map_ico)
-                
-                # Recolor the map icon if appropriate and layer the map icon with the base icon.
-                if base_item["Id"] not in MAPS_TO_SKIP_COLORING:
-                    color = None
-                    if 5 < tier <= 10:
-                        color = self._MAP_COLORS["mid tier"]
-                    if 10 < tier:
-                        color = self._MAP_COLORS["high tier"]
-                    if 16 < tier:
-                        color = self._MAP_COLORS["purple tier"]
-
-                    # This isn't quite how the game actually makes these map icons,
-                    # so it isn't ideal, but it works.
-                    if color:
-                        map_img = self._shade_sigil(map_img, color)
-                        map_img.save(map_ico)
-
-                if base_item["Id"] not in MAPS_TO_SKIP_COMPOSITING:
-                    if base_item["Id"] in MAPS_UBER_MEMORY:
-                        plate_img = memory_img
-                    elif tier == 17:
-                        plate_img = purple_img
-                    else:
-                        plate_img = base_img
-                    canvas = Image.new(plate_img.mode, plate_img.size, (0, 0, 0, 0))
-                    paste_origin = (
-                        (plate_img.size[0] - map_img.size[0]) // 2,
-                        (plate_img.size[1] - map_img.size[1]) // 2,
-                    )
-                    canvas.paste(map_img, paste_origin)
-                    Image.alpha_composite(plate_img, canvas).save(map_ico)
         
         return r

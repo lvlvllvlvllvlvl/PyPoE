@@ -41,21 +41,27 @@ Documentation
 # =============================================================================
 
 MAPS_SKIP_EXPORT = {
+    "Metadata/Items/Maps/MapAtlasShapersRealm",
     "Metadata/Items/Maps/MapWorldsShapersRealm",
 }
 
 MAPS_OFF_ATLAS = {
-    "Metadata/Items/Maps/MapWorldsHarbingerUber",
-    "Metadata/Items/Maps/MapWorldsHarbingerHigh",
-    "Metadata/Items/Maps/MapWorldsHarbingerMid",
-    "Metadata/Items/Maps/MapWorldsHarbingerLow",
-    "Metadata/Items/Maps/MapWorldsPhoenix",
+    "Metadata/Items/Maps/MapWorldsSynthesisedWorld",
     "Metadata/Items/Maps/MapWorldsChimera",
     "Metadata/Items/Maps/MapWorldsHydra",
     "Metadata/Items/Maps/MapWorldsMinotaur",
+    "Metadata/Items/Maps/MapWorldsPhoenix",
     "Metadata/Items/Maps/MapWorldsVaalTemple",
-    "Metadata/Items/Maps/MapWorldsSynthesisedWorld",
+    "Metadata/Items/Maps/MapWorldsHarbingerLow",
+    "Metadata/Items/Maps/MapWorldsHarbingerMid",
+    "Metadata/Items/Maps/MapWorldsHarbingerHigh",
+    "Metadata/Items/Maps/MapWorldsHarbingerUber",
     "Metadata/Items/Maps/MapWorldsTrialmaster",
+    "Metadata/Items/Maps/MapWorldsSanctuary",
+    "Metadata/Items/Maps/MapWorldsCitadel",
+    "Metadata/Items/Maps/MapWorldsFortress",
+    "Metadata/Items/Maps/MapWorldsAbomination",
+    "Metadata/Items/Maps/MapWorldsZiggurat",
     "Metadata/Items/Maps/MapWorldsCourtyardOfWasting",
     "Metadata/Items/Maps/MapWorldsChambersOfImpurity",
     "Metadata/Items/Maps/MapWorldsTheatreOfLies",
@@ -68,16 +74,16 @@ MAPS_UBER_MEMORY = {
 }
 
 MAPS_TO_SKIP_COLORING = {
-    "Metadata/Items/Maps/MapWorldsHarbingerUber",
-    "Metadata/Items/Maps/MapWorldsHarbingerHigh",
-    "Metadata/Items/Maps/MapWorldsHarbingerMid",
-    "Metadata/Items/Maps/MapWorldsHarbingerLow",
-    "Metadata/Items/Maps/MapWorldsPhoenix",
+    "Metadata/Items/Maps/MapWorldsSynthesisedWorld",
     "Metadata/Items/Maps/MapWorldsChimera",
     "Metadata/Items/Maps/MapWorldsHydra",
     "Metadata/Items/Maps/MapWorldsMinotaur",
+    "Metadata/Items/Maps/MapWorldsPhoenix",
     "Metadata/Items/Maps/MapWorldsVaalTemple",
-    "Metadata/Items/Maps/MapWorldsSynthesisedWorld",
+    "Metadata/Items/Maps/MapWorldsHarbingerLow",
+    "Metadata/Items/Maps/MapWorldsHarbingerMid",
+    "Metadata/Items/Maps/MapWorldsHarbingerHigh",
+    "Metadata/Items/Maps/MapWorldsHarbingerUber",
     "Metadata/Items/Maps/MapWorldsTrialmaster",
     "Metadata/Items/Maps/MapWorldsCourtyardOfWasting",
     "Metadata/Items/Maps/MapWorldsChambersOfImpurity",
@@ -85,10 +91,32 @@ MAPS_TO_SKIP_COLORING = {
 }
 
 MAPS_TO_SKIP_COMPOSITING = {
-    "Metadata/Items/Maps/MapWorldsHarbingerUber",
-    "Metadata/Items/Maps/MapWorldsHarbingerHigh",
-    "Metadata/Items/Maps/MapWorldsHarbingerMid",
-    "Metadata/Items/Maps/MapWorldsHarbingerLow",
     "Metadata/Items/Maps/MapWorldsSynthesisedWorld",
+    "Metadata/Items/Maps/MapWorldsHarbingerLow",
+    "Metadata/Items/Maps/MapWorldsHarbingerMid",
+    "Metadata/Items/Maps/MapWorldsHarbingerHigh",
+    "Metadata/Items/Maps/MapWorldsHarbingerUber",
     "Metadata/Items/Maps/MapWorldsTrialmaster",
+}
+
+# This is needed because because Mercenaries series has zeroes in the
+# tier data for some maps that should not be excluded from the export.
+MAP_SERIES_TIERS_OVERRIDE = {
+    "Mercenaries": {
+        "Metadata/Items/Maps/MapWorldsChimera": 16,
+        "Metadata/Items/Maps/MapWorldsHydra": 16,
+        "Metadata/Items/Maps/MapWorldsMinotaur": 16,
+        "Metadata/Items/Maps/MapWorldsPhoenix": 16,
+        "Metadata/Items/Maps/MapWorldsVaalTemple": 16,
+        "Metadata/Items/Maps/MapWorldsHarbingerLow": 5,
+        "Metadata/Items/Maps/MapWorldsHarbingerMid": 10,
+        "Metadata/Items/Maps/MapWorldsHarbingerHigh": 15,
+        "Metadata/Items/Maps/MapWorldsHarbingerUber": 16,
+        "Metadata/Items/Maps/MapWorldsTrialmaster": 16,
+        "Metadata/Items/Maps/MapWorldsSanctuary": 17,
+        "Metadata/Items/Maps/MapWorldsCitadel": 17,
+        "Metadata/Items/Maps/MapWorldsFortress": 17,
+        "Metadata/Items/Maps/MapWorldsAbomination": 17,
+        "Metadata/Items/Maps/MapWorldsZiggurat": 17,
+    },
 }
