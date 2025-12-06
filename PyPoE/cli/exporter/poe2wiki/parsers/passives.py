@@ -140,170 +140,165 @@ class PassiveSkillParser(parser.BaseParser):
 
     _MAX_STAT_ID = 5
 
-    _COPY_KEYS = (
+    _COPY_KEYS = OrderedDict(
         (
-            "Id",
-            {
-                "template": "id",
-            },
-        ),
-        (
-            "PassiveSkillGraphId",
-            {
-                "template": "int_id",
-                "format": normalize,
-            },
-        ),
-        (
-            "Name",
-            {
-                "template": "name",
-            },
-        ),
-        (  # icon handled not here
-            "Icon_DDSFile",
-            {
-                "template": "icon",
-                "default": "",
-            },
-        ),
-        (
-            "FlavourText",
-            {
-                "template": "flavour_text",
-                "format": lambda v: v.replace("\n", "<br>").replace("\r", ""),
-                "condition": lambda v: v is not None,
-            },
-        ),
-        (
-            "ReminderStrings",
-            {
-                "template": "reminder_text",
-                "condition": lambda v: v is not None,
-                "format": lambda v: "<br>".join([x["Text"] for x in v]),
-            },
-        ),
-        # Atlas related
-        (
-            "AtlasSubTree",
-            {
-                "template": "is_atlas_passive",
-                "condition": lambda v: v is not None,
-                "format": lambda v: True,
-            },
-        ),
-        (
-            "AtlasSubTree",
-            {
-                "template": "atlas_sub_tree",
-                "condition": lambda v: v is not None,
-                "format": lambda v: v["Id"],
-            },
-        ),
-        (
-            "IsRootOfAtlasTree",
-            {
-                "template": "is_atlas_sub_tree_starting_node",
-                "condition": lambda v: v is True,
-            },
-        ),
-        # Ascendancy related
-        (
-            "Ascendancy",
-            {
-                "template": "ascendancy_class",
-                "condition": lambda v: v is not None,
-                "format": lambda v: v["Name"],
-            },
-        ),
-        (
-            "IsAscendancyStartingNode",
-            {
-                "template": "is_ascendancy_starting_node",
-                "condition": lambda v: v is True,
-            },
-        ),
-        # Stat related
-        (
-            "PassiveSkillBuffs",
-            {
-                "template": "buff_id",
-                "condition": lambda v: v is not None,
-                "format": lambda v: ",".join([x["BuffDefinitionsKey"]["Id"] for x in v]),
-            },
-        ),
-        (
-            "SkillPointsGranted",
-            {
-                "template": "skill_points",
-                "condition": lambda v: v > 0,
-            },
-        ),
-        (
-            "GrantedSkill",
-            {
-                "template": "granted_skill",
-                "condition": lambda v: v is not None,
-                "format": lambda v: v["GemEffects"][0]["GrantedEffect"]["Id"],
-            },
-        ),
-        # Booleans
-        (
-            "IsKeystone",
-            {
-                "template": "is_keystone",
-                "condition": lambda v: v is True,
-            },
-        ),
-        (
-            "IsNotable",
-            {
-                "template": "is_notable",
-                "condition": lambda v: v is True,
-            },
-        ),
-        (
-            "IsAttribute",
-            {
-                "template": "is_attribute",
-                "condition": lambda v: v is True,
-            },
-        ),
-        (
-            "IsMultipleChoice",
-            {
-                "template": "is_multiple_choice",
-                "condition": lambda v: v is True,
-            },
-        ),
-        (
-            "IsMultipleChoiceOption",
-            {
-                "template": "is_multiple_choice_option",
-                "condition": lambda v: v is True,
-            },
-        ),
-        (
-            "IsJustIcon",
-            {
-                "template": "is_icon_only",
-                "condition": lambda v: v is True,
-            },
-        ),
-        (
-            "IsJewelSocket",
-            {
-                "template": "is_jewel_socket",
-                "condition": lambda v: v is True,
-            },
-        ),
-        (
-            "IsFree",
-            {
-                "template": "is_free",
-                "condition": lambda v: v is True,
-            },
-        ),
+            (
+                "Id",
+                {
+                    "template": "id",
+                },
+            ),
+            (
+                "PassiveSkillGraphId",
+                {
+                    "template": "int_id",
+                    "format": normalize,
+                },
+            ),
+            (
+                "Name",
+                {
+                    "template": "name",
+                    "condition": lambda v: v,
+                },
+            ),
+            (  # icon param added here but handled elsewhere
+                "Icon_DDSFile",
+                {
+                    "template": "icon",
+                    # "condition": lambda v: v,
+                },
+            ),
+            (
+                "FlavourText",
+                {
+                    "template": "flavour_text",
+                    "condition": lambda v: v,
+                    "format": lambda v: v.replace("\n", "<br>").replace("\r", ""),
+                },
+            ),
+            (
+                "ReminderStrings",
+                {
+                    "template": "reminder_text",
+                    "condition": lambda v: v,
+                    "format": lambda v: "<br>".join([x["Text"] for x in v]),
+                },
+            ),
+            # Atlas related
+            (
+                "AtlasSubTree",
+                {
+                    "template": "atlas_sub_tree",
+                    "condition": lambda v: v is not None,
+                    "format": lambda v: v["Id"],
+                },
+            ),
+            (
+                "IsRootOfAtlasTree",
+                {
+                    "template": "is_atlas_sub_tree_starting_node",
+                    "default": False,
+                },
+            ),
+            # Ascendancy related
+            (
+                "Ascendancy",
+                {
+                    "template": "ascendancy_class",
+                    "condition": lambda v: v is not None,
+                    "format": lambda v: v["Name"],
+                },
+            ),
+            (
+                "IsAscendancyStartingNode",
+                {
+                    "template": "is_ascendancy_starting_node",
+                    "default": False,
+                },
+            ),
+            # Stat related
+            (
+                "PassiveSkillBuffs",
+                {
+                    "template": "buff_id",
+                    "condition": lambda v: v,
+                    "format": lambda v: ",".join([x["BuffDefinitionsKey"]["Id"] for x in v]),
+                },
+            ),
+            (
+                "SkillPointsGranted",
+                {
+                    "template": "skill_points",
+                    "condition": lambda v: v > 0,
+                },
+            ),
+            (
+                "GrantedSkill",
+                {
+                    "template": "granted_skill",
+                    "condition": lambda v: v is not None,
+                    "format": lambda v: v["GemEffects"][0]["GrantedEffect"]["Id"],
+                },
+            ),
+            # Booleans
+            (
+                "IsKeystone",
+                {
+                    "template": "is_keystone",
+                    "default": False,
+                },
+            ),
+            (
+                "IsNotable",
+                {
+                    "template": "is_notable",
+                    "default": False,
+                },
+            ),
+            (
+                "IsAttribute",
+                {
+                    "template": "is_attribute",
+                    "default": False,
+                },
+            ),
+            (
+                "IsMultipleChoice",
+                {
+                    "template": "is_multiple_choice",
+                    "default": False,
+                },
+            ),
+            (
+                "IsMultipleChoiceOption",
+                {
+                    "template": "is_multiple_choice_option",
+                    "default": False,
+                },
+            ),
+            (
+                "IsJustIcon",
+                {
+                    "template": "is_icon_only",
+                    "default": False,
+                },
+            ),
+            (
+                "IsJewelSocket",
+                {
+                    "template": "is_jewel_socket",
+                    "default": False,
+                },
+            ),
+            (
+                "IsFree",
+                {
+                    "template": "is_free",
+                    "default": False,
+                },
+            ),
+        )
     )
 
     def _apply_filter(self, parsed_args, passives):
@@ -344,9 +339,7 @@ class PassiveSkillParser(parser.BaseParser):
 
         passives = self._apply_filter(parsed_args, passives)
 
-        console(f"Found {len(passives)} passives. Removing Royale passives...")
-        passives = [passive for passive in passives if not passive["Id"].startswith("royale")]
-        console(f"{len(passives)} passives left for processing.")
+        console(f"Found {len(passives)} passives.")
 
         if not passives:
             console(
@@ -379,9 +372,9 @@ class PassiveSkillParser(parser.BaseParser):
 
         self._image_init(parsed_args)
 
-        console("Found %s, parsing..." % len(passives))
+        # console("Found %s, parsing..." % len(passives))
 
-        for passive in passives:
+        for rowid, passive in enumerate(passives, start=1):
             if "[DNT" in passive["Name"]:
                 continue
 
@@ -389,8 +382,8 @@ class PassiveSkillParser(parser.BaseParser):
             # Print out the row number every 100 rows, and every 1/100th of completion,
             # with a minimum increment of 1
             print_increment = max(len(passives) // 100, 1)
-            if (passive.rowid % 100 == 0) or (passive.rowid % print_increment == 0):
-                console(f"Processing passive {passive['Id']} at {passive.rowid}")
+            if (rowid % 100 == 0) or (rowid % print_increment == 0):
+                console(f"Processing passive {passive['Id']} at {rowid}")
 
             # Copy over simple fields from the .dat64
             apply_column_map(infobox, self._COPY_KEYS, passive)
@@ -574,20 +567,20 @@ def apply_column_map(
     if not isinstance(list_object, DatRecord):
         list_object = list_object[0]
 
-    for k, data in column_map:
+    for k, data in column_map.items():
         value = list_object[k]
+
         if data.get("condition") and not data["condition"](value):
+            continue
+
+        # Skip default values to reduce size of template
+        if value == data.get("default"):
             continue
 
         if data.get("format"):
             value = data["format"](value)
 
-        if data.get("default") and not value:
-            infobox[data["template"]] = data["default"]
-            continue
-
-        if value:
-            infobox[data["template"]] = value
+        infobox[data["template"]] = value
 
 
 def get_translation_file(is_atlas_passive: bool):
