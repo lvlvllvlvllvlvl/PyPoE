@@ -1203,7 +1203,7 @@ class ItemsParser(SkillParserShared):
         "One Hand Axe",
         "Two Hand Axe",
         "DivinationCard",
-        # Skills are not supported yet
+        # Skills are not supported 100% yet
         "Active Skill Gem",
         "Meta Skill Gem",
         "Support Skill Gem",
@@ -2370,6 +2370,10 @@ class ItemsParser(SkillParserShared):
 
             if gem_type["SupportText"]:
                 infobox["gem_description"] = process_keywords(gem_type["SupportText"])
+
+        # Skip more complicated skills
+        if ge["AdditionalStatSets"] or additional:
+            return False
 
         primary = OrderedDict()
         self._skill(
@@ -3693,6 +3697,7 @@ class ItemsParser(SkillParserShared):
     def _get_icon_process(self, infobox: dict[str, str], base_item_type):
         comp = base_item_type["ItemVisualIdentityKey"]["Composition"]
         if comp == 1:  # Flask
+
             def flask_icon_process(img: Image):
                 layer1 = img.crop((105, 0, 210, 212))
                 layer2 = img.crop((210, 0, 315, 212))
@@ -3700,6 +3705,7 @@ class ItemsParser(SkillParserShared):
                 ico = Image.alpha_composite(layer1, Image.alpha_composite(layer2, layer3))
                 ico = self._resize_icon(ico)
                 return ico
+
             return flask_icon_process
         if comp == 3:  # Gem
             return self._get_gem_icon_process(infobox)

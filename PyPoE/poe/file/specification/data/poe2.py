@@ -2597,10 +2597,6 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Flag0",
-                    type="bool",
-                ),
-                Field(
                     name="BackgroundImage",
                     type="int",
                 ),
@@ -2609,14 +2605,22 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
+                    name="Disabled",
+                    type="bool",
+                ),
+                Field(
                     name="BaseAscendancy",
                     type="ref|generic",
                     key="Ascendancy.dat",
                 ),
                 Field(
-                    name="Key0",
+                    name="UIArt",
                     type="ref|out",
                     key="PassiveSkillTreeUIArt.dat",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
                 ),
                 Field(
                     name="Key1",
@@ -2624,10 +2628,6 @@ specification = Specification(
                 ),
                 Field(
                     name="Key2",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Key3",
                     type="ref|out",
                 ),
             ),
@@ -5535,6 +5535,42 @@ specification = Specification(
                 ),
             ),
         ),
+        "BrequelGraftTypes.dat": File(
+            fields=(
+                Field(
+                    name="BaseItemType",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                    unique=True,
+                ),
+                Field(
+                    name="LeftArm",
+                    type="ref|string",
+                ),
+                Field(
+                    name="RightArm",
+                    type="ref|string",
+                ),
+                Field(
+                    name="SkillGem",
+                    type="ref|out",
+                    key="SkillGems.dat",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="SkillAnimation",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Achievement",
+                    type="ref|out",
+                    key="AchievementItems.dat",
+                ),
+            ),
+        ),
         "BuffDefinitions.dat": File(
             fields=(
                 Field(
@@ -6288,12 +6324,14 @@ specification = Specification(
         "CharacterMeleeSkills.dat": File(
             fields=(
                 Field(
-                    name="Key0",
+                    name="MainHand",
                     type="ref|out",
+                    key="WieldableClasses.dat",
                 ),
                 Field(
-                    name="Key1",
+                    name="OffHand",
                     type="ref|out",
+                    key="WieldableClasses.dat",
                 ),
                 Field(
                     name="SkillGems",
@@ -8208,6 +8246,10 @@ specification = Specification(
                     name="Flag1",
                     type="bool",
                 ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
             ),
             virtual_fields=(
                 VirtualField(
@@ -8854,6 +8896,18 @@ specification = Specification(
                 ),
                 Field(
                     name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown2",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown3",
                     type="int",
                 ),
             ),
@@ -9720,31 +9774,31 @@ specification = Specification(
         "Descendancy.dat": File(
             fields=(
                 Field(
-                    name="Unknown0",
+                    name="Id",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown1",
+                    name="Name",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown2",
+                    name="BackgroundImage",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown3",
+                    name="FlavourText",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown4",
+                    name="CoordinateRect",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown5",
+                    name="RGBFlavourTextColour",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown6",
+                    name="UnlockCondition",
                     type="ref|string",
                 ),
                 Field(
@@ -9753,6 +9807,19 @@ specification = Specification(
                 ),
                 Field(
                     name="Key1",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="UIArt",
+                    type="ref|out",
+                    key="PassiveSkillTreeUIArtAscendancy.dat",
+                ),
+                Field(
+                    name="Key2",
                     type="ref|out",
                 ),
             ),
@@ -9952,6 +10019,10 @@ specification = Specification(
                 Field(
                     name="Influences",
                     type="ref|list|int",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
                 ),
             ),
         ),
@@ -11143,7 +11214,7 @@ specification = Specification(
                     key="Mods.dat",
                 ),
                 Field(
-                    name="Data0",
+                    name="OutcomeModWeights",
                     type="ref|list|int",
                 ),
             ),
@@ -11267,19 +11338,16 @@ specification = Specification(
                     key="Mods.dat",
                 ),
                 Field(
-                    name="Flag0",
+                    name="Perfect",
                     type="bool",
                 ),
                 Field(
-                    name="Unknown0",
-                    type="int",
+                    name="UpgradeResult",
+                    type="ref|generic",
+                    key="Essences.dat",
                 ),
                 Field(
-                    name="Unknown1",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown2",
+                    name="Tier",
                     type="int",
                 ),
                 Field(
@@ -12050,12 +12118,12 @@ specification = Specification(
                     type="ref|string",
                 ),
                 Field(
-                    name="HideoutDoodadsKeys",
+                    name="HideoutDoodads",
                     type="ref|list|ref|out",
                     key="HideoutDoodads.dat",
                 ),
                 Field(
-                    name="BaseTypeHideoutDoodadsKey",
+                    name="BaseTypeHideoutDoodads",
                     type="ref|out",
                     key="HideoutDoodads.dat",
                 ),
@@ -12076,8 +12144,20 @@ specification = Specification(
                     type="ref|out",
                 ),
                 Field(
-                    name="Unknown2",
-                    type="int",
+                    name="Key1",
+                    type="ref|out",
+                ),
+            ),
+            virtual_fields=(
+                VirtualField(
+                    name="HideoutDoodadsKeys",
+                    fields=("HideoutDoodads",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="BaseTypeHideoutDoodadsKey",
+                    fields=("BaseTypeHideoutDoodads",),
+                    alias=True,
                 ),
             ),
         ),
@@ -13868,6 +13948,14 @@ specification = Specification(
                 Field(
                     name="Key0",
                     type="ref|out",
+                ),
+                Field(
+                    name="Unknown5",
+                    type="float",
+                ),
+                Field(
+                    name="Unknown6",
+                    type="float",
                 ),
             ),
         ),
@@ -16331,9 +16419,9 @@ specification = Specification(
         "HideoutDoodads.dat": File(
             fields=(
                 Field(
-                    name="BaseItemTypesKey",
+                    name="MtxTypeGameSpecific",
                     type="ref|out",
-                    key="BaseItemTypes.dat",
+                    key="MtxTypeGameSpecific.dat",
                     unique=True,
                 ),
                 Field(
@@ -16458,6 +16546,27 @@ specification = Specification(
                     type="ref|string",
                     file_path=True,
                     file_ext=".hideout",
+                ),
+                Field(
+                    name="ClaimSideArea",
+                    type="ref|out",
+                    key="WorldAreas.dat",
+                ),
+                Field(
+                    name="HideoutImage",
+                    type="ref|string",
+                ),
+                Field(
+                    name="IsEnabled",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="Name",
+                    type="ref|string",
                 ),
             ),
         ),
@@ -17437,7 +17546,7 @@ specification = Specification(
         "ItemCostPerLevel.dat": File(
             fields=(
                 Field(
-                    name="Contract_BaseItemTypesKey",
+                    name="BaseItem",
                     type="ref|out",
                     key="BaseItemTypes.dat",
                 ),
@@ -17500,8 +17609,8 @@ specification = Specification(
                     type="ref|list|int",
                 ),
                 Field(
-                    name="Data0",
-                    type="ref|list|byte",
+                    name="RuthlessWithGold",
+                    type="ref|list|int",
                 ),
             ),
         ),
@@ -18269,6 +18378,18 @@ specification = Specification(
                     name="Key7",
                     type="ref|out",
                 ),
+                Field(
+                    name="Key8",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key9",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown29",
+                    type="ref|string",
+                ),
             ),
             virtual_fields=(
                 VirtualField(
@@ -18499,6 +18620,10 @@ specification = Specification(
                 ),
                 Field(
                     name="Unknown0",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown1",
                     type="ref|string",
                 ),
             ),
@@ -20252,8 +20377,9 @@ specification = Specification(
                     key="ItemCosts.dat",
                 ),
                 Field(
-                    name="Key0",
+                    name="CostHardmode",
                     type="ref|out",
+                    key="ItemCosts.dat",
                 ),
             ),
             virtual_fields=(
@@ -20372,6 +20498,7 @@ specification = Specification(
                     name="MapsKey",
                     type="ref|out",
                     key="Maps.dat",
+                    unique=True,
                 ),
                 Field(
                     name="MapWorldsTier",
@@ -20459,6 +20586,10 @@ specification = Specification(
                 ),
                 Field(
                     name="SecretsTier",
+                    type="int",
+                ),
+                Field(
+                    name="KeepersTier",
                     type="int",
                 ),
             ),
@@ -21482,10 +21613,15 @@ specification = Specification(
                 Field(
                     name="Id",
                     type="int",
+                    unique=True,
                 ),
                 Field(
                     name="Name",
                     type="ref|string",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
                 ),
             ),
         ),
@@ -21647,13 +21783,18 @@ specification = Specification(
         "MicrotransactionCursorVariations.dat": File(
             fields=(
                 Field(
-                    name="Key0",
+                    name="MtxTypeGameSpecific",
                     type="ref|out",
-                    key="BaseItemTypes.dat",
+                    key="MtxTypeGameSpecific.dat",
+                    unique=True,
                 ),
                 Field(
-                    name="Key1",
+                    name="Key0",
                     type="ref|out",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="short",
                 ),
             ),
         ),
@@ -21697,8 +21838,9 @@ specification = Specification(
         "MicrotransactionJewelVariations.dat": File(
             fields=(
                 Field(
-                    name="Key0",
+                    name="MtxTypeGameSpecific",
                     type="ref|out",
+                    key="MtxTypeGameSpecific.dat",
                     unique=True,
                 ),
                 Field(
@@ -21716,6 +21858,14 @@ specification = Specification(
                 Field(
                     name="Unknown3",
                     type="int",
+                ),
+                Field(
+                    name="Unknown4",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
                 ),
             ),
         ),
@@ -21938,14 +22088,68 @@ specification = Specification(
         "MicrotransactionPortalVariations.dat": File(
             fields=(
                 Field(
-                    name="BaseItemTypesKey",
+                    name="MtxTypeGameSpecific",
                     type="ref|out",
-                    key="BaseItemTypes.dat",
+                    key="MtxTypeGameSpecific.dat",
+                    unique=True,
                 ),
                 Field(
                     name="Id",
-                    type="int",
+                    type="short",
                     unique=True,
+                ),
+                Field(
+                    name="AOFile",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".ao",
+                ),
+                Field(
+                    name="MapAOFile",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".ao",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="float",
+                ),
+                Field(
+                    name="MiscObject",
+                    type="ref|out",
+                    key="MiscObjects.dat",
+                ),
+                Field(
+                    name="PortalEffect",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".ao",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="float",
+                ),
+                Field(
+                    name="Unknown2",
+                    type="ref|string",
+                ),
+                Field(
+                    name="PortalEffectLarge",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".ao",
+                ),
+                Field(
+                    name="Unknown3",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown4",
+                    type="int",
+                ),
+                Field(
+                    name="Script",
+                    type="ref|string",
                 ),
             ),
         ),
@@ -22162,6 +22366,18 @@ specification = Specification(
                 Field(
                     name="Flag1",
                     type="bool",
+                ),
+                Field(
+                    name="MinimapIconPointerMaxDistance",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="int",
                 ),
             ),
         ),
@@ -25218,6 +25434,7 @@ specification = Specification(
                     name="Type",
                     type="ref|out",
                     key="MtxTypes.dat",
+                    unique=True,
                 ),
                 Field(
                     name="HASH16",
@@ -25230,8 +25447,10 @@ specification = Specification(
                     file_ext=".dds",
                 ),
                 Field(
-                    name="Unknown0",
+                    name="Category",
                     type="int",
+                    key="MicrotransactionCategory.dat",
+                    key_id="Id",
                 ),
                 Field(
                     name="Data0",
@@ -27523,23 +27742,23 @@ specification = Specification(
                     unique=True,
                 ),
                 Field(
-                    name="Unknown0",
+                    name="Normal",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown1",
+                    name="Intermediate2",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown2",
+                    name="Intermediate",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown3",
+                    name="Active",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown4",
+                    name="Mask",
                     type="ref|string",
                 ),
                 Field(
@@ -27720,14 +27939,70 @@ specification = Specification(
                 ),
             ),
         ),
-        "PassiveSkillTrees.dat": File(
+        "PassiveSkillTreeUIArtAscendancy.dat": File(
             fields=(
                 Field(
                     name="Id",
                     type="ref|string",
                 ),
                 Field(
-                    name="PassiveSkillGraph",
+                    name="StartNode",
+                    type="ref|string",
+                ),
+                Field(
+                    name="PassiveFrameNormal",
+                    type="ref|string",
+                ),
+                Field(
+                    name="PassiveFrameCanAllocate",
+                    type="ref|string",
+                ),
+                Field(
+                    name="PassiveFrameActive",
+                    type="ref|string",
+                ),
+                Field(
+                    name="PassiveFrameMask",
+                    type="ref|string",
+                ),
+                Field(
+                    name="NotableFrameNormal",
+                    type="ref|string",
+                ),
+                Field(
+                    name="NotableFrameCanAllocate",
+                    type="ref|string",
+                ),
+                Field(
+                    name="NotableFrameActive",
+                    type="ref|string",
+                ),
+                Field(
+                    name="NotableFrameMask",
+                    type="ref|string",
+                ),
+                Field(
+                    name="SocketFrameNormal",
+                    type="ref|string",
+                ),
+                Field(
+                    name="SocketFrameCanAllocate",
+                    type="ref|string",
+                ),
+                Field(
+                    name="SocketFrameActive",
+                    type="ref|string",
+                ),
+                Field(
+                    name="SocketFrameMask",
+                    type="ref|string",
+                ),
+            ),
+        ),
+        "PassiveSkillTrees.dat": File(
+            fields=(
+                Field(
+                    name="Id",
                     type="ref|string",
                 ),
                 Field(
@@ -27745,64 +28020,6 @@ specification = Specification(
                 Field(
                     name="Unknown3",
                     type="float",
-                ),
-                Field(
-                    name="Flag0",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag1",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag2",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag3",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag4",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag5",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag6",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag7",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag8",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag9",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag10",
-                    type="bool",
-                ),
-                Field(
-                    name="Key0",
-                    type="ref|out",
-                    key="ClientStrings.dat",
-                ),
-                Field(
-                    name="UIArt",
-                    type="ref|out",
-                    key="PassiveSkillTreeUIArt.dat",
-                ),
-                Field(
-                    name="Flag11",
-                    type="bool",
                 ),
             ),
         ),
@@ -31960,20 +32177,32 @@ specification = Specification(
         "StashTabAffinities.dat": File(
             fields=(
                 Field(
-                    name="SpecializedStash",
+                    name="StashTabAffinityId",
+                    type="ref|out",
+                    key="StashTabAffinityId.dat",
+                ),
+                Field(
+                    name="Unknown0",
                     type="int",
                 ),
+            ),
+        ),
+        "StashTabAffinityByBaseItemType.dat": File(
+            fields=(
                 Field(
-                    name="Name",
+                    name="BaseItemType",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                    unique=True,
+                ),
+            ),
+        ),
+        "StashTabAffinityId.dat": File(
+            fields=(
+                Field(
+                    name="Id",
                     type="ref|string",
-                ),
-                Field(
-                    name="ShowInStashes",
-                    type="ref|list|int",
-                ),
-                Field(
-                    name="IsDisabled",
-                    type="bool",
+                    unique=True,
                 ),
             ),
         ),
@@ -32008,6 +32237,25 @@ specification = Specification(
                 Field(
                     name="Icon",
                     type="ref|string",
+                ),
+                Field(
+                    name="ConsoleIcon",
+                    type="ref|string",
+                ),
+            ),
+        ),
+        "StashtabAffinityByItemClassCategory.dat": File(
+            fields=(
+                Field(
+                    name="ItemClassCategory",
+                    type="ref|out",
+                    key="ItemClassCategories.dat",
+                    unique=True,
+                ),
+                Field(
+                    name="StashTabAffinityId",
+                    type="ref|out",
+                    key="StashTabAffinityId.dat",
                 ),
             ),
         ),
@@ -33100,6 +33348,7 @@ specification = Specification(
                 Field(
                     name="Keys0",
                     type="ref|list|ref|out",
+                    key="ClientStrings.dat",
                 ),
                 Field(
                     name="UiHints",
@@ -33967,6 +34216,66 @@ specification = Specification(
                     name="Key0",
                     type="ref|out",
                     key="Stats.dat",
+                ),
+            ),
+        ),
+        "UIArtAscendancy.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                ),
+                Field(
+                    name="AscendancyButtonNormal",
+                    type="ref|string",
+                ),
+                Field(
+                    name="AscendancyInfoPlate",
+                    type="ref|string",
+                ),
+                Field(
+                    name="ButtonBackground",
+                    type="ref|string",
+                ),
+                Field(
+                    name="ButtonBackgroundDouble",
+                    type="ref|string",
+                ),
+                Field(
+                    name="NameBackground",
+                    type="ref|string",
+                ),
+                Field(
+                    name="AscendancyButtonHighlight",
+                    type="ref|string",
+                ),
+                Field(
+                    name="AscendancyButtonPressed",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Color",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="RespcBGTop",
+                    type="ref|string",
+                ),
+                Field(
+                    name="RespcBGMiddle",
+                    type="ref|string",
+                ),
+                Field(
+                    name="RespcBGBottom",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
                 ),
             ),
         ),
@@ -36108,6 +36417,30 @@ specification = Specification(
                 Field(
                     name="Flag0",
                     type="bool",
+                ),
+            ),
+        ),
+        "brequelpassivesubtrees.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                    key="ClientStrings.dat",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                    key="ClientStrings.dat",
+                ),
+                Field(
+                    name="Key2",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
                 ),
             ),
         ),
