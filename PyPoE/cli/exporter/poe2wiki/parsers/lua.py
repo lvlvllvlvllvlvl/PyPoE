@@ -39,8 +39,11 @@ from collections import OrderedDict
 # Self
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
-from PyPoE.cli.exporter.poe2wiki.parser import BaseParser, strip_keywords
-from PyPoE.cli.exporter.poe2wiki.parsers.luaconstants import KEYWORD_LINK_MAP
+from PyPoE.cli.exporter.poe2wiki.parser import (
+    _KEYWORD_LINK_MAP,
+    BaseParser,
+    strip_keywords,
+)
 
 # =============================================================================
 # Globals
@@ -790,7 +793,7 @@ class KeywordParser(GenericLuaParser):
             keywords_lookup[row["Id"]] = row.rowid + 1
 
         # Add links
-        for key, values in KEYWORD_LINK_MAP.items():
+        for key, values in _KEYWORD_LINK_MAP.items():
             if key not in keywords_lookup:
                 console(
                     f"Links were provided for keyword '{key}', but there is no keyword with this ID",
