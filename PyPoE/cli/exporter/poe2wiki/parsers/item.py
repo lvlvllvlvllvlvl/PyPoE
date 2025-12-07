@@ -3096,23 +3096,10 @@ class ItemsParser(SkillParserShared):
         skip_warning=True,
     )
 
-    def _type_soulcore(self, infobox, base_item_type):
-        # Base SoulCores
-        if "BaseItemType" not in self.rr["SoulCores.dat64"].index:
-            self.rr["SoulCores.dat64"].build_index("BaseItemType")
-
-        try:
-            soulcore = self.rr["SoulCores.dat64"].index["BaseItemType"][base_item_type.rowid]
-        except KeyError:
-            return False
-
+    def _type_soulcore_extra(self, infobox, base_item_type, soulcores):
+        # Some have extra desc that is not in game
         if infobox.get("description"):
             infobox.pop("description")
-
-        if soulcore["RequiredLevel"]:
-            infobox["required_level"] = soulcore["RequiredLevel"]
-        else:
-            infobox.pop("required_level")
 
         sc_stat_map = [
             # stats/values key, target text key
@@ -3136,9 +3123,9 @@ class ItemsParser(SkillParserShared):
 
         results = []
         for stat_key, target in sc_stat_map:
-            if soulcore["Stats" + stat_key]:
-                stats = [s["Id"] for s in soulcore[f"Stats{stat_key}"]]
-                values = soulcore[f"StatsValues{stat_key}"]
+            if soulcores["Stats" + stat_key]:
+                stats = [s["Id"] for s in soulcores[f"Stats{stat_key}"]]
+                values = soulcores[f"StatsValues{stat_key}"]
                 stats = self._get_stats(
                     stats=stats, values=values, translation_file="stat_descriptions.txt"
                 )
@@ -3170,6 +3157,31 @@ class ItemsParser(SkillParserShared):
         infobox["description"] = "<br>".join(f"{target}: {desc}" for target, desc in results)
 
         return True
+
+    _type_soulcore = _type_factory(
+        data_file="SoulCores.dat64",
+        data_mapping=(
+            (
+                "RequiredLevel",
+                {
+                    "template": "required_level",
+                    "condition": lambda v: v > 0,
+                },
+            ),
+            (
+                "Limit",
+                {
+                    "template": "augment_limit",
+                    "condition": lambda v: v is not None,
+                    "format": lambda v: v["Text"].format(v["Limit"]) if v["Text"] else v["Limit"],
+                },
+            ),
+        ),
+        row_index=True,
+        function=_type_soulcore_extra,
+        fail_condition=True,
+        skip_warning=True,
+    )
 
     def _type_uncutgem(self, infobox, base_item_type):
         class_id = base_item_type["ItemClass"]["Id"]
@@ -3255,10 +3267,9 @@ class ItemsParser(SkillParserShared):
             _type_abyss_bones,
         ),
         "SoulCore": (
-            _type_level,
             _type_currency,
             _type_soulcore,
-        ),  # _type_level to make it in one place for all items
+        ),
         "Omen": (_type_currency,),
         "HideoutDoodad": (_type_currency, _type_hideout_doodad),
         "Microtransaction": (_type_currency, _type_microtransaction),
