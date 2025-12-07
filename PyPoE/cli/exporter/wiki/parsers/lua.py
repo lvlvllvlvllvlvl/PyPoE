@@ -37,7 +37,6 @@ import re
 from collections import OrderedDict, defaultdict
 from functools import partial
 
-from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.wiki.handler import ExporterHandler, ExporterResult
 from PyPoE.cli.exporter.wiki.parser import BaseParser, TagHandler
 
@@ -415,7 +414,7 @@ class AtlasParser(GenericLuaParser):
                     {
                         "ordinal": i,
                         "id": tier["Id"],
-                        "name": tier["Name"]
+                        "name": tier["Name"],
                     }
                     for i, tier in enumerate(self.rr["MapSeries.dat64"], 1)
                 ]
