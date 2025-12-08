@@ -396,7 +396,7 @@ class MapsParser(ItemsParser):
             return gen
 
     def _is_legacy_series(self, series_id):
-        if not f"{series_id}Tier" in self.rr["MapSeriesTiers.dat64"].specification.columns_all:
+        if f"{series_id}Tier" not in self.rr["MapSeriesTiers.dat64"].specification.columns_all:
             # If series is missing tier data, it's probably a legacy map series.
             # Otherwise, there's a problem with the dat spec.
             generation = self._get_map_generation(series_id)
@@ -686,7 +686,8 @@ class MapsParser(ItemsParser):
         latest = map_series.rowid == self.rr["MapSeries.dat64"][-1].rowid
         if not latest:
             console(
-                f"{map_series['Name']} is not the latest map series. The export will not be able to include all Atlas data.",
+                f"{map_series['Name']} is not the latest map series. " +
+                "The export will not be able to include all Atlas data.",
                 msg=Msg.warning,
             )
         console(f"Processing Atlas data for {len(maps)} maps in {map_series['Name']} series...")
