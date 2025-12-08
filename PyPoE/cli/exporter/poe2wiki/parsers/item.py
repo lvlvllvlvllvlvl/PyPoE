@@ -50,7 +50,6 @@ from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
-from PyPoE.cli.exporter.poe2wiki.parser import process_keywords, strip_keywords
 from PyPoE.cli.exporter.poe2wiki.parsers.skill import SkillParserShared
 
 # Self
@@ -2326,7 +2325,7 @@ class ItemsParser(SkillParserShared):
                 continue
             infobox[attr_long + "_percent"] = skill_gem[attr_short]
 
-        infobox["gem_tags"] = strip_keywords(
+        infobox["gem_tags"] = parser.strip_keywords(
             ", ".join([gt["Name"] for gt in gem_type["GemTags"] if gt["Name"]])
         )
 
@@ -2369,7 +2368,7 @@ class ItemsParser(SkillParserShared):
                 infobox.pop("drop_level")
 
             if gem_type["SupportText"]:
-                infobox["gem_description"] = process_keywords(gem_type["SupportText"])
+                infobox["gem_description"] = parser.process_keywords(gem_type["SupportText"])
 
         # Skip more complicated skills
         if ge["AdditionalStatSets"] or additional:
@@ -2541,7 +2540,7 @@ class ItemsParser(SkillParserShared):
                 full_result=True,
                 lang=self._language,
             )
-            infobox["buff_stat_text"] = process_keywords(
+            infobox["buff_stat_text"] = parser.process_keywords(
                 "<br>".join([parser.make_inter_wiki_links(line) for line in tr.lines])
             )
 
@@ -2674,7 +2673,7 @@ class ItemsParser(SkillParserShared):
                 {
                     "template": "help_text",
                     "condition": lambda v: v is not None,
-                    "format": lambda v: process_keywords(v["Text"]),
+                    "format": lambda v: parser.process_keywords(v["Text"]),
                 },
             ),
             (
@@ -2682,7 +2681,7 @@ class ItemsParser(SkillParserShared):
                 {
                     "template": "description",
                     "condition": lambda v: v is not None,
-                    "format": lambda v: process_keywords(v["Text"]),
+                    "format": lambda v: parser.process_keywords(v["Text"]),
                 },
             ),
         ),
@@ -2691,14 +2690,14 @@ class ItemsParser(SkillParserShared):
 
     def _currency_extra(self, infobox, base_item_type, currency):
         if infobox.get("description"):
-            infobox["description"] = process_keywords(
+            infobox["description"] = parser.process_keywords(
                 parser.parse_and_handle_description_tags(
                     rr=self.rr,
                     text=infobox["description"],
                 )
             )
         if infobox.get("help_text"):
-            infobox["help_text"] = process_keywords(
+            infobox["help_text"] = parser.process_keywords(
                 parser.parse_and_handle_description_tags(
                     rr=self.rr,
                     text=infobox["help_text"],
@@ -3003,7 +3002,7 @@ class ItemsParser(SkillParserShared):
 
         results = []
         for mod in essence_mods:
-            target = process_keywords(mod["TargetItemCategory"]["Text"])
+            target = parser.process_keywords(mod["TargetItemCategory"]["Text"])
             desc = mod["Text"]
 
             # Extract from Mod or DisplayMod if no explicit text
@@ -3014,7 +3013,7 @@ class ItemsParser(SkillParserShared):
                         desc = "<br>".join(stats)
                         break
 
-            results.append((target, process_keywords(desc)))
+            results.append((target, parser.process_keywords(desc)))
 
         # Append results to infobox
         for target, desc in results:
@@ -3040,11 +3039,12 @@ class ItemsParser(SkillParserShared):
     )
 
     # TODO:Remove: When liquid emotions mods will be supported on wiki and mods will be exported
+    # TODO: 4.0 remove this and EnchantedMod??
     def _type_liquid_emotion_extra(self, infobox, base_item_type, emotions):
         stats = self._get_stats(
             mod=emotions["EnchantedMod"], translation_file="atlas_stat_descriptions.txt"
         )
-        desc = process_keywords("<br>".join(stats))
+        desc = parser.process_keywords("<br>".join(stats))
         infobox["implicit1_text"] = "{{c|enchanted|" + desc + "}}"
 
         return True
@@ -3133,7 +3133,7 @@ class ItemsParser(SkillParserShared):
                 desc = "<br>".join(stats)
                 target = self.rr["ClientStrings.dat64"].index["Id"][target]["Text"]
 
-                results.append((process_keywords(target), process_keywords(desc)))
+                results.append((parser.process_keywords(target), parser.process_keywords(desc)))
 
         # Per class SoulCores
         if "BaseItemType" not in self.rr["SoulCoresPerClass.dat64"].index:
@@ -3151,7 +3151,7 @@ class ItemsParser(SkillParserShared):
             desc = "<br>".join(stats)
             target = sc["ItemClass"]["Name"]
 
-            results.append((target, process_keywords(desc)))
+            results.append((target, parser.process_keywords(desc)))
 
         # Append results to infobox
         infobox["description"] = "<br>".join(f"{target}: {desc}" for target, desc in results)
@@ -3478,13 +3478,13 @@ class ItemsParser(SkillParserShared):
 
         description = ot["Stack"].get("function_text")
         if description:
-            infobox["description"] = process_keywords(
+            infobox["description"] = parser.process_keywords(
                 self.rr["ClientStrings.dat64"].index["Id"][description]["Text"]
             )
 
         help_text = ot["Base"].get("description_text")
         if help_text:
-            infobox["help_text"] = infobox["help_text"] = process_keywords(
+            infobox["help_text"] = infobox["help_text"] = parser.process_keywords(
                 "<br>".join(
                     self.rr["ClientStrings.dat64"].index["Id"][help_text]["Text"].splitlines()
                 )
