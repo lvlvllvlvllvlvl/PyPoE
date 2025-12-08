@@ -3607,9 +3607,7 @@ class ItemsParser(SkillParserShared):
     def _export(self, parsed_args, items):
         classes = self._parse_class_filter(parsed_args)
         if classes:
-            items = [
-                item for item in items if item["ItemClassesKey"]["Name"] in classes
-            ]
+            items = [item for item in items if item["ItemClassesKey"]["Name"] in classes]
         else:
             items = [
                 item for item in items if item["ItemClassesKey"]["Id"] not in self._EXCLUDE_CLASSES

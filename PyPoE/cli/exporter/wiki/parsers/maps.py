@@ -35,8 +35,9 @@ import os
 import re
 import warnings
 from collections import OrderedDict
-import numpy as np
 from pathlib import Path
+
+import numpy as np
 
 # 3rd-party
 from PIL import Image
@@ -44,10 +45,10 @@ from PIL import Image
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.wiki.handler import ExporterHandler, ExporterResult
 from PyPoE.cli.exporter.wiki.parsers.item import (
-    WikiCondition,
     ItemsParser,
-    _srgb_to_linear,
+    WikiCondition,
     _linear_to_srgb,
+    _srgb_to_linear,
     _type_factory,
 )
 from PyPoE.cli.exporter.wiki.parsers.lua import LuaFormatter
@@ -59,8 +60,10 @@ from PyPoE.poe import poe1constants as constants
 # Classes
 # =============================================================================
 
+
 class MapItemWikiCondition(WikiCondition):
     NAME = "Item"
+
 
 class MapsHandler(ExporterHandler):
     def __init__(self, sub_parser, *args, **kwargs):
@@ -143,6 +146,7 @@ class MapsHandler(ExporterHandler):
             help="Filter maps in map series by internal ID",
             dest="map_series_id",
         )
+
 
 class MapsParser(ItemsParser):
 
@@ -360,7 +364,7 @@ class MapsParser(ItemsParser):
             key = re.sub(r"^.*Harbinger", "", base_item_type["Id"])
             name = f"{base_item_type['Name']} ({self._LANG[language][key]})"
         else:
-            name = base_item_type['Name']
+            name = base_item_type["Name"]
         if map_series:
             name = f"{name} ({map_series['Name']})"
         return name
@@ -403,7 +407,7 @@ class MapsParser(ItemsParser):
             if generation < constants.MAP_GENERATION.WAR_FOR_THE_ATLAS:
                 return True
             console(
-                f"Unable to locate tier data for map series ID \"{series_id}\".",
+                f'Unable to locate tier data for map series ID "{series_id}".',
                 msg=Msg.warning,
             )
         return False
@@ -427,7 +431,10 @@ class MapsParser(ItemsParser):
             if map_series.rowid < 22 and map_data["Tier"] == 17:
                 continue
             # Uber memory maps did not exist before Mercenaries series
-            if map_series.rowid < 24 and map_data["BaseItemTypesKey"]["Id"] in self._MAPS_UBER_MEMORY:
+            if (
+                map_series.rowid < 24
+                and map_data["BaseItemTypesKey"]["Id"] in self._MAPS_UBER_MEMORY
+            ):
                 continue
             if legacy:
                 maps.append(map_data)
@@ -442,9 +449,12 @@ class MapsParser(ItemsParser):
         if map_data.rowid in self.rr["MapSeriesTiers.dat64"].index["MapsKey"]:
             if (
                 map_series["Id"] in self._MAP_SERIES_TIERS_OVERRIDE
-                and map_data["BaseItemTypesKey"]["Id"] in self._MAP_SERIES_TIERS_OVERRIDE[map_series["Id"]]
+                and map_data["BaseItemTypesKey"]["Id"]
+                in self._MAP_SERIES_TIERS_OVERRIDE[map_series["Id"]]
             ):
-                tier = self._MAP_SERIES_TIERS_OVERRIDE[map_series["Id"]][map_data["BaseItemTypesKey"]["Id"]]
+                tier = self._MAP_SERIES_TIERS_OVERRIDE[map_series["Id"]][
+                    map_data["BaseItemTypesKey"]["Id"]
+                ]
             else:
                 map_series_tiers = self.rr["MapSeriesTiers.dat64"].index["MapsKey"][map_data.rowid]
                 tier = map_series_tiers["%sTier" % map_series["Id"]]
@@ -491,9 +501,11 @@ class MapsParser(ItemsParser):
                 images[name] = None
         return images
 
-    def _get_map_icon_process(self, infobox, base_item, do_coloring = False, do_compositing = False, tablet_images: dict = {}):
+    def _get_map_icon_process(
+        self, infobox, base_item, do_coloring=False, do_compositing=False, tablet_images: dict = {}
+    ):
         tier = infobox["map_tier"]
-        
+
         def process(img: Image):
             # Recolor the map icon if appropriate and layer the map icon with the base icon.
             if do_coloring:
@@ -532,6 +544,7 @@ class MapsParser(ItemsParser):
 
             img = img.crop((0, 0, 78, 78))
             return img
+
         return process
 
     def _shade_sigil(self, tex, color):
@@ -548,7 +561,7 @@ class MapsParser(ItemsParser):
         map_series = self._get_map_series(parsed_args)
         if map_series is False:
             return r
-        
+
         legacy = self._is_legacy_series(map_series["Id"])
         maps = self._get_maps_in_series(parsed_args, map_series)
         console(f"Processing {len(maps)} maps in {map_series['Name']} series...")
@@ -565,7 +578,7 @@ class MapsParser(ItemsParser):
                         msg=Msg.error,
                     )
                     return r
-            
+
                 tablet_images = self._get_map_tablet_images(parsed_args, map_series)
 
         for map_data in maps:
@@ -625,21 +638,23 @@ class MapsParser(ItemsParser):
 
                 # Warn about map with no icon
                 if not dds_file_path:
-                    warnings.warn(
-                        f'Missing 2d art inventory icon for "{base_item["Name"]}"'
-                    )
+                    warnings.warn(f'Missing 2d art inventory icon for "{base_item["Name"]}"')
                     continue
-                
+
                 map_ico = os.path.join(self._img_path, f"{icon_name} inventory icon.dds")
                 do_coloring = not legacy and base_item["Id"] not in self._MAPS_TO_SKIP_COLORING
-                do_compositing = not legacy and base_item["Id"] not in self._MAPS_TO_SKIP_COMPOSITING
+                do_compositing = (
+                    not legacy and base_item["Id"] not in self._MAPS_TO_SKIP_COMPOSITING
+                )
                 self._write_dds(
                     data=self.file_system.get_file(dds_file_path),
                     out_path=map_ico,
                     parsed_args=parsed_args,
-                    process=self._get_map_icon_process(infobox, base_item, do_coloring, do_compositing, tablet_images),
+                    process=self._get_map_icon_process(
+                        infobox, base_item, do_coloring, do_compositing, tablet_images
+                    ),
                 )
-        
+
         return r
 
     def export_map_series(self, parsed_args):
@@ -673,7 +688,7 @@ class MapsParser(ItemsParser):
         map_series = self._get_map_series(parsed_args)
         if map_series is False:
             return r
-        
+
         legacy = self._is_legacy_series(map_series["Id"])
         if legacy:
             console(
@@ -686,8 +701,8 @@ class MapsParser(ItemsParser):
         latest = map_series.rowid == self.rr["MapSeries.dat64"][-1].rowid
         if not latest:
             console(
-                f"{map_series['Name']} is not the latest map series. " +
-                "The export will not be able to include all Atlas data.",
+                f"{map_series['Name']} is not the latest map series. "
+                + "The export will not be able to include all Atlas data.",
                 msg=Msg.warning,
             )
         console(f"Processing Atlas data for {len(maps)} maps in {map_series['Name']} series...")
@@ -707,11 +722,13 @@ class MapsParser(ItemsParser):
                     # "map_base_id": map_data["BaseItemTypesKey"]["Id"],
                     "tier_0": self._get_map_series_tier(map_data, map_series),
                 }
-                
+
                 # AtlasNode.dat only contains data for latest series
                 if latest:
                     try:
-                        atlas_node = self.rr["AtlasNode.dat64"].index["WorldAreasKey"][world_area.rowid]
+                        atlas_node = self.rr["AtlasNode.dat64"].index["WorldAreasKey"][
+                            world_area.rowid
+                        ]
                     except KeyError:
                         continue
                     finally:
