@@ -718,6 +718,7 @@ class MapsParser(ItemsParser):
                 if not world_area:
                     continue
                 node_data = {
+                    "series_id": map_series["Id"],
                     "area_id": world_area["Id"],
                     # "map_base_id": map_data["BaseItemTypesKey"]["Id"],
                     "tier_0": self._get_map_series_tier(map_data, map_series),
