@@ -40,7 +40,7 @@ import os
 import re
 import struct
 import warnings
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 from dataclasses import dataclass
 from functools import partialmethod
 from pathlib import Path
@@ -55,14 +55,6 @@ from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.wiki import parser
 from PyPoE.cli.exporter.wiki.handler import ExporterHandler, ExporterResult
-from PyPoE.cli.exporter.wiki.parsers.itemconstants import (
-    MAPS_SKIP_EXPORT,
-    MAPS_OFF_ATLAS,
-    MAPS_UBER_MEMORY,
-    MAPS_TO_SKIP_COLORING,
-    MAPS_TO_SKIP_COMPOSITING,
-    MAP_SERIES_TIERS_OVERRIDE,
-)
 from PyPoE.cli.exporter.wiki.parsers.skill import SkillParserShared
 
 # Self
@@ -289,14 +281,10 @@ class ItemWikiCondition(WikiCondition):
     NAME = "Item"
 
 
-class MapItemWikiCondition(WikiCondition):
-    NAME = "Item"
-
-
 class ItemsHandler(ExporterHandler):
     def __init__(self, sub_parser, *args, **kwargs):
         super().__init__(self, sub_parser, *args, **kwargs)
-        self.parser = sub_parser.add_parser("items", help="Items Exporter")
+        self.parser = sub_parser.add_parser("items", help="Items exporter")
         self.parser.set_defaults(func=lambda args: self.parser.print_help())
         core_sub = self.parser.add_subparsers()
 
@@ -304,7 +292,7 @@ class ItemsHandler(ExporterHandler):
         # Generic base item export
         #
         item_parser = core_sub.add_parser("item", help="Regular item export")
-        item_parser.set_defaults(func=lambda args: parser.print_help())
+        item_parser.set_defaults(func=lambda args: item_parser.print_help())
         sub = item_parser.add_subparsers()
 
         self.add_default_subparser_filters(sub, cls=ItemsParser, type="item")
@@ -333,58 +321,6 @@ class ItemsHandler(ExporterHandler):
             "--filter-metadata-id",
             help="Filter by item metadata id using regular expression",
             dest="re_id",
-        )
-
-        #
-        # Maps
-        #
-        parser = core_sub.add_parser("maps", help="Maps export (Betrayal series and later)")
-        parser.set_defaults(func=lambda args: parser.print_help())
-
-        self.add_default_parsers(
-            parser=parser,
-            cls=ItemsParser,
-            func=ItemsParser.export_map,
-        )
-        self.add_image_arguments(parser)
-        self.add_map_series_parsers(parser)
-
-        parser.add_argument(
-            "name",
-            help="Visible name (i.e. the name you see in game). Can be specified multiple times.",
-            nargs="*",
-        )
-
-        #
-        # Atlas icons
-        #
-        parser = core_sub.add_parser("atlas_icons", help="Atlas icons export")
-        parser.set_defaults(func=lambda args: parser.print_help())
-
-        self.add_default_parsers(
-            parser=parser,
-            cls=ItemsParser,
-            func=ItemsParser.export_map_icons,
-        )
-        self.add_image_arguments(parser)
-        self.add_map_series_parsers(parser)
-
-    def add_map_series_parsers(self, parser):
-        group = parser.add_mutually_exclusive_group(required=False)
-        group.add_argument(
-            "-ms",
-            "--map-series",
-            "--filter-map-series",
-            help="Filter by map series name (localized)",
-            dest="map_series",
-        )
-
-        group.add_argument(
-            "-msid",
-            "--map-series-id",
-            "--filter-map-series-id",
-            help="Filter by internal map series id",
-            dest="map_series_id",
         )
 
     def add_default_parsers(self, *args, type=None, **kwargs):
@@ -449,13 +385,6 @@ class ItemsParser(SkillParserShared):
 
     # Item inventory icons are scaled down so that this is the largest dimension
     _ICON_MAX_DIMENSION = 312
-
-    _MAP_COLORS = {
-        "low tier": (248, 248, 248),
-        "mid tier": (252, 159, 14),
-        "high tier": (235, 3, 0),
-        "purple tier": (131, 54, 231),
-    }
 
     _IGNORE_DROP_LEVEL_CLASSES = (
         "HideoutDoodad",
@@ -1064,30 +993,18 @@ class ItemsParser(SkillParserShared):
 
     _LANG = {
         "English": {
-            "Low": "Low Tier",
-            "Mid": "Mid Tier",
-            "High": "High Tier",
-            "Uber": "Max Tier",
             "decoration": "%s (%s %s decoration)",
             "decoration_wounded": "%s (%s %s decoration, Wounded)",
             "of": "%s of %s",
             "descent": "Descent",
         },
         "German": {
-            "Low": "Niedrige Stufe",
-            "Mid": "Mittlere Stufe",
-            "High": "Hohe Stufe",
-            "Uber": "Maximale Stufe",
             "decoration": "%s (%s %s Dekoration)",
             "decoration_wounded": "%s (%s %s Dekoration, verletzt)",
             "of": "%s von %s",
             "descent": "Descent",
         },
         "Russian": {
-            "Low": "низкий уровень",
-            "Mid": "средний уровень",
-            "High": "высокий уровень",
-            "Uber": "максимальный уровень",
             "decoration": "%s (%s %s предмет убежища)",
             "decoration_wounded": "%s (%s %s предмет убежища, Раненый)",
             "of": "%s из %s",
@@ -2728,70 +2645,6 @@ class ItemsParser(SkillParserShared):
         row_index=True,
     )
 
-    def _maps_extra(self, infobox, base_item_type, maps):
-        if maps["Shaped_AreaLevel"] > 0:
-            infobox["map_area_level"] = maps["Shaped_AreaLevel"]
-        else:
-            infobox["map_area_level"] = maps["Regular_WorldAreasKey"]["AreaLevel"]
-
-        """# Regular items are handled in the main function
-        if maps['Tier'] < 17:
-            self._process_purchase_costs(
-                self.rr['MapPurchaseCosts.dat64'].index['Tier'][maps['Tier']],
-                infobox
-            )"""
-
-    _type_map = _type_factory(
-        data_file="Maps.dat64",
-        data_mapping=(
-            (
-                "Tier",
-                {
-                    "template": "map_tier",
-                },
-            ),
-            (
-                "Regular_GuildCharacter",
-                {
-                    "template": "map_guild_character",
-                    "condition": lambda v: v,
-                },
-            ),
-            (
-                "Regular_WorldAreasKey",
-                {
-                    "template": "map_area_id",
-                    "format": lambda v: v["Id"],
-                },
-            ),
-            (
-                "Unique_GuildCharacter",
-                {
-                    "template": "unique_map_guild_character",
-                    "condition": lambda v: v != "",
-                },
-            ),
-            (
-                "Unique_WorldAreasKey",
-                {
-                    "template": "unique_map_area_id",
-                    "format": lambda v: v["Id"],
-                    "condition": lambda v: v is not None,
-                },
-            ),
-            (
-                "Unique_WorldAreasKey",
-                {
-                    "template": "unique_map_area_level",
-                    "format": lambda v: v["AreaLevel"],
-                    "condition": lambda v: v is not None,
-                },
-            ),
-        ),
-        row_index=True,
-        function=_maps_extra,
-    )
-
     def _map_fragment_extra(self, infobox, base_item_type, map_fragment_mods):
         if map_fragment_mods["ModsKeys"]:
             i = 1
@@ -3418,7 +3271,6 @@ class ItemsParser(SkillParserShared):
         "LabyrinthTrinket": (_type_labyrinth_trinket,),
         # 'LabyrinthMapItem': (),
         # Misc
-        "Map": (_type_map,),
         "MapFragment": (_type_currency, _type_map_fragment),
         "QuestItem": (_skip_quest_contracts,),
         "AtlasRegionUpgradeItem": (),
@@ -3529,27 +3381,6 @@ class ItemsParser(SkillParserShared):
 
             return base_item_type["Name"]
 
-    def _conflict_maps(self, infobox, base_item_type, rr, language):
-        id = base_item_type["Id"].replace("Metadata/Items/Maps/", "")
-        # Legacy maps
-        map_series = None
-        for row in rr["MapSeries.dat64"]:
-            if not id.startswith(row["Id"]):
-                continue
-            map_series = row
-        # Maps are updated using the map series exporter.
-        name = self._format_map_name(base_item_type)
-
-        name_with_wonky_series = self._format_map_name(base_item_type, map_series)
-
-        # Each iteration of maps has it's own art
-        infobox["inventory_icon"] = name_with_wonky_series
-        # For betrayal map conflict handling is not used, so setting this to
-        # false here should be fine
-        infobox["drop_enabled"] = False
-
-        return name
-
     def _conflict_map_fragments(self, infobox, base_item_type, rr, language):
         return base_item_type["Name"]
 
@@ -3589,7 +3420,6 @@ class ItemsParser(SkillParserShared):
         "QuestItem": _conflict_quest_items,
         # TODO: Make a new doodad resolver that doesn't rely on 'HideoutNPCsKey'
         # 'HideoutDoodad': _conflict_hideout_doodad,
-        "Map": _conflict_maps,
         "MapFragment": _conflict_map_fragments,
         "DivinationCard": _conflict_divination_card,
         "LabyrinthMapItem": _conflict_labyrinth_map_item,
@@ -3750,7 +3580,7 @@ class ItemsParser(SkillParserShared):
                 for item in rr["BaseItemTypes.dat64"].index["Name"][name]
                 if item["Id"] not in self._skipped_items
             ]
-            if cls_id == "Map" or len(items) > 1:
+            if len(items) > 1:
                 resolver = self._conflict_resolver_map.get(cls_id)
                 if resolver:
                     name = resolver(self, infobox, base_item_type, rr, language)
@@ -3837,8 +3667,6 @@ class ItemsParser(SkillParserShared):
 
             for infobox in infoboxes:
                 # handle items with duplicate name entries
-                # Maps must be handled in any case due to unique naming style of
-                # pages
                 page = self._process_name_conflicts(infobox, base_item_type, self._language)
                 if page is None:
                     continue
@@ -4031,357 +3859,3 @@ class ItemsParser(SkillParserShared):
             console(f"Processing item with rowid {base_item_type.rowid}: {base_item_type['Name']}")
         self.num_processed = self.num_processed + 1
         return
-
-    def _format_map_name(self, base_item_type, map_series=None, language=None):
-        if language is None:
-            language = self._language
-        if "Harbinger" in base_item_type["Id"]:
-            # Resolve name conflicts between Harbinger maps
-            key = re.sub(r"^.*Harbinger", "", base_item_type["Id"])
-            name = f"{base_item_type['Name']} ({self._LANG[language][key]})"
-        else:
-            name = base_item_type['Name']
-        if map_series:
-            name = f"{name} ({map_series['Name']})"
-        return name
-
-    def _get_map_series(self, parsed_args):
-        if parsed_args.map_series_id is not None:
-            self.rr["MapSeries.dat64"].build_index("Id")
-            try:
-                map_series = self.rr["MapSeries.dat64"].index["Id"][parsed_args.map_series_id]
-            except KeyError:
-                console("Invalid map series id", msg=Msg.warning)
-                return False
-        elif parsed_args.map_series is not None:
-            self.rr["MapSeries.dat64"].build_index("Name")
-            try:
-                map_series = self.rr["MapSeries.dat64"].index["Name"][parsed_args.map_series][0]
-            except IndexError:
-                console("Invalid map series name", msg=Msg.warning)
-                return False
-        else:
-            map_series = self.rr["MapSeries.dat64"][-1]
-            console(
-                'No map series specified. Using latest series "%s".' % (map_series["Name"],),
-                msg=Msg.warning,
-            )
-        return map_series
-
-    def _get_map_generation(self, series_id):
-        for sid, gen in constants.MAP_SERIES_GENERATION_MAP.items():
-            if series_id == sid:
-                return gen
-        else:
-            return gen
-
-    def _get_map_tablet_images(self, parsed_args, map_series):
-        def process(img: Image):
-            img = img.crop((0, 0, 78, 78))
-            return img
-
-        tablet_image_map = {
-            "Base": {
-                "file": "BaseIcon_DDSFile",
-                "out": "Base.dds",
-            },
-            "Shaper": {
-                "file": "Shaper_DDSFile",
-                "out": "Shaper.dds",
-            },
-            "Purple": {
-                "file": "Purple_DDSFile",
-                "out": "Tier17.dds",
-            },
-            "UberMemory": {
-                "file": "UberMemory_DDSFile",
-                "out": "UberMemory.dds",
-            },
-        }
-
-        images = {}
-        for name, tablet in tablet_image_map.items():
-            file = map_series[tablet["file"]]
-            if file:
-                ico = os.path.join(self._img_path, tablet["out"])
-                self._write_dds(
-                    data=self.file_system.get_file(file),
-                    out_path=ico,
-                    parsed_args=parsed_args,
-                    process=process,
-                )
-                img = ico.replace(".dds", ".png")
-                images[name] = Image.open(img)
-            else:
-                images[name] = None
-        return images
-
-    def _get_map_icon_process(self, infobox, base_item, do_coloring = False, do_compositing = False, tablet_images: dict = {}):
-        tier = infobox["map_tier"]
-        
-        def process(img: Image):
-            # Recolor the map icon if appropriate and layer the map icon with the base icon.
-            if do_coloring:
-                color = None
-                if 5 < tier <= 10:
-                    color = self._MAP_COLORS["mid tier"]
-                if 10 < tier:
-                    color = self._MAP_COLORS["high tier"]
-                if 16 < tier:
-                    color = self._MAP_COLORS["purple tier"]
-
-                # This isn't quite how the game actually makes these map icons,
-                # so it isn't ideal, but it works.
-                if color:
-                    img = self._shade_sigil(img, color)
-
-            if do_compositing:
-                if base_item["Id"] in MAPS_UBER_MEMORY and tablet_images["UberMemory"]:
-                    plate_img = tablet_images["UberMemory"]
-                elif tier == 17 and tablet_images["Purple"]:
-                    plate_img = tablet_images["Purple"]
-                elif (
-                    "MapShaperInfluence" in [mod["Id"] for mod in base_item["Implicit_ModsKeys"]]
-                    and tablet_images["Shaper"]
-                ):
-                    plate_img = tablet_images["Shaper"]
-                else:
-                    plate_img = tablet_images["Base"]
-                canvas = Image.new(plate_img.mode, plate_img.size, (0, 0, 0, 0))
-                paste_origin = (
-                    (plate_img.size[0] - img.size[0]) // 2,
-                    (plate_img.size[1] - img.size[1]) // 2,
-                )
-                canvas.paste(img, paste_origin)
-                img = Image.alpha_composite(plate_img, canvas)
-
-            img = img.crop((0, 0, 78, 78))
-            return img
-        return process
-
-    def _shade_sigil(self, tex, color):
-        color = np.reshape(np.array(color + (255,)), (1, 1, 4)) / 255.0
-        samples = np.asarray(tex, np.float32) / 255.0
-        tex_colour = np.dstack((_srgb_to_linear(samples[:, :, :3]), samples[:, :, 3]))
-        final = color * tex_colour
-        final[:, :, :3] = _linear_to_srgb(final[:, :, :3])
-        return Image.fromarray(np.uint8(final * 255.0), "RGBA")
-
-    def export_map_icons(self, parsed_args):
-        r = ExporterResult()
-
-        # This needs to fall back to baseitemtype -> ItemVisualIdentity.
-        # It's failing on the weird Harbinger base map types and the shaper guardian maps.
-
-        if not parsed_args.store_images or not parsed_args.convert_images:
-            console(
-                "Image storage options must be specified for this function",
-                msg=Msg.error,
-            )
-            return r
-
-        map_series = self._get_map_series(parsed_args)
-        if map_series is False:
-            return r
-
-        # === Base map icons ===
-        self._image_init(parsed_args)
-
-        # output base icon (without map symbol) to .../Base.dds
-        base_ico = os.path.join(self._img_path, "Base.dds")
-        purple_ico = os.path.join(self._img_path, "Tier17.dds")
-
-        # read from the file path in the BaseIcon_DDSFile field from MapSeries.dat.
-        self._write_dds(
-            data=self.file_system.get_file(map_series["BaseIcon_DDSFile"]),
-            out_path=base_ico,
-            parsed_args=parsed_args,
-        )
-
-        # read from the file path in the Purple_DDSFile field from MapSeries.dat.
-        self._write_dds(
-            data=self.file_system.get_file(map_series["Purple_DDSFile"]),
-            out_path=purple_ico,
-            parsed_args=parsed_args,
-        )
-
-        # === Maps from Atlas ===
-        for atlas_node in self.rr["AtlasNode.dat64"]:
-            if not atlas_node["ItemVisualIdentityKey"]["DDSFile"]:
-                warnings.warn(
-                    "Missing 2d art inventory icon at index %s" % atlas_node.index,
-                )
-                continue
-
-            name = atlas_node["WorldAreasKey"]["Name"]
-
-            ico = os.path.join(self._img_path, name + ".dds")
-
-            self._write_dds(
-                data=self.file_system.get_file(atlas_node["ItemVisualIdentityKey"]["DDSFile"]),
-                out_path=ico,
-                parsed_args=parsed_args,
-            )
-
-            if "Unique" not in atlas_node["WorldAreasKey"]["Id"]:
-                ico = ico.replace(".dds", ".png")
-                for name, color in self._MAP_COLORS.items():
-                    ico_path = Path(ico)
-                    out_path = ico_path.with_suffix(f".{name}.png")
-                    if not os.path.isfile(ico_path):
-                        continue
-
-                    img = Image.open(ico_path)
-                    img = self._shade_sigil(img, color)
-                    img.save(out_path)
-
-        return r
-
-    def export_map(self, parsed_args):
-        r = ExporterResult()
-
-        map_series = self._get_map_series(parsed_args)
-        if map_series is False:
-            return r
-        
-        has_tier_data = True
-        if not f"{map_series['Id']}Tier" in self.rr["MapSeriesTiers.dat64"].specification.columns_all:
-            console(
-                f"Unable to locate tier data for map series ID \"{map_series['Id']}\".",
-                msg=Msg.warning,
-            )
-            has_tier_data = False
-
-        # Build list of maps to process
-        if "MapsKey" not in self.rr["MapSeriesTiers.dat64"].index:
-            self.rr["MapSeriesTiers.dat64"].build_index("MapsKey")
-        generation = self._get_map_generation(map_series["Id"])
-        names = set(parsed_args.name)
-        maps = []
-        for row in self.rr["Maps.dat64"]:
-            if row["MapGeneration"] != generation:
-                continue
-            if row["BaseItemTypesKey"]["Id"] in MAPS_SKIP_EXPORT:
-                continue
-            # Only include named maps, if filtering by name
-            if names and row["BaseItemTypesKey"]["Name"] not in names:
-                continue
-            # T17 maps did not exist before Necropolis series
-            if map_series.rowid < 22 and row["Tier"] == 17:
-                continue
-            # Uber memory maps did not exist before Mercenaries series
-            if map_series.rowid < 24 and row["BaseItemTypesKey"]["Id"] in MAPS_UBER_MEMORY:
-                continue
-            if not has_tier_data:
-                maps.append(row)
-            elif row.rowid in self.rr["MapSeriesTiers.dat64"].index["MapsKey"]:
-                map_series_tiers = self.rr["MapSeriesTiers.dat64"].index["MapsKey"][row.rowid]
-                if (
-                    map_series_tiers["%sTier" % map_series["Id"]] > 0
-                    or map_series["Id"] in MAP_SERIES_TIERS_OVERRIDE
-                    and row["BaseItemTypesKey"]["Id"] in MAP_SERIES_TIERS_OVERRIDE[map_series["Id"]]
-                ):
-                    maps.append(row)
-            elif row["BaseItemTypesKey"]["Id"] in MAPS_OFF_ATLAS:
-                maps.append(row)
-
-        console(f"Processing {len(maps)} maps in {map_series['Name']} series...")
-
-        if parsed_args.store_images:
-            self._image_init(parsed_args)
-
-            # Save off the base icons
-            tablet_images = None
-            if has_tier_data:
-                if not parsed_args.convert_images or parsed_args.convert_images != ".png":
-                    console(
-                        "Map images need to be processed and require conversion option to be '.png'.",
-                        msg=Msg.error,
-                    )
-                    return r
-            
-                tablet_images = self._get_map_tablet_images(parsed_args, map_series)
-
-        for row in maps:
-            base_item = row["BaseItemTypesKey"]
-            name = self._format_map_name(base_item)
-            name_series = self._format_map_name(base_item, map_series)
-            tier = row["Tier"]
-            if row.rowid in self.rr["MapSeriesTiers.dat64"].index["MapsKey"]:
-                if (
-                    map_series["Id"] in MAP_SERIES_TIERS_OVERRIDE
-                    and row["BaseItemTypesKey"]["Id"] in MAP_SERIES_TIERS_OVERRIDE[map_series["Id"]]
-                ):
-                    tier = MAP_SERIES_TIERS_OVERRIDE[map_series["Id"]][row["BaseItemTypesKey"]["Id"]]
-                else:
-                    map_series_tiers = self.rr["MapSeriesTiers.dat64"].index["MapsKey"][row.rowid]
-                    ms_tier = map_series_tiers["%sTier" % map_series["Id"]]
-                    if ms_tier > 0:
-                        tier = ms_tier
-
-            # Base info
-            infobox = OrderedDict()
-            self._process_base_item_type(base_item, infobox)
-            self._type_map(infobox, base_item)
-
-            # Overrides
-            infobox["map_tier"] = tier
-            infobox["map_area_level"] = 67 + tier
-            # Map start dropping at one tier lower, with the exception of
-            # tier 1 maps which can drop rather early
-            infobox["drop_level"] = 66 + tier if tier > 1 else 58
-            infobox["unique_map_area_level"] = 67 + tier
-            infobox["map_series"] = map_series["Name"]
-            if base_item["Id"] in MAPS_TO_SKIP_COMPOSITING:
-                infobox["inventory_icon"] = name
-                icon_name = name
-            else:
-                infobox["map_series_icon"] = name_series
-                icon_name = name_series
-
-            if self._language != "English" and parsed_args.english_file_link:
-                infobox["map_series_icon"] = self._format_map_name(
-                    self.rr2["BaseItemTypes.dat64"][base_item.rowid],
-                    self.rr2["MapSeries.dat64"][map_series.rowid],
-                    "English",
-                )
-
-            cond = MapItemWikiCondition(
-                data=infobox,
-                cmdargs=parsed_args,
-            )
-
-            r.add_result(
-                text=cond,
-                out_file=f"map_{name}.txt",
-                wiki_page=[
-                    {
-                        "page": name,
-                        "condition": cond,
-                    }
-                ],
-                wiki_message="Map exporter",
-            )
-
-            # Export map icon
-            if parsed_args.store_images:
-                dds_file_path = base_item["ItemVisualIdentityKey"]["DDSFile"]
-
-                # Warn about map with no icon
-                if not dds_file_path:
-                    warnings.warn(
-                        f'Missing 2d art inventory icon for "{base_item["Name"]}"'
-                    )
-                    continue
-                
-                map_ico = os.path.join(self._img_path, f"{icon_name} inventory icon.dds")
-                do_coloring = has_tier_data and base_item["Id"] not in MAPS_TO_SKIP_COLORING
-                do_compositing = has_tier_data and base_item["Id"] not in MAPS_TO_SKIP_COMPOSITING
-                self._write_dds(
-                    data=self.file_system.get_file(dds_file_path),
-                    out_path=map_ico,
-                    parsed_args=parsed_args,
-                    process=self._get_map_icon_process(infobox, base_item, do_coloring, do_compositing, tablet_images),
-                )
-        
-        return r

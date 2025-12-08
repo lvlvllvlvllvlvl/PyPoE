@@ -2708,6 +2708,7 @@ specification = Specification(
                     name="WorldAreasKey",
                     type="ref|out",
                     key="WorldAreas.dat",
+                    unique=True,
                 ),
                 Field(
                     name="ItemVisualIdentityKey",
@@ -2780,7 +2781,7 @@ specification = Specification(
                     file_ext=".dds",
                 ),
                 Field(
-                    name="Flag1",
+                    name="StartingNode",
                     type="bool",
                 ),
                 Field(
@@ -2805,6 +2806,11 @@ specification = Specification(
                 ),
                 Field(
                     name="DivCards",
+                    type="ref|list|ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="Keys0",
                     type="ref|list|ref|out",
                     key="BaseItemTypes.dat",
                 ),
