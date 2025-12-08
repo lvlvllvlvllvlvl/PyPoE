@@ -2921,6 +2921,7 @@ specification = Specification(
                     name="WorldAreasKey",
                     type="ref|out",
                     key="WorldAreas.dat",
+                    unique=True,
                 ),
                 Field(
                     name="ItemVisualIdentityKey",
@@ -2993,7 +2994,7 @@ specification = Specification(
                     file_ext=".dds",
                 ),
                 Field(
-                    name="Flag1",
+                    name="StartingNode",
                     type="bool",
                 ),
                 Field(
@@ -3018,6 +3019,11 @@ specification = Specification(
                 ),
                 Field(
                     name="DivCards",
+                    type="ref|list|ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="Keys0",
                     type="ref|list|ref|out",
                     key="BaseItemTypes.dat",
                 ),
@@ -16493,6 +16499,59 @@ specification = Specification(
                 Field(
                     name="Text",
                     type="ref|string",
+                ),
+            ),
+        ),
+        "HideoutSalvageBenchDoodads.dat": File(
+            fields=(
+                Field(
+                    name="HideoutDoodads",
+                    type="ref|out",
+                    key="HideoutDoodads.dat",
+                    unique=True,
+                ),
+                Field(
+                    name="InterfaceVisuals",
+                    type="ref|out",
+                    key="HideoutSalvageBenchInterfaceVisuals.dat",
+                    unique=True,
+                ),
+            ),
+        ),
+        "HideoutSalvageBenchInterfaceVisuals.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="BackgroundArt",
+                    type="ref|string",
+                ),
+                Field(
+                    name="HammerArt",
+                    type="ref|string",
+                ),
+                Field(
+                    name="ButtonArt",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown2",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown3",
+                    type="int",
                 ),
             ),
         ),
@@ -32194,6 +32253,11 @@ specification = Specification(
                     type="ref|out",
                     key="BaseItemTypes.dat",
                     unique=True,
+                ),
+                Field(
+                    name="StashTabAffinityId",
+                    type="ref|list|ref|out",
+                    key="StashTabAffinityId.dat",
                 ),
             ),
         ),

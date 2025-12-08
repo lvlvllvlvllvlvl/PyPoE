@@ -281,17 +281,6 @@ class WikiCondition(parser.WikiCondition):
         "quest_reward4_act",
         "quest_reward4_class_ids",
         "quest_reward4_npc",
-        # TODO:Remove: When mods will be done, temporary for jewels and some other items
-        "extra_stat1_id",
-        "extra_stat1_min",
-        "extra_stat1_max",
-        "extra_stat2_id",
-        "extra_stat2_min",
-        "extra_stat2_max",
-    )
-    COPY_MATCH = re.compile(
-        r"^(recipe|sell_price|inherent_skill[0-9]+_(?:min|max)_level|implicit[0-9]+_(?:text|random_list)).*",
-        re.UNICODE,
     )
     COPY_MATCH = re.compile(
         r"^(recipe|sell_price|inherent_skill[0-9]+_(?:min|max)_level|implicit[0-9]+_(?:text|random_list)).*",
@@ -2905,8 +2894,8 @@ class ItemsParser(SkillParserShared):
             item_type = next(
                 (
                     self._COSMETIC_ITEM_CLASS_MAP[self._language].get(
-                        i["ItemClassesKey"]["Id"],
-                        i["ItemClassesKey"]["ItemClassCategory"]["Text"] + suffix,
+                        i["ItemClass"]["Id"],
+                        i["ItemClass"]["ItemClassCategory"]["Text"] + suffix,
                     )
                     for i in (
                         item_index[target]
@@ -2914,7 +2903,7 @@ class ItemsParser(SkillParserShared):
                         or item_index[target + " Trap"]
                         or item_index["Summon " + target]
                     )
-                    if i["ItemClassesKey"] and i["ItemClassesKey"]["Id"] != "Microtransaction"
+                    if i["ItemClass"] and i["ItemClass"]["Id"] != "Microtransaction"
                 ),
                 None,
             )
@@ -3231,6 +3220,7 @@ class ItemsParser(SkillParserShared):
         "Two Hand Sword": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
         "Two Hand Axe": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
         "Two Hand Mace": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "Talisman": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
         "FishingRod": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
         "Warstaff": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
         "Spear": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
@@ -3382,8 +3372,8 @@ class ItemsParser(SkillParserShared):
         if base_item_type["Id"] in self._SKIP_ITEMS_BY_ID:
             self._skipped_items.add(base_item_type["Id"])
             return True
-        if base_item_type["ItemClassesKey"]["Id"] in self._ITEM_SKIP_PATTERNS:
-            for pattern in self._ITEM_SKIP_PATTERNS[base_item_type["ItemClassesKey"]["Id"]]:
+        if base_item_type["ItemClass"]["Id"] in self._ITEM_SKIP_PATTERNS:
+            for pattern in self._ITEM_SKIP_PATTERNS[base_item_type["ItemClass"]["Id"]]:
                 if re.search(pattern, base_item_type["Id"], flags=re.IGNORECASE):
                     self._skipped_items.add(base_item_type["Id"])
                     return True
@@ -3442,16 +3432,16 @@ class ItemsParser(SkillParserShared):
 
         # BaseItemTypes.dat
         infobox["name"] = base_item_type["Name"]
-        infobox["class_id"] = base_item_type["ItemClassesKey"]["Id"]
+        infobox["class_id"] = base_item_type["ItemClass"]["Id"]
         infobox["size_x"] = base_item_type["Width"]
         infobox["size_y"] = base_item_type["Height"]
-        if base_item_type["FlavourTextKey"]:
+        if base_item_type["FlavourText"]:
             infobox["flavour_text"] = parser.parse_and_handle_description_tags(
                 rr=self.rr,
-                text=base_item_type["FlavourTextKey"]["Text"],
+                text=base_item_type["FlavourText"]["Text"],
             )
 
-        if base_item_type["ItemClassesKey"]["Id"] not in self._IGNORE_DROP_LEVEL_CLASSES:
+        if base_item_type["ItemClass"]["Id"] not in self._IGNORE_DROP_LEVEL_CLASSES:
             if base_item_type["Id"] in self._DROP_LEVEL_BY_ID:
                 infobox["drop_level"] = self._DROP_LEVEL_BY_ID[base_item_type["Id"]]
             else:
@@ -3490,9 +3480,16 @@ class ItemsParser(SkillParserShared):
                 )
             )
 
-        # TODO:Remove: Unnote when modifiers will be done/exported
-        # for i, mod in enumerate(base_item_type["Implicit_Mods"]):
-        #    infobox["implicit%s" % (i + 1)] = mod["Id"]
+        # Prepend charm slots implicit for belts
+        if base_item_type["ItemClass"]["Id"] == "Belt":
+            if "Id" not in self.rr["Mods.dat64"].index:
+                self.rr["Mods.dat64"].build_index("Id")
+            base_item_type["Implicit_Mods"].insert(
+                0, self.rr["Mods.dat64"].index["Id"]["BeltImplicitCharmSlots3"]
+            )
+
+        for i, mod in enumerate(base_item_type["Implicit_Mods"]):
+            infobox["implicit%s" % (i + 1)] = mod["Id"]
 
     def _process_name_conflicts(self, infobox, base_item_type, language):
         rr = self.rr2 if language != self._language else self.rr
@@ -3556,7 +3553,7 @@ class ItemsParser(SkillParserShared):
     def _export(self, parsed_args, items):
         classes = self._parse_class_filter(parsed_args)
         if classes:
-            items = [item for item in items if item["ItemClassesKey"]["Name"] in classes]
+            items = [item for item in items if item["ItemClass"]["Name"] in classes]
         else:
             items = [item for item in items if item["ItemClass"]["Id"] not in self._EXCLUDE_CLASSES]
 
