@@ -43,7 +43,6 @@ import warnings
 from collections import OrderedDict
 from dataclasses import dataclass
 from functools import partialmethod
-from pathlib import Path
 
 import matplotlib.colors
 import numpy as np

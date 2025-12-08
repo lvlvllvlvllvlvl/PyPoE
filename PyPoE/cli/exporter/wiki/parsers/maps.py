@@ -35,6 +35,7 @@ import os
 import re
 from collections import OrderedDict
 import numpy as np
+from pathlib import Path
 
 # 3rd-party
 from PIL import Image
