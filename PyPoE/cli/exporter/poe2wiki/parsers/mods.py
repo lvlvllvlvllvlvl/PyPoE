@@ -38,19 +38,17 @@ FIX the jewel generator (corrupted)
 from collections import OrderedDict
 from functools import partialmethod
 
+# Self
 from PyPoE.cli.core import Msg, console
-from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
 from PyPoE.cli.exporter.poe2wiki.parser import (
     BaseParser,
     WikiCondition,
     process_keywords,
 )
-
-# Self
 from PyPoE.poe import poe2constants as constants
 from PyPoE.poe import text
-from PyPoE.shared.decorators import deprecated
+from PyPoE.poe.file.dat import DatRecord
 
 # =============================================================================
 # Globals
@@ -111,18 +109,6 @@ class ModsHandler(ExporterHandler):
             func=ModParser.filter,
         )
 
-        # Tempest
-        parser = lua_sub.add_parser(
-            "tempest",
-            help="Extract tempest stuff (DEPRECATED).",
-        )
-        self.add_default_parsers(
-            parser=parser,
-            cls=ModParser,
-            func=ModParser.tempest,
-            wiki=False,
-        )
-
     def add_default_parsers(self, *args, **kwargs):
         super().add_default_parsers(*args, **kwargs)
         parser = kwargs["parser"]
@@ -145,6 +131,43 @@ class ModParser(BaseParser):
         BaseParser._column_index_filter,
         dat_file_name="Mods.dat64",
         error_msg="Several areas have not been found:\n%s",
+    )
+
+    _COPY_KEYS = OrderedDict(
+        (
+            (
+                "Id",
+                {
+                    "template": "id",
+                },
+            ),
+            (
+                "Families",
+                {
+                    "template": "mod_groups",
+                    "condition": lambda v: v,
+                },
+            ),
+            (
+                "Domain",
+                {
+                    "template": "domain",
+                },
+            ),
+            (
+                "GenerationType",
+                {
+                    "template": "generation_type",
+                },
+            ),
+            (
+                "Level",
+                {
+                    "template": "required_level",
+                    "condition": lambda v: v > 0,
+                },
+            ),
+        )
     )
 
     def _append_effect(self, result, mylist, heading):
@@ -216,18 +239,10 @@ class ModParser(BaseParser):
         self.rr["BaseItemTypes.dat64"].build_index("Id")
 
         for mod in mods:
-            data = OrderedDict()
+            infobox = OrderedDict()
 
-            for k in (
-                ("Id", "id"),
-                ("Families", "mod_groups"),
-                ("Domain", "domain"),
-                ("GenerationType", "generation_type"),
-                ("Level", "required_level"),
-            ):
-                v = mod[k[0]]
-                if v:
-                    data[k[1]] = v
+            # Copy over simple fields from the .dat64
+            apply_column_map(infobox, self._COPY_KEYS, mod)
 
             if mod["Name"]:
                 root = text.parse_description_tags(mod["Name"])
@@ -235,26 +250,26 @@ class ModParser(BaseParser):
                 def handler(hstr, parameter):
                     return hstr if parameter == "MS" else ""
 
-                data["name"] = root.handle_tags({"if": handler, "elif": handler})
+                infobox["name"] = root.handle_tags({"if": handler, "elif": handler})
 
             # TODO: need to look into this before completely removing it.
 
             if mod["BuffTemplate"] and mod["BuffTemplate"]["BuffDefinitionsKey"]:
-                data["granted_buff_id"] = mod["BuffTemplate"]["BuffDefinitionsKey"]["Id"]
-                data["granted_buff_value"] = mod["BuffTemplate"]["AuraRadius"]
+                infobox["granted_buff_id"] = mod["BuffTemplate"]["BuffDefinitionsKey"]["Id"]
+                infobox["granted_buff_value"] = mod["BuffTemplate"]["AuraRadius"]
             # todo ID for GEPL
 
             # 3.19 Update - Lake of Kalandra
             # Parse Families to mod groups
 
             if mod["Families"]:
-                data["mod_groups"] = ", ".join([m["Id"] for m in mod["Families"]])
+                infobox["mod_groups"] = ", ".join([m["Id"] for m in mod["Families"]])
 
             if mod["GrantedEffectsPerLevelKeys"]:
-                data["granted_skill"] = ", ".join(
+                infobox["granted_skill"] = ", ".join(
                     [k["GrantedEffect"]["Id"] for k in mod["GrantedEffectsPerLevelKeys"]]
                 )
-            data["mod_type"] = mod["ModTypeKey"]["Name"]
+            infobox["mod_type"] = mod["ModTypeKey"]["Name"]
 
             stats = []
             values = []
@@ -273,50 +288,52 @@ class ModParser(BaseParser):
                 stats.append(stat)
                 values.append(value)
 
-            data["stat_text"] = process_keywords("<br>".join(self._get_stats(stats, values, mod)))
+            infobox["stat_text"] = process_keywords(
+                "<br>".join(self._get_stats(stats, values, mod))
+            )
             # if mod["BuffTemplate"] and mod["BuffTemplate"]["AuraRadius"]:
             #    radius = mod["BuffTemplate"]["AuraRadius"] / 10
-            #    data["stat_text"] = re.sub(
+            #    infobox["stat_text"] = re.sub(
             #        r"\[\[Nearby\|?([^]]*)]]",
             #        lambda match: f"{{{{Radius|{match.group(1)}|{radius}m}}}}",
-            #        data["stat_text"],
+            #        infobox["stat_text"],
             #   )
 
             for i, (sid, (vmin, vmax)) in enumerate(zip(stats, values), start=1):
-                data["stat%s_id" % i] = sid
-                data["stat%s_min" % i] = vmin
-                data["stat%s_max" % i] = vmax
+                infobox["stat%s_id" % i] = sid
+                infobox["stat%s_min" % i] = vmin
+                infobox["stat%s_max" % i] = vmax
 
             for i, tag in enumerate(mod["SpawnWeight_TagsKeys"]):
                 j = i + 1
-                data["spawn_weight%s_tag" % j] = tag["Id"]
-                data["spawn_weight%s_value" % j] = mod["SpawnWeight_Values"][i]
+                infobox["spawn_weight%s_tag" % j] = tag["Id"]
+                infobox["spawn_weight%s_value" % j] = mod["SpawnWeight_Values"][i]
 
             for i, tag in enumerate(mod["GenerationWeight_TagsKeys"]):
                 j = i + 1
-                data["generation_weight%s_tag" % j] = tag["Id"]
-                data["generation_weight%s_value" % j] = mod["GenerationWeight_Values"][i]
+                infobox["generation_weight%s_tag" % j] = tag["Id"]
+                infobox["generation_weight%s_value" % j] = mod["GenerationWeight_Values"][i]
 
             # 3.15
 
             tags = []
             for i, tag in enumerate(mod["ImplicitTagsKeys"]):
                 j = i + 1
-                # data['tag%s_tag' % j] = tag['Id']
-                # data['tag%s_value' % j] = mod['ImplicitTagsKeys'][i]
+                # infobox['tag%s_tag' % j] = tag['Id']
+                # infobox['tag%s_value' % j] = mod['ImplicitTagsKeys'][i]
                 # print(tag['Id'])
                 tags.append(tag["Id"])
             # tags = ','.join(tags)
             if tags:
-                data["tags"] = ", ".join(tags)
+                infobox["tags"] = ", ".join(tags)
 
             # 3+ tildes not allowed
             page_name = "Modifier:" + self._format_wiki_title(mod["Id"])
-            cond = ModWikiCondition(data, parsed_args)
+            cond = ModWikiCondition(infobox, parsed_args)
 
             r.add_result(
                 text=cond,
-                out_file="mod_%s.txt" % data["id"],
+                out_file="mod_%s.txt" % infobox["id"],
                 wiki_page=[
                     {"page": page_name, "condition": cond},
                 ],
@@ -325,85 +342,38 @@ class ModParser(BaseParser):
 
         return r
 
-    @deprecated(message="Will be done in-wiki in the future - non functional")
-    def tempest(self, parsed_args):
-        tf = self.tc["map_stat_descriptions.txt"]
-        data = []
-        for mod in self.rr["Mods.dat64"]:
-            # Is it a tempest mod?
-            if mod["CorrectGroup"] != "MapEclipse":
-                continue
 
-            # Doesn't have a name - probably not implemented
-            if not mod["Name"]:
-                continue
+# =============================================================================
+# Functions
+# =============================================================================
 
-            stats = []
-            for i in constants.MOD_STATS_RANGE:
-                stat = mod["StatsKey%s" % i]
-                if stat:
-                    stats.append(stat)
 
-            info = {}
-            info["name"] = mod["Name"]
-            effects = []
+def apply_column_map(
+    infobox, column_map: tuple[tuple[str, dict], ...], list_object: DatRecord | list[DatRecord]
+):
+    """
+    Copy over simple fields from the .dat64
 
-            stat_ids = [st["Id"] for st in stats]
-            stat_values = []
+    Parameters
+    ----------
+    infobox: Dictionary in which values should be added
+    column_map: Map to apply
+    list_object: File to search for keys
+    """
+    if not isinstance(list_object, DatRecord):
+        list_object = list_object[0]
 
-            for i, stat in enumerate(stats):
-                j = i + 1
-                values = [mod["Stat%sMin" % j], mod["Stat%sMax" % j]]
-                if values[0] == values[1]:
-                    values = values[0]
-                stat_values.append(values)
+    for k, data in column_map.items():
+        value = list_object[k]
 
-            try:
-                index = stat_ids.index("map_summon_exploding_buff_storms")
-            except ValueError:
-                pass
-            else:
-                # Value is incremented by 1 for some reason
-                tempest = self.rr["ExplodingStormBuffs.dat64"][stat_values[index] - 1]
+        if data.get("condition") and not data["condition"](value):
+            continue
 
-                stat_ids.pop(index)
-                stat_values.pop(index)
+        # Skip default values to reduce size of template
+        if value == data.get("default"):
+            continue
 
-                if tempest["BuffDefinitionsKey"]:
-                    tempest_stats = tempest["BuffDefinitionsKey"]["StatKeys"]
-                    tempest_values = tempest["StatValues"]
-                    tempest_stat_ids = [st["Id"] for st in tempest_stats]
-                    t = tf.get_translation(
-                        tempest_stat_ids,
-                        tempest_values,
-                        full_result=True,
-                        lang=config.get_option("language"),
-                    )
-                    self._append_effect(
-                        t, effects, "The tempest buff provides the following effects:"
-                    )
-                # if tempest['MonsterVarietiesKey']:
-                #    print(tempest['MonsterVarietiesKey'])
-                #    break
+        if data.get("format"):
+            value = data["format"](value)
 
-            t = tf.get_translation(
-                stat_ids, stat_values, full_result=True, lang=config.get_option("language")
-            )
-            self._append_effect(t, effects, "The area gets the following modifiers:")
-
-            info["effect"] = "\n".join(effects)
-            data.append(info)
-
-        data.sort(key=lambda info: info["name"])
-
-        out = []
-        for info in data:
-            out.append("|-\n")
-            out.append("| %s\n" % info["name"])
-            out.append("| %s\n" % info["effect"])
-            out.append("| \n")
-
-        r = ExporterResult()
-        r.add_result(lines=out, out_file="tempest_mods.txt")
-
-        return r
+        infobox[data["template"]] = value

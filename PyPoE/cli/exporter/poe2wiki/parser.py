@@ -56,7 +56,7 @@ import os
 import re
 import warnings
 from collections import OrderedDict
-from functools import partial
+from functools import lru_cache, partial
 
 # Python
 from hashlib import md5
@@ -100,6 +100,8 @@ __all__ = [
     "format_result_rows",
     "make_inter_wiki_links",
     "parse_and_handle_description_tags",
+    "process_keywords",
+    "strip_keywords",
 ]
 
 DEFAULT_INDENT = 32
@@ -1971,739 +1973,858 @@ def make_inter_wiki_links(string):
 
 _KEYWORD_LINK_MAP = {
     # Keyword:
-    # ("visible text", "link")
-    "Abyssalify": [
-        ("Desecrate", "Desecrate"),
-        ("", "Desecrate"),
-    ],
-    "Accuracy": [
-        ("Accuracy", "Accuracy"),
-        ("Accurate", "Accurate"),
-        ("", "Accuracy"),
-    ],
-    "Ailments": [
-        ("Ailments", "Ailments"),
-        ("Ailment", "Ailment"),
-        ("", "Ailment"),
-    ],
-    "AilmentSpread": [
-        ("Spread", "Spread"),
-        ("", "Spread"),
-    ],
-    "AilmentThreshold": [
-        ("Ailment Threshold", "Ailment Threshold"),
-        ("", "Ailment"),
-    ],
-    "Allies": [
-        ("Allies", "Allies"),
-        ("Allied", "Allied"),
-        ("", "Allies"),
-    ],
-    "AncestralBoost": [
-        ("Ancestrally Boosted", "Ancestrally Boosted"),
-        ("Ancestral Boost", "Ancestral Boost"),
-        ("", "Ancestral Boost"),
-    ],
-    "ArcaneSurge": [
-        ("Arcane Surge", "Arcane Surge"),
-        ("", "Arcane Surge"),
-    ],
-    "Archon": [
-        ("Archon", "Archon"),
-        ("", "Archon"),
-    ],
-    "ArmourBreak": [
-        ("Armour Break", "Armour Break"),
-        ("Armour Broken", "Armour Broken"),
-        ("Break Armour", "Break Armour"),
-        ("Breaks Armour", "Breaks Armour"),
-        ("Breaking Armour", "Breaking Armour"),
-        ("Broken Armour", "Broken Armour"),
-        ("Fully Armour Broken", "Fully Armour Broken"),
-        ("Fully Break", "Fully Break"),
-        ("Fully Broken Armour", "Fully Broken Armour"),
-        ("Fully Breaking Armour", "Fully Breaking Armour"),
-        ("Fully Broken", "Fully Broken"),
-        ("Break", "Break"),
-        ("", "Armour Break"),
-    ],
-    "ArmouredShield": [
-        ("Armoured Shield", "Shield"),
-        ("", "Shield"),
-    ],
-    "ArtificersOrb": [
-        ("Artificer's Orb", "Artificer's Orb"),
-        ("", "Artificer's Orb"),
-    ],
-    "Attributes": [
-        ("Attributes", "Attributes"),
-        ("attributes", "attributes"),
-        ("Attribute", "Attribute"),
-        ("attribute", "attribute"),
-        ("", "Attribute"),
-    ],
-    "AzmeriSpirit": [
-        ("Azmeri Spirit", "Azmeri Spirit"),
-        ("", "Azmeri Spirit"),
-    ],
-    "Bleeding": [
-        ("Bleeding", "Bleeding"),
-        ("Bleed", "Bleed"),
-        ("", "Bleed"),
-    ],
-    "BloodLoss": [
-        ("Blood Loss", "Blood Loss"),
-        ("", "Blood Loss"),
-    ],
-    "BooleanDamageRoll": [
-        ("", "Damage"),
-    ],
-    "BrokenStance": [
-        ("Broken Stance", "Broken Stance"),
-        ("", "Broken Stance"),
-    ],
-    "BuffEffect": [
-        ("", "Buff"),
-    ],
-    "BuffMagnitude": [
-        ("Magnitude", "Magnitude"),
-        ("", "Magnitude"),
-    ],
-    "Burning": [
-        ("Burning", "Burning"),
-        ("Burn", "Burn"),
-        ("", "Burn"),
-    ],
-    "Channelling": [
-        ("Channelled", "Channelled"),
-        ("Channelling", "Channelling"),
-        ("Channel", "Channelling"),
-        ("", "Channelling"),
-    ],
-    "ChaosOrb": [
-        ("ChaosOrb", "Chaos Orb"),
-        ("", "Chaos Orb"),
-    ],
-    "Charges": [
-        ("Power Charges", "Power Charges"),
-        ("Power Charge", "Power Charge"),
-        ("Frenzy Charges", "Frenzy Charges"),
-        ("Frenzy Charge", "Frenzy Charge"),
-        ("Endurance Charges", "Endurance Charges"),
-        ("Endurance Charge", "Endurance Charge"),
-        ("Charges", "Charges"),
-        ("Charge", "Charge"),
-        ("", "Charge"),
-    ],
-    "ChilledGround": [
-        ("Chilled Ground", "Chilled Ground"),
-        ("", "Chilled Ground"),
-    ],
-    "Conditional": [
-        ("Condition", "Condition"),
-        ("", "Condition"),
-    ],
-    "ConsecratedGround": [
-        ("Consecrated Ground", "Consecrated Ground"),
-        ("", "Consecrated Ground"),
-    ],
-    "ContainsDelirium": [
-        ("Delirium", "Delirium"),
-        ("", "Delirium"),
-    ],
-    "CooldownRecovery": [
-        ("Cooldown Recovery Rate", "Cooldown Recovery Rate"),
-        ("Cooldowns Recover", "Cooldowns Recover"),
-        ("", "Cooldown"),
-    ],
-    "CorruptedBlood": [
-        ("Corrupted Blood", "Corrupted Blood"),
-        ("", "Corrupted Blood"),
-    ],
-    "Conversion": [
-        ("Conversion", "Conversion"),
-        ("", "Conversion"),
-    ],
-    "Critical": [
-        ("Critical Hit Chance", "Critical Hit Chance"),
-        ("Critically Hit", "Critically Hit"),
-        ("Critically hit", "Critically hit"),
-        ("Critical Hit", "Critical Hit"),
-        ("Critical hit", "Critical hit"),
-        ("Critical", "Critical"),
-        ("", "Critical"),
-    ],
-    "CriticalDamageBonus": [
-        ("Critical Damage Bonus", "Critical Damage Bonus"),
-        ("", "Critical Damage Bonus"),
-    ],
-    "CriticalWeakness": [
-        ("Critical Weakness", "Critical Weakness"),
-        ("", "Critical Weakness"),
-    ],
-    "CrushingBlow": [
-        ("Crushing Blow", "Crushing Blow"),
-        ("", "Crushing Blow"),
-    ],
-    "CullingStrike": [
-        ("Culling Strike", "Culling Strike"),
-        ("Culling strike", "Culling strike"),
-        ("Cull", "Cull"),
-        ("", "Cull"),
-    ],
-    "DamageTypes": [
-        ("Damage Types", "Damage Types"),
-        ("Damage types", "Damage types"),
-        ("Damage Type", "Damage Type"),
-        ("Damage type", "Damage type"),
-        ("", "Damage Type"),
-    ],
-    "DamagingAilments": [
-        ("Damaging Ailments", "Damaging Ailments"),
-        ("Damaging Ailment", "Damaging Ailment"),
-        ("", "Damaging Ailment"),
-    ],
-    "Defences": [
-        ("Defences", "Defences"),
-        ("Defence", "Defence"),
-        ("", "Defence"),
-    ],
-    "DetonationTime": [
-        ("Detonation Time", "Detonation Time"),
-        ("Detonation", "Detonation"),
-        ("Detonate", "Detonate"),
-        ("", "Detonate"),
-    ],
-    "DistilledEmotion": [
-        ("Liquid Emotion", "Liquid Emotion"),
-        ("", "Liquid Emotion"),
-    ],
-    "DualWield": [
-        ("Dual Wielding", "Dual Wielding"),
-        ("", "Dual Wielding"),
-    ],
-    "EasyTargetDebuff": [
-        ("Easy Target", "Easy Target"),
-        ("", "Easy Target"),
-    ],
-    "ElementalAilments": [
-        ("Elemental Ailment", "Elemental Ailment"),
-        ("Elemental ailment", "Elemental ailment"),
-        ("Ailment", "Elemental ailment"),
-        ("", "Elemental ailment"),
-    ],
-    "ElementalDamage": [
-        ("Elemental Hit Damage", "Elemental Hit Damage"),
-        ("Elemental Damage", "Elemental Damage"),
-        ("Elemental damage", "Elemental damage"),
-        ("Elemental", "Elemental"),
-        ("", "Elemental"),
-    ],
-    "ElementalGround": [
-        ("Elemental Ground Surfaces", "Elemental Ground Surfaces"),
-        ("", "Ground effect"),
-    ],
-    "ElementalInfusion": [
-        ("Elemental Infusion", "Elemental Infusion"),
-        ("Infusion", "Infusion"),
-        ("Infused", "Infused"),
-        ("", "Infusion"),
-    ],
-    "Empowered": [
-        ("Empowered", "Empowered"),
-        ("Empower", "Empower"),
-        ("", "Empower"),
-    ],
-    "EnergyShield": [
-        ("Energy Shield", "Energy Shield"),
-        ("", "Energy Shield"),
-    ],
-    "EnergyShieldLeech": [
-        ("Energy Shield Leech", "Energy Shield Leech"),
-        ("Leech Energy Shield", "Leech Energy Shield"),
-        ("Leech", "Leech"),
-        ("", "Leech"),
-    ],
-    "EquipArmour": [
-        ("", "Armour (equipment)"),
-    ],
-    "ESRecharge": [
-        ("Energy Shield Recharge", "Energy Shield Recharge"),
-        ("", "Energy Shield"),
-    ],
-    "ESRechargeRate": [
-        ("Energy Shield Recharge Rate", "Energy Shield Recharge Rate"),
-        ("", "Energy Shield"),
-    ],
-    "Evasion": [
-        ("Evasion Rating", "Evasion Rating"),
-        ("", "Evasion"),
-    ],
-    "ExpectedKnockback": [
-        ("", "Knockback"),
-    ],
-    "Exposure": [
-        ("", "Exposure"),
-    ],
-    "FasterESRechargeStart": [
-        ("", "Energy Shield"),
-    ],
-    "FinalStrike": [
-        ("Final Strike", "Final Strike"),
-        ("", "Final Strike"),
-    ],
-    "Flask": [
-        ("Flask", "Flask"),
-        ("flask", "flask"),
-        ("", "Flask"),
-    ],
-    "FlameArchon": [
-        ("Flame Archon", "Flame Archon"),
-        ("", "Flame Archon"),
-    ],
-    "FlamesOfChayula": [
-        ("Flames Of Chayula", "Flames Of Chayula"),
-        ("Flames of Chayula", "Flames of Chayula"),
-        ("Flame Of Chayula", "Flame Of Chayula"),
-        ("Flame of Chayula", "Flame of Chayula"),
-        ("", "Flame Of Chayula"),
-    ],
-    "ForksCrit": [
-        ("", "Critical"),
-    ],
-    "Freeze": [
-        ("Freezing", "Freezing"),
-        ("", "Freeze"),
-    ],
-    "HeavyStun": [
-        ("Heavily Stun", "Heavily Stun"),
-        ("Heavy Stun", "Heavy Stun"),
-        ("", "Heavy Stun"),
-    ],
-    "HeavyStunPlayer": [
-        ("Heavily Stun", "Heavily Stun"),
-        ("Heavy Stun", "Heavy Stun"),
-        ("", "Heavy Stun"),
-    ],
-    "HitDamage": [
-        ("Damaging Hit", "Damaging Hit"),
-        ("Damaging hit", "Damaging hit"),
-        ("Hit Damage", "Hit Damage"),
-        ("Hit", "Hit"),
-        ("", "Hit"),
-    ],
-    "IceArchon": [
-        ("Ice Archon", "Ice Archon"),
-        ("", "Ice Archon"),
-    ],
-    "IceCrystals": [
-        ("Ice Crystal", "Ice Crystal"),
-        ("", "Ice Crystal"),
-    ],
-    "IceFragment": [
-        ("Ice Fragment", "Ice Fragment"),
-        ("", "Ice Fragment"),
-    ],
-    "Ignite": [
-        ("Igniting", "Igniting"),
-        ("", "Ignite"),
-    ],
-    "IgnitedGround": [
-        ("Ignited Ground", "Ignited Ground"),
-        ("", "Ignited Ground"),
-    ],
-    "IgnoreResistances": [
-        ("", "Resistance"),
-    ],
-    "Invoke": [
-        ("Invoking", "Invoking"),
-        ("", "Invoke"),
-    ],
-    "ItemDefences": [
-        ("", "Defences"),
-    ],
-    "ItemRarity": [
-        ("Normal", "Normal"),
-        ("Rare", "Rare"),
-        ("Magic", "Magic"),
-        ("Unique", "Unique"),
-        ("", "Rarity"),
-    ],
-    "JaggedGround": [
-        ("Jagged Ground", "Jagged Ground"),
-        ("", "Jagged Ground"),
-    ],
-    "KillingBlow": [
-        ("Killing Blow", "Killing Blow"),
-        ("Kill", "Kill"),
-        ("", "Kill"),
-    ],
-    "Knockback": [
-        ("Knocking Back", "Knocking Back"),
-        ("Knock Back", "Knock Back"),
-        ("Knock back", "Knock back"),
-        ("", "Knockback"),
-    ],
-    "LifeLeech": [
-        ("Life Leech", "Life Leech"),
-        ("Leech Life", "Leech Life"),
-        ("Leech", "Leech"),
-        ("", "Leech"),
-    ],
-    "LifeLoss": [
-        ("", "Life Loss"),
-    ],
-    "LightningAilment": [
-        ("Lightning Ailment", "Lightning Ailment"),
-        ("Lightning ailment", "Lightning ailment"),
-        ("", "Lightning Ailment"),
-    ],
-    "LightningArchon": [
-        ("Lightning Archon", "Lightning Archon"),
-        ("", "Lightning Archon"),
-    ],
-    "LightStun": [
-        ("Light Stun", "Light Stun"),
-        ("", "Stun"),
-    ],
-    "LowLife": [
-        ("Low Life", "Low Life"),
-        ("", "Low Life"),
-    ],
-    "ManaLeech": [
-        ("Mana Leech", "Mana Leech"),
-        ("Leech Mana", "Leech Mana"),
-        ("Leech", "Leech"),
-        ("", "Leech"),
-    ],
-    "MarkofAbyssalLord": [
-        ("Mark of the Abyssal Lord", "Mark of the Abyssal Lord"),
-        ("", "Mark of the Abyssal Lord"),
-    ],
-    "MartialWeapon": [
-        ("Martial Weapon", "Martial Weapon"),
-        ("Martial weapon", "Martial weapon"),
-        ("martial weapon", "martial weapon"),
-        ("", "Martial Weapon"),
-    ],
-    "MaximumResistances": [
-        ("Maximum Fire Resistance", "Maximum Fire Resistance"),
-        ("Maximum Cold Resistance", "Maximum Cold Resistance"),
-        ("Maximum Lightning Resistance", "Maximum Lightning Resistance"),
-        ("Maximum Chaos Resistance", "Maximum Chaos Resistance"),
-        ("Maximum Resistance", "Maximum Resistance"),
-        ("", "Maximum Resistance"),
-    ],
-    "MinionDeath": [
-        ("", "Minion death"),
-    ],
-    "MoltenFissure": [
-        ("Molten Fissure", "Molten Fissure"),
-        ("", "Molten Fissure"),
-    ],
-    "MonsterCategory": [
-        ("Monster category", "Monster category"),
-        ("", "Monster category"),
-    ],
-    "MonsterModifiers": [
-        ("Modifier", "Modifier"),
-        ("", "Modifier"),
-    ],
-    "NonDamagingAilments": [
-        ("Non-Damaging Ailment", "Non-Damaging Ailment"),
-        ("", "Ailment"),
-    ],
-    "OilGround": [
-        ("Oil Ground", "Oil Ground"),
-        ("", "Oil Ground"),
-    ],
-    "OrbOfAlchemy": [
-        ("Orb of Alchemy", "Orb of Alchemy"),
-        ("", "Orb of Alchemy"),
-    ],
-    "OrbOfAlteration": [
-        ("Orb of Alteration", "Orb of Alteration"),
-        ("", "Orb of Alteration"),
-    ],
-    "OrbOfChance": [
-        ("Orb of Chance", "Orb of Chance"),
-        ("", "Orb of Chance"),
-    ],
-    "OrbOfTransmutation": [
-        ("Orb of Transmutation", "Orb of Transmutation"),
-        ("", "Orb of Transmutation"),
-    ],
-    "OvercapChance": [
-        ("Overcap Chance", "Overcap Chance"),
-        ("", "Overcap chance"),
-    ],
-    "OvercappedBlock": [
-        ("", "Block"),
-    ],
-    "ParriedDebuff": [
-        ("Parried Debuff", "Parried Debuff"),
-        ("Parried", "Parried"),
-        ("", "Parried"),
-    ],
-    "Penetration": [
-        ("Penetrate", "Penetrate"),
-        ("", "Penetrate"),
-    ],
-    "PerfectionBuff": [
-        ("Perfection Buff", "Perfection Buff"),
-        ("", "Perfection Buff"),
-    ],
-    "PerfectTiming": [
-        ("Perfect Timing", "Perfect Timing"),
-        ("Perfectly Timing", "Perfectly Timing"),
-        ("", "Perfect Timing"),
-    ],
-    "Physical": [
-        ("Physical", "Physical"),
-        ("Physical Damage", "Physical Damage"),
-        ("", "Physical"),
-    ],
-    "PlayerPossessed": [
-        ("", "Azmerian wisp"),
-    ],
-    "PrecursorTablet": [
-        ("Precursor Tablets", "Precursor Tablets"),
-        ("Precursor tablets", "Precursor tablets"),
-        ("Precursor Tablet", "Precursor Tablet"),
-        ("Precursor tablet", "Precursor tablet"),
-        ("", "Precursor tablet"),
-    ],
-    "PrimedElectrocution": [
-        ("Primed for Electrocution", "Primed for Electrocution"),
-        ("", "Primed for Electrocution"),
-    ],
-    "PrimedFreeze": [
-        ("Primed for Electrocution", "Primed for Freeze"),
-        ("", "Primed for Freeze"),
-    ],
-    "PrimedPin": [
-        ("Primed for Pin", "Primed for Pin"),
-        ("", "Primed for Pin"),
-    ],
-    "PrimedStun": [
-        ("Primed for Stun", "Primed for Stun"),
-        ("", "Primed for Stun"),
-    ],
-    "PurpleFlamesOfChayula": [
-        ("Purple Flames of Chayul", "Purple Flames of Chayula"),
-        ("", "Purple Flames of Chayula"),
-    ],
-    "Quality": [
-        ("Quality", "Quality"),
-        ("quality", "quality"),
-        ("", "Quality"),
-    ],
-    "RageLeech": [
-        ("Rage Leech", "Rage Leech"),
-        ("Leech Rage", "Leech Rage"),
-        ("Leech", "Leech"),
-        ("", "Leech"),
-    ],
-    "Rarity": [
-        ("Normal", "Normal"),
-        ("Rare", "Rare"),
-        ("Magic", "Magic"),
-        ("Unique", "Unique"),
-        ("", "Rarity"),
-    ],
-    "RegalOrb": [
-        ("Regal Orb", "Regal Orb"),
-        ("", "Regal Orb"),
-    ],
-    "Resistances": [
-        ("Elemental Resistances", "Elemental Resistances"),
-        ("Elemental Resistance", "Elemental Resistance"),
-        ("Fire Resistance", "Fire Resistance"),
-        ("Cold Resistance", "Cold Resistance"),
-        ("Lightning Resistance", "Lightning Resistance"),
-        ("Chaos Resistance", "Chaos Resistance"),
-        ("Resistances", "Resistances"),
-        ("Resistance", "Resistance"),
-        ("", "Resistance"),
-    ],
-    "ResistedBy": [
-        ("", "Resistance"),
-    ],
-    "Resonance": [
-        ("Resonance", "Resonance (buff)"),
-        ("", "Resonance (buff)"),
-    ],
-    "Reviving": [
-        ("Reviving", "Reviving"),
-        ("Revived", "Revived"),
-        ("", "Revived"),
-    ],
-    "RivenArmour": [
-        ("Riven Armour", "Riven Armour"),
-        ("", "Riven Armour"),
-    ],
-    "RogueExile": [
-        ("Rogue Exile", "Rogue Exile"),
-        ("", "Rogue Exile"),
-    ],
-    "RunicInscription": [
-        ("Runic Inscriptions", "Runic Inscriptions"),
-        ("", "Runic Inscriptions"),
-    ],
-    "ShockedGround": [
-        ("Shocked Ground", "Shocked Ground"),
-        ("", "Shocked Ground"),
-    ],
-    "SkillSpeed": [
-        ("Skill Speed", "Skill Speed"),
-        ("", "Skill Speed"),
-    ],
-    "SoulEater": [
-        ("Soul Eater", "Soul Eater"),
-        ("", "Soul Eater"),
-    ],
-    "SoulEaterMonster": [
-        ("Soul Eater", "Soul Eater"),
-        ("", "Soul Eater"),
-    ],
-    "SpiritOfTheBearPossessedPlayer": [
-        ("", "Azmerian wisp"),
-    ],
-    "SpiritOfTheBoarPossessedPlayer": [
-        ("", "Azmerian wisp"),
-    ],
-    "SpiritOfTheCatPossessedPlayer": [
-        ("", "Azmerian wisp"),
-    ],
-    "SpiritOfTheOwlPossessedPlayer": [
-        ("", "Azmerian wisp"),
-    ],
-    "SpiritOfTheOxPossessedPlayer": [
-        ("", "Azmerian wisp"),
-    ],
-    "SpiritOfTheSerpentPossessedPlayer": [
-        ("", "Azmerian wisp"),
-    ],
-    "SpiritOfTheStagPossessedPlayer": [
-        ("", "Azmerian wisp"),
-    ],
-    "SpiritOfTheWolfPossessedPlayer": [
-        ("", "Azmerian wisp"),
-    ],
-    "StatConversion": [
-        ("Convert", "Convert"),
-        ("", "Conversion"),
-    ],
-    "StatGain": [
-        ("Gain", "Gain"),
-        ("", "Gain"),
-    ],
-    "StunThreshold": [
-        ("Stun Threshold", "Stun Threshold"),
-        ("", "Stun Threshold"),
-    ],
-    "SunderedArmour": [
-        ("Sundered Armour", "Sundered Armour"),
-        ("", "Sundered Armour"),
-    ],
-    "ThornsRetaliation": [
-        ("Retaliate with Thorns", "Thorns"),
-        ("", "Thorns"),
-    ],
-    "TotalPlus": [
-        ("", "Total"),
-    ],
-    "UnboundFury": [
-        ("Unbound Fury", "Unbound Fury"),
-        ("", "Unbound Fury"),
-    ],
-    "UnholyMight": [
-        ("Unholy Might", "Unholy Might"),
-        ("", "Unholy Might"),
-    ],
-    "Warcry": [
-        ("Warcry", "Warcry"),
-        ("Warcries", "Warcries"),
-        ("", "Warcry"),
-    ],
-    "WeaponSetPassiveSkillPoints": [
-        ("Weapon Set Passive Skill Points", "Weapon Set Passive Skill Points"),
-        ("", "Weapon set#Weapon set passive skill points"),
-    ],
-    "WeaponSets": [
-        ("Weapon Sets", "Weapon Sets"),
-        ("Weapon Set", "Weapon Set"),
-        ("", "Weapon Set"),
-    ],
-    "Wells": [
-        ("Well", "Well"),
-        ("", "Well"),
-    ],
-    "Withered": [
-        ("Withered", "Withered"),
-        ("Wither", "Wither"),
-        ("", "Wither"),
-    ],
-    "WitheringGround": [
-        ("Withering Ground", "Withering Ground"),
-        ("", "Withering Ground"),
-    ],
+    #   default (string): Replace the default link that is the title by default.
+    #   links (list): Optional links can be either strings or tuples ("text to check", "link").
+    #   A tuple is useful for linking to sections on a page.
+    #   no_link (bool): Wheter keyword should not be linked to anywhere.
+    # "keywordId": {
+    #    "default": "",
+    #    "links": [
+    #    ]
+    # },
+    #
+    # Note: Case matter and order in links matter.
+    "Abyssalify": {
+        "default": "Desecrated modifier",
+        "links": [
+            "Desecrate",
+        ],
+    },
+    "Accuracy": {
+        "links": [
+            "Accurate",
+        ],
+    },
+    "Ailments": {
+        "default": "Ailment",
+        "links": [
+            "Ailments",
+        ],
+    },
+    "AilmentSpread": {
+        "default": "Spread",
+    },
+    "AilmentThreshold": {
+        "default": "Ailment",
+        "links": [
+            "Ailment Threshold",
+        ],
+    },
+    "Allies": {
+        "default": "Ally",
+        "links": [
+            "Allied",
+            "Allies",
+        ],
+    },
+    "AncestralBoost": {
+        "links": [
+            "Ancestrally Boosted",
+        ],
+    },
+    "ArcaneSurge": {},
+    "Archon": {
+        "default": "Archon",
+    },
+    "ArmourBreak": {
+        "links": [
+            "Armour Break",
+            "Armour Broken",
+            "Break Armour",
+            "Breaks Armour",
+            "Breaking Armour",
+            "Broken Armour",
+            "Fully Armour Broken",
+            "Fully Break",
+            "Fully Broken Armour",
+            "Fully Breaking Armour",
+            "Fully Broken",
+            "Break",
+        ],
+    },
+    "ArmourOverbreak": {
+        "default": "Armour Break",
+    },
+    "ArmouredShield": {
+        "default": "Shield",
+        "links": [
+            "Armoured Shield",
+        ],
+    },
+    "ArtificersOrb": {},
+    "Attributes": {
+        "default": "Attribute",
+        "links": [
+            "attribute",
+            "Attributes",
+            "attributes",
+        ],
+    },
+    "AzmeriSpirit": {
+        "default": "Azmerian wisp",
+        "links": [
+            "Azmeri Spirit",
+        ],
+    },
+    "Bleeding": {
+        "default": "Bleed",
+        "links": [
+            "Bleeding",
+        ],
+    },
+    "BloodLoss": {},
+    "BlueFlamesOfChayula": {
+        "default": "Blue Flame of Chayula",
+        "links": [
+            "Blue Flames of Chayula",
+        ],
+    },
+    "BooleanDamageRoll": {
+        "default": "Damage",
+    },
+    "BrokenStance": {},
+    "BuffEffect": {
+        "default": "Buff",
+    },
+    "BuffMagnitude": {
+        "default": "Magnitude",
+    },
+    "Burning": {
+        "default": "Ignite",
+        "links": [
+            "Burn",
+            "Burning",
+        ],
+    },
+    "Channelling": {
+        "links": [
+            "Channelled",
+        ],
+    },
+    "ChaosOrb": {},
+    "Charges": {
+        "default": "Charge",
+        "links": [
+            "Charges",
+            "Endurance Charge",
+            "Endurance Charges",
+            "Frenzy Charge",
+            "Frenzy Charges",
+            "Power Charge",
+            "Power Charges",
+        ],
+    },
+    "ChilledGround": {},
+    "Conditional": {
+        "default": "Conditional",
+        "links": [
+            "Condition",
+        ],
+    },
+    "ConsecratedGround": {},
+    "ContainsAbyss": {},
+    "ContainsBreach": {},
+    "ContainsDelirium": {},
+    "ContainsExpedition": {},
+    "ContainsIrradiated": {},
+    "ContainsRitual": {},
+    "CooldownRecovery": {
+        "default": "Cooldown",
+        "links": [
+            "Cooldown Recovery Rate",
+            "Cooldowns Recover",
+        ],
+    },
+    "CorruptedBlood": {},
+    "Conversion": {
+        "default": "Damage conversion",
+        "links": [
+            "Damage Conversion",
+        ],
+    },
+    "Critical": {
+        "default": "Critical hit",
+        "links": [
+            "Critical",
+            "Critical Hit",
+            "Critical Hits",
+            "Critical hits",
+            "Critical Hit Chance",
+            "Critically Hit",
+            "Critically hit",
+        ],
+    },
+    "CriticalDamageBonus": {},
+    "CriticalWeakness": {},
+    "CrushingBlow": {
+        "links": [
+            "Crushing Blow",
+        ],
+    },
+    "CullingStrike": {
+        "default": "Culling strike",
+        "links": [
+            "Cull",
+            "Culling Strike",
+        ],
+    },
+    "Curse": {
+        "default": "Curse",
+        "links": [
+            "Curses",
+        ],
+    },
+    "DamageTypes": {
+        "default": "Damage type",
+        "links": [
+            "Damage Type",
+            "Damage Types",
+            "Damage types",
+        ],
+    },
+    "DamagingAilments": {
+        "links": [
+            "Damaging Ailment",
+        ],
+    },
+    "Defences": {
+        "default": "Defence",
+        "links": [
+            "Defences",
+        ],
+    },
+    "DetonationTime": {
+        "links": [
+            "Detonate",
+            "Detonation",
+        ],
+    },
+    "DistilledEmotion": {
+        "default": "Liquid emotion",
+        "links": [
+            "Liquid Emotion",
+            "Liquid Emotions",
+        ],
+    },
+    "DualWield": {
+        "default": "Dual wielding",
+        "links": [
+            "Dual Wielding",
+        ],
+    },
+    "EasyTargetDebuff": {},
+    "ElementalAilments": {
+        "default": "Elemental ailment",
+        "links": [
+            "Ailment",
+            "Elemental Ailment",
+        ],
+    },
+    "ElementalDamage": {
+        "default": "Elemental damage",
+        "links": [
+            "Elemental",
+            "Elemental Damage",
+            "Elemental Hit Damage",
+        ],
+    },
+    "ElementalGround": {
+        "default": "Ground surface",
+        "links": [
+            "Elemental Ground Surfaces",
+        ],
+    },
+    "ElementalInfusion": {
+        "default": "Infusion",
+        "links": [
+            "Elemental Infusion",
+            "Infused",
+        ],
+    },
+    "Empowered": {
+        "default": "Empowered skill",
+        "links": [
+            "Empower",
+            "Empowered",
+            "Empowered Skills",
+        ],
+    },
+    "EnergyShield": {},
+    "EnergyShieldLeech": {
+        "default": "Energy shield leech",
+        "links": [
+            "Energy Shield Leech",
+            "Energy Shield leech",
+            "Leech Energy Shield",
+            "Leech",
+        ],
+    },
+    "EquipArmour": {
+        "default": "Armour (equipment)",
+        "links": [
+            "Equippable Armour",
+            "Equippable Armours",
+        ],
+    },
+    "ESRecharge": {
+        "default": "Energy Shield",
+        "links": [
+            "Energy Shield Recharge",
+        ],
+    },
+    "ESRechargeRate": {
+        "default": "Energy Shield",
+        "links": [
+            "Energy Shield Recharge Rate",
+        ],
+    },
+    "Essence": {
+        "default": "Essence (encounter)",
+    },
+    "Evasion": {
+        "links": [
+            "Evasion Rating",
+        ],
+    },
+    "ExpectedKnockback": {
+        "links": [
+            "Expected knockback",
+        ],
+    },
+    "Exposure": {},
+    "FasterESRechargeStart": {
+        "default": "Energy Shield",
+        "links": [
+            "Faster Start of Energy Shield Recharge",
+        ],
+    },
+    "FinalStrike": {},
+    "Flask": {
+        "default": "Flask",
+        "links": [
+            "flask",
+            "Flasks",
+            "flasks",
+        ],
+    },
+    "FlameArchon": {
+        "default": "Archon",
+        "links": [
+            "Flame Archon",
+        ],
+    },
+    "FlamesOfChayula": {
+        "links": [
+            "Flame Of Chayula",
+            "Flames Of Chayula",
+            "Flames of Chayula",
+        ],
+    },
+    "ForksCrit": {
+        "default": "Tangletongue",  # unique
+    },
+    "Freeze": {
+        "links": [
+            "Freezing",
+        ],
+    },
+    "HeavyStun": {
+        "links": [
+            "Heavily Stun",
+            "Heavily Stuned",
+        ],
+    },
+    "HeavyStunPlayer": {
+        "default": "Heavy Stun",
+        "links": [
+            "Heavily Stun",
+            "Heavily Stuned",
+        ],
+    },
+    "HitDamage": {
+        "default": "Hit",
+        "links": [
+            "Damaging Hit",
+            "Damaging hit",
+            "Hit Damage",
+            "Hits",
+        ],
+    },
+    "IceArchon": {
+        "default": "Archon",
+        "links": [
+            "Ice Archon",
+        ],
+    },
+    "IceCrystals": {
+        "default": "Ice Crystal",
+        "links": [
+            "Ice Crystals",
+        ],
+    },
+    "IceFragment": {
+        "links": [
+            "Ice Fragment",
+        ],
+    },
+    "Ignite": {
+        "links": [
+            "Ignited",
+            "Igniting",
+            "Ignites",
+        ],
+    },
+    "IgnitedGround": {},
+    "IgnoreResistances": {},
+    "Invoke": {
+        "default": "Invocation",
+        "links": [
+            "Invoke",
+            "Invoking",
+        ],
+    },
+    "ItemDefences": {
+        "default": "Defences",
+    },
+    "ItemRarity": {
+        "default": "Rarity",
+        "links": [
+            "Normal",
+            "Rare",
+            "Magic",
+            "Unique",
+        ],
+    },
+    "JaggedGround": {},
+    "KillingBlow": {
+        "default": "Kill",
+        "links": [
+            "Killing Blow",
+            "Killing Blows",
+        ],
+    },
+    "Knockback": {
+        "links": [
+            "Knock Back",
+            "Knock back",
+            "Knocking Back",
+        ],
+    },
+    "LifeLeech": {
+        "links": [
+            "Leech",
+            "Leech Life",
+        ],
+    },
+    "LifeLoss": {},
+    "LightningAilment": {
+        "default": "Lightning Ailment",
+        "links": [
+            "Lightning ailment",
+            "Lightning Ailments",
+            "Lightning ailments",
+        ],
+    },
+    "LightningArchon": {
+        "default": "Archon",
+        "links": [
+            "Lightning Archon",
+        ],
+    },
+    "LightStun": {},
+    "LowLife": {},
+    "ManaLeech": {
+        "links": [
+            "Leech Mana",
+            "Leech",
+        ],
+    },
+    "MarkofAbyssalLord": {},
+    "MartialWeapon": {
+        "links": [
+            "Martial Weapon",
+            "Martial weapon",
+            "martial weapon",
+            "Martial weapons",
+            "martial weapons",
+        ],
+    },
+    "MaximumResistances": {
+        "links": [
+            "Maximum Resistance",
+            "Maximum Fire Resistance",
+            "Maximum Cold Resistance",
+            "Maximum Lightning Resistance",
+            "Maximum Chaos Resistance",
+        ],
+    },
+    "MinionDeath": {
+        "default": "Minion death",
+    },
+    "Minion": {
+        "default": "Minion",
+        "links": [
+            "Minions",
+        ],
+    },
+    "MoltenFissure": {},
+    "MonsterCategory": {
+        "default": "Monster category",
+        "links": [
+            "Monster Category",
+        ],
+    },
+    "MonsterModifiers": {
+        "default": "Monster modifier",
+        "links": [
+            "Monster Modifier",
+            "Monster Modifiers",
+            "Monster modifiers",
+        ],
+    },
+    "NonDamagingAilments": {
+        "links": [
+            "Non-Damaging Ailment",
+        ],
+    },
+    "OilGround": {
+        "default": "Oiled ground",
+        "links": [
+            "Oil Ground",
+            "Oil ground",
+        ],
+    },
+    "OrbOfAlchemy": {},
+    "OrbOfAlteration": {},
+    "OrbOfChance": {},
+    "OrbOfTransmutation": {},
+    "OvercapChance": {
+        "default": "Overcap chance",
+        "links": [
+            "Overcap Chance",
+        ],
+    },
+    "OvercappedBlock": {
+        "links": [
+            "Overcapped Block",
+        ],
+    },
+    "ParriedDebuff": {
+        "default": "Parry",
+        "links": [
+            "Parried",
+            "Parried Debuff",
+        ],
+    },
+    "Penetration": {
+        "links": [
+            "Resistance Penetration",
+        ],
+    },
+    "PerfectionBuff": {},
+    "PerfectTiming": {
+        "links": [
+            "Perfectly Timing",
+        ],
+    },
+    "Physical": {
+        "default": "Physical",
+        "links": [
+            "Physical Damage",
+            "Physical damage",
+        ],
+    },
+    "PlayerPossessed": {
+        "default": "Azmerian wisp",
+    },
+    "PrecursorTablet": {
+        "default": "Precursor tablet",
+        "links": [
+            "Precursor Tablet",
+            "Precursor Tablets",
+            "Precursor tablets",
+        ],
+    },
+    "PrimedElectrocution": {},
+    "PrimedFreeze": {},
+    "PrimedPin": {},
+    "PrimedStun": {},
+    "PurpleFlamesOfChayula": {
+        "links": [
+            "Purple Flames of Chayul",
+        ],
+    },
+    "Quality": {
+        "links": [
+            "quality",
+        ],
+    },
+    "RageLeech": {
+        "links": [
+            "Leech Rage",
+            "Leech",
+        ],
+    },
+    "Rarity": {
+        "links": [
+            "Normal",
+            "Rare",
+            "Magic",
+            "Unique",
+        ],
+    },
+    "RegalOrb": {},
+    "RedFlamesOfChayula": {
+        "default": "Red Flame of Chayula",
+        "links": [
+            "Red Flames of Chayula",
+        ],
+    },
+    "Resistances": {
+        "default": "Resistance",
+        "links": [
+            "Resistances",
+            "Elemental Resistance",
+            "Elemental Resistances",
+            "Fire Resistance",
+            "Cold Resistance",
+            "Lightning Resistance",
+            "Chaos Resistance",
+        ],
+    },
+    "ResistedBy": {
+        "default": "Resistance",
+    },
+    "Resonance": {
+        "default": "Resonance (buff)",
+    },
+    "Reviving": {},
+    "RivenArmour": {},
+    "RogueExile": {
+        "links": [
+            "Rogue Exiles",
+        ],
+    },
+    "RunicInscription": {},
+    "Sacrifice": {
+        "default": "Sacrifice (keyword)",
+    },
+    "ShockedGround": {},
+    "SkillSpeed": {},
+    "SoulEater": {},
+    "SoulEaterMonster": {
+        "default": "Soul Eater",
+    },
+    "Spell": {
+        "default": "Spell",
+        "links": [
+            "Spells",
+        ],
+    },
+    "SpiritOfTheBearPossessedPlayer": {
+        "default": "Azmerian wisp",
+    },
+    "SpiritOfTheBoarPossessedPlayer": {
+        "default": "Azmerian wisp",
+    },
+    "SpiritOfTheCatPossessedPlayer": {
+        "default": "Azmerian wisp",
+    },
+    "SpiritOfTheOwlPossessedPlayer": {
+        "default": "Azmerian wisp",
+    },
+    "SpiritOfTheOxPossessedPlayer": {
+        "default": "Azmerian wisp",
+    },
+    "SpiritOfTheSerpentPossessedPlayer": {
+        "default": "Azmerian wisp",
+    },
+    "SpiritOfTheStagPossessedPlayer": {
+        "default": "Azmerian wisp",
+    },
+    "SpiritOfTheWolfPossessedPlayer": {
+        "default": "Azmerian wisp",
+    },
+    "StatConversion": {
+        "default": "Stat conversion",
+        "links": [
+            "Stat Conversion",
+        ],
+    },
+    "StatGain": {
+        "default": "Gain",  # Should be different
+    },
+    "StunThreshold": {
+        "default": "Stun Threshold",
+    },
+    "SunderedArmour": {
+        "default": "Sundered Armour",
+    },
+    "ThornsRetaliation": {
+        "default": "Thorns",
+        "links": [
+            "Retaliate with Thorns",
+        ],
+    },
+    "Total": {
+        "no_link": True,
+    },
+    "TotalPlus": {
+        "no_link": True,
+    },
+    "UnboundFury": {},
+    "UnholyMight": {},
+    "Warcry": {
+        "links": [
+            "Warcries",
+        ],
+    },
+    "WeaponSetPassiveSkillPoints": {},
+    "WeaponSets": {
+        "default": "Weapon set",
+        "links": [
+            "Weapon Set",
+            "Weapon Sets",
+        ],
+    },
+    "Wells": {
+        "default": "Well",
+        "links": [
+            "Wells",
+        ],
+    },
+    "Withered": {
+        "links": [
+            "Wither",
+        ],
+    },
+    "WitheringGround": {},
 }
 
 
+# There should be better way to do get rr, right?
+@lru_cache(maxsize=1)
+def get_keywords_rr():
+    specification = load(version=config.get_option("version"))
+    return RelationalReader(
+        path_or_file_system=FileSystem(root_path=get_content_path(specification.sequel)),
+        files=["KeywordPopups.dat64"],
+        read_options={
+            "use_dat_value": False,
+            "auto_build_index": True,
+            "x64": True,
+        },
+        specification=specification,
+        raise_error_on_missing_relation=False,
+        language=config.get_option("language"),
+    )
+
+
 def process_keywords(text: str):
-    text = text.replace("\r\n", "<br>").replace("\n", "<br>")
+    text = text.replace("\r", "").replace("\n", "<br>")
+
+    def resolve_link(key, display):
+        """Resolve link using the _KEYWORD_LINK_MAP structure."""
+        info = _KEYWORD_LINK_MAP.get(key)
+
+        rr = get_keywords_rr()
+        try:
+            # TODO: Might need to handle keys with different capitalisation
+            term = rr["KeywordPopups.dat64"].index["Id"][key]["Term"]
+        except KeyError:
+            term = key
+
+        # Get keyword title as link
+        # Usually better than e.g. "DamagingAilments"
+        if not info:
+            return term
+
+        # No link at all
+        if info.get("no_link"):
+            return None
+
+        # Collect all candidate matches with suffix lengths
+        candidates = []
+        links = info.get("links", [])
+        # Try to match against defined links
+        for entry in links:
+            # Tuple: ("text to check", "link")
+            if isinstance(entry, (list, tuple)):
+                check_text, link = entry
+
+                if display == check_text:
+                    return link
+
+                if display.startswith(check_text):
+                    suffix = display[len(check_text) :]
+                    if "'" not in suffix and " " not in suffix:
+                        candidates.append((len(suffix), link))
+
+            # String: direct link
+            elif isinstance(entry, str):
+                if display == entry:
+                    return entry
+
+                if display.startswith(entry):
+                    suffix = display[len(entry) :]
+                    if "'" not in suffix and " " not in suffix:
+                        candidates.append((len(suffix), entry))
+
+        # If default equals the display, it should take priority
+        default_link = info.get("default")
+        if default_link and display == default_link:
+            return default_link
+
+        # If we found candidates, pick the one with the shortest suffix
+        if candidates:
+            candidates.sort(key=lambda x: x[0])
+            return candidates[0][1]
+
+        # Fallback to default if provided
+        if default_link:
+            return default_link
+
+        # Final fallback to keyword title
+        return term
 
     def replace_match(match):
         raw = match.group(1)
 
-        # Handle pipe-form keywords: [keyword|visible text]
+        # ---------------------------------------------
+        # Case 1: [keyword|Display text]
+        # ---------------------------------------------
         if "|" in raw:
-            base, display = raw.split("|", 1)
+            key, display = raw.split("|", 1)
+            link = resolve_link(key, display)
 
-            # If exact match, simple wrap
-            if base == display:
+            # 1. No link available → plain display
+            if not link:
+                return display
+
+            # 2. Exact match: [Key|Key]
+            if key == display:
                 return f"[[{display}]]"
 
-            # Case: display starts with base + suffix (e.g., "Remnant|Remnants")
-            if display.startswith(base):
-                suffix = display[len(base) :]
+            # 3. Suffix case: [Key|Keywords] where "words" = suffix
+            if display.startswith(key):
+                suffix = display[len(key) :]
                 if "'" not in suffix and " " not in suffix:
-                    return f"[[{base}]]{suffix}"
+                    return f"[[{key}]]{suffix}"
 
-            # Try using _KEYWORD_LINK_MAP
-            if base in _KEYWORD_LINK_MAP:
-                for variant, link in _KEYWORD_LINK_MAP[base]:
-                    if display == link:
-                        return f"[[{display}]]"
-                    elif variant == display:
-                        return f"[[{link}|{display}]]"
-                    elif variant == "":
-                        return f"[[{link}|{display}]]"
-                    elif display.startswith(variant):
-                        suffix = display[len(variant) :]
-                        if variant == link and "'" not in suffix and " " not in suffix:
-                            return f"[[{link}]]{suffix}"
-                        elif "" not in _KEYWORD_LINK_MAP[base][-1][1]:
-                            return f"[[{link}|{display}]]"
-            else:
-                console(f"Missing keyword handling for: {raw}", msg=Msg.error)
+            # 4. Exact match 2 (link)
+            if link == display:
+                return f"[[{display}]]"
 
-        # Default case: no pipe, regular keyword
-        else:
-            key = raw
-            if key in _KEYWORD_LINK_MAP:
-                for variant, link in _KEYWORD_LINK_MAP[key]:
-                    if key == link:
-                        return f"[[{key}]]"
-                    elif variant == "":
-                        return f"[[{link}|{key}]]"
-                    elif key.startswith(variant):
-                        suffix = key[len(variant) :]
-                        if variant == link and "'" not in suffix and " " not in suffix:
-                            return f"[[{link}]]{suffix}"
+            # 5. Regular link formatting
+            return f"[[{link}|{display}]]"
 
-        return f"[[{raw}]]"
+        # ---------------------------------------------
+        # Case 2: [keyword] (no pipe)
+        # ---------------------------------------------
+        key = raw
+        link = resolve_link(key, key)
+
+        return f"[[{key}]]" if link else key
 
     return re.sub(r"\[(.+?)\]", replace_match, text)
 

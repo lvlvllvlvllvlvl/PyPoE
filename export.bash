@@ -195,12 +195,11 @@ exporting modules && {
   elif [ "$WIKI" = "poe2wiki" ]; then
     # Run only for poe2
     pypoe_exporter $QUIET $WIKI lua keywords "${ARGS[@]}" "$@"
+    pypoe_exporter $QUIET $WIKI lua tags "${ARGS[@]}" "$@"
+    pypoe_exporter $QUIET $WIKI lua gemtags "${ARGS[@]}" "$@"
   fi
   # Run for both
   pypoe_exporter $QUIET $WIKI lua ot "${ARGS[@]}" "$@"
-  # For now only poe1 (need check/rework)
-  # pypoe_exporter $QUIET $WIKI lua monster "${ARGS[@]}" "$@"
-  # pypoe_exporter $QUIET $WIKI lua minimap "${ARGS[@]}" "$@"
   # pypoe_exporter $QUIET $WIKI lua packs "${ARGS[@]}" "$@"
 }
 exporting atlas-icons &&

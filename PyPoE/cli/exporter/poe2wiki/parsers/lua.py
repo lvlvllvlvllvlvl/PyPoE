@@ -39,8 +39,11 @@ from collections import OrderedDict
 # Self
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
-from PyPoE.cli.exporter.poe2wiki.parser import BaseParser, strip_keywords
-from PyPoE.cli.exporter.poe2wiki.parsers.luaconstants import KEYWORD_LINK_MAP
+from PyPoE.cli.exporter.poe2wiki.parser import (
+    _KEYWORD_LINK_MAP,
+    BaseParser,
+    strip_keywords,
+)
 
 # =============================================================================
 # Globals
@@ -85,6 +88,19 @@ class LuaFormatter:
         return "".join(out)
 
     @classmethod
+    def format_module_group(self, data, parts, indent=0, br=True):
+        out = []
+        out.append("local data = {}")
+        out.append("\n")
+        for i, p in enumerate(parts):
+            part_data = data[i]
+            out.append("data.%s = %s" % (p, self.format_value(part_data, indent=indent + 1, br=br)))
+            out.append("\n")
+        out.append("return data")
+
+        return "".join(out)
+
+    @classmethod
     def format_key(self, key):
         if not isinstance(key, str):
             key = str(key)
@@ -118,6 +134,8 @@ class LuaFormatter:
                 return "{\n%s\n%s}" % (",\n".join(values), "\t" * (indent - 1))
 
         elif isinstance(value, dict):
+            if not value:
+                return "{}"
             values = []
             fmt = "%s%%s = %%s," % ("\t" * indent)
             for k, v in value.items():
@@ -125,12 +143,17 @@ class LuaFormatter:
                     fmt
                     % (
                         self.format_key(k),
-                        self.format_value(v, indent=indent + 1, br=br),
+                        self.format_value(v, indent=indent + 1, br=br, prev="dict"),
                     )
                 )
-            fmt = "%(indent)s{\n%%s\n%(indent)s}" % {
-                "indent": "\t" * (indent - 1),
-            }
+            if prev == "dict":
+                fmt = "{\n%%s\n%(indent)s}" % {
+                    "indent": "\t" * (indent - 1),
+                }
+            else:
+                fmt = "%(indent)s{\n%%s\n%(indent)s}" % {
+                    "indent": "\t" * (indent - 1),
+                }
             return fmt % "\n".join(values)
 
         elif isinstance(value, str):
@@ -232,6 +255,26 @@ class LuaHandler(ExporterHandler):
             func=KeywordParser.main,
         )
 
+        parser = lua_sub.add_parser(
+            "tags",
+            help="Extract tags",
+        )
+        self.add_default_parsers(
+            parser=parser,
+            cls=TagsParser,
+            func=TagsParser.main,
+        )
+
+        parser = lua_sub.add_parser(
+            "gemtags",
+            help="Extract gem tags",
+        )
+        self.add_default_parsers(
+            parser=parser,
+            cls=GemTagsParser,
+            func=GemTagsParser.main,
+        )
+
 
 class OTStatsParser(GenericLuaParser):
     _DATA = (
@@ -287,7 +330,7 @@ class OTStatsParser(GenericLuaParser):
 
             r.add_result(
                 text=LuaFormatter.format_module(stats),
-                out_file="%s_stats.lua" % data["fn"].lower(),
+                out_file="lua_module_%s_stats.lua" % data["fn"].lower(),
                 wiki_page=[
                     {
                         "page": "Module:Data tables/%s_stats" % data["fn"].lower(),
@@ -327,7 +370,7 @@ class MinimapIconsParser(GenericLuaParser):
         for k in ("minimap_icons", "minimap_icons_lookup"):
             r.add_result(
                 text=LuaFormatter.format_module(locals()[k]),
-                out_file="%s.lua" % k,
+                out_file="lua_module_%s.lua" % k,
                 wiki_page=[
                     {
                         "page": "Module:Minimap/%s" % k,
@@ -634,7 +677,7 @@ class MonsterParser(GenericLuaParser):
         for key, v in data.items():
             r.add_result(
                 text=LuaFormatter.format_module(v),
-                out_file="%s.lua" % key,
+                out_file="lua_module_%s.lua" % key,
                 wiki_page=[
                     {
                         "page": "Module:Monster/%s" % key,
@@ -741,7 +784,7 @@ class MonsterPackParser(GenericLuaParser):
         ]:
             r.add_result(
                 text=LuaFormatter.format_module(data, br=False),
-                out_file=f"{key.lower()}.lua",
+                out_file=f"lua_module_{key.lower()}.lua",
                 wiki_page=[
                     {
                         "page": f"Module:{key}/data",
@@ -790,7 +833,7 @@ class KeywordParser(GenericLuaParser):
             keywords_lookup[row["Id"]] = row.rowid + 1
 
         # Add links
-        for key, values in KEYWORD_LINK_MAP.items():
+        for key, values in _KEYWORD_LINK_MAP.items():
             if key not in keywords_lookup:
                 console(
                     f"Links were provided for keyword '{key}', but there is no keyword with this ID",
@@ -812,7 +855,7 @@ class KeywordParser(GenericLuaParser):
         for k in ("keywords", "keywords_lookup"):
             r.add_result(
                 text=LuaFormatter.format_module(locals()[k]),
-                out_file="%s.lua" % k,
+                out_file="lua_module_%s.lua" % k,
                 wiki_page=[
                     {
                         "page": "Module:Keyword/%s" % k,
@@ -820,5 +863,68 @@ class KeywordParser(GenericLuaParser):
                     }
                 ],
             )
+
+        return r
+
+
+class TagsParser(GenericLuaParser):
+    _files = [
+        "Tags.datc64",
+    ]
+
+    def main(self, parsed_args):
+        tags = OrderedDict()
+
+        for row in self.rr["Tags.dat64"]:
+            tags[row["Id"]] = {}
+            if row["DisplayString"]:
+                tags[row["Id"]]["name"] = row["DisplayString"]
+
+        r = ExporterResult()
+        for k in ("tags",):
+            r.add_result(
+                text=LuaFormatter.format_module(locals()[k]),
+                out_file="lua_module_%s.lua" % k,
+                wiki_page=[
+                    {
+                        "page": "Module:Game/%s" % k,
+                        "condition": None,
+                    }
+                ],
+            )
+
+        return r
+
+
+class GemTagsParser(GenericLuaParser):
+    _files = [
+        "GemTags.datc64",
+    ]
+
+    def main(self, parsed_args):
+        gem_tags = OrderedDict()
+        gem_tags_lookup = OrderedDict()
+
+        for row in self.rr["GemTags.dat64"]:
+            gem_tags[row["Id"]] = {}
+            gem_tags[row["Id"]]["id"] = row.rowid + 1  # Lua starts offsets at 1
+            gem_tags[row["Id"]]["tag"] = strip_keywords(row["Name"])
+
+            if row["Name"]:
+                gem_tags_lookup[strip_keywords(row["Name"])] = row["Id"]
+
+        data = [gem_tags, gem_tags_lookup]
+        parts = ["tags", "lookup"]
+        r = ExporterResult()
+        r.add_result(
+            text=LuaFormatter.format_module_group(data, parts),
+            out_file="lua_module_gem_tags.lua",
+            wiki_page=[
+                {
+                    "page": "Module:Game/gem_tags",
+                    "condition": None,
+                }
+            ],
+        )
 
         return r
