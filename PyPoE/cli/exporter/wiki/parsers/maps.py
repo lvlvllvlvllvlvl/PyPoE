@@ -649,7 +649,7 @@ class MapsParser(ItemsParser):
                     {
                         "ordinal": i,
                         "id": tier["Id"],
-                        "name": tier["Name"]
+                        "name": tier["Name"],
                     }
                     for i, tier in enumerate(self.rr["MapSeries.dat64"], 1)
                 ]
