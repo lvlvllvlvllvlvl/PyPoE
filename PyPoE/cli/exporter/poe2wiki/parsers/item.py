@@ -1448,6 +1448,11 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Weapons/TwoHandWeapons/TwoHandMaces/FourTwoHandMace11",
         "Metadata/Items/Weapons/TwoHandWeapons/TwoHandMaces/FourTwoHandMace12",
         # =================================================================
+        # Spears
+        # =================================================================
+        # EA only, mod have 50% while item 100%
+        "Metadata/Items/Weapons/OneHandWeapons/OneHandSpears/FourSpear12",
+        # =================================================================
         # Fishing rods
         # =================================================================
         "Metadata/Items/Weapons/TwoHandWeapon/FishingRods/FishingRod1",

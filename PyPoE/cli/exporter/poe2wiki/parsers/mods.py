@@ -43,7 +43,6 @@ from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
 from PyPoE.poe import poe2constants as constants
-from PyPoE.poe import text
 from PyPoE.poe.file.dat import DatRecord
 
 # =============================================================================
@@ -152,14 +151,6 @@ class ModParser(parser.BaseParser):
                 },
             ),
             (
-                "ModType",
-                {
-                    "template": "mod_type",
-                    "condition": lambda v: v is not None,
-                    "format": lambda v: v["Name"],
-                },
-            ),
-            (
                 "Domain",
                 {
                     "template": "domain",
@@ -176,6 +167,37 @@ class ModParser(parser.BaseParser):
                 {
                     "template": "required_level",
                     "condition": lambda v: v > 0,
+                },
+            ),
+            (
+                "Name",
+                {
+                    "template": "name",
+                    "condition": lambda v: v,
+                },
+            ),
+            (
+                "ModType",
+                {
+                    "template": "mod_type",
+                    "condition": lambda v: v is not None,
+                    "format": lambda v: v["Name"],
+                },
+            ),
+            # (
+            #    "Tags",
+            #    {
+            #        "template": "tags",
+            #        "condition": lambda v: v,
+            #        "format": lambda v: ", ".join([t["Id"] for t in v]),
+            #    },
+            # ),
+            (
+                "ImplicitTags",
+                {
+                    "template": "tags",  # "implicit_tags",
+                    "condition": lambda v: v,
+                    "format": lambda v: ", ".join([t["Id"] for t in v]),
                 },
             ),
         )
@@ -255,42 +277,9 @@ class ModParser(parser.BaseParser):
             # Copy over simple fields from the .dat64
             apply_column_map(infobox, self._COPY_KEYS, mod)
 
-            mod_prices = self.rr["GoldModPrices.dat64"].index["Mod"][mod]
-
-            # Tags
-            implicit_tags = ", ".join([t["Id"] for t in mod["ImplicitTags"]])
-            tags = ", ".join([t["Id"] for t in mod["Tags"]])
-            if implicit_tags or tags:
-                infobox["tags"] = ", ".join(s for s in [implicit_tags, tags] if s)
-
-            if mod_prices and mod_prices[0]["Tags"]:
-                infobox["spawn_tags"] = ", ".join(
-                    tag["Id"]
-                    for tag, spawn_weight in zip(
-                        mod_prices[0]["Tags"], mod_prices[0]["SpawnWeight"]
-                    )
-                    if spawn_weight
-                )
-
-            # Name
-            if mod["Name"]:
-                root = text.parse_description_tags(mod["Name"])
-
-                def handler(hstr, parameter):
-                    return hstr if parameter == "MS" else ""
-
-                infobox["name"] = root.handle_tags({"if": handler, "elif": handler})
-
-            # TODO:Sell price
-            # mod value + (base value + inherent skill value) * multipliers,
-            # and then sell price back to the vendor is 11% of that
-            # mod_prices...
-
-            # TODO: need to look into this before completely removing it.
-            if mod["BuffTemplate"] and mod["BuffTemplate"]["BuffDefinitionsKey"]:
-                infobox["granted_buff_id"] = mod["BuffTemplate"]["BuffDefinitionsKey"]["Id"]
+            if mod["BuffTemplate"] and mod["BuffTemplate"]["BuffDefinition"]:
+                infobox["granted_buff_id"] = mod["BuffTemplate"]["BuffDefinition"]["Id"]
                 infobox["granted_buff_value"] = mod["BuffTemplate"]["AuraRadius"]
-            # todo ID for GEPL
 
             if mod["GrantedEffectsPerLevel"]:
                 infobox["granted_skill"] = ", ".join(
@@ -329,6 +318,21 @@ class ModParser(parser.BaseParser):
                 infobox["stat%s_id" % i] = sid
                 infobox["stat%s_min" % i] = vmin
                 infobox["stat%s_max" % i] = vmax
+
+            mod_prices = self.rr["GoldModPrices.dat64"].index["Mod"][mod]
+
+            # Spawn weights
+            if mod_prices and mod_prices[0]["Tags"]:
+                i = 0
+                for tag, spawn_weight in zip(mod_prices[0]["Tags"], mod_prices[0]["SpawnWeight"]):
+                    i = i + 1
+                    infobox["spawn_weight%s_tag" % i] = tag["Id"]
+                    infobox["spawn_weight%s_value" % i] = spawn_weight
+
+            # TODO:Sell price
+            # mod value + (base value + inherent skill value) * multipliers,
+            # and then sell price back to the vendor is 11% of that
+            # mod_prices...
 
             cond = WikiCondition(
                 data=infobox,
