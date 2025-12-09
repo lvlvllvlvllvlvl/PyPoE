@@ -49,7 +49,6 @@ from functools import partialmethod
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
-from PyPoE.cli.exporter.poe2wiki.parser import process_keywords
 from PyPoE.poe.file.dat import DatRecord
 from PyPoE.poe.file.psg2 import PSGFile
 
@@ -459,7 +458,7 @@ class PassiveSkillParser(parser.BaseParser):
             values.append(passive["Stat%sValue" % j])
             infobox["stat%s_value" % j] = passive["Stat%sValue" % j]
 
-        stat_text = process_keywords(
+        stat_text = parser.process_keywords(
             "<br>".join(
                 self._get_stats(
                     stats=stat_ids,
@@ -491,7 +490,7 @@ class PassiveSkillParser(parser.BaseParser):
                 infobox["stat%s_id" % j] = sid
                 infobox["stat%s_value" % j] = val
 
-            buff_stat_text = process_keywords(
+            buff_stat_text = parser.process_keywords(
                 "<br>".join(
                     self._get_stats(
                         stats=stat_ids,

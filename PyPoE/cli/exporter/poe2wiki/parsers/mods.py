@@ -40,14 +40,9 @@ from functools import partialmethod
 
 # Self
 from PyPoE.cli.core import Msg, console
+from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
-from PyPoE.cli.exporter.poe2wiki.parser import (
-    BaseParser,
-    WikiCondition,
-    process_keywords,
-)
 from PyPoE.poe import poe2constants as constants
-from PyPoE.poe import text
 from PyPoE.poe.file.dat import DatRecord
 
 # =============================================================================
@@ -65,16 +60,21 @@ class OutOfBoundsWarning(UserWarning):
     pass
 
 
-class ModWikiCondition(WikiCondition):
+class WikiCondition(parser.WikiCondition):
     COPY_KEYS = ("tier_text",)
-    COPY_CONDITIONS = {"tags": WikiCondition.tagsets_equal}
+    COPY_CONDITIONS = {
+        "tags": parser.WikiCondition.tagsets_equal,
+    }
 
     NAME = "Mod"
 
 
 class ModsHandler(ExporterHandler):
     def __init__(self, sub_parser):
-        self.parser = sub_parser.add_parser("mods", help="Mods Exporter")
+        self.parser = sub_parser.add_parser(
+            "mods",
+            help="Mods Exporter",
+        )
         self.parser.set_defaults(func=lambda args: self.parser.print_help())
         lua_sub = self.parser.add_subparsers()
 
@@ -115,11 +115,12 @@ class ModsHandler(ExporterHandler):
         self.add_format_argument(parser)
 
 
-class ModParser(BaseParser):
+class ModParser(parser.BaseParser):
     # Load files in advance
     _files = [
         "Mods.datc64",
         "Stats.datc64",
+        "GoldModPrices.datc64",
     ]
 
     # Load translations in advance
@@ -128,9 +129,9 @@ class ModParser(BaseParser):
     ]
 
     _mod_column_index_filter = partialmethod(
-        BaseParser._column_index_filter,
+        parser.BaseParser._column_index_filter,
         dat_file_name="Mods.dat64",
-        error_msg="Several areas have not been found:\n%s",
+        error_msg="Several modifiers have not been found:\n%s",
     )
 
     _COPY_KEYS = OrderedDict(
@@ -146,6 +147,7 @@ class ModParser(BaseParser):
                 {
                     "template": "mod_groups",
                     "condition": lambda v: v,
+                    "format": lambda v: ", ".join([m["Id"] for m in v]),
                 },
             ),
             (
@@ -165,6 +167,37 @@ class ModParser(BaseParser):
                 {
                     "template": "required_level",
                     "condition": lambda v: v > 0,
+                },
+            ),
+            (
+                "Name",
+                {
+                    "template": "name",
+                    "condition": lambda v: v,
+                },
+            ),
+            (
+                "ModType",
+                {
+                    "template": "mod_type",
+                    "condition": lambda v: v is not None,
+                    "format": lambda v: v["Name"],
+                },
+            ),
+            # (
+            #    "Tags",
+            #    {
+            #        "template": "tags",
+            #        "condition": lambda v: v,
+            #        "format": lambda v: ", ".join([t["Id"] for t in v]),
+            #    },
+            # ),
+            (
+                "ImplicitTags",
+                {
+                    "template": "tags",  # "implicit_tags",
+                    "condition": lambda v: v,
+                    "format": lambda v: ", ".join([t["Id"] for t in v]),
                 },
             ),
         )
@@ -235,8 +268,8 @@ class ModParser(BaseParser):
             console("No mods found for the specified parameters. Quitting.", msg=Msg.warning)
             return r
 
-        # Needed for localizing sell prices
-        self.rr["BaseItemTypes.dat64"].build_index("Id")
+        # Needed for spawn tags
+        self.rr["GoldModPrices.dat64"].build_index("Mod")
 
         for mod in mods:
             infobox = OrderedDict()
@@ -244,32 +277,14 @@ class ModParser(BaseParser):
             # Copy over simple fields from the .dat64
             apply_column_map(infobox, self._COPY_KEYS, mod)
 
-            if mod["Name"]:
-                root = text.parse_description_tags(mod["Name"])
-
-                def handler(hstr, parameter):
-                    return hstr if parameter == "MS" else ""
-
-                infobox["name"] = root.handle_tags({"if": handler, "elif": handler})
-
-            # TODO: need to look into this before completely removing it.
-
-            if mod["BuffTemplate"] and mod["BuffTemplate"]["BuffDefinitionsKey"]:
-                infobox["granted_buff_id"] = mod["BuffTemplate"]["BuffDefinitionsKey"]["Id"]
+            if mod["BuffTemplate"] and mod["BuffTemplate"]["BuffDefinition"]:
+                infobox["granted_buff_id"] = mod["BuffTemplate"]["BuffDefinition"]["Id"]
                 infobox["granted_buff_value"] = mod["BuffTemplate"]["AuraRadius"]
-            # todo ID for GEPL
 
-            # 3.19 Update - Lake of Kalandra
-            # Parse Families to mod groups
-
-            if mod["Families"]:
-                infobox["mod_groups"] = ", ".join([m["Id"] for m in mod["Families"]])
-
-            if mod["GrantedEffectsPerLevelKeys"]:
+            if mod["GrantedEffectsPerLevel"]:
                 infobox["granted_skill"] = ", ".join(
-                    [k["GrantedEffect"]["Id"] for k in mod["GrantedEffectsPerLevelKeys"]]
+                    [k["GrantedEffect"]["Id"] for k in mod["GrantedEffectsPerLevel"]]
                 )
-            infobox["mod_type"] = mod["ModTypeKey"]["Name"]
 
             stats = []
             values = []
@@ -288,7 +303,7 @@ class ModParser(BaseParser):
                 stats.append(stat)
                 values.append(value)
 
-            infobox["stat_text"] = process_keywords(
+            infobox["stat_text"] = parser.process_keywords(
                 "<br>".join(self._get_stats(stats, values, mod))
             )
             # if mod["BuffTemplate"] and mod["BuffTemplate"]["AuraRadius"]:
@@ -304,38 +319,34 @@ class ModParser(BaseParser):
                 infobox["stat%s_min" % i] = vmin
                 infobox["stat%s_max" % i] = vmax
 
-            for i, tag in enumerate(mod["SpawnWeight_TagsKeys"]):
-                j = i + 1
-                infobox["spawn_weight%s_tag" % j] = tag["Id"]
-                infobox["spawn_weight%s_value" % j] = mod["SpawnWeight_Values"][i]
+            mod_prices = self.rr["GoldModPrices.dat64"].index["Mod"][mod]
 
-            for i, tag in enumerate(mod["GenerationWeight_TagsKeys"]):
-                j = i + 1
-                infobox["generation_weight%s_tag" % j] = tag["Id"]
-                infobox["generation_weight%s_value" % j] = mod["GenerationWeight_Values"][i]
+            # Spawn weights
+            if mod_prices and mod_prices[0]["Tags"]:
+                i = 0
+                for tag, spawn_weight in zip(mod_prices[0]["Tags"], mod_prices[0]["SpawnWeight"]):
+                    i = i + 1
+                    infobox["spawn_weight%s_tag" % i] = tag["Id"]
+                    infobox["spawn_weight%s_value" % i] = spawn_weight
 
-            # 3.15
+            # TODO:Sell price
+            # mod value + (base value + inherent skill value) * multipliers,
+            # and then sell price back to the vendor is 11% of that
+            # mod_prices...
 
-            tags = []
-            for i, tag in enumerate(mod["ImplicitTagsKeys"]):
-                j = i + 1
-                # infobox['tag%s_tag' % j] = tag['Id']
-                # infobox['tag%s_value' % j] = mod['ImplicitTagsKeys'][i]
-                # print(tag['Id'])
-                tags.append(tag["Id"])
-            # tags = ','.join(tags)
-            if tags:
-                infobox["tags"] = ", ".join(tags)
-
-            # 3+ tildes not allowed
-            page_name = "Modifier:" + self._format_wiki_title(mod["Id"])
-            cond = ModWikiCondition(infobox, parsed_args)
+            cond = WikiCondition(
+                data=infobox,
+                cmdargs=parsed_args,
+            )
 
             r.add_result(
                 text=cond,
                 out_file="mod_%s.txt" % infobox["id"],
                 wiki_page=[
-                    {"page": page_name, "condition": cond},
+                    {
+                        "page": "Modifier:" + self._format_wiki_title(mod["Id"]),
+                        "condition": cond,
+                    },
                 ],
                 wiki_message="Mod updater",
             )
