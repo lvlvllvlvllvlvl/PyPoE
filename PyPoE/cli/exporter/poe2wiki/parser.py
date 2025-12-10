@@ -1973,17 +1973,15 @@ def make_inter_wiki_links(string):
 
 _KEYWORD_LINK_MAP = {
     # Keyword:
-    #   default (string): Replace the default link that is the title by default.
+    #   default (string): Replace the default link that is the title/term by default.
     #   links (list): Optional links can be either strings or tuples ("text to check", "link").
-    #   A tuple is useful for linking to sections on a page.
+    #     A tuple is useful for linking to sections on a page.
+    #     Longer versions are not needed if the short is added or default.
+    #     eg. if default is Hit then Hits -> [[Hit]]s, Hitting -> [[Hit]]ting.
     #   no_link (bool): Wheter keyword should not be linked to anywhere.
-    # "keywordId": {
-    #    "default": "",
-    #    "links": [
-    #    ]
-    # },
     #
-    # Note: Case matter and order in links matter.
+    # NOTE: This is used by lua module exported for keywords.
+    #       Any changes to the structure should be reflected in the wiki Module:Keyword.
     "Abyssalify": {
         "default": "Desecrated modifier",
         "links": [
@@ -1995,11 +1993,11 @@ _KEYWORD_LINK_MAP = {
             "Accurate",
         ],
     },
+    "Aftershock": {
+        "default": "Aftershock",
+    },
     "Ailments": {
         "default": "Ailment",
-        "links": [
-            "Ailments",
-        ],
     },
     "AilmentSpread": {
         "default": "Spread",
@@ -2056,14 +2054,28 @@ _KEYWORD_LINK_MAP = {
         "default": "Attribute",
         "links": [
             "attribute",
-            "Attributes",
-            "attributes",
         ],
+    },
+    "Attack": {
+        "default": "Attack",
+    },
+    "Aura": {
+        "default": "Aura",
+    },
+    "Axe": {
+        "default": "Axe",
     },
     "AzmeriSpirit": {
         "default": "Azmerian wisp",
         "links": [
+            "Azmerian Wisp",
             "Azmeri Spirit",
+        ],
+    },
+    "Banner": {
+        "default": "Banner",
+        "links": [
+            "Banner Skill",
         ],
     },
     "Bleeding": {
@@ -2082,7 +2094,13 @@ _KEYWORD_LINK_MAP = {
     "BooleanDamageRoll": {
         "default": "Damage",
     },
+    "Bow": {
+        "default": "Bow",
+    },
     "BrokenStance": {},
+    "Buckler": {
+        "default": "Buckler",
+    },
     "BuffEffect": {
         "default": "Buff",
     },
@@ -2093,8 +2111,10 @@ _KEYWORD_LINK_MAP = {
         "default": "Ignite",
         "links": [
             "Burn",
-            "Burning",
         ],
+    },
+    "Catalyst": {
+        "default": "Catalyst",
     },
     "Channelling": {
         "links": [
@@ -2105,14 +2125,13 @@ _KEYWORD_LINK_MAP = {
     "Charges": {
         "default": "Charge",
         "links": [
-            "Charges",
             "Endurance Charge",
-            "Endurance Charges",
             "Frenzy Charge",
-            "Frenzy Charges",
             "Power Charge",
-            "Power Charges",
         ],
+    },
+    "Charm": {
+        "default": "Charm",
     },
     "ChilledGround": {},
     "Conditional": {
@@ -2135,10 +2154,19 @@ _KEYWORD_LINK_MAP = {
             "Cooldowns Recover",
         ],
     },
+    "Corpse": {
+        "default": "Corpse",
+    },
     "Corrupted": {
         "default": "Corrupted",
     },
     "CorruptedBlood": {},
+    "Command": {
+        "default": "Command",
+    },
+    "Companion": {
+        "default": "Companion",
+    },
     "Conversion": {
         "default": "Damage conversion",
         "links": [
@@ -2150,8 +2178,6 @@ _KEYWORD_LINK_MAP = {
         "links": [
             "Critical",
             "Critical Hit",
-            "Critical Hits",
-            "Critical hits",
             "Critical Hit Chance",
             "Critically Hit",
             "Critically hit",
@@ -2159,6 +2185,9 @@ _KEYWORD_LINK_MAP = {
     },
     "CriticalDamageBonus": {},
     "CriticalWeakness": {},
+    "Crossbow": {
+        "default": "Crossbow",
+    },
     "CrushingBlow": {
         "links": [
             "Crushing Blow",
@@ -2173,22 +2202,23 @@ _KEYWORD_LINK_MAP = {
     },
     "Curse": {
         "default": "Curse",
-        "links": [
-            "Curses",
-        ],
+    },
+    "Dagger": {
+        "default": "Dagger",
     },
     "DamageTypes": {
         "default": "Damage type",
         "links": [
             "Damage Type",
-            "Damage Types",
-            "Damage types",
         ],
     },
     "DamagingAilments": {
         "links": [
             "Damaging Ailment",
         ],
+    },
+    "Debuff": {
+        "default": "Debuff",
     },
     "Defences": {
         "default": "Defence",
@@ -2202,11 +2232,16 @@ _KEYWORD_LINK_MAP = {
             "Detonation",
         ],
     },
+    "Detonator": {
+        "default": "Detonator",
+        "links": [
+            "Detonator Skill",
+        ],
+    },
     "DistilledEmotion": {
         "default": "Liquid emotion",
         "links": [
             "Liquid Emotion",
-            "Liquid Emotions",
         ],
     },
     "DualWield": {
@@ -2216,6 +2251,12 @@ _KEYWORD_LINK_MAP = {
         ],
     },
     "EasyTargetDebuff": {},
+    "Electrocute": {
+        "default": "Electrocute",
+        "links": [
+            "Electrocution",
+        ],
+    },
     "ElementalAilments": {
         "default": "Elemental ailment",
         "links": [
@@ -2248,8 +2289,7 @@ _KEYWORD_LINK_MAP = {
         "default": "Empowered skill",
         "links": [
             "Empower",
-            "Empowered",
-            "Empowered Skills",
+            "Empowered Skill",
         ],
     },
     "EnergyShield": {},
@@ -2266,7 +2306,6 @@ _KEYWORD_LINK_MAP = {
         "default": "Armour (equipment)",
         "links": [
             "Equippable Armour",
-            "Equippable Armours",
         ],
     },
     "ESRecharge": {
@@ -2302,12 +2341,13 @@ _KEYWORD_LINK_MAP = {
         ],
     },
     "FinalStrike": {},
+    "Flail": {
+        "default": "Flail",
+    },
     "Flask": {
         "default": "Flask",
         "links": [
             "flask",
-            "Flasks",
-            "flasks",
         ],
     },
     "FlameArchon": {
@@ -2323,23 +2363,36 @@ _KEYWORD_LINK_MAP = {
             "Flames of Chayula",
         ],
     },
+    "Focus": {
+        "default": "Focus",
+        "links": [
+            "Foci",
+        ],
+    },
     "ForksCrit": {},
     "Freeze": {
         "links": [
             "Freezing",
         ],
     },
+    "Grenade": {
+        "default": "Grenade",
+        "links": [
+            "Grenade Skill",
+        ],
+    },
+    "Hazard": {
+        "default": "Hazard",
+    },
     "HeavyStun": {
         "links": [
             "Heavily Stun",
-            "Heavily Stuned",
         ],
     },
     "HeavyStunPlayer": {
         "default": "Heavy Stun",
         "links": [
             "Heavily Stun",
-            "Heavily Stuned",
         ],
     },
     "HitDamage": {
@@ -2348,7 +2401,6 @@ _KEYWORD_LINK_MAP = {
             "Damaging Hit",
             "Damaging hit",
             "Hit Damage",
-            "Hits",
         ],
     },
     "IceArchon": {
@@ -2359,20 +2411,13 @@ _KEYWORD_LINK_MAP = {
     },
     "IceCrystals": {
         "default": "Ice Crystal",
-        "links": [
-            "Ice Crystals",
-        ],
     },
     "IceFragment": {
-        "links": [
-            "Ice Fragment",
-        ],
+        "default": "Ice Fragment",
     },
     "Ignite": {
         "links": [
-            "Ignited",
             "Igniting",
-            "Ignites",
         ],
     },
     "IgnitedGround": {},
@@ -2401,7 +2446,6 @@ _KEYWORD_LINK_MAP = {
         "default": "Kill",
         "links": [
             "Killing Blow",
-            "Killing Blows",
         ],
     },
     "Knockback": {
@@ -2413,8 +2457,8 @@ _KEYWORD_LINK_MAP = {
     },
     "LifeLeech": {
         "links": [
-            "Leech",
             "Leech Life",
+            "Leech",
         ],
     },
     "LifeLoss": {},
@@ -2422,8 +2466,6 @@ _KEYWORD_LINK_MAP = {
         "default": "Lightning Ailment",
         "links": [
             "Lightning ailment",
-            "Lightning Ailments",
-            "Lightning ailments",
         ],
     },
     "LightningArchon": {
@@ -2433,7 +2475,11 @@ _KEYWORD_LINK_MAP = {
         ],
     },
     "LightStun": {},
+    "Logbook": {
+        "default": "Logbook",
+    },
     "LowLife": {},
+    "Mace": {"default": "Mace"},
     "ManaLeech": {
         "links": [
             "Leech Mana",
@@ -2446,11 +2492,10 @@ _KEYWORD_LINK_MAP = {
             "Martial Weapon",
             "Martial weapon",
             "martial weapon",
-            "Martial weapons",
-            "martial weapons",
         ],
     },
     "MaximumResistances": {
+        "default": "Maximum Resistance",
         "links": [
             "Maximum Resistance",
             "Maximum Fire Resistance",
@@ -2459,16 +2504,21 @@ _KEYWORD_LINK_MAP = {
             "Maximum Chaos Resistance",
         ],
     },
+    "Meta": {
+        "default": "Meta Gem",
+    },
     "MinionDeath": {
         "default": "Minion death",
     },
     "Minion": {
         "default": "Minion",
+    },
+    "MoltenFissure": {
+        "default": "Molten fissure",
         "links": [
-            "Minions",
+            "Molten Fissure",
         ],
     },
-    "MoltenFissure": {},
     "MonsterCategory": {
         "default": "Monster category",
         "links": [
@@ -2479,13 +2529,17 @@ _KEYWORD_LINK_MAP = {
         "default": "Monster modifier",
         "links": [
             "Monster Modifier",
-            "Monster Modifiers",
-            "Monster modifiers",
         ],
     },
     "NonDamagingAilments": {
         "links": [
             "Non-Damaging Ailment",
+        ],
+    },
+    "Offering": {
+        "default": "Offering",
+        "links": [
+            "Offering Skill",
         ],
     },
     "OilGround": {
@@ -2494,6 +2548,9 @@ _KEYWORD_LINK_MAP = {
             "Oil Ground",
             "Oil ground",
         ],
+    },
+    "Omen": {
+        "default": "Omen",
     },
     "OrbOfAlchemy": {},
     "OrbOfAlteration": {},
@@ -2516,6 +2573,10 @@ _KEYWORD_LINK_MAP = {
             "Parried",
             "Parried Debuff",
         ],
+    },
+    "Payoff": {
+        "default": "Payoff",
+        "links": ["Payoff Skill"],
     },
     "Penetration": {
         "links": [
@@ -2542,8 +2603,6 @@ _KEYWORD_LINK_MAP = {
         "default": "Precursor tablet",
         "links": [
             "Precursor Tablet",
-            "Precursor Tablets",
-            "Precursor tablets",
         ],
     },
     "PrimedElectrocution": {},
@@ -2559,6 +2618,15 @@ _KEYWORD_LINK_MAP = {
         "links": [
             "quality",
         ],
+    },
+    "Quarterstaff": {
+        "default": "Quarterstaff",
+        "links": [
+            "Quarterstaves",
+        ],
+    },
+    "Quiver": {
+        "default": "Quiver",
     },
     "RageLeech": {
         "links": [
@@ -2581,12 +2649,17 @@ _KEYWORD_LINK_MAP = {
             "Red Flames of Chayula",
         ],
     },
+    "Relic": {
+        "default": "Relic",
+    },
+    "Remnant": {
+        "default": "Remnant",
+    },
     "Resistances": {
         "default": "Resistance",
         "links": [
             "Resistances",
             "Elemental Resistance",
-            "Elemental Resistances",
             "Fire Resistance",
             "Cold Resistance",
             "Lightning Resistance",
@@ -2606,6 +2679,9 @@ _KEYWORD_LINK_MAP = {
             "Rogue Exiles",
         ],
     },
+    "Rune": {
+        "default": "Rune",
+    },
     "RunicInscription": {},
     "Sacrifice": {
         "default": "Sacrifice (keyword)",
@@ -2613,17 +2689,26 @@ _KEYWORD_LINK_MAP = {
     "Sanctified": {
         "default": "Sanctified",
     },
+    "Sceptre": {
+        "default": "Sceptre",
+    },
+    "Shield": {
+        "default": "Shield",
+    },
     "ShockedGround": {},
     "SkillSpeed": {},
+    "Slam": {
+        "default": "Slam",
+    },
     "SoulEater": {},
     "SoulEaterMonster": {
         "default": "Soul Eater",
     },
+    "Spear": {
+        "default": "Spear",
+    },
     "Spell": {
         "default": "Spell",
-        "links": [
-            "Spells",
-        ],
     },
     "SpiritOfTheBearPossessedPlayer": {
         "default": "Azmerian wisp",
@@ -2649,6 +2734,12 @@ _KEYWORD_LINK_MAP = {
     "SpiritOfTheWolfPossessedPlayer": {
         "default": "Azmerian wisp",
     },
+    "Staff": {
+        "default": "Staff",
+        "links": [
+            "Staves",
+        ],
+    },
     "StatConversion": {
         "default": "Stat conversion",
         "links": [
@@ -2664,6 +2755,15 @@ _KEYWORD_LINK_MAP = {
     "SunderedArmour": {
         "default": "Sundered Armour",
     },
+    "SupportGem": {
+        "default": "Support Gem",
+    },
+    "Sword": {
+        "default": "Sword",
+    },
+    "Talisman": {
+        "default": "Talisman",
+    },
     "ThornsRetaliation": {
         "default": "Thorns",
         "links": [
@@ -2676,26 +2776,39 @@ _KEYWORD_LINK_MAP = {
     "TotalPlus": {
         "no_link": True,
     },
+    "Totem": {
+        "default": "Totem",
+    },
+    "Trap": {
+        "default": "Trap",
+    },
+    "Trigger": {
+        "default": "Trigger",
+    },
     "UnboundFury": {},
     "UnholyMight": {},
+    "Wand": {
+        "default": "Wand",
+    },
     "Warcry": {
+        "default": "Warcry",
         "links": [
             "Warcries",
+            "Warcry Skill",
         ],
+    },
+    "Waystone": {
+        "default": "Waystone",
     },
     "WeaponSetPassiveSkillPoints": {},
     "WeaponSets": {
         "default": "Weapon set",
         "links": [
             "Weapon Set",
-            "Weapon Sets",
         ],
     },
     "Wells": {
         "default": "Well",
-        "links": [
-            "Wells",
-        ],
     },
     "Withered": {
         "links": [
@@ -2724,6 +2837,8 @@ def get_keywords_rr():
     )
 
 
+# NOTE: Any changes here should be reflected in the wiki Module:Keyword
+#       to ensure 100% compatibility.
 def process_keywords(text: str):
     text = text.replace("\r", "").replace("\n", "<br>")
 
@@ -2746,6 +2861,11 @@ def process_keywords(text: str):
         # No link at all
         if info.get("no_link"):
             return None
+
+        # If default equals the display, it should take priority
+        default_link = info.get("default")
+        if default_link and display == default_link:
+            return default_link
 
         # Collect all candidate matches with suffix lengths
         candidates = []
@@ -2773,11 +2893,6 @@ def process_keywords(text: str):
                     suffix = display[len(entry) :]
                     if "'" not in suffix and " " not in suffix:
                         candidates.append((len(suffix), entry))
-
-        # If default equals the display, it should take priority
-        default_link = info.get("default")
-        if default_link and display == default_link:
-            return default_link
 
         # If we found candidates, pick the one with the shortest suffix
         if candidates:
@@ -2810,10 +2925,10 @@ def process_keywords(text: str):
                 return f"[[{display}]]"
 
             # 3. Suffix case: [Key|Keywords] where "words" = suffix
-            if display.startswith(key):
-                suffix = display[len(key) :]
+            if display.startswith(link):
+                suffix = display[len(link) :]
                 if "'" not in suffix and " " not in suffix:
-                    return f"[[{key}]]{suffix}"
+                    return f"[[{link}]]{suffix}"
 
             # 4. Exact match 2 (link)
             if link == display:
@@ -2828,7 +2943,11 @@ def process_keywords(text: str):
         key = raw
         link = resolve_link(key, key)
 
-        return f"[[{key}]]" if link else key
+        if not link:
+            return key
+        if "(" in link:
+            return f"[[{link}|{key}]]"
+        return f"[[{key}]]"
 
     return re.sub(r"\[(.+?)\]", replace_match, text)
 
