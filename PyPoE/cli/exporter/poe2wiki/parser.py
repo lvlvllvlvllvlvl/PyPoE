@@ -2320,9 +2320,7 @@ _KEYWORD_LINK_MAP = {
             "Flames of Chayula",
         ],
     },
-    "ForksCrit": {
-        "default": "Tangletongue",  # unique
-    },
+    "ForksCrit": {},
     "Freeze": {
         "links": [
             "Freezing",
