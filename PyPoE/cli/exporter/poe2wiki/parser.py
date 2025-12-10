@@ -2135,6 +2135,9 @@ _KEYWORD_LINK_MAP = {
             "Cooldowns Recover",
         ],
     },
+    "Corrupted": {
+        "default": "Corrupted",
+    },
     "CorruptedBlood": {},
     "Conversion": {
         "default": "Damage conversion",
@@ -2606,6 +2609,9 @@ _KEYWORD_LINK_MAP = {
     "RunicInscription": {},
     "Sacrifice": {
         "default": "Sacrifice (keyword)",
+    },
+    "Sanctified": {
+        "default": "Sanctified",
     },
     "ShockedGround": {},
     "SkillSpeed": {},

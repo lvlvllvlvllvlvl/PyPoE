@@ -46,13 +46,12 @@ import numpy as np
 # 3rd-party
 from PIL import Image, ImageOps
 
+# Self
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
 from PyPoE.cli.exporter.poe2wiki.parsers.skill import SkillParserShared
-
-# Self
 from PyPoE.poe import poe2constants as constants
 from PyPoE.poe.file.dat import DatReader, DatRecord, RelationalReader
 from PyPoE.poe.file.it import ITFile
@@ -747,6 +746,10 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDrop": "",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": " (Cruel)",
             # =================================================================
+            # Map fragments
+            # =================================================================
+            "Metadata/Items/MapFragments/CurrencyAfflictionFragment": " (map fragment)",
+            # =================================================================
             # Hideout decorations
             # =================================================================
             "Metadata/Items/Hideout/HideoutLightningCoil": " (hideout decoration)",
@@ -1107,16 +1110,6 @@ class ItemsParser(SkillParserShared):
             # Schleifstein
             "Metadata/Items/Currency/CurrencyWeaponQuality": "",
             "Metadata/Items/HideoutInteractables/StrDexCraftingBench": " (Dinge fürs Versteck)",
-        },
-    }
-
-    # Apped name without changing inventory icon
-    _NAME_APPENDIX_BY_ID_2 = {
-        "English": {
-            # =================================================================
-            # Map fragments
-            # =================================================================
-            "Metadata/Items/MapFragments/CurrencyAfflictionFragment": " (map fragment)",
         },
     }
 
@@ -3507,7 +3500,6 @@ class ItemsParser(SkillParserShared):
         override = self._NAME_OVERRIDE_BY_ID[language].get(m_id)
         override_2 = self._NAME_OVERRIDE_BY_ID_2[language].get(m_id)
         appendix = self._NAME_APPENDIX_BY_ID[language].get(m_id)
-        appendix_2 = self._NAME_APPENDIX_BY_ID_2[language].get(m_id)
 
         if override is not None:
             name = override
@@ -3519,8 +3511,6 @@ class ItemsParser(SkillParserShared):
             name += appendix
             if appendix != "":
                 infobox["inventory_icon"] = name
-        elif appendix_2 is not None:
-            name += appendix_2
         else:
             items = [
                 item
