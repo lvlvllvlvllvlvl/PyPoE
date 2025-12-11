@@ -2015,6 +2015,13 @@ _KEYWORD_LINK_MAP = {
             "Allies",
         ],
     },
+    "Ammunition": {
+        "default": "Ammunition",
+        "links": [
+            "Crossbow Ammunition Skill",
+            "Ammunition Skill",
+        ],
+    },
     "AncestralBoost": {
         "links": [
             "Ancestrally Boosted",

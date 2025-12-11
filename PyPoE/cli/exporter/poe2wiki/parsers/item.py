@@ -505,6 +505,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemVolatileDead": "Item",
         "Metadata/items/Gems/SkillGemStaffUnleash": "Item",
         "Metadata/Items/Gem/SkillGemBlinkSandPlayer": "Item",
+        "Metadata/Items/Gem/SkillGemUniqueEarthboundTriggeredSpark": "Item",
         "Metadata/Items/Gem/SkillGemUniqueBreachLightningBolt": "Item",
         "Metadata/Items/Gems/SkillGemLightningBolt": "Item",
         "Metadata/Items/Gem/SkillGemSolarOrb": "Item",
@@ -644,6 +645,7 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookRitual1": "Ritualistic Book of Knowledge",
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition1": "Runic Book of Knowledge",
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss1": "Vanquisher's Book of Knowledge",
+            # "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss1": "Lightless Book of Knowledge", # TODO:0.4.0
             # =================================================================
             # Uncut Gems
             # =================================================================
@@ -662,10 +664,12 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/Gem/SkillGemAscendancyUnleash": " (Chronomancer skill)",
             "Metadata/items/Gems/SkillGemStaffUnleash": " (skill)",
             "Metadata/Items/Gems/SkillGemFlammability": " (curse)",
-            "Metadata/Items/Gem/SkillGemUniqueBreachLightningBolt": " (triggered skill)",
+            "Metadata/Items/Gem/SkillGemUniqueBreachLightningBolt": " (Choir of the Storm)",
             "Metadata/Items/Gems/SkillGemLightningBolt": "",
             "Metadata/Items/Gem/SkillGemBlinkSandPlayer": " (Sands of Silk)",
             "Metadata/Items/Gem/SkillGemBlink": "",
+            "Metadata/Items/Gem/SkillGemUniqueEarthboundTriggeredSpark": " (Earthbound)",
+            "Metadata/Items/Gems/SkillGemSpark": "",
             # Weapon attacks
             "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe": " (one hand)",
             "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe": " (two hand)",
@@ -1233,7 +1237,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemSkeletalWarrior",
         "Metadata/Items/Gems/SkillGemCorpsewadeCorpseCloud",
         "Metadata/Items/Gem/SkillGemUniqueDuskVigilTriggeredBlazingCluster",
-        "Metadata/Items/Gem/SkillGemUniqueEarthboundTriggeredSpark",
         "Metadata/Items/Gems/UniqueSkillGemHeraldOfAsh",
         "Metadata/Items/Gems/UniqueSkillGemHeraldOfIce",
         "Metadata/Items/Gems/UniqueSkillGemHeraldOfThunder",
@@ -1244,7 +1247,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemDarkTempest",
         "Metadata/Items/Gems/SkillGemCastCurseOnBlock",
         "Metadata/Items/Gems/SkillGemSoulCrystal",
-        # Weapon default attacks
+        # Unreleased weapon default attacks
         "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe",
         "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe",
         "Metadata/Items/Gem/SkillGemPlayerDefaultAxeAxe",

@@ -193,6 +193,14 @@ class PassiveSkillParser(parser.BaseParser):
                     "format": lambda v: v["Id"],
                 },
             ),
+            (  # TODO: Do it other way
+                "SkillType",
+                {
+                    "template": "is_atlas_passive",
+                    "condition": lambda v: v > 0,
+                    "format": lambda v: True,
+                },
+            ),
             (
                 "IsRootOfAtlasTree",
                 {
@@ -463,7 +471,7 @@ class PassiveSkillParser(parser.BaseParser):
                 self._get_stats(
                     stats=stat_ids,
                     values=values,
-                    translation_file=get_translation_file(bool(passive["AtlasSubTree"])),
+                    translation_file=get_translation_file(passive["Id"]),
                 )
             )
         )
@@ -528,14 +536,14 @@ class PassiveSkillParser(parser.BaseParser):
 
             infobox["icon"] = posixpath.basename(passive["Icon_DDSFile"]).replace(".dds", "")
 
+            if passive["Icon_DDSFile"].startswith("Art/2DArt/SkillIcons/passives/"):
+                icon = passive["Icon_DDSFile"].split("/")
+                if icon[-2] != "passives":
+                    infobox["icon"] = "%s (%s)" % (infobox["icon"], icon[-2])
+
             # Extract icons if specified
             if self.parsed_args.store_images:
-                if bool(passive["AtlasSubTree"]):
-                    icon = "%s atlas" % infobox["icon"]
-                elif bool(passive["Ascendancy"]):
-                    icon = "%s %s" % (infobox["icon"], passive["Ascendancy"]["Id"])
-                else:
-                    icon = infobox["icon"]
+                icon = infobox["icon"]
                 self._write_dds(
                     data=data,
                     out_path=os.path.join(self._img_path, "%s passive skill icon.dds" % icon),
@@ -544,6 +552,7 @@ class PassiveSkillParser(parser.BaseParser):
         # atlas_start_node doesn't have an icon path
         else:
             warnings.warn(f"Icon path file not found for {passive['Id']}: {passive['Name']}")
+            infobox.pop("icon")
 
 
 # =============================================================================
@@ -582,16 +591,15 @@ def apply_column_map(
         infobox[data["template"]] = value
 
 
-def get_translation_file(is_atlas_passive: bool):
+def get_translation_file(passive_id: str):
     """
-    Determines which translation file should be used
-    based on whether the passive skill has an "AtlasSubTree" key
+    Determines which translation file should be used based on the passive skill ID.
 
     Parameters
     ----------
-    is_atlas_passive: the boolean based on "AtlasSubTree" key
+    passive_id: the Id of the passive skill
     """
-    if is_atlas_passive:
+    if passive_id.startswith("atlas"):
         return "atlas_stat_descriptions.txt"
     else:
         return "passive_skill_stat_descriptions.txt"
