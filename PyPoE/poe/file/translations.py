@@ -2160,8 +2160,9 @@ class TranslationFileCache(AbstractFileCache[TranslationFile]):
         TranslationFile
             the specified TranslationFile
         """
-        if not item.startswith("Metadata/StatDescriptions/"):
-            item = "Metadata/StatDescriptions/" + item
+        dir_name = "Data/StatDescriptions/" if self.sequel == 2 else "Metadata/StatDescriptions/"
+        if not item.startswith(dir_name):
+            item = dir_name + item
         return self.get_file(item)
 
     @doc(doc=AbstractFileCache._get_file_instance_args)
@@ -2446,6 +2447,14 @@ def install_data_dependant_quantifiers(relational_reader: RelationalReader):
         index_column="PassiveSkillGraphId",
         convert_type="short",
         placeholder="&lt;random Passive Skill&gt;",
+    )
+
+    TQRelationalData(
+        id="passive_keystone_index",
+        relational_reader=relational_reader,
+        table="PassiveKeystoneList.dat64",
+        value_column="DisplayText",
+        placeholder="&lt;Keystone Passive Skill&gt;",
     )
 
     TranslationQuantifierHandler.init()
@@ -2827,6 +2836,10 @@ TranslationQuantifier(
 
 TranslationQuantifier(
     id="display_indexable_skill",
+)
+
+TranslationQuantifier(
+    id="passive_keystone_index",
 )
 
 TranslationQuantifierHandler.init()

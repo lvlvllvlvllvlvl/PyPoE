@@ -647,19 +647,21 @@ class MOD_DOMAIN(IntEnumOverride):
     HEIST_AREA = 23
     HEIST_NPC = 24
     HEIST_TRINKET = 25
-    # 26 is unused
+    WATCHSTONE = 26
     VEILED = 27
     DESECRATED = 28
     EXPEDITION_RELIC = 29
     # 30 is unused
     SENTINEL = 31
     MEMORY_LINE = 32
-    # 33 is unused
+    SANCTIFIED_RELIC = 33
     TABLET = 34
     ULTIMATUM_KEY = 35
+    VAULT_KEY = 36
+    INCURSION_LIMB = 37
 
     # Items that can't have mods (may need to increase the number when new values are added)
-    MODS_DISALLOWED = 36
+    MODS_DISALLOWED = 38
 
 
 MOD_TRANSLATION_MAP = {

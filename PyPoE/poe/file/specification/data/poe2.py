@@ -13451,15 +13451,6 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Tags",
-                    type="ref|list|ref|out",
-                    key="Tags.dat",
-                ),
-                Field(
-                    name="SpawnWeight",
-                    type="ref|list|int",
-                ),
-                Field(
                     name="CraftableType",
                     type="ref|out",
                     key="CraftableModTypes.dat",
@@ -17377,10 +17368,6 @@ specification = Specification(
                 ),
                 Field(
                     name="CanHaveAspects",
-                    type="bool",
-                ),
-                Field(
-                    name="CanTransferSkin",
                     type="bool",
                 ),
                 Field(
@@ -30620,22 +30607,6 @@ specification = Specification(
                     file_ext=".ao",
                 ),
                 Field(
-                    name="ACTFile",
-                    type="ref|string",
-                    file_path=True,
-                    file_ext=".act",
-                ),
-                Field(
-                    name="Source",
-                    type="ref|out",
-                    key="MiscEffectPacks.dat",
-                ),
-                Field(
-                    name="Destination",
-                    type="ref|out",
-                    key="MiscEffectPacks.dat",
-                ),
-                Field(
                     name="StatsKeys",
                     type="ref|list|ref|out",
                     key="Stats.dat",
@@ -32089,10 +32060,6 @@ specification = Specification(
                 Field(
                     name="Semantic",
                     type="int",
-                ),
-                Field(
-                    name="Text",
-                    type="ref|string",
                 ),
                 Field(
                     name="Flag1",
