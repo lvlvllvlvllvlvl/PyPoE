@@ -158,7 +158,7 @@ class PassiveSkillParser(parser.BaseParser):
                 "Name",
                 {
                     "template": "name",
-                    "condition": lambda v: v,
+                    "condition": lambda v: parser.strip_keywords(v),
                 },
             ),
             (  # icon param added here but handled elsewhere
@@ -403,15 +403,22 @@ class PassiveSkillParser(parser.BaseParser):
             stat_text, j = self.get_stat_text(infobox, j, passive)
             # For now this is being added to the stat text
             buff_stat_text, j = self.get_buff_stat_text(infobox, j, passive)
+            # Temporary for granted skills
+            granted_skill_stat_text = None
+            if passive["GrantedSkill"]:
+                frm = "Grants Skill: [[{}]]"
+                skill = passive["GrantedSkill"]
+                granted_skill_stat_text = frm.format(skill["BaseItemType"]["Name"])
 
-            if stat_text and buff_stat_text:
-                infobox["stat_text"] = stat_text + "<br>" + buff_stat_text
-            elif stat_text:
-                infobox["stat_text"] = stat_text
-            elif buff_stat_text:
-                infobox["stat_text"] = buff_stat_text
-            else:
-                infobox["stat_text"] = ""
+            stat_parts = []
+            if granted_skill_stat_text:
+                stat_parts.append(granted_skill_stat_text)
+            if stat_text:
+                stat_parts.append(stat_text)
+            if buff_stat_text:
+                stat_parts.append(buff_stat_text)
+
+            infobox["stat_text"] = "<br>".join(stat_parts)
 
             # Handle connections
             node = node_index.get(normalize(passive["PassiveSkillGraphId"]))
