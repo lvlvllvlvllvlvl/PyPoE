@@ -67,10 +67,7 @@ __all__ = []
 
 
 class WikiCondition(parser.WikiCondition):
-    COPY_KEYS = (
-        "main_page",
-        "icon",
-    )
+    COPY_KEYS = ("main_page",)
 
     NAME = "Passive skill"
     ADD_INCLUDE = False
@@ -606,7 +603,7 @@ def get_translation_file(passive_id: str):
     ----------
     passive_id: the Id of the passive skill
     """
-    if passive_id.startswith("atlas"):
+    if passive_id.lower().startswith("atlas"):
         return "atlas_stat_descriptions.txt"
     else:
         return "passive_skill_stat_descriptions.txt"
