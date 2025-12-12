@@ -569,7 +569,7 @@ class MOD_DOMAIN(IntEnumOverride):
     CHEST
         Chest domain, i.e. strongboxes or other type of chest-like
         containers
-    UNKNOWN1
+    STRONGBOX
         Seems to be for strongboxes? ^CHEST for regular chests?
     AREA
         Area domain, i.e. for the various zones of Path of Exile 2
@@ -619,6 +619,8 @@ class MOD_DOMAIN(IntEnumOverride):
         Domain for tablets
     ULTIMATUM_KEY
         Domain for ultimatum keys
+    VAULT_KEY
+        Domain for reliquary vault keys
     UNDEFINED
     """
 
@@ -626,7 +628,7 @@ class MOD_DOMAIN(IntEnumOverride):
     FLASK = 2
     MONSTER = 3
     CHEST = 4
-    UNKNOWN1 = 5
+    STRONGBOX = 5
     AREA = 6
     # 7 is unused
     SANCTUM_RELIC = 8
@@ -667,6 +669,7 @@ class MOD_DOMAIN(IntEnumOverride):
 MOD_TRANSLATION_MAP = {
     MOD_DOMAIN.MONSTER: "monster_stat_descriptions.txt",
     MOD_DOMAIN.CHEST: "chest_stat_descriptions.txt",
+    MOD_DOMAIN.STRONGBOX: "chest_stat_descriptions.txt",
     MOD_DOMAIN.AREA: "map_stat_descriptions.txt",
     MOD_DOMAIN.ATLAS: "atlas_stat_descriptions.txt",
     MOD_DOMAIN.LEAGUESTONE: "leaguestone_stat_descriptions.txt",

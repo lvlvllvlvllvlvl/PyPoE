@@ -50,7 +50,6 @@ from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
-from PyPoE.cli.exporter.poe2wiki.parser import process_keywords, strip_keywords
 from PyPoE.cli.exporter.poe2wiki.parsers.skill import SkillParserShared
 
 # Self
@@ -282,17 +281,6 @@ class WikiCondition(parser.WikiCondition):
         "quest_reward4_act",
         "quest_reward4_class_ids",
         "quest_reward4_npc",
-        # TODO:Remove: When mods will be done, temporary for jewels and some other items
-        "extra_stat1_id",
-        "extra_stat1_min",
-        "extra_stat1_max",
-        "extra_stat2_id",
-        "extra_stat2_min",
-        "extra_stat2_max",
-    )
-    COPY_MATCH = re.compile(
-        r"^(recipe|sell_price|inherent_skill[0-9]+_(?:min|max)_level|implicit[0-9]+_(?:text|random_list)).*",
-        re.UNICODE,
     )
     COPY_MATCH = re.compile(
         r"^(recipe|sell_price|inherent_skill[0-9]+_(?:min|max)_level|implicit[0-9]+_(?:text|random_list)).*",
@@ -1203,7 +1191,7 @@ class ItemsParser(SkillParserShared):
         "One Hand Axe",
         "Two Hand Axe",
         "DivinationCard",
-        # Skills are not supported yet
+        # Skills are not supported 100% yet
         "Active Skill Gem",
         "Meta Skill Gem",
         "Support Skill Gem",
@@ -1459,6 +1447,11 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Weapons/OneHandWeapons/OneHandMaces/FourOneHandMace11",
         "Metadata/Items/Weapons/TwoHandWeapons/TwoHandMaces/FourTwoHandMace11",
         "Metadata/Items/Weapons/TwoHandWeapons/TwoHandMaces/FourTwoHandMace12",
+        # =================================================================
+        # Spears
+        # =================================================================
+        # EA only, mod have 50% while item 100%
+        "Metadata/Items/Weapons/OneHandWeapons/OneHandSpears/FourSpear12",
         # =================================================================
         # Fishing rods
         # =================================================================
@@ -2326,7 +2319,7 @@ class ItemsParser(SkillParserShared):
                 continue
             infobox[attr_long + "_percent"] = skill_gem[attr_short]
 
-        infobox["gem_tags"] = strip_keywords(
+        infobox["gem_tags"] = parser.strip_keywords(
             ", ".join([gt["Name"] for gt in gem_type["GemTags"] if gt["Name"]])
         )
 
@@ -2369,7 +2362,11 @@ class ItemsParser(SkillParserShared):
                 infobox.pop("drop_level")
 
             if gem_type["SupportText"]:
-                infobox["gem_description"] = process_keywords(gem_type["SupportText"])
+                infobox["gem_description"] = parser.process_keywords(gem_type["SupportText"])
+
+        # Skip more complicated skills
+        if ge["AdditionalStatSets"] or additional:
+            return False
 
         primary = OrderedDict()
         self._skill(
@@ -2537,7 +2534,7 @@ class ItemsParser(SkillParserShared):
                 full_result=True,
                 lang=self._language,
             )
-            infobox["buff_stat_text"] = process_keywords(
+            infobox["buff_stat_text"] = parser.process_keywords(
                 "<br>".join([parser.make_inter_wiki_links(line) for line in tr.lines])
             )
 
@@ -2670,7 +2667,7 @@ class ItemsParser(SkillParserShared):
                 {
                     "template": "help_text",
                     "condition": lambda v: v is not None,
-                    "format": lambda v: process_keywords(v["Text"]),
+                    "format": lambda v: parser.process_keywords(v["Text"]),
                 },
             ),
             (
@@ -2678,7 +2675,7 @@ class ItemsParser(SkillParserShared):
                 {
                     "template": "description",
                     "condition": lambda v: v is not None,
-                    "format": lambda v: process_keywords(v["Text"]),
+                    "format": lambda v: parser.process_keywords(v["Text"]),
                 },
             ),
         ),
@@ -2687,14 +2684,14 @@ class ItemsParser(SkillParserShared):
 
     def _currency_extra(self, infobox, base_item_type, currency):
         if infobox.get("description"):
-            infobox["description"] = process_keywords(
+            infobox["description"] = parser.process_keywords(
                 parser.parse_and_handle_description_tags(
                     rr=self.rr,
                     text=infobox["description"],
                 )
             )
         if infobox.get("help_text"):
-            infobox["help_text"] = process_keywords(
+            infobox["help_text"] = parser.process_keywords(
                 parser.parse_and_handle_description_tags(
                     rr=self.rr,
                     text=infobox["help_text"],
@@ -2902,8 +2899,8 @@ class ItemsParser(SkillParserShared):
             item_type = next(
                 (
                     self._COSMETIC_ITEM_CLASS_MAP[self._language].get(
-                        i["ItemClassesKey"]["Id"],
-                        i["ItemClassesKey"]["ItemClassCategory"]["Text"] + suffix,
+                        i["ItemClass"]["Id"],
+                        i["ItemClass"]["ItemClassCategory"]["Text"] + suffix,
                     )
                     for i in (
                         item_index[target]
@@ -2911,7 +2908,7 @@ class ItemsParser(SkillParserShared):
                         or item_index[target + " Trap"]
                         or item_index["Summon " + target]
                     )
-                    if i["ItemClassesKey"] and i["ItemClassesKey"]["Id"] != "Microtransaction"
+                    if i["ItemClass"] and i["ItemClass"]["Id"] != "Microtransaction"
                 ),
                 None,
             )
@@ -2999,7 +2996,7 @@ class ItemsParser(SkillParserShared):
 
         results = []
         for mod in essence_mods:
-            target = process_keywords(mod["TargetItemCategory"]["Text"])
+            target = parser.process_keywords(mod["TargetItemCategory"]["Text"])
             desc = mod["Text"]
 
             # Extract from Mod or DisplayMod if no explicit text
@@ -3010,7 +3007,7 @@ class ItemsParser(SkillParserShared):
                         desc = "<br>".join(stats)
                         break
 
-            results.append((target, process_keywords(desc)))
+            results.append((target, parser.process_keywords(desc)))
 
         # Append results to infobox
         for target, desc in results:
@@ -3036,11 +3033,12 @@ class ItemsParser(SkillParserShared):
     )
 
     # TODO:Remove: When liquid emotions mods will be supported on wiki and mods will be exported
+    # TODO: 4.0 remove this and EnchantedMod??
     def _type_liquid_emotion_extra(self, infobox, base_item_type, emotions):
         stats = self._get_stats(
             mod=emotions["EnchantedMod"], translation_file="atlas_stat_descriptions.txt"
         )
-        desc = process_keywords("<br>".join(stats))
+        desc = parser.process_keywords("<br>".join(stats))
         infobox["implicit1_text"] = "{{c|enchanted|" + desc + "}}"
 
         return True
@@ -3092,23 +3090,10 @@ class ItemsParser(SkillParserShared):
         skip_warning=True,
     )
 
-    def _type_soulcore(self, infobox, base_item_type):
-        # Base SoulCores
-        if "BaseItemType" not in self.rr["SoulCores.dat64"].index:
-            self.rr["SoulCores.dat64"].build_index("BaseItemType")
-
-        try:
-            soulcore = self.rr["SoulCores.dat64"].index["BaseItemType"][base_item_type.rowid]
-        except KeyError:
-            return False
-
+    def _type_soulcore_extra(self, infobox, base_item_type, soulcores):
+        # Some have extra desc that is not in game
         if infobox.get("description"):
             infobox.pop("description")
-
-        if soulcore["RequiredLevel"]:
-            infobox["required_level"] = soulcore["RequiredLevel"]
-        else:
-            infobox.pop("required_level")
 
         sc_stat_map = [
             # stats/values key, target text key
@@ -3132,9 +3117,9 @@ class ItemsParser(SkillParserShared):
 
         results = []
         for stat_key, target in sc_stat_map:
-            if soulcore["Stats" + stat_key]:
-                stats = [s["Id"] for s in soulcore[f"Stats{stat_key}"]]
-                values = soulcore[f"StatsValues{stat_key}"]
+            if soulcores["Stats" + stat_key]:
+                stats = [s["Id"] for s in soulcores[f"Stats{stat_key}"]]
+                values = soulcores[f"StatsValues{stat_key}"]
                 stats = self._get_stats(
                     stats=stats, values=values, translation_file="stat_descriptions.txt"
                 )
@@ -3142,7 +3127,7 @@ class ItemsParser(SkillParserShared):
                 desc = "<br>".join(stats)
                 target = self.rr["ClientStrings.dat64"].index["Id"][target]["Text"]
 
-                results.append((process_keywords(target), process_keywords(desc)))
+                results.append((parser.process_keywords(target), parser.process_keywords(desc)))
 
         # Per class SoulCores
         if "BaseItemType" not in self.rr["SoulCoresPerClass.dat64"].index:
@@ -3160,12 +3145,37 @@ class ItemsParser(SkillParserShared):
             desc = "<br>".join(stats)
             target = sc["ItemClass"]["Name"]
 
-            results.append((target, process_keywords(desc)))
+            results.append((target, parser.process_keywords(desc)))
 
         # Append results to infobox
         infobox["description"] = "<br>".join(f"{target}: {desc}" for target, desc in results)
 
         return True
+
+    _type_soulcore = _type_factory(
+        data_file="SoulCores.dat64",
+        data_mapping=(
+            (
+                "RequiredLevel",
+                {
+                    "template": "required_level",
+                    "condition": lambda v: v > 0,
+                },
+            ),
+            (
+                "Limit",
+                {
+                    "template": "augment_limit",
+                    "condition": lambda v: v is not None,
+                    "format": lambda v: v["Text"].format(v["Limit"]) if v["Text"] else v["Limit"],
+                },
+            ),
+        ),
+        row_index=True,
+        function=_type_soulcore_extra,
+        fail_condition=True,
+        skip_warning=True,
+    )
 
     def _type_uncutgem(self, infobox, base_item_type):
         class_id = base_item_type["ItemClass"]["Id"]
@@ -3215,6 +3225,7 @@ class ItemsParser(SkillParserShared):
         "Two Hand Sword": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
         "Two Hand Axe": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
         "Two Hand Mace": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "Talisman": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
         "FishingRod": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
         "Warstaff": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
         "Spear": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
@@ -3251,10 +3262,9 @@ class ItemsParser(SkillParserShared):
             _type_abyss_bones,
         ),
         "SoulCore": (
-            _type_level,
             _type_currency,
             _type_soulcore,
-        ),  # _type_level to make it in one place for all items
+        ),
         "Omen": (_type_currency,),
         "HideoutDoodad": (_type_currency, _type_hideout_doodad),
         "Microtransaction": (_type_currency, _type_microtransaction),
@@ -3367,8 +3377,8 @@ class ItemsParser(SkillParserShared):
         if base_item_type["Id"] in self._SKIP_ITEMS_BY_ID:
             self._skipped_items.add(base_item_type["Id"])
             return True
-        if base_item_type["ItemClassesKey"]["Id"] in self._ITEM_SKIP_PATTERNS:
-            for pattern in self._ITEM_SKIP_PATTERNS[base_item_type["ItemClassesKey"]["Id"]]:
+        if base_item_type["ItemClass"]["Id"] in self._ITEM_SKIP_PATTERNS:
+            for pattern in self._ITEM_SKIP_PATTERNS[base_item_type["ItemClass"]["Id"]]:
                 if re.search(pattern, base_item_type["Id"], flags=re.IGNORECASE):
                     self._skipped_items.add(base_item_type["Id"])
                     return True
@@ -3427,16 +3437,16 @@ class ItemsParser(SkillParserShared):
 
         # BaseItemTypes.dat
         infobox["name"] = base_item_type["Name"]
-        infobox["class_id"] = base_item_type["ItemClassesKey"]["Id"]
+        infobox["class_id"] = base_item_type["ItemClass"]["Id"]
         infobox["size_x"] = base_item_type["Width"]
         infobox["size_y"] = base_item_type["Height"]
-        if base_item_type["FlavourTextKey"]:
+        if base_item_type["FlavourText"]:
             infobox["flavour_text"] = parser.parse_and_handle_description_tags(
                 rr=self.rr,
-                text=base_item_type["FlavourTextKey"]["Text"],
+                text=base_item_type["FlavourText"]["Text"],
             )
 
-        if base_item_type["ItemClassesKey"]["Id"] not in self._IGNORE_DROP_LEVEL_CLASSES:
+        if base_item_type["ItemClass"]["Id"] not in self._IGNORE_DROP_LEVEL_CLASSES:
             if base_item_type["Id"] in self._DROP_LEVEL_BY_ID:
                 infobox["drop_level"] = self._DROP_LEVEL_BY_ID[base_item_type["Id"]]
             else:
@@ -3463,21 +3473,28 @@ class ItemsParser(SkillParserShared):
 
         description = ot["Stack"].get("function_text")
         if description:
-            infobox["description"] = process_keywords(
+            infobox["description"] = parser.process_keywords(
                 self.rr["ClientStrings.dat64"].index["Id"][description]["Text"]
             )
 
         help_text = ot["Base"].get("description_text")
         if help_text:
-            infobox["help_text"] = infobox["help_text"] = process_keywords(
+            infobox["help_text"] = infobox["help_text"] = parser.process_keywords(
                 "<br>".join(
                     self.rr["ClientStrings.dat64"].index["Id"][help_text]["Text"].splitlines()
                 )
             )
 
-        # TODO:Remove: Unnote when modifiers will be done/exported
-        # for i, mod in enumerate(base_item_type["Implicit_Mods"]):
-        #    infobox["implicit%s" % (i + 1)] = mod["Id"]
+        # Prepend charm slots implicit for belts
+        if base_item_type["ItemClass"]["Id"] == "Belt":
+            if "Id" not in self.rr["Mods.dat64"].index:
+                self.rr["Mods.dat64"].build_index("Id")
+            base_item_type["Implicit_Mods"].insert(
+                0, self.rr["Mods.dat64"].index["Id"]["BeltImplicitCharmSlots3"]
+            )
+
+        for i, mod in enumerate(base_item_type["Implicit_Mods"]):
+            infobox["implicit%s" % (i + 1)] = mod["Id"]
 
     def _process_name_conflicts(self, infobox, base_item_type, language):
         rr = self.rr2 if language != self._language else self.rr
@@ -3541,7 +3558,7 @@ class ItemsParser(SkillParserShared):
     def _export(self, parsed_args, items):
         classes = self._parse_class_filter(parsed_args)
         if classes:
-            items = [item for item in items if item["ItemClassesKey"]["Name"] in classes]
+            items = [item for item in items if item["ItemClass"]["Name"] in classes]
         else:
             items = [item for item in items if item["ItemClass"]["Id"] not in self._EXCLUDE_CLASSES]
 
@@ -3693,6 +3710,7 @@ class ItemsParser(SkillParserShared):
     def _get_icon_process(self, infobox: dict[str, str], base_item_type):
         comp = base_item_type["ItemVisualIdentityKey"]["Composition"]
         if comp == 1:  # Flask
+
             def flask_icon_process(img: Image):
                 layer1 = img.crop((105, 0, 210, 212))
                 layer2 = img.crop((210, 0, 315, 212))
@@ -3700,6 +3718,7 @@ class ItemsParser(SkillParserShared):
                 ico = Image.alpha_composite(layer1, Image.alpha_composite(layer2, layer3))
                 ico = self._resize_icon(ico)
                 return ico
+
             return flask_icon_process
         if comp == 3:  # Gem
             return self._get_gem_icon_process(infobox)

@@ -181,11 +181,20 @@ class AreaParser(parser.BaseParser):
     # Unreleased or disabled areas to avoid exporting to the wiki
     _SKIP_AREAS_BY_ID = [
         "NULL",  # 0.1.0
+        "TN_WorldMap",
+        "CharacterSelect",
+        "G_login",
         "BlackTest",  # 0.3.1
         "Design",  # 0.3.1
         "Design_Lite",  # 0.3.1
         "Programming",  # 0.3.1
         "Programming_Lite",  # 0.3.1
+        "G1_WorldMap",
+        "G2_WorldMap",
+        "G3_WorldMap",
+        "G4_WorldMap",
+        "G5_WorldMap",
+        "G6_WorldMap",
         "G1_10",
         "G2_3s",
         "G2_8a",
@@ -209,6 +218,7 @@ class AreaParser(parser.BaseParser):
                 "Name",
                 {
                     "template": "name",
+                    "condition": lambda v: v,
                 },
             ),
             (
@@ -221,6 +231,7 @@ class AreaParser(parser.BaseParser):
                 "AreaLevel",
                 {
                     "template": "area_level",
+                    "condition": lambda v: v > 0,
                 },
             ),
             (
@@ -280,6 +291,7 @@ class AreaParser(parser.BaseParser):
                 "ParentTown",
                 {
                     "template": "parent_area_id",
+                    "condition": lambda v: v is not None,
                     "format": lambda value: value["Id"],
                 },
             ),
@@ -345,7 +357,7 @@ class AreaParser(parser.BaseParser):
             #     'default': '',
             #     'format': lambda value: ', '.join([str(v) for v in value]),
             # }),
-            # bools
+            # Booleans
             (
                 "IsMapArea",
                 {
@@ -443,9 +455,9 @@ class AreaParser(parser.BaseParser):
         return self.export(parsed_args, out)
 
     def export(self, parsed_args, areas):
-        console("Found %s areas, parsing..." % len(areas))
-
         r = ExporterResult()
+
+        console("Found %s areas, parsing..." % len(areas))
 
         if not areas:
             console(
@@ -487,7 +499,7 @@ class AreaParser(parser.BaseParser):
             if endgame_map:
                 infobox["flavour_text"] = endgame_map["FlavourText"]
 
-                biomes = self._get_endgame_map_biomes(endgame_map)
+                biomes = get_endgame_map_biomes(endgame_map)
                 for k, v in biomes.items():
                     infobox[k] = v
 
@@ -531,23 +543,23 @@ def apply_column_map(
     if not isinstance(list_object, DatRecord):
         list_object = list_object[0]
 
-    for k, data in column_map:
+    for k, data in column_map.items():
         value = list_object[k]
+
         if data.get("condition") and not data["condition"](value):
+            continue
+
+        # Skip default values to reduce size of template
+        if value == data.get("default"):
             continue
 
         if data.get("format"):
             value = data["format"](value)
 
-        if data.get("default") and not value:
-            infobox[data["template"]] = data["default"]
-            continue
-
-        if value:
-            infobox[data["template"]] = value
+        infobox[data["template"]] = value
 
 
-def _get_endgame_map_biomes(endgame_map):
+def get_endgame_map_biomes(endgame_map):
     result = OrderedDict()
 
     seen = set()

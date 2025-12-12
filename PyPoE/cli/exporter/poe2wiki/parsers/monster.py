@@ -176,6 +176,13 @@ class MonsterParser(parser.BaseParser):
                     "format": lambda v: v["Id"],
                 },
             ),
+            (
+                "Name",
+                {
+                    "template": "name",
+                    "condition": lambda v: v,
+                },
+            ),
             # (
             #    "Mods",
             #    {
@@ -208,6 +215,7 @@ class MonsterParser(parser.BaseParser):
                 "Tags",
                 {
                     "template": "tags",
+                    "condition": lambda v: v,
                     "format": lambda v: ", ".join([r["Id"] for r in v]),
                 },
             ),
@@ -215,13 +223,8 @@ class MonsterParser(parser.BaseParser):
                 "GrantedEffects",
                 {
                     "template": "skill_ids",
+                    "condition": lambda v: v,
                     "format": lambda v: ", ".join([r["Id"] for r in v]),
-                },
-            ),
-            (
-                "Name",
-                {
-                    "template": "name",
                 },
             ),
             (
@@ -236,6 +239,7 @@ class MonsterParser(parser.BaseParser):
                 "ObjectSize",
                 {
                     "template": "size",
+                    "default": 0,
                 },
             ),
             (
@@ -282,6 +286,7 @@ class MonsterParser(parser.BaseParser):
             #    "CriticalStrikeChance",
             #    {
             #        "template": "critical_strike_chance",
+            #        "condition": lambda v: v > 0,
             #        "format": lambda v: v / 100,
             #    },
             # ),
@@ -289,6 +294,7 @@ class MonsterParser(parser.BaseParser):
                 "AttackSpeed",
                 {
                     "template": "attack_speed",
+                    "condition": lambda v: v > 0,
                     "format": lambda v: v / 1000,
                 },
             ),
@@ -385,17 +391,17 @@ def apply_column_map(
     if not isinstance(list_object, DatRecord):
         list_object = list_object[0]
 
-    for k, data in column_map:
+    for k, data in column_map.items():
         value = list_object[k]
+
         if data.get("condition") and not data["condition"](value):
+            continue
+
+        # Skip default values to reduce size of template
+        if value == data.get("default"):
             continue
 
         if data.get("format"):
             value = data["format"](value)
 
-        if data.get("default") and not value:
-            infobox[data["template"]] = data["default"]
-            continue
-
-        if value:
-            infobox[data["template"]] = value
+        infobox[data["template"]] = value

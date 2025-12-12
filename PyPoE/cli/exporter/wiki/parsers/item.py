@@ -3958,6 +3958,7 @@ class ItemsParser(SkillParserShared):
     def _get_icon_process(self, infobox: dict[str, str], base_item_type):
         comp = base_item_type["ItemVisualIdentityKey"]["Composition"]
         if comp == 1:  # Flask
+
             def flask_icon_process(img: Image):
                 layer1 = img.crop((78, 0, 156, 156))
                 layer2 = img.crop((156, 0, 234, 156))
@@ -3965,6 +3966,7 @@ class ItemsParser(SkillParserShared):
                 ico = Image.alpha_composite(layer1, Image.alpha_composite(layer2, layer3))
                 ico = self._resize_icon(ico)
                 return ico
+
             return flask_icon_process
         if comp == 3:  # Gem
             return self._get_gem_icon_process(infobox)
