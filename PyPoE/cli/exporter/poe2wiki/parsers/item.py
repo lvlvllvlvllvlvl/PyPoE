@@ -607,6 +607,10 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition2": "Runic Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition3": "Runic Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition4": "Runic Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss1": "Lightless Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss2": "Lightless Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss3": "Lightless Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss4": "Lightless Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss1": "Vanquisher's Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss2": "Vanquisher's Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss3": "Vanquisher's Book of Knowledge",
@@ -644,8 +648,8 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookDelirium1": "Deranging Book of Knowledge",
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookRitual1": "Ritualistic Book of Knowledge",
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition1": "Runic Book of Knowledge",
+            "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss1": "Lightless Book of Knowledge",
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss1": "Vanquisher's Book of Knowledge",
-            # "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss1": "Lightless Book of Knowledge", # TODO:0.4.0
             # =================================================================
             # Uncut Gems
             # =================================================================
@@ -1192,6 +1196,10 @@ class ItemsParser(SkillParserShared):
         "Active Skill Gem",
         "Meta Skill Gem",
         "Support Skill Gem",
+        "SoulCore",
+        # 0.4.0 Atziri's temple stuff
+        "IncursionArm",
+        "IncursionLeg",
     }
 
     # Unreleased or disabled items to avoid exporting to the wiki
@@ -1572,6 +1580,9 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition2",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition3",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition4",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss2",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss3",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss4",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss2",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss3",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss4",
@@ -3028,17 +3039,6 @@ class ItemsParser(SkillParserShared):
         skip_warning=True,
     )
 
-    # TODO:Remove: When liquid emotions mods will be supported on wiki and mods will be exported
-    # TODO: 4.0 remove this and EnchantedMod??
-    def _type_liquid_emotion_extra(self, infobox, base_item_type, emotions):
-        stats = self._get_stats(
-            mod=emotions["EnchantedMod"], translation_file="atlas_stat_descriptions.txt"
-        )
-        desc = parser.process_keywords("<br>".join(stats))
-        infobox["implicit1_text"] = "{{c|enchanted|" + desc + "}}"
-
-        return True
-
     _type_liquid_emotion = _type_factory(
         data_file="BlightCraftingItems.dat64",
         data_mapping=(
@@ -3058,7 +3058,6 @@ class ItemsParser(SkillParserShared):
             ),
         ),
         row_index=True,
-        function=_type_liquid_emotion_extra,
         fail_condition=True,
         skip_warning=True,
     )
@@ -3086,6 +3085,7 @@ class ItemsParser(SkillParserShared):
         skip_warning=True,
     )
 
+    # TODO: 0.4.0 rework
     def _type_soulcore_extra(self, infobox, base_item_type, soulcores):
         # Some have extra desc that is not in game
         if infobox.get("description"):
