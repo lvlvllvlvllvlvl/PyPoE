@@ -69,7 +69,9 @@ __all__ = []
 class WikiCondition(parser.WikiCondition):
     COPY_KEYS = (
         "main_page",
-        "icon",
+        "is_in_game",
+        "release_version",
+        "removal_version",
     )
 
     NAME = "Passive skill"
@@ -158,7 +160,7 @@ class PassiveSkillParser(parser.BaseParser):
                 "Name",
                 {
                     "template": "name",
-                    "condition": lambda v: v,
+                    "condition": lambda v: parser.strip_keywords(v),
                 },
             ),
             (  # icon param added here but handled elsewhere
@@ -191,6 +193,14 @@ class PassiveSkillParser(parser.BaseParser):
                     "template": "atlas_sub_tree",
                     "condition": lambda v: v is not None,
                     "format": lambda v: v["Id"],
+                },
+            ),
+            (  # TODO: Do it other way
+                "SkillType",
+                {
+                    "template": "is_atlas_passive",
+                    "condition": lambda v: v > 0,
+                    "format": lambda v: True,
                 },
             ),
             (
@@ -229,6 +239,13 @@ class PassiveSkillParser(parser.BaseParser):
                 "SkillPointsGranted",
                 {
                     "template": "skill_points",
+                    "condition": lambda v: v > 0,
+                },
+            ),
+            (
+                "WeaponPointsGranted",
+                {
+                    "template": "weapon_points_granted",
                     "condition": lambda v: v > 0,
                 },
             ),
@@ -396,14 +413,52 @@ class PassiveSkillParser(parser.BaseParser):
             # For now this is being added to the stat text
             buff_stat_text, j = self.get_buff_stat_text(infobox, j, passive)
 
-            if stat_text and buff_stat_text:
-                infobox["stat_text"] = stat_text + "<br>" + buff_stat_text
-            elif stat_text:
-                infobox["stat_text"] = stat_text
-            elif buff_stat_text:
-                infobox["stat_text"] = buff_stat_text
-            else:
-                infobox["stat_text"] = ""
+            # Temporary for granted skills
+            granted_skill_stat_text = None
+            if passive["GrantedSkill"]:
+                frm = "Grants Skill: [[{}]]"
+                skill = passive["GrantedSkill"]
+                granted_skill_stat_text = frm.format(skill["BaseItemType"]["Name"])
+
+            def grant_text(key_singular, key_plural, amount):
+                if not amount or amount <= 0:
+                    return None
+
+                cs = self.rr["ClientStrings.dat64"]
+                if "Id" not in cs.index:
+                    cs.build_index("Id")
+
+                key = key_singular if amount == 1 else key_plural
+                frm = cs.index["Id"][key]["Text"]
+                return parser.process_keywords(frm.format(amount))
+
+            # Temporary for WeaponPointsGranted
+            granted_weapon_passives = grant_text(
+                "PassiveNodeGrantsSpecialisationPoint",
+                "PassiveNodeGrantsSpecialisationPoints",
+                passive["WeaponPointsGranted"],
+            )
+
+            # Temporary for SkillPointsGranted
+            granted_skill_passives = grant_text(
+                "PassiveNodeGrantsPassivePoint",
+                "PassiveNodeGrantsPassivePoints",
+                passive["SkillPointsGranted"],
+            )
+
+            stat_parts = []
+            if granted_skill_stat_text:
+                stat_parts.append(granted_skill_stat_text)
+            if granted_skill_passives:
+                stat_parts.append(granted_skill_passives)
+            if granted_weapon_passives:
+                stat_parts.append(granted_weapon_passives)
+            if stat_text:
+                stat_parts.append(stat_text)
+            if buff_stat_text:
+                stat_parts.append(buff_stat_text)
+
+            infobox["stat_text"] = "<br>".join(stat_parts)
 
             # Handle connections
             node = node_index.get(normalize(passive["PassiveSkillGraphId"]))
@@ -463,7 +518,7 @@ class PassiveSkillParser(parser.BaseParser):
                 self._get_stats(
                     stats=stat_ids,
                     values=values,
-                    translation_file=get_translation_file(bool(passive["AtlasSubTree"])),
+                    translation_file=get_translation_file(passive["Id"]),
                 )
             )
         )
@@ -528,14 +583,14 @@ class PassiveSkillParser(parser.BaseParser):
 
             infobox["icon"] = posixpath.basename(passive["Icon_DDSFile"]).replace(".dds", "")
 
+            if passive["Icon_DDSFile"].startswith("Art/2DArt/SkillIcons/passives/"):
+                icon = passive["Icon_DDSFile"].split("/")
+                if icon[-2] != "passives":
+                    infobox["icon"] = "%s (%s)" % (infobox["icon"], icon[-2])
+
             # Extract icons if specified
             if self.parsed_args.store_images:
-                if bool(passive["AtlasSubTree"]):
-                    icon = "%s atlas" % infobox["icon"]
-                elif bool(passive["Ascendancy"]):
-                    icon = "%s %s" % (infobox["icon"], passive["Ascendancy"]["Id"])
-                else:
-                    icon = infobox["icon"]
+                icon = infobox["icon"]
                 self._write_dds(
                     data=data,
                     out_path=os.path.join(self._img_path, "%s passive skill icon.dds" % icon),
@@ -544,6 +599,7 @@ class PassiveSkillParser(parser.BaseParser):
         # atlas_start_node doesn't have an icon path
         else:
             warnings.warn(f"Icon path file not found for {passive['Id']}: {passive['Name']}")
+            infobox.pop("icon")
 
 
 # =============================================================================
@@ -582,16 +638,15 @@ def apply_column_map(
         infobox[data["template"]] = value
 
 
-def get_translation_file(is_atlas_passive: bool):
+def get_translation_file(passive_id: str):
     """
-    Determines which translation file should be used
-    based on whether the passive skill has an "AtlasSubTree" key
+    Determines which translation file should be used based on the passive skill ID.
 
     Parameters
     ----------
-    is_atlas_passive: the boolean based on "AtlasSubTree" key
+    passive_id: the Id of the passive skill
     """
-    if is_atlas_passive:
+    if passive_id.lower().startswith("atlas"):
         return "atlas_stat_descriptions.txt"
     else:
         return "passive_skill_stat_descriptions.txt"

@@ -46,13 +46,12 @@ import numpy as np
 # 3rd-party
 from PIL import Image, ImageOps
 
+# Self
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
 from PyPoE.cli.exporter.poe2wiki.parsers.skill import SkillParserShared
-
-# Self
 from PyPoE.poe import poe2constants as constants
 from PyPoE.poe.file.dat import DatReader, DatRecord, RelationalReader
 from PyPoE.poe.file.it import ITFile
@@ -506,6 +505,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemVolatileDead": "Item",
         "Metadata/items/Gems/SkillGemStaffUnleash": "Item",
         "Metadata/Items/Gem/SkillGemBlinkSandPlayer": "Item",
+        "Metadata/Items/Gem/SkillGemUniqueEarthboundTriggeredSpark": "Item",
         "Metadata/Items/Gem/SkillGemUniqueBreachLightningBolt": "Item",
         "Metadata/Items/Gems/SkillGemLightningBolt": "Item",
         "Metadata/Items/Gem/SkillGemSolarOrb": "Item",
@@ -607,6 +607,10 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition2": "Runic Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition3": "Runic Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition4": "Runic Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss1": "Lightless Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss2": "Lightless Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss3": "Lightless Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss4": "Lightless Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss1": "Vanquisher's Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss2": "Vanquisher's Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss3": "Vanquisher's Book of Knowledge",
@@ -644,6 +648,7 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookDelirium1": "Deranging Book of Knowledge",
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookRitual1": "Ritualistic Book of Knowledge",
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition1": "Runic Book of Knowledge",
+            "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss1": "Lightless Book of Knowledge",
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss1": "Vanquisher's Book of Knowledge",
             # =================================================================
             # Uncut Gems
@@ -663,10 +668,12 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/Gem/SkillGemAscendancyUnleash": " (Chronomancer skill)",
             "Metadata/items/Gems/SkillGemStaffUnleash": " (skill)",
             "Metadata/Items/Gems/SkillGemFlammability": " (curse)",
-            "Metadata/Items/Gem/SkillGemUniqueBreachLightningBolt": " (triggered skill)",
+            "Metadata/Items/Gem/SkillGemUniqueBreachLightningBolt": " (Choir of the Storm)",
             "Metadata/Items/Gems/SkillGemLightningBolt": "",
             "Metadata/Items/Gem/SkillGemBlinkSandPlayer": " (Sands of Silk)",
             "Metadata/Items/Gem/SkillGemBlink": "",
+            "Metadata/Items/Gem/SkillGemUniqueEarthboundTriggeredSpark": " (Earthbound)",
+            "Metadata/Items/Gems/SkillGemSpark": "",
             # Weapon attacks
             "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe": " (one hand)",
             "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe": " (two hand)",
@@ -746,6 +753,10 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/QuestItems/Gallows/Interlude/InterludeFinalSkillBook": " (Interlude)",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDrop": "",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": " (Cruel)",
+            # =================================================================
+            # Map fragments
+            # =================================================================
+            "Metadata/Items/MapFragments/CurrencyAfflictionFragment": " (map fragment)",
             # =================================================================
             # Hideout decorations
             # =================================================================
@@ -1110,16 +1121,6 @@ class ItemsParser(SkillParserShared):
         },
     }
 
-    # Apped name without changing inventory icon
-    _NAME_APPENDIX_BY_ID_2 = {
-        "English": {
-            # =================================================================
-            # Map fragments
-            # =================================================================
-            "Metadata/Items/MapFragments/CurrencyAfflictionFragment": " (map fragment)",
-        },
-    }
-
     _LANG = {
         "English": {
             "Low": "Low Tier",
@@ -1195,6 +1196,10 @@ class ItemsParser(SkillParserShared):
         "Active Skill Gem",
         "Meta Skill Gem",
         "Support Skill Gem",
+        "SoulCore",
+        # 0.4.0 Atziri's temple stuff
+        "IncursionArm",
+        "IncursionLeg",
     }
 
     # Unreleased or disabled items to avoid exporting to the wiki
@@ -1240,7 +1245,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemSkeletalWarrior",
         "Metadata/Items/Gems/SkillGemCorpsewadeCorpseCloud",
         "Metadata/Items/Gem/SkillGemUniqueDuskVigilTriggeredBlazingCluster",
-        "Metadata/Items/Gem/SkillGemUniqueEarthboundTriggeredSpark",
         "Metadata/Items/Gems/UniqueSkillGemHeraldOfAsh",
         "Metadata/Items/Gems/UniqueSkillGemHeraldOfIce",
         "Metadata/Items/Gems/UniqueSkillGemHeraldOfThunder",
@@ -1251,7 +1255,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemDarkTempest",
         "Metadata/Items/Gems/SkillGemCastCurseOnBlock",
         "Metadata/Items/Gems/SkillGemSoulCrystal",
-        # Weapon default attacks
+        # Unreleased weapon default attacks
         "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe",
         "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe",
         "Metadata/Items/Gem/SkillGemPlayerDefaultAxeAxe",
@@ -1576,6 +1580,9 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition2",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition3",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition4",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss2",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss3",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss4",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss2",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss3",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss4",
@@ -3032,17 +3039,6 @@ class ItemsParser(SkillParserShared):
         skip_warning=True,
     )
 
-    # TODO:Remove: When liquid emotions mods will be supported on wiki and mods will be exported
-    # TODO: 4.0 remove this and EnchantedMod??
-    def _type_liquid_emotion_extra(self, infobox, base_item_type, emotions):
-        stats = self._get_stats(
-            mod=emotions["EnchantedMod"], translation_file="atlas_stat_descriptions.txt"
-        )
-        desc = parser.process_keywords("<br>".join(stats))
-        infobox["implicit1_text"] = "{{c|enchanted|" + desc + "}}"
-
-        return True
-
     _type_liquid_emotion = _type_factory(
         data_file="BlightCraftingItems.dat64",
         data_mapping=(
@@ -3062,7 +3058,6 @@ class ItemsParser(SkillParserShared):
             ),
         ),
         row_index=True,
-        function=_type_liquid_emotion_extra,
         fail_condition=True,
         skip_warning=True,
     )
@@ -3090,6 +3085,7 @@ class ItemsParser(SkillParserShared):
         skip_warning=True,
     )
 
+    # TODO: 0.4.0 rework
     def _type_soulcore_extra(self, infobox, base_item_type, soulcores):
         # Some have extra desc that is not in game
         if infobox.get("description"):
@@ -3507,7 +3503,6 @@ class ItemsParser(SkillParserShared):
         override = self._NAME_OVERRIDE_BY_ID[language].get(m_id)
         override_2 = self._NAME_OVERRIDE_BY_ID_2[language].get(m_id)
         appendix = self._NAME_APPENDIX_BY_ID[language].get(m_id)
-        appendix_2 = self._NAME_APPENDIX_BY_ID_2[language].get(m_id)
 
         if override is not None:
             name = override
@@ -3519,8 +3514,6 @@ class ItemsParser(SkillParserShared):
             name += appendix
             if appendix != "":
                 infobox["inventory_icon"] = name
-        elif appendix_2 is not None:
-            name += appendix_2
         else:
             items = [
                 item

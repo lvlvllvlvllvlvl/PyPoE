@@ -268,8 +268,8 @@ class ModParser(parser.BaseParser):
             console("No mods found for the specified parameters. Quitting.", msg=Msg.warning)
             return r
 
-        # Needed for spawn tags
-        self.rr["GoldModPrices.dat64"].build_index("Mod")
+        # Not needed for spawn tags
+        # self.rr["GoldModPrices.dat64"].build_index("Mod")
 
         for mod in mods:
             infobox = OrderedDict()
@@ -319,17 +319,14 @@ class ModParser(parser.BaseParser):
                 infobox["stat%s_min" % i] = vmin
                 infobox["stat%s_max" % i] = vmax
 
-            mod_prices = self.rr["GoldModPrices.dat64"].index["Mod"][mod]
-
             # Spawn weights
-            if mod_prices and mod_prices[0]["Tags"]:
-                i = 0
-                for tag, spawn_weight in zip(mod_prices[0]["Tags"], mod_prices[0]["SpawnWeight"]):
-                    i = i + 1
-                    infobox["spawn_weight%s_tag" % i] = tag["Id"]
-                    infobox["spawn_weight%s_value" % i] = spawn_weight
+            for i, tag in enumerate(mod["SpawnWeight_Tags"]):
+                j = i + 1
+                infobox["spawn_weight%s_tag" % j] = tag["Id"]
+                infobox["spawn_weight%s_value" % j] = mod["SpawnWeight_Values"][i]
 
-            # TODO:Sell price
+            # TODO: Sell price
+            # mod_prices = self.rr["GoldModPrices.dat64"].index["Mod"][mod]
             # mod value + (base value + inherent skill value) * multipliers,
             # and then sell price back to the vendor is 11% of that
             # mod_prices...
