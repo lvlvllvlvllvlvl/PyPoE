@@ -204,6 +204,7 @@ class AreaParser(parser.BaseParser):
         "G4_9_",  # 0.3.0
         "G4_12",  # 0.3.0
         "G4_14",  # 0.3.0
+        "CurrentTown",  # 0.4.0
     ]
 
     _COPY_KEYS = OrderedDict(

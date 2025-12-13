@@ -67,7 +67,12 @@ __all__ = []
 
 
 class WikiCondition(parser.WikiCondition):
-    COPY_KEYS = ("main_page",)
+    COPY_KEYS = (
+        "main_page",
+        "is_in_game",
+        "release_version",
+        "removal_version",
+    )
 
     NAME = "Passive skill"
     ADD_INCLUDE = False
@@ -238,6 +243,13 @@ class PassiveSkillParser(parser.BaseParser):
                 },
             ),
             (
+                "WeaponPointsGranted",
+                {
+                    "template": "weapon_points_granted",
+                    "condition": lambda v: v > 0,
+                },
+            ),
+            (
                 "GrantedSkill",
                 {
                     "template": "granted_skill",
@@ -400,6 +412,7 @@ class PassiveSkillParser(parser.BaseParser):
             stat_text, j = self.get_stat_text(infobox, j, passive)
             # For now this is being added to the stat text
             buff_stat_text, j = self.get_buff_stat_text(infobox, j, passive)
+
             # Temporary for granted skills
             granted_skill_stat_text = None
             if passive["GrantedSkill"]:
@@ -407,9 +420,39 @@ class PassiveSkillParser(parser.BaseParser):
                 skill = passive["GrantedSkill"]
                 granted_skill_stat_text = frm.format(skill["BaseItemType"]["Name"])
 
+            def grant_text(key_singular, key_plural, amount):
+                if not amount or amount <= 0:
+                    return None
+
+                cs = self.rr["ClientStrings.dat64"]
+                if "Id" not in cs.index:
+                    cs.build_index("Id")
+
+                key = key_singular if amount == 1 else key_plural
+                frm = cs.index["Id"][key]["Text"]
+                return parser.process_keywords(frm.format(amount))
+
+            # Temporary for WeaponPointsGranted
+            granted_weapon_passives = grant_text(
+                "PassiveNodeGrantsSpecialisationPoint",
+                "PassiveNodeGrantsSpecialisationPoints",
+                passive["WeaponPointsGranted"],
+            )
+
+            # Temporary for SkillPointsGranted
+            granted_skill_passives = grant_text(
+                "PassiveNodeGrantsPassivePoint",
+                "PassiveNodeGrantsPassivePoints",
+                passive["SkillPointsGranted"],
+            )
+
             stat_parts = []
             if granted_skill_stat_text:
                 stat_parts.append(granted_skill_stat_text)
+            if granted_skill_passives:
+                stat_parts.append(granted_skill_passives)
+            if granted_weapon_passives:
+                stat_parts.append(granted_weapon_passives)
             if stat_text:
                 stat_parts.append(stat_text)
             if buff_stat_text:
