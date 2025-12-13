@@ -621,6 +621,8 @@ class MOD_DOMAIN(IntEnumOverride):
         Domain for ultimatum keys
     VAULT_KEY
         Domain for reliquary vault keys
+    INCURSION_LIMB
+        Domain for limbs from Atziri's Temple
     UNDEFINED
     """
 

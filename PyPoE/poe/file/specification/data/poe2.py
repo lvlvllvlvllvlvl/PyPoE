@@ -13464,6 +13464,7 @@ specification = Specification(
                     name="Mod",
                     type="ref|out",
                     key="Mods.dat",
+                    unique=True,
                 ),
                 Field(
                     name="Value",
@@ -23025,7 +23026,7 @@ specification = Specification(
                     key="Tags.dat",
                 ),
                 Field(
-                    name="SpawnWeight_Values",
+                    name="Data0",
                     type="ref|list|int",
                 ),
                 Field(
@@ -23273,6 +23274,10 @@ specification = Specification(
                 Field(
                     name="Unknown18",
                     type="int",
+                ),
+                Field(
+                    name="SpawnWeight_Values",
+                    type="ref|list|int",
                 ),
             ),
             virtual_fields=(
@@ -27924,6 +27929,10 @@ specification = Specification(
                     type="ref|string",
                 ),
                 Field(
+                    name="PassiveSkillGraph",
+                    type="ref|string",
+                ),
+                Field(
                     name="Unknown0",
                     type="int",
                 ),
@@ -27938,6 +27947,60 @@ specification = Specification(
                 Field(
                     name="Unknown3",
                     type="float",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag1",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag2",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag3",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag4",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag5",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag6",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag7",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag8",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag9",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag10",
+                    type="bool",
+                ),
+                Field(
+                    name="Name",
+                    type="ref|out",
+                    key="ClientStrings.dat",
+                ),
+                Field(
+                    name="UIArt",
+                    type="ref|out",
+                    key="PassiveSkillTreeUIArt.dat",
                 ),
             ),
         ),
