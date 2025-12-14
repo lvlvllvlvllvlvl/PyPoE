@@ -16742,6 +16742,248 @@ specification = Specification(
                 ),
             ),
         ),
+        "Incursion2CorruptionCurrencies.dat": File(
+            fields=(
+                Field(
+                    name="BaseItemType",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                    unique=True,
+                ),
+                Field(
+                    name="ItemClasses",
+                    type="ref|list|ref|out",
+                    key="ItemClasses.dat",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+            ),
+        ),
+        "Incursion2Crafting.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="BaseItemType",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
+                Field(
+                    name="Icon_DDSFile",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".dds",
+                ),
+                Field(
+                    name="Name",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Description",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="Unknown2",
+                    type="int",
+                ),
+                Field(
+                    name="GlowIcon_DDSFile",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".dds",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+            ),
+        ),
+        "Incursion2EncounterTilePerArea.dat": File(
+            fields=(
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                    unique=True,
+                ),
+                Field(
+                    name="Unknown0",
+                    type="ref|string",
+                ),
+            ),
+        ),
+        "Incursion2Medallions.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="Name",
+                    type="ref|string",
+                ),
+                Field(
+                    name="FlavourText",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Icon_DDSFile",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".dds",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Description",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                ),
+            ),
+        ),
+        "Incursion2MutatedUniqueModsClient.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="Mods",
+                    type="ref|list|ref|out",
+                    key="Mods.dat",
+                ),
+            ),
+        ),
+        "Incursion2RoomPerLevel.dat": File(
+            fields=(
+                Field(
+                    name="Room",
+                    type="ref|out",
+                    key="Incursion2Rooms.dat",
+                ),
+                Field(
+                    name="Level",
+                    type="int",
+                ),
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="Description",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Name",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Icon_DDSFile",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".dds",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Data0",
+                    type="ref|list|int",
+                ),
+            ),
+        ),
+        "Incursion2Rooms.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="IsPathway",
+                    type="bool",
+                ),
+                Field(
+                    name="Data0",
+                    type="ref|list|ref|generic",
+                    key="Incursion2Rooms.dat",
+                ),
+                Field(
+                    name="Data1",
+                    type="ref|list|ref|generic",
+                    key="Incursion2Rooms.dat",
+                ),
+                Field(
+                    name="Data2",
+                    type="ref|list|ref|generic",
+                    key="Incursion2Rooms.dat",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag1",
+                    type="bool",
+                ),
+                Field(
+                    name="Name",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Icon_DDSFile",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".dds",
+                ),
+            ),
+        ),
+        "Incursion2TempleLevelPerCharacterLevel.dat": File(
+            fields=(
+                Field(
+                    name="CharacterLevel",
+                    type="int",
+                    unique=True,
+                ),
+                Field(
+                    name="AreaLevel",
+                    type="int",
+                ),
+            ),
+        ),
         "IncursionArchitect.dat": File(
             fields=(
                 Field(
@@ -31818,6 +32060,7 @@ specification = Specification(
                 Field(
                     name="Id",
                     type="ref|string",
+                    unique=True,
                 ),
                 Field(
                     name="Limit",
@@ -31826,6 +32069,87 @@ specification = Specification(
                 Field(
                     name="Text",
                     type="ref|string",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+            ),
+        ),
+        "SoulCoreStatCategories.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="TargetItemClasses",
+                    type="ref|list|ref|out",
+                    key="ItemClasses.dat",
+                ),
+                Field(
+                    name="Display",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+            ),
+        ),
+        "SoulCoreStats.dat": File(
+            fields=(
+                Field(
+                    name="SoulCore",
+                    type="ref|out",
+                    key="SoulCores.dat",
+                ),
+                Field(
+                    name="StatCategory",
+                    type="ref|out",
+                    key="SoulCoreStatCategories.dat",
+                ),
+                Field(
+                    name="Stats",
+                    type="ref|list|ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="StatsValues",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="BondedStats",
+                    type="ref|list|ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="BondedStatsValues",
+                    type="ref|list|int",
+                ),
+            ),
+        ),
+        "SoulCoreTypes.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="EffectStat",
+                    type="ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="Name",
+                    type="ref|string",
+                ),
+                Field(
+                    name="SocketedStat",
+                    type="ref|out",
+                    key="Stats.dat",
                 ),
             ),
         ),
@@ -31837,28 +32161,23 @@ specification = Specification(
                     key="BaseItemTypes.dat",
                     unique=True,
                 ),
-            ),
-        ),
-        "SoulCoresPerClass.dat": File(
-            fields=(
                 Field(
-                    name="BaseItemType",
+                    name="RequiredLevel",
+                    type="int",
+                ),
+                Field(
+                    name="Limit",
                     type="ref|out",
-                    key="BaseItemTypes.dat",
+                    key="SoulCoreLimits.dat",
                 ),
                 Field(
-                    name="ItemClass",
+                    name="Key0",
                     type="ref|out",
-                    key="ItemClasses.dat",
                 ),
                 Field(
-                    name="Stats",
-                    type="ref|list|ref|out",
-                    key="Stats.dat",
-                ),
-                Field(
-                    name="StatsValues",
-                    type="ref|list|int",
+                    name="Type",
+                    type="ref|out",
+                    key="SoulCoreTypes.dat",
                 ),
             ),
         ),

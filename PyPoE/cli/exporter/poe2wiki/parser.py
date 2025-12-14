@@ -2956,7 +2956,7 @@ def process_keywords(text: str):
             return f"[[{link}|{key}]]"
         return f"[[{key}]]"
 
-    return re.sub(r"\[(.+?)\]", replace_match, text)
+    return re.sub(r"(?<!\[)\[([^\[\]]+?)\](?!\])", replace_match, text)
 
 
 def strip_keywords(text: str):
