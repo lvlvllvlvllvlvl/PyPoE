@@ -1196,7 +1196,6 @@ class ItemsParser(SkillParserShared):
         "Active Skill Gem",
         "Meta Skill Gem",
         "Support Skill Gem",
-        "SoulCore",
         # 0.4.0 Atziri's temple stuff
         "IncursionArm",
         "IncursionLeg",
@@ -3085,66 +3084,64 @@ class ItemsParser(SkillParserShared):
         skip_warning=True,
     )
 
-    # TODO: 0.4.0 rework
-    def _type_soulcore_extra(self, infobox, base_item_type, soulcores):
+    def _type_soulcore_extra(self, infobox, base_item_type, soulcore):
         # Some have extra desc that is not in game
         if infobox.get("description"):
             infobox.pop("description")
 
-        sc_stat_map = [
-            # stats/values key, target text key
+        results = OrderedDict(
             (
-                "MartialWeapon",
-                "SoulCoreCategoryWeapons",
-            ),
-            (
-                "Armour",
-                "SoulCoreCategoryArmour",
-            ),
-            (
-                "CasterWeapon",
-                "SoulCoreCategoryCasterWeapons",
-            ),
-            (
-                "AllEquipment",
-                "SoulCoreCategoryAllEquipment",
-            ),
-        ]
+                ("generic", []),
+                ("bonded", []),
+            )
+        )
 
-        results = []
-        for stat_key, target in sc_stat_map:
-            if soulcores["Stats" + stat_key]:
-                stats = [s["Id"] for s in soulcores[f"Stats{stat_key}"]]
-                values = soulcores[f"StatsValues{stat_key}"]
-                stats = self._get_stats(
-                    stats=stats, values=values, translation_file="stat_descriptions.txt"
+        # Stats
+        if "SoulCore" not in self.rr["SoulCoreStats.dat64"].index:
+            self.rr["SoulCoreStats.dat64"].build_index("SoulCore")
+
+        for sc in self.rr["SoulCoreStats.dat64"].index["SoulCore"][soulcore]:
+            if sc["StatCategory"]["Display"]:
+                target = sc["StatCategory"]["Display"]
+            else:  # Unsure if this is that or something else
+                target = sc["StatCategory"]["TargetItemClasses"][0]["Name"]
+
+            def get_stats(stats, values):
+                stats = [s["Id"] for s in stats]
+                values = values
+                return "<br>".join(
+                    self._get_stats(
+                        stats=stats, values=values, translation_file="stat_descriptions.txt"
+                    )
                 )
 
-                desc = "<br>".join(stats)
-                target = self.rr["ClientStrings.dat64"].index["Id"][target]["Text"]
+            # Get stats
+            if sc["Stats"]:
+                results["generic"].append([target, get_stats(sc["Stats"], sc["StatsValues"])])
+            if sc["BondedStats"]:
+                results["bonded"].append(
+                    [target, get_stats(sc["BondedStats"], sc["BondedStatsValues"])]
+                )
 
-                results.append((parser.process_keywords(target), parser.process_keywords(desc)))
+        # Join stats into one string
+        for key, value in results.items():
+            if value:
+                results[key] = parser.process_keywords(
+                    "<br>".join(f"{target}: {desc}" for target, desc in value)
+                )
 
-        # Per class SoulCores
-        if "BaseItemType" not in self.rr["SoulCoresPerClass.dat64"].index:
-            self.rr["SoulCoresPerClass.dat64"].build_index("BaseItemType")
+        # Finish
+        parts = []
+        if results["generic"]:
+            parts.append(results["generic"])
+        if results["bonded"]:
+            parts.append("Bonded:<br>" + results["bonded"])
 
-        soulcore_pc = self.rr["SoulCoresPerClass.dat64"].index["BaseItemType"][base_item_type]
-
-        for sc in soulcore_pc:
-            stats = [s["Id"] for s in sc["Stats"]]
-            values = sc["StatsValues"]
-            stats = self._get_stats(
-                stats=stats, values=values, translation_file="stat_descriptions.txt"
-            )
-
-            desc = "<br>".join(stats)
-            target = sc["ItemClass"]["Name"]
-
-            results.append((target, parser.process_keywords(desc)))
-
-        # Append results to infobox
-        infobox["description"] = "<br>".join(f"{target}: {desc}" for target, desc in results)
+        infobox["description"] = "<br><br>".join(parts)
+        if results["generic"]:
+            infobox["augment_stat_text"] = results["generic"]
+        if results["bonded"]:
+            infobox["augment_stat_text_bonded"] = results["bonded"]
 
         return True
 
@@ -3163,14 +3160,32 @@ class ItemsParser(SkillParserShared):
                 {
                     "template": "augment_limit",
                     "condition": lambda v: v is not None,
-                    "format": lambda v: v["Text"].format(v["Limit"]) if v["Text"] else v["Limit"],
+                    "format": lambda v: (
+                        parser.process_keywords(v["Text"].format(v["Limit"]))
+                        if v["Text"]
+                        else v["Limit"]
+                    ),
+                },
+            ),
+            (
+                "Type",
+                {
+                    "template": "augment_type_id",
+                    "conditon": lambda v: v is not None,
+                    "format": lambda v: v["Id"],
+                },
+            ),
+            (
+                "Type",
+                {
+                    "template": "augment_type",
+                    "conditon": lambda v: v is not None,
+                    "format": lambda v: parser.strip_keywords(v["Name"]),
                 },
             ),
         ),
         row_index=True,
         function=_type_soulcore_extra,
-        fail_condition=True,
-        skip_warning=True,
     )
 
     def _type_uncutgem(self, infobox, base_item_type):
