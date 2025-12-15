@@ -638,6 +638,10 @@ class ItemsParser(SkillParserShared):
             # Skill Gems
             # =================================================================
             "Metadata/Items/Gem/SupportGemLivingLightning": "Living Lightning I",
+            "Metadata/Items/Gem/SupportGemAmbrosia": "Ambrosia I",
+            "Metadata/Items/Gem/SupportGemSingleOut": "Mark for Death I",
+            "Metadata/Items/Gems/SupportGemMarkOfSiphoning": "Mark of Siphoning I",
+            "Metadata/Items/Gems/SupportGemThrillOfTheKill": "Thrill of the Kill I",
             # =================================================================
             # Quest Items
             # =================================================================
@@ -674,6 +678,7 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/Gem/SkillGemBlink": "",
             "Metadata/Items/Gem/SkillGemUniqueEarthboundTriggeredSpark": " (Earthbound)",
             "Metadata/Items/Gems/SkillGemSpark": "",
+            "Metadata/Items/Gems/SkillGemBriarpatch": " (skill gem)",
             # Weapon attacks
             "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe": " (one hand)",
             "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe": " (two hand)",
@@ -1164,7 +1169,6 @@ class ItemsParser(SkillParserShared):
         "DelveSocketableCurrency",
         "DelveStackableSocketableCurrency",
         "Incubator",
-        "IncubatorStackable",
         "HeistContract",
         "HeistEquipmentWeapon",
         "HeistEquipmentTool",
@@ -1222,20 +1226,11 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gem/SkillGemDetonateMinion",
         "Metadata/Items/Gem/SkillGemElementalSiphon",
         "Metadata/Items/Gems/SkillGemExsanguinate",
-        "Metadata/Items/Gems/SupportGemFerociousRoar",
-        "Metadata/Items/Gems/SkillGemFuriousSlam",
         "Metadata/Items/Gem/SkillGemHydra",
-        "Metadata/Items/Gems/SkillGemLightningStorm",
-        "Metadata/Items/Gems/SkillGemBearMaul",
-        "Metadata/Items/Gems/SkillGemBearRampage",
-        "Metadata/Items/Gems/SkillGemRollingMagma",
         "Metadata/Items/Gems/SkillGemShroud",
         "Metadata/Items/Gems/SkillGemSoulrend",
         "Metadata/Items/Gems/SkillGemSpinningInferno",
         "Metadata/Items/Gems/SkillGemSummonMercenaryCompanion",
-        "Metadata/Items/Gems/SkillGemSummonWolfCompanion",
-        "Metadata/Items/Gems/SkillGemTornado",
-        "Metadata/Items/Gems/SkillGemVolcano",
         "Metadata/Items/Gem/SkillGemPlaytestAttack",
         "Metadata/Items/Gem/SkillGemPlaytestSpell",
         "Metadata/Items/Gem/SkillGemPlaytestSlam",
@@ -1254,6 +1249,9 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemDarkTempest",
         "Metadata/Items/Gems/SkillGemCastCurseOnBlock",
         "Metadata/Items/Gems/SkillGemSoulCrystal",
+        # New 0.4.0
+        "Metadata/Items/Gem/SkillGemPrimalAvatar",
+        "Metadata/Items/Gems/SkillGemRunicTempering",
         # Unreleased weapon default attacks
         "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe",
         "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe",
@@ -1285,13 +1283,20 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gem/SupportGemAdhereThree",
         "Metadata/Items/Gems/SupportGemAftershockThree",
         "Metadata/Items/Gem/SupportGemAncestralCallThree",
-        "Metadata/Items/Gems/SupportGemDiscombobulate",  # Daze
-        "Metadata/Items/Gem/SupportGemBloodintheEyes",  # Hobble
+        "Metadata/Items/Gems/SupportGemDiscombobulate",  # EA only
+        "Metadata/Items/Gem/SupportGemBloodintheEyes",  # EA only
         "Metadata/Items/Gems/SupportGemOverabundanceThree",
         "Metadata/Items/Gems/SupportGemPersistenceThree",
         "Metadata/Items/Gem/SupportGemGrudge",
+        "Metadata/Items/Gem/SupportGemUnsteadyTempo",  # Removed
         # New 0.3.1
         "Metadata/Items/Gem/SupportGemFlamePillar",
+        # New 0.4.0
+        "Metadata/Items/Gem/SupportGemHideOfHelbrym",
+        "Metadata/Items/Gem/SupportGemAtzirisCommunion",
+        "Metadata/Items/Gem/SupportGemRicochetThree",  # EA only
+        "Metadata/Items/Gem/SupportGemGreatwoodTwo",  # Removed
+        "Metadata/Items/Gems/SupportGemFontofRage",  # Removed
         # =================================================================
         # Uncut Gems
         # =================================================================
@@ -1454,7 +1459,7 @@ class ItemsParser(SkillParserShared):
         # Spears
         # =================================================================
         # EA only, mod have 50% while item 100%
-        "Metadata/Items/Weapons/OneHandWeapons/OneHandSpears/FourSpear12",
+        # "Metadata/Items/Weapons/OneHandWeapons/OneHandSpears/FourSpear12",
         # =================================================================
         # Fishing rods
         # =================================================================
@@ -1524,6 +1529,9 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Currency/CurrencyVultureFeather",
         "Metadata/Items/Currency/CurrencyPeacockFeather",
         "Metadata/Items/Currency/CurrencySkillGemToken",
+        "Metadata/Items/Currency/CurrencyIncursionCorrupt1",
+        # New 0.4.0
+        "Metadata/Items/Currency/CurrencyIncursionExtractAllSocketablesBench",
         # =================================================================
         # SoulCores
         # =================================================================
@@ -2210,8 +2218,10 @@ class ItemsParser(SkillParserShared):
             r"SentinelCurrency",
             r"BestiaryNet",
             r"RandomFossilOutcome",
-            r"CurrencyIncursionCorrupt",
             r"CurrencyAddAtlasMod",
+        },
+        "IncubatorStackable": {
+            r"CurrencyIncubation",
         },
         "MapFragment": {
             r"Scarabs",
@@ -3137,7 +3147,6 @@ class ItemsParser(SkillParserShared):
         if results["bonded"]:
             parts.append("Bonded:<br>" + results["bonded"])
 
-        infobox["description"] = "<br><br>".join(parts)
         if results["generic"]:
             infobox["augment_stat_text"] = results["generic"]
         if results["bonded"]:
@@ -3277,9 +3286,11 @@ class ItemsParser(SkillParserShared):
             _type_soulcore,
         ),
         "Omen": (_type_currency,),
+        "IncubatorStackable": (_type_currency,),
+        "DivinationCard": (_type_currency,),
+        # Remove mtx VVV?
         "HideoutDoodad": (_type_currency, _type_hideout_doodad),
         "Microtransaction": (_type_currency, _type_microtransaction),
-        "DivinationCard": (_type_currency,),
         # Misc
         "Map": (_type_map,),  # Aka waystone
         "MapFragment": (_type_currency,),
