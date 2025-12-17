@@ -635,13 +635,15 @@ class ItemsParser(SkillParserShared):
     _NAME_OVERRIDE_BY_ID_2 = {
         "English": {
             # =================================================================
-            # Skill Gems
+            # Support Gems
             # =================================================================
             "Metadata/Items/Gem/SupportGemLivingLightning": "Living Lightning I",
             "Metadata/Items/Gem/SupportGemAmbrosia": "Ambrosia I",
             "Metadata/Items/Gem/SupportGemSingleOut": "Mark for Death I",
             "Metadata/Items/Gems/SupportGemMarkOfSiphoning": "Mark of Siphoning I",
             "Metadata/Items/Gems/SupportGemThrillOfTheKill": "Thrill of the Kill I",
+            "Metadata/Items/Gems/SupportGemExplosiveGrowth": "Accelerated Growth I",
+            "Metadata/Items/Gems/SupportGemFanTheFlames": "Fan The Flames I",
             # =================================================================
             # Quest Items
             # =================================================================
@@ -671,7 +673,7 @@ class ItemsParser(SkillParserShared):
             # =================================================================
             "Metadata/Items/Gem/SkillGemAscendancyUnleash": " (Chronomancer skill)",
             "Metadata/items/Gems/SkillGemStaffUnleash": " (skill)",
-            "Metadata/Items/Gems/SkillGemFlammability": " (curse)",
+            "Metadata/Items/Gems/SkillGemFlammability": " (skill gem)",
             "Metadata/Items/Gem/SkillGemUniqueBreachLightningBolt": " (Choir of the Storm)",
             "Metadata/Items/Gems/SkillGemLightningBolt": "",
             "Metadata/Items/Gem/SkillGemBlinkSandPlayer": " (Sands of Silk)",
@@ -707,6 +709,7 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/Gems/SupportGemMaim": " (support gem)",
             "Metadata/Items/Gems/SupportGemConduction": " (support gem)",
             "Metadata/Items/Gem/SupportGemVolatility": " (support gem)",
+            "Metadata/Items/Gem/SupportGemIncision": " (support gem)",
             "Metadata/Items/Gems/SupportGemUnleash": "",
             # =================================================================
             # Uncut Gems
@@ -3266,7 +3269,7 @@ class ItemsParser(SkillParserShared):
         "Support Skill Gem": (
             _type_level,
             _skill_gem,
-        ),  # _type_level to make it in one place for all items (lineage)
+        ),
         "Meta Skill Gem": (_skill_gem,),
         # Uncut gems
         "UncutSkillGemStackable": (_type_uncutgem,),

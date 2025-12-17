@@ -43,7 +43,6 @@ from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
 from PyPoE.poe import poe2constants as constants
-from PyPoE.poe.file.dat import DatRecord
 
 # =============================================================================
 # Globals
@@ -134,73 +133,63 @@ class ModParser(parser.BaseParser):
         error_msg="Several modifiers have not been found:\n%s",
     )
 
-    _COPY_KEYS = OrderedDict(
+    _COPY_KEYS = (
         (
-            (
-                "Id",
-                {
-                    "template": "id",
-                },
-            ),
-            (
-                "Families",
-                {
-                    "template": "mod_groups",
-                    "condition": lambda v: v,
-                    "format": lambda v: ", ".join([m["Id"] for m in v]),
-                },
-            ),
-            (
-                "Domain",
-                {
-                    "template": "domain",
-                },
-            ),
-            (
-                "GenerationType",
-                {
-                    "template": "generation_type",
-                },
-            ),
-            (
-                "Level",
-                {
-                    "template": "required_level",
-                    "condition": lambda v: v > 0,
-                },
-            ),
-            (
-                "Name",
-                {
-                    "template": "name",
-                    "condition": lambda v: v,
-                },
-            ),
-            (
-                "ModType",
-                {
-                    "template": "mod_type",
-                    "condition": lambda v: v is not None,
-                    "format": lambda v: v["Name"],
-                },
-            ),
-            # (
-            #    "Tags",
-            #    {
-            #        "template": "tags",
-            #        "condition": lambda v: v,
-            #        "format": lambda v: ", ".join([t["Id"] for t in v]),
-            #    },
-            # ),
-            (
-                "ImplicitTags",
-                {
-                    "template": "tags",  # "implicit_tags",
-                    "condition": lambda v: v,
-                    "format": lambda v: ", ".join([t["Id"] for t in v]),
-                },
-            ),
-        )
+            "Id",
+            {
+                "template": "id",
+            },
+        ),
+        (
+            "Families",
+            {
+                "template": "mod_groups",
+                "condition": lambda v: v,
+                "format": lambda v: ", ".join([m["Id"] for m in v]),
+            },
+        ),
+        (
+            "Domain",
+            {
+                "template": "domain",
+            },
+        ),
+        (
+            "GenerationType",
+            {
+                "template": "generation_type",
+            },
+        ),
+        (
+            "Level",
+            {
+                "template": "required_level",
+                "condition": lambda v: v > 0,
+            },
+        ),
+        (
+            "Name",
+            {
+                "template": "name",
+                "condition": lambda v: v,
+            },
+        ),
+        (
+            "ModType",
+            {
+                "template": "mod_type",
+                "condition": lambda v: v is not None,
+                "format": lambda v: v["Name"],
+            },
+        ),
+        (
+            "ImplicitTags",
+            {
+                "template": "tags",
+                "condition": lambda v: v,
+                "format": lambda v: ", ".join([t["Id"] for t in v]),
+            },
+        ),
     )
 
     def _append_effect(self, result, mylist, heading):
@@ -262,11 +251,14 @@ class ModParser(parser.BaseParser):
     def _export(self, parsed_args, mods):
         r = ExporterResult()
 
-        if mods:
-            console("Found %s mods. Processing..." % len(mods))
-        else:
-            console("No mods found for the specified parameters. Quitting.", msg=Msg.warning)
+        if not mods:
+            console(
+                "No modifiers found for the specified parameters. Quitting.",
+                msg=Msg.warning,
+            )
             return r
+
+        console("Found %s mods. Processing..." % len(mods))
 
         # Not needed for spawn tags
         # self.rr["GoldModPrices.dat64"].build_index("Mod")
@@ -275,7 +267,7 @@ class ModParser(parser.BaseParser):
             infobox = OrderedDict()
 
             # Copy over simple fields from the .dat64
-            apply_column_map(infobox, self._COPY_KEYS, mod)
+            parser.apply_simple_column_map(infobox, self._COPY_KEYS, mod)
 
             if mod["BuffTemplate"] and mod["BuffTemplate"]["BuffDefinition"]:
                 infobox["granted_buff_id"] = mod["BuffTemplate"]["BuffDefinition"]["Id"]
@@ -354,34 +346,3 @@ class ModParser(parser.BaseParser):
 # =============================================================================
 # Functions
 # =============================================================================
-
-
-def apply_column_map(
-    infobox, column_map: tuple[tuple[str, dict], ...], list_object: DatRecord | list[DatRecord]
-):
-    """
-    Copy over simple fields from the .dat64
-
-    Parameters
-    ----------
-    infobox: Dictionary in which values should be added
-    column_map: Map to apply
-    list_object: File to search for keys
-    """
-    if not isinstance(list_object, DatRecord):
-        list_object = list_object[0]
-
-    for k, data in column_map.items():
-        value = list_object[k]
-
-        if data.get("condition") and not data["condition"](value):
-            continue
-
-        # Skip default values to reduce size of template
-        if value == data.get("default"):
-            continue
-
-        if data.get("format"):
-            value = data["format"](value)
-
-        infobox[data["template"]] = value
