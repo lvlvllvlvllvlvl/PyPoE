@@ -506,9 +506,7 @@ class SkillParserShared(parser.BaseParser):
 
         act_skill = gra_eff["ActiveSkill"]
         if act_skill:
-            file = act_skill["StatDescription"]
-            file = file.removeprefix("Metadata/StatDescriptions/").removesuffix("/") + ".txt"
-            tf = self.tc[file]
+            tf = self.tc[act_skill["StatDescription"]]
 
             if parsed_args.store_images and act_skill["Icon_DDSFile"]:
                 file_path = act_skill["Icon_DDSFile"]

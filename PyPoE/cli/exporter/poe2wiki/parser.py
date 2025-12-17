@@ -73,7 +73,7 @@ from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.util import fix_path, get_content_path
 from PyPoE.poe import poe2constants as constants
-from PyPoE.poe.file.dat import RelationalReader
+from PyPoE.poe.file.dat import DatRecord, RelationalReader
 from PyPoE.poe.file.file_system import FileSystem
 from PyPoE.poe.file.it import ITFileCache
 from PyPoE.poe.file.ot import OTFileCache
@@ -1704,23 +1704,9 @@ class TagHandler:
 
     # Language should not be necessary as we are checking Words.dat['Text'],
     # while the translated name is in Text2
-    UNIQ_FORMATS = {
-        "Lightpoacher": "[[%s]]",
-        "Grand Spectrum": "[[%s]]",
-        "Precursor's Emblem": "[[%s]]",
-        "Shroud of the Lightless": "[[%s]]",
-        "Thread of Hope": "{{il|html=|page=%s}}",
-        "Aul's Uprising": "[[%s]]",
-    }
+    UNIQ_FORMATS = {}
 
-    CUSTOM_LINKS = {
-        "4x Scarab": "4x [[Scarab]]",
-        "Horned Scarab": "[[Horned Scarab]]",
-        "Cartography Scarab": "[[Cartography Scarab (disambiguation)|Cartography Scarab]]",
-        "Divination Scarab": "[[Divination Scarab (disambiguation)|Divination Scarab]]",
-        "Bestiary Scarab": "[[Bestiary Scarab (disambiguation)|Bestiary Scarab]]",
-        "Sulphite Scarab": "[[Sulphite Scarab (disambiguation)|Sulphite Scarab]]",
-    }
+    CUSTOM_LINKS = {}
 
     def __init__(self, rr):
         """
@@ -1762,7 +1748,7 @@ class TagHandler:
 
     def _unique_handler(self, hstr, parameter):
         words = self.rr["Words.dat64"].index["Text"][hstr]
-        if words and words[0]["WordlistsKey"] == constants.WORDLISTS.UNIQUE_ITEM:
+        if words and words[0]["Wordlist"] == constants.WORDLISTS.UNIQUE_ITEM:
             # Check whether unique item name clashes with base item name
             items = self.rr["BaseItemTypes.dat64"].index["Name"][hstr]
             if len(items) > 0:
@@ -1785,6 +1771,9 @@ class TagHandler:
     def _pass_through_handler(self, hstr, parameter):
         return hstr
 
+    def _italic_handler(self, hstr, parameter):
+        return "''%s''" % hstr
+
     tag_handlers = {
         "normal": partial(_default_handler, tid="normal"),
         "default": partial(_default_handler, tid="default"),
@@ -1801,6 +1790,8 @@ class TagHandler:
         "divination": partial(_default_handler, tid="divination"),
         "corrupted": partial(_link_handler, tid="corrupted"),
         "fractured": partial(_link_handler, tid="fractured"),
+        "i": _italic_handler,
+        "italic": _italic_handler,
     }
 
 
@@ -3107,3 +3098,30 @@ def parse_and_handle_description_tags(rr, text):
         .replace("\n", "<br>")
         .replace("\r", "")
     )
+
+
+def apply_simple_column_map(
+    infobox, column_map: tuple[tuple[str, dict], ...], list_object: DatRecord | list[DatRecord]
+):
+    """
+    Copy over simple fields from the .dat64
+
+    Parameters
+    ----------
+    infobox: Dictionary in which values should be added
+    column_map: Map to apply
+    list_object: File to search for keys
+    """
+    if not isinstance(list_object, DatRecord):
+        list_object = list_object[0]
+
+    for k, data in column_map:
+        value = list_object[k]
+
+        if data.get("condition") and not data["condition"](value):
+            continue
+
+        if data.get("format"):
+            value = data["format"](value)
+
+        infobox[data["template"]] = value
