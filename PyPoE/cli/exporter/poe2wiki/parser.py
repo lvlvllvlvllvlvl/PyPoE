@@ -2554,12 +2554,6 @@ _KEYWORD_LINK_MAP = {
     "OrbOfAlteration": {},
     "OrbOfChance": {},
     "OrbOfTransmutation": {},
-    "OvercapChance": {
-        "default": "Overcap chance",
-        "links": [
-            "Overcap Chance",
-        ],
-    },
     "OvercappedBlock": {
         "links": [
             "Overcapped Block",
@@ -2755,6 +2749,14 @@ _KEYWORD_LINK_MAP = {
     },
     "SupportGem": {
         "default": "Support Gem",
+    },
+    "SurpassChance": {
+        "default": "Surpassing chance",
+        "links": [
+            "Surpass Chance",
+            "Surpass chance",
+            "Surpassing Chance",
+        ],
     },
     "Sword": {
         "default": "Sword",
