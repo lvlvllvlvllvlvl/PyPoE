@@ -74,7 +74,6 @@ from io import BytesIO
 from PyPoE.poe.file.shared import AbstractFileReadOnly
 from PyPoE.poe.file.shared.cache import AbstractFileCache
 from PyPoE.poe.file.specification.data import stable
-from PyPoE.poe.file.specification.data.poe2 import specification
 from PyPoE.poe.file.specification.errors import SpecificationError, SpecificationWarning
 from PyPoE.poe.file.specification.fields import Specification
 
@@ -1101,7 +1100,7 @@ class RelationalReader(AbstractFileCache[DatFile]):
         * self['Data/DF.dat'] <==> read_file('Data/{language}DF.dat').reader
         * self['DF.dat64'] <==> self['DF.datc64']
         """
-        data_dir = "Data/Balance/" if specification.sequel == 2 else "Data/"
+        data_dir = "Data/Balance/" if self.specification.sequel == 2 else "Data/"
         if item.startswith(data_dir):
             item = item[len(data_dir) :]
         item = item.replace(".dat64", ".datc64")

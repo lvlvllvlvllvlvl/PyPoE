@@ -2453,14 +2453,15 @@ def install_data_dependant_quantifiers(relational_reader: RelationalReader):
         placeholder="&lt;random Passive Skill&gt;",
     )
 
-    TQRelationalData(
-        id="passive_keystone_index",
-        relational_reader=relational_reader,
-        table="PassiveKeystoneList.dat64",
-        index_start=1,
-        value_column="DisplayText",
-        placeholder="&lt;Keystone Passive Skill&gt;",
-    )
+    if relational_reader.specification.sequel == 2:
+        TQRelationalData(
+            id="passive_keystone_index",
+            relational_reader=relational_reader,
+            table="PassiveKeystoneList.dat64",
+            index_start=1,
+            value_column="DisplayText",
+            placeholder="&lt;Keystone Passive Skill&gt;",
+        )
 
     TranslationQuantifierHandler.init()
 
