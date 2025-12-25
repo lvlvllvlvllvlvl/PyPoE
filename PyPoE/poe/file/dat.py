@@ -406,6 +406,15 @@ class DatRecord(list):
                 return value
             else:
                 raise KeyError(f"No column {item} found in {self.parent.file_name}")
+
+        if item == 0:
+            # rr.index has a different shape depending on if a column is marked as unique in the schema.
+            # this is a common source of bugs (changes in the upstream schema require exporter code changes)
+            warnings.warn(
+                "Cell 0 of a DatRecord row has been requested - may need to remove "
+                "the `[0]` from a `rr[<table>].index[<col>][<val>][0]` access",
+                SpecificationWarning,
+            )
         return list.__getitem__(self, item)
 
     def __repr__(self):
