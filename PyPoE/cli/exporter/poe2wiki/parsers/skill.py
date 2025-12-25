@@ -44,7 +44,6 @@ from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
-from PyPoE.cli.exporter.poe2wiki.parser import process_keywords, strip_keywords
 from PyPoE.poe.file.stat_filters import StatFilterFile
 from PyPoE.poe.file.translations import StatValue, TranslationFile
 from PyPoE.poe.sim.poe2formula import gem_stat_requirement
@@ -507,9 +506,7 @@ class SkillParserShared(parser.BaseParser):
 
         act_skill = gra_eff["ActiveSkill"]
         if act_skill:
-            file = act_skill["StatDescription"]
-            file = file.removeprefix("Metadata/StatDescriptions/").removesuffix("/") + ".txt"
-            tf = self.tc[file]
+            tf = self.tc[act_skill["StatDescription"]]
 
             if parsed_args.store_images and act_skill["Icon_DDSFile"]:
                 file_path = act_skill["Icon_DDSFile"]
@@ -690,7 +687,7 @@ class SkillParserShared(parser.BaseParser):
 
         # From ActiveSkills.dat64
         if act_skill:
-            infobox["gem_description"] = process_keywords(act_skill["Description"])
+            infobox["gem_description"] = parser.process_keywords(act_skill["Description"])
             infobox["active_skill_name"] = act_skill["DisplayedName"]
 
             if act_skill["WeaponRequirements"]:
@@ -712,7 +709,7 @@ class SkillParserShared(parser.BaseParser):
                             break
                     reqiured_eq = ", ".join(wieldable)
 
-                infobox["equipment_requirement"] = process_keywords(reqiured_eq)
+                infobox["equipment_requirement"] = parser.process_keywords(reqiured_eq)
 
         # From Projectile.dat64 if available
         # TODO - remap
@@ -796,7 +793,7 @@ class SkillParserShared(parser.BaseParser):
                     )[0].split("\n")
                 )
 
-            infobox[prefix + "stat_text"] = process_keywords("<br>".join(lines))
+            infobox[prefix + "stat_text"] = parser.process_keywords("<br>".join(lines))
             if breakpoints:
                 infobox[prefix + "breakpoints"] = ",".join(breakpoints)
 
@@ -929,7 +926,7 @@ class SkillParserShared(parser.BaseParser):
             if added:
                 lines = added + lines
 
-        infobox["stat_text"] = process_keywords(self._format_lines(lines))
+        infobox["stat_text"] = parser.process_keywords(self._format_lines(lines))
 
         #
         # Output handling for progression
@@ -1000,7 +997,7 @@ class SkillParserShared(parser.BaseParser):
                 stats.extend(stat_dict["stats"])
                 values.extend(stat_dict["values"])
             if lines:
-                infobox[prefix + "stat_text"] = strip_keywords(self._format_lines(lines))
+                infobox[prefix + "stat_text"] = parser.strip_keywords(self._format_lines(lines))
             self._write_stats(
                 infobox,
                 [(s, v) for s, v in zip(stats, values) if s not in static["stat_keys"]],

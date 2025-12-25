@@ -569,7 +569,7 @@ class MOD_DOMAIN(IntEnumOverride):
     CHEST
         Chest domain, i.e. strongboxes or other type of chest-like
         containers
-    UNKNOWN1
+    STRONGBOX
         Seems to be for strongboxes? ^CHEST for regular chests?
     AREA
         Area domain, i.e. for the various zones of Path of Exile 2
@@ -619,6 +619,10 @@ class MOD_DOMAIN(IntEnumOverride):
         Domain for tablets
     ULTIMATUM_KEY
         Domain for ultimatum keys
+    VAULT_KEY
+        Domain for reliquary vault keys
+    INCURSION_LIMB
+        Domain for limbs from Atziri's Temple
     UNDEFINED
     """
 
@@ -626,7 +630,7 @@ class MOD_DOMAIN(IntEnumOverride):
     FLASK = 2
     MONSTER = 3
     CHEST = 4
-    UNKNOWN1 = 5
+    STRONGBOX = 5
     AREA = 6
     # 7 is unused
     SANCTUM_RELIC = 8
@@ -647,30 +651,34 @@ class MOD_DOMAIN(IntEnumOverride):
     HEIST_AREA = 23
     HEIST_NPC = 24
     HEIST_TRINKET = 25
-    # 26 is unused
+    WATCHSTONE = 26
     VEILED = 27
     DESECRATED = 28
     EXPEDITION_RELIC = 29
     # 30 is unused
     SENTINEL = 31
     MEMORY_LINE = 32
-    # 33 is unused
+    SANCTIFIED_RELIC = 33
     TABLET = 34
     ULTIMATUM_KEY = 35
+    VAULT_KEY = 36
+    INCURSION_LIMB = 37
 
     # Items that can't have mods (may need to increase the number when new values are added)
-    MODS_DISALLOWED = 36
+    MODS_DISALLOWED = 38
 
 
 MOD_TRANSLATION_MAP = {
     MOD_DOMAIN.MONSTER: "monster_stat_descriptions.txt",
     MOD_DOMAIN.CHEST: "chest_stat_descriptions.txt",
+    MOD_DOMAIN.STRONGBOX: "chest_stat_descriptions.txt",
     MOD_DOMAIN.AREA: "map_stat_descriptions.txt",
+    MOD_DOMAIN.SANCTUM_RELIC: "sanctum_relic_stat_descriptions.txt",
+    MOD_DOMAIN.CRAFTED: "map_stat_descriptions.txt",
     MOD_DOMAIN.ATLAS: "atlas_stat_descriptions.txt",
     MOD_DOMAIN.LEAGUESTONE: "leaguestone_stat_descriptions.txt",
-    MOD_DOMAIN.DELVE_AREA: "map_stat_descriptions.txt",
     MOD_DOMAIN.MAP_DEVICE: "map_stat_descriptions.txt",
-    MOD_DOMAIN.CRAFTED: "map_stat_descriptions.txt",
+    MOD_DOMAIN.DELVE_AREA: "map_stat_descriptions.txt",
     MOD_DOMAIN.HEIST_NPC: "heist_equipment_stat_descriptions.txt",
     MOD_DOMAIN.SENTINEL: "sentinel_stat_descriptions.txt",
     MOD_DOMAIN.TABLET: "tablet_stat_descriptions.txt",

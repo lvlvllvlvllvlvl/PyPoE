@@ -337,6 +337,7 @@ class OTStatsParser(GenericLuaParser):
                         "condition": None,
                     }
                 ],
+                wiki_message="Lua module updater",
             )
 
         return r
@@ -377,6 +378,7 @@ class MinimapIconsParser(GenericLuaParser):
                         "condition": None,
                     }
                 ],
+                wiki_message="Lua module updater",
             )
 
         return r
@@ -684,6 +686,7 @@ class MonsterParser(GenericLuaParser):
                         "condition": None,
                     }
                 ],
+                wiki_message="Lua module updater",
             )
 
         return r
@@ -791,6 +794,7 @@ class MonsterPackParser(GenericLuaParser):
                         "condition": None,
                     }
                 ],
+                wiki_message="Lua module updater",
             )
 
         return r
@@ -862,6 +866,7 @@ class KeywordParser(GenericLuaParser):
                         "condition": None,
                     }
                 ],
+                wiki_message="Lua module updater",
             )
 
         return r
@@ -891,6 +896,7 @@ class TagsParser(GenericLuaParser):
                         "condition": None,
                     }
                 ],
+                wiki_message="Lua module updater",
             )
 
         return r
@@ -925,6 +931,7 @@ class GemTagsParser(GenericLuaParser):
                     "condition": None,
                 }
             ],
+            wiki_message="Lua module updater",
         )
 
         return r

@@ -1296,6 +1296,7 @@ class TQRelationalData(TranslationQuantifier):
         placeholder: str = None,
         convert_type: str = None,
         format_value: Callable = None,
+        index_start: int = 0,
     ):
         self.table = relational_reader[table]
         if index_column and index_column not in self.table.index:
@@ -1306,6 +1307,7 @@ class TQRelationalData(TranslationQuantifier):
         self.placeholder = placeholder
         self.convert_type = convert_type
         self.format_value = format_value or str
+        self.index_start = index_start
         super().__init__(
             id=id, handler=self.handle, reverse_handler=None if format_value else self.reverse
         )
@@ -1317,6 +1319,8 @@ class TQRelationalData(TranslationQuantifier):
         try:
             if self.convert_type == "short" and v and v < 0:
                 v = v + 0x10000
+
+            v = v - self.index_start
 
             if self.index_column:
                 result = self.table.index[self.index_column][v]
@@ -2160,8 +2164,9 @@ class TranslationFileCache(AbstractFileCache[TranslationFile]):
         TranslationFile
             the specified TranslationFile
         """
-        if not item.startswith("Metadata/StatDescriptions/"):
-            item = "Metadata/StatDescriptions/" + item
+        dir_name = "Data/StatDescriptions/" if self.sequel == 2 else "Metadata/StatDescriptions/"
+        if not item.startswith(dir_name):
+            item = dir_name + item
         return self.get_file(item)
 
     @doc(doc=AbstractFileCache._get_file_instance_args)
@@ -2446,6 +2451,15 @@ def install_data_dependant_quantifiers(relational_reader: RelationalReader):
         index_column="PassiveSkillGraphId",
         convert_type="short",
         placeholder="&lt;random Passive Skill&gt;",
+    )
+
+    TQRelationalData(
+        id="passive_keystone_index",
+        relational_reader=relational_reader,
+        table="PassiveKeystoneList.dat64",
+        index_start=1,
+        value_column="DisplayText",
+        placeholder="&lt;Keystone Passive Skill&gt;",
     )
 
     TranslationQuantifierHandler.init()
@@ -2827,6 +2841,10 @@ TranslationQuantifier(
 
 TranslationQuantifier(
     id="display_indexable_skill",
+)
+
+TranslationQuantifier(
+    id="passive_keystone_index",
 )
 
 TranslationQuantifierHandler.init()

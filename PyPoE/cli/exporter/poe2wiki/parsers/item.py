@@ -46,14 +46,12 @@ import numpy as np
 # 3rd-party
 from PIL import Image, ImageOps
 
+# Self
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
-from PyPoE.cli.exporter.poe2wiki.parser import process_keywords, strip_keywords
 from PyPoE.cli.exporter.poe2wiki.parsers.skill import SkillParserShared
-
-# Self
 from PyPoE.poe import poe2constants as constants
 from PyPoE.poe.file.dat import DatReader, DatRecord, RelationalReader
 from PyPoE.poe.file.it import ITFile
@@ -252,8 +250,6 @@ class WikiCondition(parser.WikiCondition):
         "is_account_bound",
         "suppress_improper_modifiers_category",
         "disable_automatic_recipes",
-        # MTX Categorization
-        "cosmetic_type",
         # Version information
         "release_version",
         "removal_version",
@@ -282,17 +278,6 @@ class WikiCondition(parser.WikiCondition):
         "quest_reward4_act",
         "quest_reward4_class_ids",
         "quest_reward4_npc",
-        # TODO:Remove: When mods will be done, temporary for jewels and some other items
-        "extra_stat1_id",
-        "extra_stat1_min",
-        "extra_stat1_max",
-        "extra_stat2_id",
-        "extra_stat2_min",
-        "extra_stat2_max",
-    )
-    COPY_MATCH = re.compile(
-        r"^(recipe|sell_price|inherent_skill[0-9]+_(?:min|max)_level|implicit[0-9]+_(?:text|random_list)).*",
-        re.UNICODE,
     )
     COPY_MATCH = re.compile(
         r"^(recipe|sell_price|inherent_skill[0-9]+_(?:min|max)_level|implicit[0-9]+_(?:text|random_list)).*",
@@ -424,8 +409,6 @@ class ItemsParser(SkillParserShared):
     _IGNORE_DROP_LEVEL_CLASSES = (
         "Active Skill Gem",
         "Meta Skill Gem",
-        "HideoutDoodad",
-        "Microtransaction",
         "InstanceLocalItem",
     )
 
@@ -518,6 +501,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemVolatileDead": "Item",
         "Metadata/items/Gems/SkillGemStaffUnleash": "Item",
         "Metadata/Items/Gem/SkillGemBlinkSandPlayer": "Item",
+        "Metadata/Items/Gem/SkillGemUniqueEarthboundTriggeredSpark": "Item",
         "Metadata/Items/Gem/SkillGemUniqueBreachLightningBolt": "Item",
         "Metadata/Items/Gems/SkillGemLightningBolt": "Item",
         "Metadata/Items/Gem/SkillGemSolarOrb": "Item",
@@ -619,6 +603,10 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition2": "Runic Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition3": "Runic Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition4": "Runic Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss1": "Lightless Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss2": "Lightless Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss3": "Lightless Book of Knowledge",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss4": "Lightless Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss1": "Vanquisher's Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss2": "Vanquisher's Book of Knowledge",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss3": "Vanquisher's Book of Knowledge",
@@ -643,9 +631,15 @@ class ItemsParser(SkillParserShared):
     _NAME_OVERRIDE_BY_ID_2 = {
         "English": {
             # =================================================================
-            # Skill Gems
+            # Support Gems
             # =================================================================
             "Metadata/Items/Gem/SupportGemLivingLightning": "Living Lightning I",
+            "Metadata/Items/Gem/SupportGemAmbrosia": "Ambrosia I",
+            "Metadata/Items/Gem/SupportGemSingleOut": "Mark for Death I",
+            "Metadata/Items/Gems/SupportGemMarkOfSiphoning": "Mark of Siphoning I",
+            "Metadata/Items/Gems/SupportGemThrillOfTheKill": "Thrill of the Kill I",
+            "Metadata/Items/Gems/SupportGemExplosiveGrowth": "Accelerated Growth I",
+            "Metadata/Items/Gems/SupportGemFanTheFlames": "Fan The Flames I",
             # =================================================================
             # Quest Items
             # =================================================================
@@ -656,6 +650,7 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookDelirium1": "Deranging Book of Knowledge",
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookRitual1": "Ritualistic Book of Knowledge",
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition1": "Runic Book of Knowledge",
+            "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss1": "Lightless Book of Knowledge",
             "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss1": "Vanquisher's Book of Knowledge",
             # =================================================================
             # Uncut Gems
@@ -674,11 +669,14 @@ class ItemsParser(SkillParserShared):
             # =================================================================
             "Metadata/Items/Gem/SkillGemAscendancyUnleash": " (Chronomancer skill)",
             "Metadata/items/Gems/SkillGemStaffUnleash": " (skill)",
-            "Metadata/Items/Gems/SkillGemFlammability": " (curse)",
-            "Metadata/Items/Gem/SkillGemUniqueBreachLightningBolt": " (triggered skill)",
+            "Metadata/Items/Gems/SkillGemFlammability": " (skill gem)",
+            "Metadata/Items/Gem/SkillGemUniqueBreachLightningBolt": " (Choir of the Storm)",
             "Metadata/Items/Gems/SkillGemLightningBolt": "",
             "Metadata/Items/Gem/SkillGemBlinkSandPlayer": " (Sands of Silk)",
             "Metadata/Items/Gem/SkillGemBlink": "",
+            "Metadata/Items/Gem/SkillGemUniqueEarthboundTriggeredSpark": " (Earthbound)",
+            "Metadata/Items/Gems/SkillGemSpark": "",
+            "Metadata/Items/Gems/SkillGemBriarpatch": " (skill gem)",
             # Weapon attacks
             "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe": " (one hand)",
             "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe": " (two hand)",
@@ -707,6 +705,7 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/Gems/SupportGemMaim": " (support gem)",
             "Metadata/Items/Gems/SupportGemConduction": " (support gem)",
             "Metadata/Items/Gem/SupportGemVolatility": " (support gem)",
+            "Metadata/Items/Gem/SupportGemIncision": " (support gem)",
             "Metadata/Items/Gems/SupportGemUnleash": "",
             # =================================================================
             # Uncut Gems
@@ -759,377 +758,12 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDrop": "",
             "Metadata/Items/QuestItems/Gallows/Act1/ManorGargoyleDropCruel": " (Cruel)",
             # =================================================================
-            # Hideout decorations
-            # =================================================================
-            "Metadata/Items/Hideout/HideoutLightningCoil": " (hideout decoration)",
-            "Metadata/Items/Hideout/HideoutVollConfession": " (hideout decoration)",
-            "Metadata/Items/Hideout/HideoutRaptureDevice": " (hideout decoration)",
-            "Metadata/Items/Hideout/HideoutBeastLoreObject": " (hideout decoration)",
-            "Metadata/Items/Hideout/HideoutEncampmentLetters": " (hideout decoration)",
-            "Metadata/Items/Hideout/HideoutPrisonTorturedevice8": " (hideout decoration)",
-            "Metadata/Items/Hideout/HideoutColossusSword": " (hideout decoration)",
-            "Metadata/Items/Hideout/HideoutChestVaal": " (hideout decoration)",
-            "Metadata/Items/Hideout/HideoutIncaPyramid": " (hideout decoration)",
-            "Metadata/Items/Hideout/HideoutRitualTotem": " (hideout decoration)",
-            "Metadata/Items/Hideout/HideoutCharredSkeleton": " (hideout decoration)",
-            "Metadata/Items/Hideout/HideoutVaalWhispySmoke": " (hideout decoration)",
-            "Metadata/Items/Hideout/HideoutLionStatueKneeling": "",  # Sitting Lion Statue
-            "Metadata/Items/Hideout/HideoutChurchRuins": " (hideout decoration)",
-            "Metadata/Items/Hideout/HideoutIncaLetter": " (hideout decoration)",
-            # =================================================================
-            # Cosmetic items
-            # =================================================================
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox1x1": " (1x1)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox1x2": " (1x2)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox1x3": " (1x3)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox1x4": " (1x4)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox2x1": " (2x1)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox2x2": " (2x2)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox2x3": " (2x3)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox2x4": " (2x4)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox3x2": " (3x2)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox3x3": " (3x3)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionIronMaiden": " (helmet skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionInfernalAxe": " (weapon skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionColossusSword": "",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionLegionBoots": " (boots skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionLegionGloves": " (gloves skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionScholarBoots": " (boots skin)",
-            "Metadata/Items/Pets/DemonLion": " (pet)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionHoodedCloak": " (armour attachment)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionArcaneCloak": " (armour attachment)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCrusaderHelmet": " (helmet skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCrusaderBoots": " (boots skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCrusaderGloves": " (gloves skin)",
-            "Metadata/Items/MicrotransactionCurrency/StashTab": " (consumable item)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsAuthority": " (weapon skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsBeacon": " (shield skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsBounty": " (belt skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsDominance": " (armour skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsEye": " (ring skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsImmortality": " (helmet skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsPresence": " (amulet skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsStride": " (boots skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsTouch": " (gloves skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemigodsTriumph": " (helmet skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionWarlockGloves": " (gloves skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionWarlockBoots": " (boots skin)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionConquestHelmet": " (helmet skin)",
-        },
-        "Russian": {
-            # =================================================================
-            # Active Skill Gems
-            # =================================================================
-            "Metadata/Items/Gems/SkillGemPortal": " (камень умения)",
-            # =================================================================
-            # One Hand Axes
-            # =================================================================
-            "Metadata/Items/Weapons/OneHandWeapons/OneHandAxes/OneHandAxe22": "",
-            # =================================================================
-            # Boots
-            # =================================================================
-            "Metadata/Items/Armours/Boots/BootsInt4": "",
-            # Legion Boots
-            "Metadata/Items/Armours/Boots/BootsStrInt7": "",
-            "Metadata/Items/Armours/Boots/BootsAtlas1": " (сопротивление холоду и молнии)",
-            "Metadata/Items/Armours/Boots/BootsAtlas2": " (сопротивление огню и холоду)",
-            "Metadata/Items/Armours/Boots/BootsAtlas3": " (сопротивление огню и молнии)",
-            # =================================================================
-            # Gloves
-            # =================================================================
-            # Legion Gloves
-            "Metadata/Items/Armours/Gloves/GlovesStrInt7": "",
-            # =================================================================
-            # Quivers
-            # =================================================================
-            "Metadata/Items/Quivers/QuiverDescent": " (Спуск)",
-            # =================================================================
-            # Rings
-            # =================================================================
-            "Metadata/Items/Rings/Ring12": " (рубин и топаз)",
-            "Metadata/Items/Rings/Ring13": " (сапфир и топаз)",
-            "Metadata/Items/Rings/Ring14": " (рубин и сапфир)",
-            # =================================================================
-            # Amulets
-            # =================================================================
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_1": (
-                " (получаемый урон от огня становится уроном от холода)"
-            ),
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_2": (
-                " (получаемый урон от огня становится уроном от молнии)"
-            ),
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_3": (
-                " (получаемый урон от холода становится уроном от огня)"
-            ),
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_4": (
-                " (получаемый урон от холода становится уроном от молнии)"
-            ),
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_5": (
-                " (получаемый урон от молнии становится уроном от холода)"
-            ),
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_6": (
-                " (получаемый урон от молнии становится уроном от огня)"
-            ),
-            "Metadata/Items/Amulets/Talismans/Talisman3_6_1": " (заряд энергии при убийстве)",
-            "Metadata/Items/Amulets/Talismans/Talisman3_6_2": " (заряд ярости при убийстве)",
-            "Metadata/Items/Amulets/Talismans/Talisman3_6_3": " (заряд выносливости при убийстве)",
-            # =================================================================
-            # Hideout Doodads
-            # =================================================================
-            "Metadata/Items/Hideout/HideoutMalachaiHeart": " (предмет убежища)",
-            "Metadata/Items/Hideout/HideoutVaalWhispySmoke": " (предмет убежища)",
-            "Metadata/Items/Hideout/HideoutChestVaal": " (предмет убежища)",
-            "Metadata/Items/Hideout/HideoutEncampmentFireplace": " (предмет убежища)",
-            "Metadata/Items/Hideout/HideoutEncampmentLetters": " (предмет убежища)",
-            "Metadata/Items/Hideout/HideoutIncaPyramid": " (предмет убежища)",
-            "Metadata/Items/Hideout/HideoutDarkSoulercoaster": " (предмет убежища)",
-            "Metadata/Items/Hideout/HideoutVaalMechanism": " (предмет убежища)",
-            "Metadata/Items/Hideout/HideoutCharredSkeleton": " (предмет убежища)",
-            "Metadata/Items/HideoutInteractables/DexIntCraftingBench": " (предмет убежища)",
-            # =================================================================
-            # Piece
-            # =================================================================
-            "Metadata/Items/UniqueFragments/FragmentUniqueShield1_1": " (1 из 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueShield1_2": " (2 из 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueShield1_3": " (3 из 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueShield1_4": " (4 из 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueSword1_1": " (1 из 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueSword1_2": " (2 из 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueSword1_3": " (3 из 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueStaff1_1": " (1 из 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueStaff1_2": " (2 из 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueStaff1_3": " (3 из 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueBelt1_1": " (1 из 2)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueBelt1_2": " (2 из 2)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueQuiver1_1": " (1 из 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueQuiver1_2": " (2 из 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueQuiver1_3": " (3 из 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueHelmet1_1": " (1 из 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueHelmet1_2": " (2 из 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueHelmet1_3": " (3 из 3)",
-            # =================================================================
-            # MTX
-            # =================================================================
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox1x1": " (1x1)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox1x2": " (1x2)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox1x3": " (1x3)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox1x4": " (1x4)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox2x1": " (2x1)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox2x2": " (2x2)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox2x3": " (2x3)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox2x4": " (2x4)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox3x2": " (3x2)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox3x3": " (3x3)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionIronMaiden": "",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionInfernalAxe": (
-                " (внешний вид оружия)"
-            ),
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionColossusSword": "",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionLegionBoots": (
-                " (микротранзакция)"
-            ),
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionLegionGloves": (
-                " (микротранзакция)"
-            ),
-            "Metadata/Items/MicrotransactionItemEffects/MasterArmour1Boots": " (микротранзакция)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSinFootprintsEffect": (
-                " (микротранзакция)"
-            ),
-            "Metadata/Items/Pets/DemonLion": " (питомец)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionHeartWeapon2014": " (2014)",
-            # =================================================================
-            # Quest items
-            # =================================================================
-            "Metadata/Items/QuestItems/GoldenPages/Page1": " (1 из 4)",
-            "Metadata/Items/QuestItems/GoldenPages/Page2": " (2 из 4)",
-            "Metadata/Items/QuestItems/GoldenPages/Page3": " (3 из 4)",
-            "Metadata/Items/QuestItems/GoldenPages/Page4": " (4 из 4)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier8_1": " (1 из 2)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier8_2": " (2 из 2)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier9_1": " (1 из 3)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier9_2": " (2 из 3)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier9_3": " (3 из 3)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier10_1": " (1 из 3)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier10_2": " (2 из 3)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier10_3": " (3 из 3)",
-            "Metadata/Items/QuestItems/RibbonSpool": " (предмет)",
-            "Metadata/Items/QuestItems/Act7/SilverLocket": " (предмет)",
-            "Metadata/Items/QuestItems/Act7/KisharaStar": " (предмет)",
-            "Metadata/Items/QuestItems/Act8/WingsOfVastiri": " (предмет)",
-            "Metadata/Items/QuestItems/Act9/StormSword": " (предмет)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_1": " (1 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_2": " (2 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_3": " (3 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_4": " (4 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_5": " (5 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_6": " (6 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_7": " (7 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_8": " (8 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_1": " (1 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_2": " (2 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_3": " (3 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_4": " (4 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_5": " (5 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_6": " (6 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_7": " (7 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_8": " (8 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_1": " (1 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_2": " (2 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_3": " (3 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_4": " (4 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_5": " (5 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_6": " (6 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_7": " (7 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_8": " (8 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_1": " (1 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_2": " (2 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_3": " (3 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_4": " (4 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_5": " (5 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_6": " (6 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_7": " (7 из 8)",
-            "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_8": " (8 из 8)",
-        },
-        "German": {
-            # =================================================================
-            # One Hand Axes
-            # =================================================================
-            "Metadata/Items/Weapons/OneHandWeapons/OneHandAxes/OneHandAxe22": "",
-            # =================================================================
-            # Boots
-            # =================================================================
-            "Metadata/Items/Armours/Boots/BootsInt4": "",
-            # Legion Boots
-            "Metadata/Items/Armours/Boots/BootsStrInt7": "",
-            "Metadata/Items/Armours/Boots/BootsAtlas1": " (Kälte und Blitz Resistenzen)",
-            "Metadata/Items/Armours/Boots/BootsAtlas2": " (Feuer und Kälte Resistenzen)",
-            "Metadata/Items/Armours/Boots/BootsAtlas3": " (Feuer und Blitz Resistenzen)",
-            # =================================================================
-            # Gloves
-            # =================================================================
-            # Legion Gloves
-            "Metadata/Items/Armours/Gloves/GlovesStrInt7": "",
-            # =================================================================
-            # Quivers
-            # =================================================================
-            "Metadata/Items/Quivers/QuiverDescent": " (Descent)",
-            # =================================================================
-            # Rings
-            # =================================================================
-            "Metadata/Items/Rings/Ring12": " (Rubin und Topas)",
-            "Metadata/Items/Rings/Ring13": " (Saphir und Topas)",
-            "Metadata/Items/Rings/Ring14": " (Rubin und Saphir)",
-            # =================================================================
-            # Amulets
-            # =================================================================
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_1": (
-                " (Feuerschaden erlitten als Kälteschaden)"
-            ),
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_2": (
-                " (Feuerschaden erlitten als Blitzschaden)"
-            ),
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_3": (
-                " (Kälteschaden erlitten als Feuerschaden)"
-            ),
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_4": (
-                " (Kälteschaden erlitten als Blitzschaden)"
-            ),
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_5": (
-                " (Blitzschaden erlitten als Kälteschaden)"
-            ),
-            "Metadata/Items/Amulets/Talismans/Talisman2_6_6": (
-                " (Blitzschaden erlitten als Feuerschaden)"
-            ),
-            "Metadata/Items/Amulets/Talismans/Talisman3_6_1": " (Energie-Ladung bei Tötung)",
-            "Metadata/Items/Amulets/Talismans/Talisman3_6_2": " (Raserei-Ladung bei Tötung)",
-            "Metadata/Items/Amulets/Talismans/Talisman3_6_3": " (Widerstands-Ladung bei Tötung)",
-            # =================================================================
-            # Hideout Doodads
-            # =================================================================
-            "Metadata/Items/Hideout/HideoutLightningCoil": " (Dinge fürs Versteck)",
-            # =================================================================
-            # Piece
-            # =================================================================
-            "Metadata/Items/UniqueFragments/FragmentUniqueShield1_1": " (1 von 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueShield1_2": " (2 von 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueShield1_3": " (3 von 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueShield1_4": " (4 von 4)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueSword1_1": " (1 von 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueSword1_2": " (2 von 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueSword1_3": " (3 von 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueStaff1_1": " (1 von 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueStaff1_2": " (2 von 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueStaff1_3": " (3 von 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueBelt1_1": " (1 von 2)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueBelt1_2": " (2 von 2)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueQuiver1_1": " (1 von 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueQuiver1_2": " (2 von 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueQuiver1_3": " (3 von 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueHelmet1_1": " (1 von 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueHelmet1_2": " (2 von 3)",
-            "Metadata/Items/UniqueFragments/FragmentUniqueHelmet1_3": " (3 von 3)",
-            # =================================================================
-            # MTX
-            # =================================================================
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox1x1": " (1x1)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox1x2": " (1x2)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox1x3": " (1x3)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox1x4": " (1x4)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox2x1": " (2x1)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox2x2": " (2x2)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox2x3": " (2x3)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox2x4": " (2x4)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox3x2": " (3x2)",
-            "Metadata/Items/MicrotransactionCurrency/MysteryBox3x3": " (3x3)",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionIronMaiden": "",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionInfernalAxe": (
-                " (Weapon Skin)"
-            ),
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionColossusSword": "",
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionLegionBoots": (
-                " (Mikrotransaktion)"
-            ),
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionLegionGloves": (
-                " (Mikrotransaktion)"
-            ),
-            "Metadata/Items/MicrotransactionItemEffects/MicrotransactionScholarBoots": (
-                " (Mikrotransaktion)"
-            ),
-            "Metadata/Items/Pets/DemonLion": " (Haustier)",
-            # =================================================================
-            # Quest items
-            # =================================================================
-            "Metadata/Items/QuestItems/GoldenPages/Page1": " (1 von 4)",
-            "Metadata/Items/QuestItems/GoldenPages/Page2": " (2 von 4)",
-            "Metadata/Items/QuestItems/GoldenPages/Page3": " (3 von 4)",
-            "Metadata/Items/QuestItems/GoldenPages/Page4": " (4 von 4)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier8_1": " (1 von 2)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier8_2": " (2 von 2)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier9_1": " (1 von 3)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier9_2": " (2 von 3)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier9_3": " (3 von 3)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier10_1": " (1 von 3)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier10_2": " (2 von 3)",
-            "Metadata/Items/QuestItems/MapUpgrades/MapUpgradeTier10_3": " (3 von 3)",
-            # =================================================================
-            # =================================================================
-            # ==================== Germany only conflicts =====================
-            # =================================================================
-            # =================================================================
-            # Schleifstein
-            "Metadata/Items/Currency/CurrencyWeaponQuality": "",
-            "Metadata/Items/HideoutInteractables/StrDexCraftingBench": " (Dinge fürs Versteck)",
-        },
-    }
-
-    # Apped name without changing inventory icon
-    _NAME_APPENDIX_BY_ID_2 = {
-        "English": {
-            # =================================================================
             # Map fragments
             # =================================================================
             "Metadata/Items/MapFragments/CurrencyAfflictionFragment": " (map fragment)",
         },
+        "Russian": {},
+        "German": {},
     }
 
     _LANG = {
@@ -1172,24 +806,30 @@ class ItemsParser(SkillParserShared):
         "MiscMapItem",
         "UniqueFragment",
         "IncursionItem",
+        "Incubator",
+        "ArchnemesisMod",
+        "SentinelDrone",
+        "MemoryLine",
+        "SanctumSpecialRelic",
+        "SkillGemToken",
+        # Delve (poe1)
         "DelveSocketableCurrency",
         "DelveStackableSocketableCurrency",
-        "Incubator",
-        "IncubatorStackable",
+        # Heist (poe1)
         "HeistContract",
         "HeistEquipmentWeapon",
         "HeistEquipmentTool",
         "HeistEquipmentUtility",
         "HeistEquipmentReward",
         "HeistBlueprint",
+        "Trinket",
         "HeistObjective",
-        "ArchnemesisMod",
-        "SentinelDrone",
-        "MemoryLine",
-        "SanctumSpecialRelic",
+        # MTX
+        "HideoutDoodad",
+        "Microtransaction",
         "GiftBox",
         "ConventionTreasure",
-        "SkillGemToken",
+        # Old uncuts
         "UncutSkillGem_OLD",
         "UncutSupportGem_OLD",
         "UncutReservationGem_OLD",
@@ -1207,6 +847,9 @@ class ItemsParser(SkillParserShared):
         "Active Skill Gem",
         "Meta Skill Gem",
         "Support Skill Gem",
+        # 0.4.0 Atziri's temple stuff
+        "IncursionArm",
+        "IncursionLeg",
     }
 
     # Unreleased or disabled items to avoid exporting to the wiki
@@ -1230,20 +873,11 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gem/SkillGemDetonateMinion",
         "Metadata/Items/Gem/SkillGemElementalSiphon",
         "Metadata/Items/Gems/SkillGemExsanguinate",
-        "Metadata/Items/Gems/SupportGemFerociousRoar",
-        "Metadata/Items/Gems/SkillGemFuriousSlam",
         "Metadata/Items/Gem/SkillGemHydra",
-        "Metadata/Items/Gems/SkillGemLightningStorm",
-        "Metadata/Items/Gems/SkillGemBearMaul",
-        "Metadata/Items/Gems/SkillGemBearRampage",
-        "Metadata/Items/Gems/SkillGemRollingMagma",
         "Metadata/Items/Gems/SkillGemShroud",
         "Metadata/Items/Gems/SkillGemSoulrend",
         "Metadata/Items/Gems/SkillGemSpinningInferno",
         "Metadata/Items/Gems/SkillGemSummonMercenaryCompanion",
-        "Metadata/Items/Gems/SkillGemSummonWolfCompanion",
-        "Metadata/Items/Gems/SkillGemTornado",
-        "Metadata/Items/Gems/SkillGemVolcano",
         "Metadata/Items/Gem/SkillGemPlaytestAttack",
         "Metadata/Items/Gem/SkillGemPlaytestSpell",
         "Metadata/Items/Gem/SkillGemPlaytestSlam",
@@ -1252,7 +886,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemSkeletalWarrior",
         "Metadata/Items/Gems/SkillGemCorpsewadeCorpseCloud",
         "Metadata/Items/Gem/SkillGemUniqueDuskVigilTriggeredBlazingCluster",
-        "Metadata/Items/Gem/SkillGemUniqueEarthboundTriggeredSpark",
         "Metadata/Items/Gems/UniqueSkillGemHeraldOfAsh",
         "Metadata/Items/Gems/UniqueSkillGemHeraldOfIce",
         "Metadata/Items/Gems/UniqueSkillGemHeraldOfThunder",
@@ -1263,7 +896,10 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemDarkTempest",
         "Metadata/Items/Gems/SkillGemCastCurseOnBlock",
         "Metadata/Items/Gems/SkillGemSoulCrystal",
-        # Weapon default attacks
+        # New 0.4.0
+        "Metadata/Items/Gem/SkillGemPrimalAvatar",
+        "Metadata/Items/Gems/SkillGemRunicTempering",
+        # Unreleased weapon default attacks
         "Metadata/Items/Gem/SkillGemPlayerDefault1HAxe",
         "Metadata/Items/Gem/SkillGemPlayerDefault2HAxe",
         "Metadata/Items/Gem/SkillGemPlayerDefaultAxeAxe",
@@ -1294,13 +930,20 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gem/SupportGemAdhereThree",
         "Metadata/Items/Gems/SupportGemAftershockThree",
         "Metadata/Items/Gem/SupportGemAncestralCallThree",
-        "Metadata/Items/Gems/SupportGemDiscombobulate",  # Daze
-        "Metadata/Items/Gem/SupportGemBloodintheEyes",  # Hobble
+        "Metadata/Items/Gems/SupportGemDiscombobulate",  # EA only
+        "Metadata/Items/Gem/SupportGemBloodintheEyes",  # EA only
         "Metadata/Items/Gems/SupportGemOverabundanceThree",
         "Metadata/Items/Gems/SupportGemPersistenceThree",
         "Metadata/Items/Gem/SupportGemGrudge",
+        "Metadata/Items/Gem/SupportGemUnsteadyTempo",  # Removed
         # New 0.3.1
         "Metadata/Items/Gem/SupportGemFlamePillar",
+        # New 0.4.0
+        "Metadata/Items/Gem/SupportGemHideOfHelbrym",
+        "Metadata/Items/Gem/SupportGemAtzirisCommunion",
+        "Metadata/Items/Gem/SupportGemRicochetThree",  # EA only
+        "Metadata/Items/Gem/SupportGemGreatwoodTwo",  # Removed
+        "Metadata/Items/Gems/SupportGemFontofRage",  # Removed
         # =================================================================
         # Uncut Gems
         # =================================================================
@@ -1460,6 +1103,11 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Weapons/TwoHandWeapons/TwoHandMaces/FourTwoHandMace11",
         "Metadata/Items/Weapons/TwoHandWeapons/TwoHandMaces/FourTwoHandMace12",
         # =================================================================
+        # Spears
+        # =================================================================
+        # EA only, mod have 50% while item 100%
+        # "Metadata/Items/Weapons/OneHandWeapons/OneHandSpears/FourSpear12",
+        # =================================================================
         # Fishing rods
         # =================================================================
         "Metadata/Items/Weapons/TwoHandWeapon/FishingRods/FishingRod1",
@@ -1528,6 +1176,9 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Currency/CurrencyVultureFeather",
         "Metadata/Items/Currency/CurrencyPeacockFeather",
         "Metadata/Items/Currency/CurrencySkillGemToken",
+        "Metadata/Items/Currency/CurrencyIncursionCorrupt1",
+        # New 0.4.0
+        "Metadata/Items/Currency/CurrencyIncursionExtractAllSocketablesBench",
         # =================================================================
         # SoulCores
         # =================================================================
@@ -1583,6 +1234,9 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition2",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition3",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookExpedition4",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss2",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss3",
+        "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookAbyss4",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss2",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss3",
         "Metadata/Items/QuestItems/SkillBooks/AtlasSkillBookBoss4",
@@ -1659,440 +1313,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/MapFragments/CurrencyMavenKey",
         "Metadata/Items/MapFragments/CurrencyMavenKeyFragment",
         # =================================================================
-        # Cosmetic items
-        # =================================================================
-        "Metadata/Items/MicrotransactionCurrency/MysteryBox1x1",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBox1x2",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBox1x3",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBox1x4",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBox2x1",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBox2x2",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBox2x3",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBox2x4",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBox3x2",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBox3x3",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBox3x1",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBox4x1",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem1x1",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem1x2",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem1x3",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem1x4",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem2x1",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem2x2",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem2x3",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem2x4",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem3x2",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem3x1",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem4x1",
-        "Metadata/Items/MicrotransactionCurrency/GiftBox1x1",
-        "Metadata/Items/MicrotransactionCurrency/GiftBox1x2",
-        "Metadata/Items/MicrotransactionCurrency/GiftBox1x3",
-        "Metadata/Items/MicrotransactionCurrency/GiftBox1x4",
-        "Metadata/Items/MicrotransactionCurrency/GiftBox2x1",
-        "Metadata/Items/MicrotransactionCurrency/GiftBox2x2",
-        "Metadata/Items/MicrotransactionCurrency/GiftBox2x3",
-        "Metadata/Items/MicrotransactionCurrency/GiftBox2x4",
-        "Metadata/Items/MicrotransactionCurrency/GiftBox3x2",
-        "Metadata/Items/MicrotransactionCurrency/GiftBox3x1",
-        "Metadata/Items/MicrotransactionCurrency/GiftBox4x1",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem1x1Ritual",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem1x2Ritual",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem1x3Ritual",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem1x4Ritual",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem2x1Ritual",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem2x2Ritual",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem2x3Ritual",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem2x4Ritual",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem3x2Ritual",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem3x1Ritual",
-        "Metadata/Items/MicrotransactionCurrency/HiddenItem4x1Ritual",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionRemoveCosmetic",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionSpectralThrowEbony",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionFirstBlood",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionTitanPlate",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionStatueSummonSkeletons2",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionStatueSummonSkeletons3",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionStatueSummonSkeletons4",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionAlternatePortal",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionBloodSlam",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionNewRaiseSpectre",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionNewRaiseZombie",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionNewTotem",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionPlinthWarp",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionWhiteWeapon",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionYellowWeapon",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionHeartWeapon2015",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionPortalSteam1",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionTestCharacterPortrait",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionTestCharacterPortrait2",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionAuraEffect1",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionAuraEffect2",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionAuraEffect3",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionAuraEffect4",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionBloodRavenSummonRagingSpirit",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMarkOfThePhoenixPurple",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionWuqiWeaponEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionBlackguardCape",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemonhandClaw",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDivineShield",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionEldritchWings",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionCelestialAuraEffect1",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionCelestialAuraEffect2",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionCelestialAuraEffect3",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSoulstealerWings1",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSoulstealerWings2",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSoulstealerWings3",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSoulstealerWings4",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionZenithBackAttachment1",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionZenithBackAttachment2",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionZenithBackAttachment3",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionOrionWings1",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionOrionWings2",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionOrionWings3",
-        "Metadata/Items/MicrotransactionCharacterEffects/"
-        "MicrotransactionImaginationCharacterEffect1",
-        "Metadata/Items/MicrotransactionCharacterEffects/"
-        "MicrotransactionImaginationCharacterEffect2",
-        "Metadata/Items/MicrotransactionCharacterEffects/"
-        "MicrotransactionImaginationCharacterEffect3",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGlimmerwoodWings1",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGlimmerwoodWings2",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGlimmerwoodWings3",
-        "Metadata/Items/MicrotransactionCharacterEffects/"
-        "MicrotransactionCelestialTentaclesCharacterEffect1",
-        "Metadata/Items/MicrotransactionCharacterEffects/"
-        "MicrotransactionCelestialTentaclesCharacterEffect2",
-        "Metadata/Items/MicrotransactionCharacterEffects/"
-        "MicrotransactionCelestialTentaclesCharacterEffect3",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMarkOfTheWarriorWings",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionFireBallFrame",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionLightningBallFrame",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionIceBallFrame",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCrystalHelmet",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCrystalBoots",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCrystalGloves",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCrystalBodyArmour",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCrystalBackAttachment",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMadmanHelmet",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMadmanBoots",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMadmanGloves",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMadmanBodyArmour",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionStalkerWingsUpgrade1",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionStalkerWingsUpgrade2",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionStalkerWingsUpgrade3",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDragonHunterHelmetAttachment",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionBlueDragonPortalEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCrusaderPortalEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionAltDunShield",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionDarkDeicidePortraitFrame",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionKitavaWings",
-        "Metadata/Items/MicrotransactionCharacterEffects/"
-        "MicrotransactionBenevolenceCharacterEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionEternalSyndicatePortalEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionHighPriestWeapon",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionSurvivorsGoggles",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionChieftainHelmet",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionChieftainBoots",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionChieftainGloves",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionChieftainBodyArmour",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionReaperPortalEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDoomGauntletShield",
-        "Metadata/Items/MicrotransactionItemEffects/"
-        "MicrotransactionChieftainApparitionPortalEffect",
-        "Metadata/Items/MicrotransactionItemEffects/"
-        "MicrotransactionInfernalSteamPoweredPortalEffect",
-        "Metadata/Items/Pets/Eyeball1",
-        "Metadata/Items/Pets/Eyeball2",
-        "Metadata/Items/Pets/Eyeball3",
-        "Metadata/Items/Pets/Eyeball4",
-        "Metadata/Items/Pets/Eyeball5",
-        "Metadata/Items/Pets/CaneToad2",
-        "Metadata/Items/Pets/CaneToad3",
-        "Metadata/Items/Pets/CaneToad4",
-        "Metadata/Items/Pets/CaneToad5",
-        "Metadata/Items/Pets/CaneToad6",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionStygianInfernalBlowEffect",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionCelestialSweepEffect",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionNightfallDualStrikeEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSunriseNecrolordHelmet",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSunriseNecrolordBoots",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSunriseNecrolordGloves",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSunriseNecrolordBodyArmour",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSunriseNecrolordCloak",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSunriseNecrolordWings",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionMyrmidonHydrosphereEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDragonSwordPortalEffect",
-        "Metadata/Items/Pets/AmberCatPet",
-        "Metadata/Items/Pets/LargeInfernalBasilisk",
-        "Metadata/Items/Pets/Merveil",
-        "Metadata/Items/Pets/FootballPet",
-        "Metadata/Items/Pets/ElderDarkseerPet",
-        "Metadata/Items/Pets/SurvivorsHoundPet",
-        "Metadata/Items/Pets/TwilightPegasusPet",
-        "Metadata/Items/Pets/BuccaneerPet",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionScourgeFootprintsEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionNullifierHood",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionOblivionBodyArmour1",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionOblivionBodyArmour2",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionOblivionBodyArmour3",
-        "Metadata/Items/Pets/GoddessPet",
-        "Metadata/Items/Pets/GargoyleAmaranthinePremium",
-        "Metadata/Items/Pets/GargoyleAmaranthinePremiumExpired",
-        "Metadata/Items/Pets/Hundun",
-        "Metadata/Items/Pets/Taowu",
-        "Metadata/Items/Pets/Taotie",
-        "Metadata/Items/Pets/Qiongqi",
-        "Metadata/Items/Pets/DaughterOfSinPet",
-        "Metadata/Items/Pets/SpectralGryffonPet",
-        "Metadata/Items/Pets/BladeSoulPet",
-        "Metadata/Items/Pets/LunarRabbitPet",
-        "Metadata/Items/Pets/GhostriderCompanionPet",
-        "Metadata/Items/Pets/AlchemistCompanionPet",
-        "Metadata/Items/Pets/AlchemistCompanionPetTemporary",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGreenLichHelmet",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGreenLichBodyArmour",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGreenLichGloves",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGreenLichBoots",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGreenLichCloak",
-        "Metadata/Items/MicrotransactionCurrency/MicrotransactionSalvageFragmentSmall",
-        "Metadata/Items/MicrotransactionCurrency/MicrotransactionSalvageFragment",
-        "Metadata/Items/MicrotransactionCurrency/MicrotransactionSalvageFragmentLarge",
-        "Metadata/Items/MicrotransactionCurrency/TradeMarketTab",
-        "Metadata/Items/MicrotransactionCurrency/TradeMarketBuyoutTab",
-        "Metadata/Items/MicrotransactionCurrency/TradeMarketBuyoutTabTemporary",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBoxLightChaos",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBoxRadiant",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBoxGoddess",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBoxLunar",
-        "Metadata/Items/MicrotransactionCurrency/MysteryBoxBladeSoul",
-        "Metadata/Items/MicrotransactionCurrency/ProxyArcticAurora10",
-        "Metadata/Items/MicrotransactionCurrency/ProxyFireworksClassic20",
-        "Metadata/Items/MicrotransactionCurrency/ProxyFireworksDarkSoulercoaster15",
-        "Metadata/Items/MicrotransactionCurrency/ProxySkinTransferPack5",
-        "Metadata/Items/MicrotransactionCurrency/ProxySkinTransferPack10",
-        "Metadata/Items/MicrotransactionCurrency/ProxySkinTransferPack50",
-        "Metadata/Items/MicrotransactionCurrency/TradeMarketBuyoutTabTemporary",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionAltLioneyesGlare",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionAlchemistsBelt",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionAnnihilationSmiteEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSurvivorsGogglesHelmetAttachment",  # noqa
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionReLinkQuary",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCathedralWings1",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCathedralWings2",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCathedralWings3",
-        "Metadata/Items/MicrotransactionCurrency/MicrotransactionPetConvertToBlueGhostrider",
-        "Metadata/Items/MicrotransactionCurrency/HideoutMonsterStatueCreator",
-        "Metadata/Items/Pets/Mimic",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionVoodooAsenathsGentleTouch",
-        "Metadata/Items/Pets/HeritageHummingbirdPet",
-        "Metadata/Items/Pets/AristocratCatPet",
-        "Metadata/Items/Pets/AristocratLargeCatPet",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionAristocratWeaponEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionOceanGreatbow",
-        "Metadata/Items/Pets/AyeAyePet",
-        "Metadata/Items/Pets/BlackWidowSpider",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionJadeMarohiErqi",
-        "Metadata/Items/Pets/FangtoothMorayPet",
-        "Metadata/Items/Pets/FaridunLizardPet",
-        "Metadata/Items/Pets/FennecFoxPet",
-        "Metadata/Items/Pets/FluffyMothPet",
-        "Metadata/Items/Pets/LifeBatteryPet",
-        "Metadata/Items/Pets/ManaBatteryPet",
-        "Metadata/Items/Pets/NecroticCatPet",
-        "Metadata/Items/Pets/PetRockVaal",
-        "Metadata/Items/Pets/PetRockStatues",
-        "Metadata/Items/Pets/WolverinePet",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionPhoenixEggRiseofthePhoenix",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionArachnamagusPortalEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionPhantomPortalEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSmokePortalEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionTentacleApparitionPortalEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionBerserkerHelmet",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCentipedeCorpseCloak",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionCorruptedCharacterEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionCrystalGreatbow",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDarkCollectorsSack",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDarkRustKingsWeapon",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionDemonicFireballEffect",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionDemonicRainofArrowsEffect",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionDruidicLochtonialCaress",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionElementalStaff",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionElvenKnightBodyArmour",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionElvenKnightBoots",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionElvenKnightGloves",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionElvenKnightHelmet",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionEtherealWeapon",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionReaperWeaponEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionFireflyCursor",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGiftCollectorsSack",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGlacialGreatbow",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGoldRustKingsWeapon",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGoldenGreatbow",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGothicWeapon",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionJunkCollectorsSack",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionKnightmasterHood",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionKnightmasterWeaponEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMasqueradeCloak",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMossyGreatbow",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionNullifierHood",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionOblivionGroundSlamEffect",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionOblivionRainofArrowsEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionOmniscienceScalingBodyArmour",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionOnyxOblivionFireballEffect",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionOnyxOblivionGroundSlamEffect",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionOnyxOblivionRainofArrowsEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionOphidianCovenant",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionOxidizedRustKingsWeapon",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionPhantomAuraEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionPhantomWeaponEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionRustKingsWeapon",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionSawbladeLightningStrikeEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSharkFinBackAttachment",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSiegeGreatbow",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSilverGreatbow",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionTreasureCollectorsSack",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionVineReapEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionVulcanWeaponEffect",
-        "Metadata/Items/Pets/GiantHornetPet",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionAlchemistPoisonousConcoctionEffect",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionAuspiciousCycloneEffect",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionAuspiciousFlameDashEffect",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionAuspiciousToxicRainEffect",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionCelestialNovaAuraEffect1",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionCelestialNovaAuraEffect2",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionCelestialNovaAuraEffect3",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionDarkwoodHeraldEffect",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionGhastlyMarinersTotem",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionGoreLacerateEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMoltenEarthshatterEffect",
-        "Metadata/Items/MicrotransactionSkillEffects/MicrotransactionStarfallRageVortexEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSunDyadianDawn",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionFireworksSingapore",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionSilkweaversThreadOfHope",
-        "Metadata/Items/Pets/ScorpionPurple",
-        "Metadata/Items/Pets/FrogPurpleCrown",
-        "Metadata/Items/Pets/WhiteTiger",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionBalefireOblivionWings1",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionBalefireOblivionWings2",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionBalefireOblivionWings3",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGemlingSageWings1",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGemlingSageWings2",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionGemlingSageWings3",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMercurialWings",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMistWings",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionWinterDragonWings",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMistBodyArmour",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMistBoots",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionLithomancersCharacterEffect1",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionLithomancersCharacterEffect2",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionLithomancersCharacterEffect3",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionMarakethCharacterEffectUpgrade1",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionMarakethCharacterEffectUpgrade2",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionMarakethCharacterEffectUpgrade3",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionMarakethCharacterEffectUpgrade4",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionMarakethCharacterEffectUpgrade5",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionMarakethCharacterEffectUpgrade6",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionMercurialCharacterEffect1",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionMercurialCharacterEffect2",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionMercurialCharacterEffect3",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionMistCharacterEffect",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionRedLanternCharacterEffect",
-        "Metadata/Items/MicrotransactionCharacterEffects/MicrotransactionWinterDragonCharacterEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMistFootprintsEffect",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionReaperFootprints",
-        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionFieryHands",
-        # =================================================================
-        # Hideout decorations
-        # =================================================================
-        # Hideout totem test variants, not needed
-        "Metadata/Items/Hideout/HideoutTotemPoleTest",
-        "Metadata/Items/Hideout/HideoutTotemPole2Test",
-        "Metadata/Items/Hideout/HideoutTotemPole3Test",
-        "Metadata/Items/Hideout/HideoutTotemPole4Test",
-        "Metadata/Items/Hideout/HideoutTotemPole5Test",
-        "Metadata/Items/Hideout/HideoutTotemPole6Test",
-        "Metadata/Items/Hideout/HideoutTotemPole7Test",
-        "Metadata/Items/Hideout/HideoutTotemPole8Test",
-        "Metadata/Items/Hideout/HideoutTotemPole9Test",
-        "Metadata/Items/Hideout/HideoutTotemPole10Test",
-        "Metadata/Items/Hideout/HideoutTotemPole11Test",
-        "Metadata/Items/Hideout/HideoutTotemPole12Test",
-        "Metadata/Items/Hideout/HideoutTotemPole13Test",
-        "Metadata/Items/Hideout/HideoutTotemPole14Test",
-        "Metadata/Items/Hideout/HideoutTotemPole15Test",
-        "Metadata/Items/Hideout/HideoutTotemPole16Test",
-        "Metadata/Items/Hideout/HideoutTotemPole17Test",
-        "Metadata/Items/Hideout/HideoutTotemPole18Test",
-        "Metadata/Items/Hideout/HideoutTotemPole19Test",
-        "Metadata/Items/Hideout/HideoutTotemPole20Test",
-        "Metadata/Items/Hideout/HideoutTotemPole21Test",
-        "Metadata/Items/Hideout/HideoutTotemPole22Test",
-        "Metadata/Items/Hideout/HideoutTotemPole23Test",
-        "Metadata/Items/Hideout/HideoutTotemPole24Test",
-        "Metadata/Items/Hideout/HideoutTeleport",
-        "Metadata/Items/Hideout/HideoutTelepad",
-        "Metadata/Items/Hideout/HideoutTeleportProxy",
-        "Metadata/Items/Hideout/HideoutTeleportOwnerOnly",
-        "Metadata/Items/Hideout/HideoutMiracleMapDevice1",
-        "Metadata/Items/Hideout/HideoutMiracleMapDevice2",
-        "Metadata/Items/Hideout/HideoutMiracleMapDevice3",
-        "Metadata/Items/Hideout/HideoutShengjingBuildingSupplies1",
-        "Metadata/Items/Hideout/HideoutShengjingBuildingSupplies2",
-        "Metadata/Items/Hideout/HideoutShengjingBuildingSupplies3",
-        "Metadata/Items/Hideout/HideoutShengjingBuildingSupplies4",
-        "Metadata/Items/Hideout/HideoutShengjingBuildingSupplies5",
-        "Metadata/Items/Hideout/HideoutSteampunkWalls",
-        "Metadata/Items/Hideout/HideoutSteampunkWaypoint",
-        "Metadata/Items/Hideout/HideoutSteampunkVats",
-        "Metadata/Items/Hideout/HideoutSteampunkTables",
-        "Metadata/Items/Hideout/HideoutSteampunkPipes",
-        "Metadata/Items/Hideout/HideoutLionStatueKneeling2",
-        "Metadata/Items/MicrotransactionCurrency/MicrotransactionMysteryBoxWrapper",
-        # =================================================================
-        # Non-stackable resonators from before 3.8.0
-        # =================================================================
-        "Metadata/Items/Delve/DelveSocketableCurrencyUpgrade1",
-        "Metadata/Items/Delve/DelveSocketableCurrencyUpgrade2",
-        "Metadata/Items/Delve/DelveSocketableCurrencyUpgrade3",
-        "Metadata/Items/Delve/DelveSocketableCurrencyUpgrade4",
-        "Metadata/Items/Delve/DelveSocketableCurrencyReroll1",
-        "Metadata/Items/Delve/DelveSocketableCurrencyReroll2",
-        "Metadata/Items/Delve/DelveSocketableCurrencyReroll3",
-        "Metadata/Items/Delve/DelveSocketableCurrencyReroll4",
-        # =================================================================
-        # Non-stackable incubators from before 3.16.0
-        # =================================================================
-        "Metadata/Items/Currency/CurrencyIncubationEssence",
-        "Metadata/Items/Currency/CurrencyIncubationCurrency",
-        "Metadata/Items/Currency/CurrencyIncubationUniques",
-        "Metadata/Items/Currency/CurrencyIncubationMaps",
-        "Metadata/Items/Currency/CurrencyIncubationUniqueMaps",
-        "Metadata/Items/Currency/CurrencyIncubationAbyss",
-        "Metadata/Items/Currency/CurrencyIncubationFragments",
-        "Metadata/Items/Currency/CurrencyIncubationScarabs",
-        "Metadata/Items/Currency/CurrencyIncubationEssenceHigh",
-        "Metadata/Items/Currency/CurrencyIncubationFossils",
-        "Metadata/Items/Currency/CurrencyIncubationPerandus",
-        "Metadata/Items/Currency/CurrencyIncubationDivination",
-        "Metadata/Items/Currency/CurrencyIncubationTalismans",
-        "Metadata/Items/Currency/CurrencyIncubationLabyrinthHelm",
-        "Metadata/Items/Currency/CurrencyIncubationArmour6Linked",
-        "Metadata/Items/Currency/CurrencyIncubationCurrencyMid",
-        "Metadata/Items/Currency/CurrencyIncubationUniqueLeague",
-        "Metadata/Items/Currency/CurrencyIncubationArmourShaperElder",
-        "Metadata/Items/Currency/CurrencyIncubationWeaponShaperElder",
-        "Metadata/Items/Currency/CurrencyIncubationTrinketShaperElder",
-        "Metadata/Items/Currency/CurrencyIncubationMapElder",
-        "Metadata/Items/Currency/CurrencyIncubationBreach",
-        "Metadata/Items/Currency/CurrencyIncubationHarbingerShard",
-        "Metadata/Items/Currency/CurrencyIncubationGem",
-        "Metadata/Items/Currency/CurrencyIncubationGeneric",
-        "Metadata/Items/Currency/CurrencyIncubationGemLow",
-        "Metadata/Items/Currency/CurrencyIncubationBestiary",
-        "Metadata/Items/Currency/CurrencyIncubationBlight",
-        "Metadata/Items/Currency/CurrencyIncubationMetamorph",
-        "Metadata/Items/Currency/CurrencyIncubationDelirium",
-        # =================================================================
         # Old map fragments
         # =================================================================
         "Metadata/Items/MapFragments/VaalFragment1_1",
@@ -2118,66 +1338,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/MapFragments/BreachFragmentPhysical",
         "Metadata/Items/MapFragments/BreachFragmentChaos",
         "Metadata/Items/Labyrinth/OfferingToTheGoddess",
-        # =================================================================
-        # Watchstones
-        # =================================================================
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgradeFinal",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_1",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_2",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_3",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_4",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_5",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_6",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_7",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade1_8",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_1",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_2",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_3",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_4",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_5",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_6",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_7",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade2_8",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_1",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_2",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_3",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_4",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_5",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_6",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_7",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade3_8",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_1",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_2",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_3",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_4",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_5",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_6",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_7",
-        "Metadata/Items/AtlasUpgrades/AtlasRegionUpgrade4_8",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable1_1",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable1_2",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable1_3",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable1_4",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable1_5",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable1_6",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable1_7",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable1_8",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable2_1",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable2_2",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable2_3",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable2_4",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable2_5",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable2_6",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable2_7",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable2_8",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable3_1",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable3_2",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable3_3",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable3_4",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable3_5",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable3_6",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable3_7",
-        "Metadata/Items/AtlasUpgrades/AtlasUpgradeCraftable3_8",
     }
 
     _ITEM_SKIP_PATTERNS = {
@@ -2211,8 +1371,10 @@ class ItemsParser(SkillParserShared):
             r"SentinelCurrency",
             r"BestiaryNet",
             r"RandomFossilOutcome",
-            r"CurrencyIncursionCorrupt",
             r"CurrencyAddAtlasMod",
+        },
+        "IncubatorStackable": {
+            r"CurrencyIncubation",
         },
         "MapFragment": {
             r"Scarabs",
@@ -2241,30 +1403,7 @@ class ItemsParser(SkillParserShared):
             r"Maven/MavenMap",
             r"MapFragments/Primordial/Quest",
         },
-        "Microtransaction": {
-            r"Garena",
-            r"Tencent",
-            r"Jingwei",
-            r"Chiyou",
-            r"Auspicious.*Dragon",
-            r"Jinli",
-            r"MicrotransactionGoddess",
-            r"MicrotransactionLunar",
-            r"GodOfThunder",
-            r"AltDeicide",
-            r"Freya",
-            r"Hasina",
-            r"Skadi",
-            r"Upgrade.*Scroll",
-            r"Convert.*Scroll",
-            r"Premium.*Pet",
-            r"UnifiedAuraEffect",
-            r"MicrotransactionWrapper",
-            r"MicrotransactionDance",
-        },
     }
-
-    _PLACEHOLDER_IMAGES = {"Art/2DItems/Hideout/HideoutPlaceholder.dds"}
 
     _attribute_map = OrderedDict(
         (
@@ -2326,7 +1465,7 @@ class ItemsParser(SkillParserShared):
                 continue
             infobox[attr_long + "_percent"] = skill_gem[attr_short]
 
-        infobox["gem_tags"] = strip_keywords(
+        infobox["gem_tags"] = parser.strip_keywords(
             ", ".join([gt["Name"] for gt in gem_type["GemTags"] if gt["Name"]])
         )
 
@@ -2369,7 +1508,7 @@ class ItemsParser(SkillParserShared):
                 infobox.pop("drop_level")
 
             if gem_type["SupportText"]:
-                infobox["gem_description"] = process_keywords(gem_type["SupportText"])
+                infobox["gem_description"] = parser.process_keywords(gem_type["SupportText"])
 
         # Skip more complicated skills
         if ge["AdditionalStatSets"] or additional:
@@ -2541,7 +1680,7 @@ class ItemsParser(SkillParserShared):
                 full_result=True,
                 lang=self._language,
             )
-            infobox["buff_stat_text"] = process_keywords(
+            infobox["buff_stat_text"] = parser.process_keywords(
                 "<br>".join([parser.make_inter_wiki_links(line) for line in tr.lines])
             )
 
@@ -2674,7 +1813,7 @@ class ItemsParser(SkillParserShared):
                 {
                     "template": "help_text",
                     "condition": lambda v: v is not None,
-                    "format": lambda v: process_keywords(v["Text"]),
+                    "format": lambda v: parser.process_keywords(v["Text"]),
                 },
             ),
             (
@@ -2682,7 +1821,7 @@ class ItemsParser(SkillParserShared):
                 {
                     "template": "description",
                     "condition": lambda v: v is not None,
-                    "format": lambda v: process_keywords(v["Text"]),
+                    "format": lambda v: parser.process_keywords(v["Text"]),
                 },
             ),
         ),
@@ -2691,14 +1830,14 @@ class ItemsParser(SkillParserShared):
 
     def _currency_extra(self, infobox, base_item_type, currency):
         if infobox.get("description"):
-            infobox["description"] = process_keywords(
+            infobox["description"] = parser.process_keywords(
                 parser.parse_and_handle_description_tags(
                     rr=self.rr,
                     text=infobox["description"],
                 )
             )
         if infobox.get("help_text"):
-            infobox["help_text"] = process_keywords(
+            infobox["help_text"] = parser.process_keywords(
                 parser.parse_and_handle_description_tags(
                     rr=self.rr,
                     text=infobox["help_text"],
@@ -2760,214 +1899,6 @@ class ItemsParser(SkillParserShared):
         skip_warning=True,
     )
 
-    _COSMETIC_NAME_MAP = {
-        "English": {
-            "Skin Transfer": {"cosmetic_type": "Consumable"},
-            "Vanishing Dye": {"cosmetic_type": "Miscellaneous"},
-            "Invisible Buff Effect": {
-                "cosmetic_type": "Skill Gem Effect",
-                "cosmetic_target": "Buff",
-            },
-        }
-    }
-
-    _COSMETIC_TYPE_MAP = {
-        "English": {
-            "Blink and Mirror Arrow Skin": {
-                "cosmetic_type": "Skill Gem Effect",
-                "cosmetic_target": "Blink Arrow,Mirror Arrow",
-            },
-            "Blink Mirror Arrow Skin": {
-                "cosmetic_type": "Skill Gem Effect",
-                "cosmetic_target": "Blink Arrow,Mirror Arrow",
-            },
-            "Orb Void Sphere Skin": {
-                "cosmetic_type": "Skill Gem Effect",
-                "cosmetic_target": "Void Sphere",
-            },
-            "Oblivion Fireball Skin": {
-                "cosmetic_type": "Skill Gem Effect",
-                "cosmetic_target": "Fireball",
-            },
-            "Arctic Glacial Cascade": {
-                "cosmetic_type": "Skill Gem Effect",
-                "cosmetic_target": "Glacial Cascade",
-            },
-            "Summon Raging Spirits Skin": {
-                "cosmetic_type": "Skill Gem Effect",
-                "cosmetic_target": "Summon Raging Spirit",
-            },
-            "Artillery Ballis Skin": {
-                "cosmetic_type": "Skill Gem Effect",
-                "cosmetic_target": "Artillery Ballista",
-            },
-            "Banner Skin": {"cosmetic_type": "Skill Gem Effect", "cosmetic_target": "Banner"},
-            "Offering Skin": {"cosmetic_type": "Skill Gem Effect", "cosmetic_target": "Offering"},
-            "Quiver Skin": {"cosmetic_type": "Weapon Skin", "cosmetic_target": "Quiver"},
-            "Apparition Effect": {"cosmetic_type": "Apparition"},
-            "Amulet Effect": {"cosmetic_type": "Apparition"},
-            "Consumable Effect": {"cosmetic_type": "Consumable"},
-            "Charge Skin": {"cosmetic_type": "Alternate Charge Skin"},
-            "Cursor Skin": {"cosmetic_type": "Cursor"},
-            "Footprints Effect": {"cosmetic_type": "Footprints"},
-            "Boots Modifier": {"cosmetic_type": "Footprints"},
-            "Flask Effect": {"cosmetic_type": "Flask Skin"},
-            "Life Flask Skin": {"cosmetic_type": "Flask Skin", "cosmetic_target": "Life Flask"},
-            "Mana Flask Skin": {"cosmetic_type": "Flask Skin", "cosmetic_target": "Mana Flask"},
-            "Utility Flask Skin": {
-                "cosmetic_type": "Flask Skin",
-                "cosmetic_target": "Utility Flask",
-            },
-            "Quicksilver Flask Effect": {
-                "cosmetic_type": "Flask Skin",
-                "cosmetic_target": "Quicksilver Flask",
-            },
-            "Weapon Modifier": {"cosmetic_type": "Weapon Added Effect"},
-            "Finisher Effect": {"cosmetic_type": "Weapon Added Effect"},
-            "Body Armour Skin": {"cosmetic_type": "Armour Skin"},
-            "Body Armour Attachment": {"cosmetic_type": "Armour Attachment"},
-            "Helmet Skin and Attachment": {"cosmetic_type": "Helmet Skin / Attachment"},
-            "Portal Modification": {"cosmetic_type": "Portal"},
-            "Portrait Frame Modification": {"cosmetic_type": "Social Frame"},
-        }
-    }
-
-    _COSMETIC_ITEM_CLASS_MAP = {
-        "English": {
-            "Body Armour": "Armour Skin",
-            "Jewel": "Passive Jewel Skin",
-            "Active Skill Gem": "Skill Gem Effect",
-            "Support Skill Gem": "Skill Gem Effect",
-            "Claw": "Weapon Skin",
-            "Dagger": "Weapon Skin",
-            "Rune Dagger": "Weapon Skin",
-            "Wand": "Weapon Skin",
-            "Axe": "Weapon Skin",
-            "Mace": "Weapon Skin",
-            "Sword": "Weapon Skin",
-            "One Hand Sword": "Weapon Skin",
-            "Thrusting One Hand Sword": "Weapon Skin",
-            "One Hand Axe": "Weapon Skin",
-            "One Hand Mace": "Weapon Skin",
-            "Sceptre": "Weapon Skin",
-            "Bow": "Weapon Skin",
-            "Staff": "Weapon Skin",
-            "Two Hand Sword": "Weapon Skin",
-            "Two Hand Axe": "Weapon Skin",
-            "Two Hand Mace": "Weapon Skin",
-            "Warstaff": "Weapon Skin",
-            "FishingRod": "Weapon Skin",
-        }
-    }
-
-    def _cosmetics_extra(self, infobox: dict[str, str], *_):
-        if "cosmetic_type" not in infobox:
-            return
-
-        if infobox["name"] in self._COSMETIC_NAME_MAP[self._language]:
-            infobox.update(self._COSMETIC_NAME_MAP[self._language][infobox["name"]])
-            return
-
-        cosmetic_type = infobox["cosmetic_type"].replace(" Of ", " of ").replace("  ", " ")
-
-        if cosmetic_type in self._COSMETIC_TYPE_MAP[self._language]:
-            infobox.update(self._COSMETIC_TYPE_MAP[self._language][cosmetic_type])
-            return
-
-        if "Name" not in self.rr["MicrotransactionCategory.dat64"].index:
-            self.rr["MicrotransactionCategory.dat64"].build_index("Name")
-        categories = self.rr["MicrotransactionCategory.dat64"].index["Name"]
-
-        if cosmetic_type not in categories:
-            for unique in self.rr["UniqueStashLayout.dat64"]:
-                unique_name = unique["WordsKey"]["Text"]
-                if unique_name in cosmetic_type or unique_name.replace("The ", "") in cosmetic_type:
-                    item_class = unique["UniqueStashTypesKey"]["Name"]
-                    unique_type = self._COSMETIC_ITEM_CLASS_MAP[self._language].get(
-                        item_class,
-                        item_class + " Skin",
-                    )
-
-                    if unique_type not in categories:
-                        console(
-                            f'invalid unique type "{unique_type}" for {infobox["name"]}',
-                            msg=Msg.warning,
-                        )
-                    else:
-                        infobox["cosmetic_type"] = unique_type
-                        infobox["cosmetic_target"] = unique_name
-                        return
-
-            target = cosmetic_type.replace(" Skin", "").replace(" Effect", "")
-            suffix = cosmetic_type.replace(target, "")
-            if "Name" not in self.rr["BaseItemTypes.dat64"].index:
-                self.rr["BaseItemTypes.dat64"].build_index("Name")
-            item_index = self.rr["BaseItemTypes.dat64"].index["Name"]
-            item_type = next(
-                (
-                    self._COSMETIC_ITEM_CLASS_MAP[self._language].get(
-                        i["ItemClassesKey"]["Id"],
-                        i["ItemClassesKey"]["ItemClassCategory"]["Text"] + suffix,
-                    )
-                    for i in (
-                        item_index[target]
-                        or item_index[target + " Support"]
-                        or item_index[target + " Trap"]
-                        or item_index["Summon " + target]
-                    )
-                    if i["ItemClassesKey"] and i["ItemClassesKey"]["Id"] != "Microtransaction"
-                ),
-                None,
-            )
-            if item_type:
-                if item_type not in categories:
-                    console(
-                        f'invalid item type "{item_type}" for {infobox["name"]}', msg=Msg.warning
-                    )
-                else:
-                    infobox["cosmetic_type"] = item_type
-                    infobox["cosmetic_target"] = target
-                    return
-
-            for tag in self.rr["GemTags.dat64"]:
-                if tag["Tag"] and tag["Tag"] + " Skin" in cosmetic_type:
-                    infobox["cosmetic_type"] = "Skill Gem Effect"
-                    infobox["cosmetic_target"] = tag["Tag"]
-                    return
-
-            console(
-                f'unknown cosmetic category "{infobox["cosmetic_type"]}" for {infobox["name"]}',
-                msg=Msg.warning,
-            )
-            del infobox["cosmetic_type"]
-
-    _type_microtransaction = _type_factory(
-        data_file="CurrencyItems.dat64",
-        data_mapping=(),
-        function=_cosmetics_extra,
-    )
-
-    _type_hideout_doodad = _type_factory(
-        data_file="HideoutDoodads.dat64",
-        data_mapping=(
-            (
-                "IsNonMasterDoodad",
-                {
-                    "template": "is_master_doodad",
-                    "format": lambda v: not v,
-                },
-            ),
-            (
-                "Variation_AOFiles",
-                {
-                    "template": "variation_count",
-                    "format": lambda v: len(v),
-                },
-            ),
-        ),
-        row_index=True,
-    )
-
     def _type_map_extra(self, infobox, base_item_type, waystone):
         if "Tier" not in self.rr["MapTiers.dat64"].index:
             self.rr["MapTiers.dat64"].build_index("Tier")
@@ -3003,7 +1934,7 @@ class ItemsParser(SkillParserShared):
 
         results = []
         for mod in essence_mods:
-            target = process_keywords(mod["TargetItemCategory"]["Text"])
+            target = parser.process_keywords(mod["TargetItemCategory"]["Text"])
             desc = mod["Text"]
 
             # Extract from Mod or DisplayMod if no explicit text
@@ -3014,7 +1945,7 @@ class ItemsParser(SkillParserShared):
                         desc = "<br>".join(stats)
                         break
 
-            results.append((target, process_keywords(desc)))
+            results.append((target, parser.process_keywords(desc)))
 
         # Append results to infobox
         for target, desc in results:
@@ -3039,16 +1970,6 @@ class ItemsParser(SkillParserShared):
         skip_warning=True,
     )
 
-    # TODO:Remove: When liquid emotions mods will be supported on wiki and mods will be exported
-    def _type_liquid_emotion_extra(self, infobox, base_item_type, emotions):
-        stats = self._get_stats(
-            mod=emotions["EnchantedMod"], translation_file="atlas_stat_descriptions.txt"
-        )
-        desc = process_keywords("<br>".join(stats))
-        infobox["implicit1_text"] = "{{c|enchanted|" + desc + "}}"
-
-        return True
-
     _type_liquid_emotion = _type_factory(
         data_file="BlightCraftingItems.dat64",
         data_mapping=(
@@ -3068,7 +1989,6 @@ class ItemsParser(SkillParserShared):
             ),
         ),
         row_index=True,
-        function=_type_liquid_emotion_extra,
         fail_condition=True,
         skip_warning=True,
     )
@@ -3096,65 +2016,63 @@ class ItemsParser(SkillParserShared):
         skip_warning=True,
     )
 
-    def _type_soulcore_extra(self, infobox, base_item_type, soulcores):
+    def _type_soulcore_extra(self, infobox, base_item_type, soulcore):
         # Some have extra desc that is not in game
         if infobox.get("description"):
             infobox.pop("description")
 
-        sc_stat_map = [
-            # stats/values key, target text key
+        results = OrderedDict(
             (
-                "MartialWeapon",
-                "SoulCoreCategoryWeapons",
-            ),
-            (
-                "Armour",
-                "SoulCoreCategoryArmour",
-            ),
-            (
-                "CasterWeapon",
-                "SoulCoreCategoryCasterWeapons",
-            ),
-            (
-                "AllEquipment",
-                "SoulCoreCategoryAllEquipment",
-            ),
-        ]
+                ("generic", []),
+                ("bonded", []),
+            )
+        )
 
-        results = []
-        for stat_key, target in sc_stat_map:
-            if soulcores["Stats" + stat_key]:
-                stats = [s["Id"] for s in soulcores[f"Stats{stat_key}"]]
-                values = soulcores[f"StatsValues{stat_key}"]
-                stats = self._get_stats(
-                    stats=stats, values=values, translation_file="stat_descriptions.txt"
+        # Stats
+        if "SoulCore" not in self.rr["SoulCoreStats.dat64"].index:
+            self.rr["SoulCoreStats.dat64"].build_index("SoulCore")
+
+        for sc in self.rr["SoulCoreStats.dat64"].index["SoulCore"][soulcore]:
+            if sc["StatCategory"]["Display"]:
+                target = sc["StatCategory"]["Display"]
+            else:  # Unsure if this is that or something else
+                target = sc["StatCategory"]["TargetItemClasses"][0]["Name"]
+
+            def get_stats(stats, values):
+                stats = [s["Id"] for s in stats]
+                values = values
+                return "<br>".join(
+                    self._get_stats(
+                        stats=stats, values=values, translation_file="stat_descriptions.txt"
+                    )
                 )
 
-                desc = "<br>".join(stats)
-                target = self.rr["ClientStrings.dat64"].index["Id"][target]["Text"]
+            # Get stats
+            if sc["Stats"]:
+                results["generic"].append([target, get_stats(sc["Stats"], sc["StatsValues"])])
+            if sc["BondedStats"]:
+                results["bonded"].append(
+                    [target, get_stats(sc["BondedStats"], sc["BondedStatsValues"])]
+                )
 
-                results.append((process_keywords(target), process_keywords(desc)))
+        # Join stats into one string
+        for key, value in results.items():
+            if value:
+                results[key] = parser.process_keywords(
+                    "<br>".join(f"{target}: {desc}" for target, desc in value)
+                )
 
-        # Per class SoulCores
-        if "BaseItemType" not in self.rr["SoulCoresPerClass.dat64"].index:
-            self.rr["SoulCoresPerClass.dat64"].build_index("BaseItemType")
+        # Finish
+        parts = []
+        if results["generic"]:
+            parts.append(results["generic"])
+        if results["bonded"]:
+            parts.append("Bonded:<br>" + results["bonded"])
 
-        soulcore_pc = self.rr["SoulCoresPerClass.dat64"].index["BaseItemType"][base_item_type]
-
-        for sc in soulcore_pc:
-            stats = [s["Id"] for s in sc["Stats"]]
-            values = sc["StatsValues"]
-            stats = self._get_stats(
-                stats=stats, values=values, translation_file="stat_descriptions.txt"
-            )
-
-            desc = "<br>".join(stats)
-            target = sc["ItemClass"]["Name"]
-
-            results.append((target, process_keywords(desc)))
-
-        # Append results to infobox
-        infobox["description"] = "<br>".join(f"{target}: {desc}" for target, desc in results)
+        if results["generic"]:
+            infobox["augment_stat_text"] = results["generic"]
+        if results["bonded"]:
+            infobox["augment_stat_text_bonded"] = results["bonded"]
 
         return True
 
@@ -3173,14 +2091,32 @@ class ItemsParser(SkillParserShared):
                 {
                     "template": "augment_limit",
                     "condition": lambda v: v is not None,
-                    "format": lambda v: v["Text"].format(v["Limit"]) if v["Text"] else v["Limit"],
+                    "format": lambda v: (
+                        parser.process_keywords(v["Text"].format(v["Limit"]))
+                        if v["Text"]
+                        else v["Limit"]
+                    ),
+                },
+            ),
+            (
+                "Type",
+                {
+                    "template": "augment_type_id",
+                    "conditon": lambda v: v is not None,
+                    "format": lambda v: v["Id"],
+                },
+            ),
+            (
+                "Type",
+                {
+                    "template": "augment_type",
+                    "conditon": lambda v: v is not None,
+                    "format": lambda v: parser.strip_keywords(v["Name"]),
                 },
             ),
         ),
         row_index=True,
         function=_type_soulcore_extra,
-        fail_condition=True,
-        skip_warning=True,
     )
 
     def _type_uncutgem(self, infobox, base_item_type):
@@ -3231,6 +2167,7 @@ class ItemsParser(SkillParserShared):
         "Two Hand Sword": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
         "Two Hand Axe": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
         "Two Hand Mace": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
+        "Talisman": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
         "FishingRod": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
         "Warstaff": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
         "Spear": (_type_inherent_skill, _type_level, _type_attribute, _type_weapon),
@@ -3251,7 +2188,7 @@ class ItemsParser(SkillParserShared):
         "Support Skill Gem": (
             _type_level,
             _skill_gem,
-        ),  # _type_level to make it in one place for all items (lineage)
+        ),
         "Meta Skill Gem": (_skill_gem,),
         # Uncut gems
         "UncutSkillGemStackable": (_type_uncutgem,),
@@ -3271,8 +2208,7 @@ class ItemsParser(SkillParserShared):
             _type_soulcore,
         ),
         "Omen": (_type_currency,),
-        "HideoutDoodad": (_type_currency, _type_hideout_doodad),
-        "Microtransaction": (_type_currency, _type_microtransaction),
+        "IncubatorStackable": (_type_currency,),
         "DivinationCard": (_type_currency,),
         # Misc
         "Map": (_type_map,),  # Aka waystone
@@ -3316,32 +2252,6 @@ class ItemsParser(SkillParserShared):
 
         return
 
-    def _conflict_hideout_doodad(self, infobox, base_item_type, rr, language):
-        try:
-            ho = rr["HideoutDoodads.dat64"].index["BaseItemTypesKey"][base_item_type.rowid]
-        except KeyError:
-            return
-
-        # This is not perfect, but works currently.
-        if ho["HideoutNPCsKey"]:
-            if base_item_type["Id"].startswith("Metadata/Items/Hideout/HideoutWounded"):
-                name_fmt = self._LANG[self._language]["decoration_wounded"]
-            else:
-                name_fmt = self._LANG[self._language]["decoration"]
-            name = name_fmt % (
-                base_item_type["Name"],
-                ho["HideoutNPCsKey"]["Hideout_NPCsKey"]["ShortName"],
-                ho["MasterLevel"],
-            )
-            infobox["inventory_icon"] = name
-            return name
-        elif base_item_type["Id"].startswith("Metadata/Items/Hideout/HideoutTotemPole"):
-            # Ingore the test doodads on purpose
-            if base_item_type["Id"].endswith("Test"):
-                return
-
-            return base_item_type["Name"]
-
     def _conflict_map_fragments(self, infobox, base_item_type, rr, language):
         return base_item_type["Name"]
 
@@ -3354,8 +2264,6 @@ class ItemsParser(SkillParserShared):
     _conflict_resolver_map = {
         "Active Skill Gem": _conflict_active_skill_gems,
         "QuestItem": _conflict_quest_items,
-        # TODO: Make a new doodad resolver that doesn't rely on 'HideoutNPCsKey'
-        # 'HideoutDoodad': _conflict_hideout_doodad,
         "MapFragment": _conflict_map_fragments,
         "DivinationCard": _conflict_divination_card,
         "MiscMapItem": _conflict_misc_map_item,
@@ -3382,8 +2290,8 @@ class ItemsParser(SkillParserShared):
         if base_item_type["Id"] in self._SKIP_ITEMS_BY_ID:
             self._skipped_items.add(base_item_type["Id"])
             return True
-        if base_item_type["ItemClassesKey"]["Id"] in self._ITEM_SKIP_PATTERNS:
-            for pattern in self._ITEM_SKIP_PATTERNS[base_item_type["ItemClassesKey"]["Id"]]:
+        if base_item_type["ItemClass"]["Id"] in self._ITEM_SKIP_PATTERNS:
+            for pattern in self._ITEM_SKIP_PATTERNS[base_item_type["ItemClass"]["Id"]]:
                 if re.search(pattern, base_item_type["Id"], flags=re.IGNORECASE):
                     self._skipped_items.add(base_item_type["Id"])
                     return True
@@ -3442,16 +2350,16 @@ class ItemsParser(SkillParserShared):
 
         # BaseItemTypes.dat
         infobox["name"] = base_item_type["Name"]
-        infobox["class_id"] = base_item_type["ItemClassesKey"]["Id"]
+        infobox["class_id"] = base_item_type["ItemClass"]["Id"]
         infobox["size_x"] = base_item_type["Width"]
         infobox["size_y"] = base_item_type["Height"]
-        if base_item_type["FlavourTextKey"]:
+        if base_item_type["FlavourText"]:
             infobox["flavour_text"] = parser.parse_and_handle_description_tags(
                 rr=self.rr,
-                text=base_item_type["FlavourTextKey"]["Text"],
+                text=base_item_type["FlavourText"]["Text"],
             )
 
-        if base_item_type["ItemClassesKey"]["Id"] not in self._IGNORE_DROP_LEVEL_CLASSES:
+        if base_item_type["ItemClass"]["Id"] not in self._IGNORE_DROP_LEVEL_CLASSES:
             if base_item_type["Id"] in self._DROP_LEVEL_BY_ID:
                 infobox["drop_level"] = self._DROP_LEVEL_BY_ID[base_item_type["Id"]]
             else:
@@ -3478,21 +2386,28 @@ class ItemsParser(SkillParserShared):
 
         description = ot["Stack"].get("function_text")
         if description:
-            infobox["description"] = process_keywords(
+            infobox["description"] = parser.process_keywords(
                 self.rr["ClientStrings.dat64"].index["Id"][description]["Text"]
             )
 
         help_text = ot["Base"].get("description_text")
         if help_text:
-            infobox["help_text"] = infobox["help_text"] = process_keywords(
+            infobox["help_text"] = infobox["help_text"] = parser.process_keywords(
                 "<br>".join(
                     self.rr["ClientStrings.dat64"].index["Id"][help_text]["Text"].splitlines()
                 )
             )
 
-        # TODO:Remove: Unnote when modifiers will be done/exported
-        # for i, mod in enumerate(base_item_type["Implicit_Mods"]):
-        #    infobox["implicit%s" % (i + 1)] = mod["Id"]
+        # Prepend charm slots implicit for belts
+        if base_item_type["ItemClass"]["Id"] == "Belt":
+            if "Id" not in self.rr["Mods.dat64"].index:
+                self.rr["Mods.dat64"].build_index("Id")
+            base_item_type["Implicit_Mods"].insert(
+                0, self.rr["Mods.dat64"].index["Id"]["BeltImplicitCharmSlots3"]
+            )
+
+        for i, mod in enumerate(base_item_type["Implicit_Mods"]):
+            infobox["implicit%s" % (i + 1)] = mod["Id"]
 
     def _process_name_conflicts(self, infobox, base_item_type, language):
         rr = self.rr2 if language != self._language else self.rr
@@ -3505,7 +2420,6 @@ class ItemsParser(SkillParserShared):
         override = self._NAME_OVERRIDE_BY_ID[language].get(m_id)
         override_2 = self._NAME_OVERRIDE_BY_ID_2[language].get(m_id)
         appendix = self._NAME_APPENDIX_BY_ID[language].get(m_id)
-        appendix_2 = self._NAME_APPENDIX_BY_ID_2[language].get(m_id)
 
         if override is not None:
             name = override
@@ -3517,8 +2431,6 @@ class ItemsParser(SkillParserShared):
             name += appendix
             if appendix != "":
                 infobox["inventory_icon"] = name
-        elif appendix_2 is not None:
-            name += appendix_2
         else:
             items = [
                 item
@@ -3556,7 +2468,7 @@ class ItemsParser(SkillParserShared):
     def _export(self, parsed_args, items):
         classes = self._parse_class_filter(parsed_args)
         if classes:
-            items = [item for item in items if item["ItemClassesKey"]["Name"] in classes]
+            items = [item for item in items if item["ItemClass"]["Name"] in classes]
         else:
             items = [item for item in items if item["ItemClass"]["Id"] not in self._EXCLUDE_CLASSES]
 
@@ -3653,21 +2565,6 @@ class ItemsParser(SkillParserShared):
                     }
                 ]
 
-                if infobox.get("cosmetic_type", None) == "Armour Skin" and "Armour" not in page:
-                    wiki_page.append(
-                        {
-                            "page": page + " Armour",
-                            "condition": cond,
-                        }
-                    )
-
-                ddsfile = base_item_type["ItemVisualIdentityKey"]["DDSFile"]
-                if ddsfile and ddsfile in self._PLACEHOLDER_IMAGES:
-                    warnings.warn(
-                        'Item "%s" has placeholder icon art. Skipping.' % base_item_type["Name"]
-                    )
-                    continue
-
                 r.add_result(
                     text=cond,
                     out_file="item_%s.txt" % page,
@@ -3676,6 +2573,7 @@ class ItemsParser(SkillParserShared):
                 )
 
                 if parsed_args.store_images:
+                    ddsfile = base_item_type["ItemVisualIdentity"]["DDSFile"]
                     if not ddsfile:
                         warnings.warn(
                             'Missing 2d art inventory icon for item "%s"' % base_item_type["Name"]

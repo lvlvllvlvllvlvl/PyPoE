@@ -39,7 +39,6 @@ from functools import partialmethod
 from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
-from PyPoE.poe.file.dat import DatRecord
 
 # =============================================================================
 # Globals
@@ -161,144 +160,142 @@ class MonsterParser(parser.BaseParser):
         error_msg="Several monsters have not been found:\n%s",
     )
 
-    _COPY_KEYS = OrderedDict(
+    _COPY_KEYS = (
         (
-            (
-                "Id",
-                {
-                    "template": "metadata_id",
-                },
-            ),
-            (
-                "MonsterType",
-                {
-                    "template": "monster_type_id",
-                    "format": lambda v: v["Id"],
-                },
-            ),
-            (
-                "Name",
-                {
-                    "template": "name",
-                    "condition": lambda v: v,
-                },
-            ),
-            # (
-            #    "Mods",
-            #    {
-            #        "template": "mod_ids",
-            #        "format": lambda v: ", ".join([r["Id"] for r in v]),
-            #    },
-            # ),
-            # (
-            #    "Part1_Mods",
-            #    {
-            #        "template": "part1_mod_ids",
-            #        "format": lambda v: ", ".join([r["Id"] for r in v]),
-            #    },
-            # ),
-            # (
-            #    "Part2_Mods",
-            #    {
-            #        "template": "part2_mod_ids",
-            #        "format": lambda v: ", ".join([r["Id"] for r in v]),
-            #    },
-            # ),
-            # (
-            #    "Endgame_Mods",
-            #    {
-            #        "template": "endgame_mod_ids",
-            #        "format": lambda v: ", ".join([r["Id"] for r in v]),
-            #    },
-            # ),
-            (
-                "Tags",
-                {
-                    "template": "tags",
-                    "condition": lambda v: v,
-                    "format": lambda v: ", ".join([r["Id"] for r in v]),
-                },
-            ),
-            (
-                "GrantedEffects",
-                {
-                    "template": "skill_ids",
-                    "condition": lambda v: v,
-                    "format": lambda v: ", ".join([r["Id"] for r in v]),
-                },
-            ),
-            (
-                "MonsterCategory",
-                {
-                    "template": "category",
-                    "condition": lambda v: v is not None,
-                    "format": lambda v: v["Name"],
-                },
-            ),
-            (
-                "ObjectSize",
-                {
-                    "template": "size",
-                    "default": 0,
-                },
-            ),
-            (
-                "MinimumAttackDistance",
-                {
-                    "template": "minimum_attack_distance",
-                },
-            ),
-            (
-                "MaximumAttackDistance",
-                {
-                    "template": "maximum_attack_distance",
-                },
-            ),
-            (
-                "ModelSizeMultiplier",
-                {
-                    "template": "model_size_multiplier",
-                    "format": lambda v: v / 100,
-                },
-            ),
-            (
-                "ExperienceMultiplier",
-                {
-                    "template": "experience_multiplier",
-                    "format": lambda v: v / 100,
-                },
-            ),
-            (
-                "DamageMultiplier",
-                {
-                    "template": "damage_multiplier",
-                    "format": lambda v: v / 100,
-                },
-            ),
-            (
-                "LifeMultiplier",
-                {
-                    "template": "health_multiplier",
-                    "format": lambda v: v / 100,
-                },
-            ),
-            # (
-            #    "CriticalStrikeChance",
-            #    {
-            #        "template": "critical_strike_chance",
-            #        "condition": lambda v: v > 0,
-            #        "format": lambda v: v / 100,
-            #    },
-            # ),
-            (
-                "AttackSpeed",
-                {
-                    "template": "attack_speed",
-                    "condition": lambda v: v > 0,
-                    "format": lambda v: v / 1000,
-                },
-            ),
-        )
+            "Id",
+            {
+                "template": "metadata_id",
+            },
+        ),
+        (
+            "MonsterType",
+            {
+                "template": "monster_type_id",
+                "format": lambda v: v["Id"],
+            },
+        ),
+        (
+            "Name",
+            {
+                "template": "name",
+                "condition": lambda v: v,
+            },
+        ),
+        # (
+        #    "Mods",
+        #    {
+        #        "template": "mod_ids",
+        #        "format": lambda v: ", ".join([r["Id"] for r in v]),
+        #    },
+        # ),
+        # (
+        #    "Part1_Mods",
+        #    {
+        #        "template": "part1_mod_ids",
+        #        "format": lambda v: ", ".join([r["Id"] for r in v]),
+        #    },
+        # ),
+        # (
+        #    "Part2_Mods",
+        #    {
+        #        "template": "part2_mod_ids",
+        #        "format": lambda v: ", ".join([r["Id"] for r in v]),
+        #    },
+        # ),
+        # (
+        #    "Endgame_Mods",
+        #    {
+        #        "template": "endgame_mod_ids",
+        #        "format": lambda v: ", ".join([r["Id"] for r in v]),
+        #    },
+        # ),
+        (
+            "Tags",
+            {
+                "template": "tags",
+                "condition": lambda v: v,
+                "format": lambda v: ", ".join([r["Id"] for r in v]),
+            },
+        ),
+        (
+            "GrantedEffects",
+            {
+                "template": "skill_ids",
+                "condition": lambda v: v,
+                "format": lambda v: ", ".join([r["Id"] for r in v]),
+            },
+        ),
+        (
+            "MonsterCategory",
+            {
+                "template": "category",
+                "condition": lambda v: v is not None,
+                "format": lambda v: v["Name"],
+            },
+        ),
+        (
+            "ObjectSize",
+            {
+                "template": "size",
+                "condition": lambda v: v > 0,
+            },
+        ),
+        (
+            "MinimumAttackDistance",
+            {
+                "template": "minimum_attack_distance",
+            },
+        ),
+        (
+            "MaximumAttackDistance",
+            {
+                "template": "maximum_attack_distance",
+            },
+        ),
+        (
+            "ModelSizeMultiplier",
+            {
+                "template": "model_size_multiplier",
+                "format": lambda v: v / 100,
+            },
+        ),
+        (
+            "ExperienceMultiplier",
+            {
+                "template": "experience_multiplier",
+                "format": lambda v: v / 100,
+            },
+        ),
+        (
+            "DamageMultiplier",
+            {
+                "template": "damage_multiplier",
+                "format": lambda v: v / 100,
+            },
+        ),
+        (
+            "LifeMultiplier",
+            {
+                "template": "health_multiplier",
+                "format": lambda v: v / 100,
+            },
+        ),
+        # (
+        #    "CriticalStrikeChance",
+        #    {
+        #        "template": "critical_strike_chance",
+        #        "condition": lambda v: v > 0,
+        #        "format": lambda v: v / 100,
+        #    },
+        # ),
+        (
+            "AttackSpeed",
+            {
+                "template": "attack_speed",
+                "condition": lambda v: v > 0,
+                "format": lambda v: v / 1000,
+            },
+        ),
     )
 
     def by_rowid(self, parsed_args):
@@ -343,13 +340,11 @@ class MonsterParser(parser.BaseParser):
 
         console("Found %s monsters, parsing..." % len(monsters))
 
-        console("Accessing additional data...")
-
         for monster in monsters:
             infobox = OrderedDict()
 
             # Copy over simple fields from the .dat64
-            apply_column_map(infobox, self._COPY_KEYS, monster)
+            parser.apply_simple_column_map(infobox, self._COPY_KEYS, monster)
 
             cond = MonsterWikiCondition(
                 data=infobox,
@@ -374,34 +369,3 @@ class MonsterParser(parser.BaseParser):
 # =============================================================================
 # Functions
 # =============================================================================
-
-
-def apply_column_map(
-    infobox, column_map: tuple[tuple[str, dict], ...], list_object: DatRecord | list[DatRecord]
-):
-    """
-    Copy over simple fields from the .dat64
-
-    Parameters
-    ----------
-    infobox: Dictionary in which values should be added
-    column_map: Map to apply
-    list_object: File to search for keys
-    """
-    if not isinstance(list_object, DatRecord):
-        list_object = list_object[0]
-
-    for k, data in column_map.items():
-        value = list_object[k]
-
-        if data.get("condition") and not data["condition"](value):
-            continue
-
-        # Skip default values to reduce size of template
-        if value == data.get("default"):
-            continue
-
-        if data.get("format"):
-            value = data["format"](value)
-
-        infobox[data["template"]] = value

@@ -40,15 +40,9 @@ from functools import partialmethod
 
 # Self
 from PyPoE.cli.core import Msg, console
+from PyPoE.cli.exporter.poe2wiki import parser
 from PyPoE.cli.exporter.poe2wiki.handler import ExporterHandler, ExporterResult
-from PyPoE.cli.exporter.poe2wiki.parser import (
-    BaseParser,
-    WikiCondition,
-    process_keywords,
-)
 from PyPoE.poe import poe2constants as constants
-from PyPoE.poe import text
-from PyPoE.poe.file.dat import DatRecord
 
 # =============================================================================
 # Globals
@@ -65,16 +59,21 @@ class OutOfBoundsWarning(UserWarning):
     pass
 
 
-class ModWikiCondition(WikiCondition):
+class WikiCondition(parser.WikiCondition):
     COPY_KEYS = ("tier_text",)
-    COPY_CONDITIONS = {"tags": WikiCondition.tagsets_equal}
+    COPY_CONDITIONS = {
+        "tags": parser.WikiCondition.tagsets_equal,
+    }
 
     NAME = "Mod"
 
 
 class ModsHandler(ExporterHandler):
     def __init__(self, sub_parser):
-        self.parser = sub_parser.add_parser("mods", help="Mods Exporter")
+        self.parser = sub_parser.add_parser(
+            "mods",
+            help="Mods Exporter",
+        )
         self.parser.set_defaults(func=lambda args: self.parser.print_help())
         lua_sub = self.parser.add_subparsers()
 
@@ -115,11 +114,12 @@ class ModsHandler(ExporterHandler):
         self.add_format_argument(parser)
 
 
-class ModParser(BaseParser):
+class ModParser(parser.BaseParser):
     # Load files in advance
     _files = [
         "Mods.datc64",
         "Stats.datc64",
+        "GoldModPrices.datc64",
     ]
 
     # Load translations in advance
@@ -128,46 +128,68 @@ class ModParser(BaseParser):
     ]
 
     _mod_column_index_filter = partialmethod(
-        BaseParser._column_index_filter,
+        parser.BaseParser._column_index_filter,
         dat_file_name="Mods.dat64",
-        error_msg="Several areas have not been found:\n%s",
+        error_msg="Several modifiers have not been found:\n%s",
     )
 
-    _COPY_KEYS = OrderedDict(
+    _COPY_KEYS = (
         (
-            (
-                "Id",
-                {
-                    "template": "id",
-                },
-            ),
-            (
-                "Families",
-                {
-                    "template": "mod_groups",
-                    "condition": lambda v: v,
-                },
-            ),
-            (
-                "Domain",
-                {
-                    "template": "domain",
-                },
-            ),
-            (
-                "GenerationType",
-                {
-                    "template": "generation_type",
-                },
-            ),
-            (
-                "Level",
-                {
-                    "template": "required_level",
-                    "condition": lambda v: v > 0,
-                },
-            ),
-        )
+            "Id",
+            {
+                "template": "id",
+            },
+        ),
+        (
+            "Families",
+            {
+                "template": "mod_groups",
+                "condition": lambda v: v,
+                "format": lambda v: ", ".join([m["Id"] for m in v]),
+            },
+        ),
+        (
+            "Domain",
+            {
+                "template": "domain",
+            },
+        ),
+        (
+            "GenerationType",
+            {
+                "template": "generation_type",
+            },
+        ),
+        (
+            "Level",
+            {
+                "template": "required_level",
+                "condition": lambda v: v > 0,
+            },
+        ),
+        (
+            "Name",
+            {
+                "template": "name",
+                "condition": lambda v: v,
+            },
+        ),
+        (
+            "ModType",
+            {
+                "template": "mod_type",
+                "condition": lambda v: v is not None,
+                "format": lambda v: v["Name"],
+            },
+        ),
+        (
+            "ImplicitTags",
+            {
+                "template": "tags",
+                "condition": lambda v: v,
+                "format": lambda v: ", ".join([t["Id"] for t in v]),
+            },
+        ),
     )
 
     def _append_effect(self, result, mylist, heading):
@@ -229,47 +251,32 @@ class ModParser(BaseParser):
     def _export(self, parsed_args, mods):
         r = ExporterResult()
 
-        if mods:
-            console("Found %s mods. Processing..." % len(mods))
-        else:
-            console("No mods found for the specified parameters. Quitting.", msg=Msg.warning)
+        if not mods:
+            console(
+                "No modifiers found for the specified parameters. Quitting.",
+                msg=Msg.warning,
+            )
             return r
 
-        # Needed for localizing sell prices
-        self.rr["BaseItemTypes.dat64"].build_index("Id")
+        console("Found %s mods. Processing..." % len(mods))
+
+        # Not needed for spawn tags
+        # self.rr["GoldModPrices.dat64"].build_index("Mod")
 
         for mod in mods:
             infobox = OrderedDict()
 
             # Copy over simple fields from the .dat64
-            apply_column_map(infobox, self._COPY_KEYS, mod)
+            parser.apply_simple_column_map(infobox, self._COPY_KEYS, mod)
 
-            if mod["Name"]:
-                root = text.parse_description_tags(mod["Name"])
-
-                def handler(hstr, parameter):
-                    return hstr if parameter == "MS" else ""
-
-                infobox["name"] = root.handle_tags({"if": handler, "elif": handler})
-
-            # TODO: need to look into this before completely removing it.
-
-            if mod["BuffTemplate"] and mod["BuffTemplate"]["BuffDefinitionsKey"]:
-                infobox["granted_buff_id"] = mod["BuffTemplate"]["BuffDefinitionsKey"]["Id"]
+            if mod["BuffTemplate"] and mod["BuffTemplate"]["BuffDefinition"]:
+                infobox["granted_buff_id"] = mod["BuffTemplate"]["BuffDefinition"]["Id"]
                 infobox["granted_buff_value"] = mod["BuffTemplate"]["AuraRadius"]
-            # todo ID for GEPL
 
-            # 3.19 Update - Lake of Kalandra
-            # Parse Families to mod groups
-
-            if mod["Families"]:
-                infobox["mod_groups"] = ", ".join([m["Id"] for m in mod["Families"]])
-
-            if mod["GrantedEffectsPerLevelKeys"]:
+            if mod["GrantedEffectsPerLevel"]:
                 infobox["granted_skill"] = ", ".join(
-                    [k["GrantedEffect"]["Id"] for k in mod["GrantedEffectsPerLevelKeys"]]
+                    [k["GrantedEffect"]["Id"] for k in mod["GrantedEffectsPerLevel"]]
                 )
-            infobox["mod_type"] = mod["ModTypeKey"]["Name"]
 
             stats = []
             values = []
@@ -288,7 +295,7 @@ class ModParser(BaseParser):
                 stats.append(stat)
                 values.append(value)
 
-            infobox["stat_text"] = process_keywords(
+            infobox["stat_text"] = parser.process_keywords(
                 "<br>".join(self._get_stats(stats, values, mod))
             )
             # if mod["BuffTemplate"] and mod["BuffTemplate"]["AuraRadius"]:
@@ -304,38 +311,31 @@ class ModParser(BaseParser):
                 infobox["stat%s_min" % i] = vmin
                 infobox["stat%s_max" % i] = vmax
 
-            for i, tag in enumerate(mod["SpawnWeight_TagsKeys"]):
+            # Spawn weights
+            for i, tag in enumerate(mod["SpawnWeight_Tags"]):
                 j = i + 1
                 infobox["spawn_weight%s_tag" % j] = tag["Id"]
                 infobox["spawn_weight%s_value" % j] = mod["SpawnWeight_Values"][i]
 
-            for i, tag in enumerate(mod["GenerationWeight_TagsKeys"]):
-                j = i + 1
-                infobox["generation_weight%s_tag" % j] = tag["Id"]
-                infobox["generation_weight%s_value" % j] = mod["GenerationWeight_Values"][i]
+            # TODO: Sell price
+            # mod_prices = self.rr["GoldModPrices.dat64"].index["Mod"][mod]
+            # mod value + (base value + inherent skill value) * multipliers,
+            # and then sell price back to the vendor is 11% of that
+            # mod_prices...
 
-            # 3.15
-
-            tags = []
-            for i, tag in enumerate(mod["ImplicitTagsKeys"]):
-                j = i + 1
-                # infobox['tag%s_tag' % j] = tag['Id']
-                # infobox['tag%s_value' % j] = mod['ImplicitTagsKeys'][i]
-                # print(tag['Id'])
-                tags.append(tag["Id"])
-            # tags = ','.join(tags)
-            if tags:
-                infobox["tags"] = ", ".join(tags)
-
-            # 3+ tildes not allowed
-            page_name = "Modifier:" + self._format_wiki_title(mod["Id"])
-            cond = ModWikiCondition(infobox, parsed_args)
+            cond = WikiCondition(
+                data=infobox,
+                cmdargs=parsed_args,
+            )
 
             r.add_result(
                 text=cond,
                 out_file="mod_%s.txt" % infobox["id"],
                 wiki_page=[
-                    {"page": page_name, "condition": cond},
+                    {
+                        "page": "Modifier:" + self._format_wiki_title(mod["Id"]),
+                        "condition": cond,
+                    },
                 ],
                 wiki_message="Mod updater",
             )
@@ -346,34 +346,3 @@ class ModParser(BaseParser):
 # =============================================================================
 # Functions
 # =============================================================================
-
-
-def apply_column_map(
-    infobox, column_map: tuple[tuple[str, dict], ...], list_object: DatRecord | list[DatRecord]
-):
-    """
-    Copy over simple fields from the .dat64
-
-    Parameters
-    ----------
-    infobox: Dictionary in which values should be added
-    column_map: Map to apply
-    list_object: File to search for keys
-    """
-    if not isinstance(list_object, DatRecord):
-        list_object = list_object[0]
-
-    for k, data in column_map.items():
-        value = list_object[k]
-
-        if data.get("condition") and not data["condition"](value):
-            continue
-
-        # Skip default values to reduce size of template
-        if value == data.get("default"):
-            continue
-
-        if data.get("format"):
-            value = data["format"](value)
-
-        infobox[data["template"]] = value
