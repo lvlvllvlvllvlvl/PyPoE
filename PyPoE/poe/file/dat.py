@@ -1238,7 +1238,7 @@ class RelationalReader(AbstractFileCache[DatFile]):
                 for i, row in enumerate(df.reader.table_data):
                     try:
                         df.reader.table_data[i][index] = vf(
-                            row[index],
+                            row[key],
                             df_other_reader,
                             key_id,
                             key_offset,
