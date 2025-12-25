@@ -293,13 +293,6 @@ class MapsParser(ItemsParser):
                 },
             ),
             (
-                "Regular_GuildCharacter",
-                {
-                    "template": "map_guild_character",
-                    "condition": lambda v: v,
-                },
-            ),
-            (
                 "Regular_WorldAreasKey",
                 {
                     "template": "map_area_id",
@@ -307,10 +300,17 @@ class MapsParser(ItemsParser):
                 },
             ),
             (
-                "Unique_GuildCharacter",
+                "Regular_WorldAreasKey",
                 {
-                    "template": "unique_map_guild_character",
-                    "condition": lambda v: v != "",
+                    "template": "map_area_level",
+                    "format": lambda v: v["AreaLevel"],
+                },
+            ),
+            (
+                "Regular_GuildCharacter",
+                {
+                    "template": "map_guild_character",
+                    "condition": lambda v: v,
                 },
             ),
             (
@@ -327,6 +327,13 @@ class MapsParser(ItemsParser):
                     "template": "unique_map_area_level",
                     "format": lambda v: v["AreaLevel"],
                     "condition": lambda v: v is not None,
+                },
+            ),
+            (
+                "Unique_GuildCharacter",
+                {
+                    "template": "unique_map_guild_character",
+                    "condition": lambda v: v != "",
                 },
             ),
         ),
@@ -417,7 +424,7 @@ class MapsParser(ItemsParser):
             self.rr["MapSeriesTiers.dat64"].build_index("MapsKey")
         generation = self._get_map_generation(map_series["Id"])
         legacy = self._is_legacy_series(map_series["Id"])
-        names = set(parsed_args.name) if "names" in parsed_args else None
+        names = set(parsed_args.name) if "name" in parsed_args else None
         maps = []
         for map_data in self.rr["Maps.dat64"]:
             if map_data["MapGeneration"] != generation:
@@ -597,10 +604,11 @@ class MapsParser(ItemsParser):
             # Overrides
             infobox["map_tier"] = tier
             infobox["map_area_level"] = 67 + tier
+            if map_data["Unique_WorldAreasKey"]:
+                infobox["unique_map_area_level"] = 67 + tier
             # Map start dropping at one tier lower, with the exception of
             # tier 1 maps which can drop rather early
             infobox["drop_level"] = 66 + tier if tier > 1 else 58
-            infobox["unique_map_area_level"] = 67 + tier
             infobox["map_series"] = map_series["Name"]
             if base_item["Id"] in self._MAPS_TO_SKIP_COMPOSITING:
                 infobox["inventory_icon"] = name
@@ -744,7 +752,7 @@ class MapsParser(ItemsParser):
                 output.append(node_data)
 
         r.add_result(
-            text=LuaFormatter.format_module(output),
+            text=LuaFormatter.format_module(sorted(output, key=lambda x: x["area_id"])),
             out_file="atlas_nodes_%s.lua" % map_series["Id"],
             wiki_page=[
                 {
