@@ -76,6 +76,8 @@ virtual_fields_mappings = {
                 Zip("UniquePurchase", ("UniquePurchase_BaseItemTypesKeys", "UniquePurchase_Costs")),
             ],
             "MapSeriesTiers": [
+                Alias("HellscapeTier", "ScourgeTier"),
+                Alias("LakeTier", "KalandraTier"),
                 Alias("AncestralTier", "AncestorTier"),
                 Alias("MercenariesTier", "SecretsTier"),
             ],

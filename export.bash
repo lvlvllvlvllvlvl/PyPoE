@@ -172,14 +172,16 @@ exporting monsters &&
 pypoe_exporter $QUIET $WIKI monster rowid "${ARGS[@]}" "$@"
 exporting areas &&
 pypoe_exporter $QUIET $WIKI area rowid "${ARGS[@]}" "$@"
-exporting maps &&
-pypoe_exporter $QUIET $WIKI items maps "${IMG[@]}" "${ARGS[@]}" "$@" --store-images --convert-images
+exporting maps && {
+  pypoe_exporter $QUIET $WIKI maps maps "${IMG[@]}" "${ARGS[@]}" "$@" --store-images --convert-images
+  pypoe_exporter $QUIET $WIKI maps atlas "${ARGS[@]}" "$@"
+  pypoe_exporter $QUIET $WIKI maps map_series "${ARGS[@]}" "$@"
+}
 exporting incursion-rooms &&
 pypoe_exporter $QUIET $WIKI incursion rooms rowid "${ARGS[@]}" "$@"
 exporting modules && {
   if [ "$WIKI" = "wiki" ]; then
     # Run only for poe1
-    pypoe_exporter $QUIET $WIKI lua atlas "${ARGS[@]}" "$@"
     pypoe_exporter $QUIET $WIKI lua bestiary "${ARGS[@]}" "$@"
     pypoe_exporter $QUIET $WIKI lua blight "${ARGS[@]}" "$@"
     pypoe_exporter $QUIET $WIKI lua crafting_bench "${ARGS[@]}" "$@"
@@ -201,6 +203,6 @@ exporting modules && {
   # pypoe_exporter $QUIET $WIKI lua packs "${ARGS[@]}" "$@"
 }
 exporting atlas-icons &&
-pypoe_exporter $QUIET $WIKI items atlas_icons "${ARGS[@]}" "$@" --store-images --convert-images
+pypoe_exporter $QUIET $WIKI maps atlas_icons "${ARGS[@]}" "$@" --store-images --convert-images
 
 date -ud "@$SECONDS" "+Export completed in: %H:%M:%S"
