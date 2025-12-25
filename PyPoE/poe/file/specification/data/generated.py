@@ -5284,6 +5284,30 @@ specification = Specification(
                 ),
             ),
         ),
+        "BrequelPassiveSubTrees.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                    key="ClientStrings.dat",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                    key="ClientStrings.dat",
+                ),
+                Field(
+                    name="Key2",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+            ),
+        ),
         "BuffDefinitions.dat": File(
             fields=(
                 Field(
@@ -26141,7 +26165,7 @@ specification = Specification(
                 Field(
                     name="BrequelSubTree",
                     type="ref|out",
-                    key="brequelpassivesubtrees.dat",
+                    key="BrequelPassiveSubTrees.dat",
                 ),
                 Field(
                     name="Flag2",
@@ -33286,30 +33310,6 @@ specification = Specification(
                 Field(
                     name="Flag0",
                     type="bool",
-                ),
-            ),
-        ),
-        "brequelpassivesubtrees.dat": File(
-            fields=(
-                Field(
-                    name="Id",
-                    type="ref|string",
-                    unique=True,
-                ),
-                Field(
-                    name="Key0",
-                    type="ref|out",
-                    key="ClientStrings.dat",
-                ),
-                Field(
-                    name="Key1",
-                    type="ref|out",
-                    key="ClientStrings.dat",
-                ),
-                Field(
-                    name="Key2",
-                    type="ref|out",
-                    key="BaseItemTypes.dat",
                 ),
             ),
         ),

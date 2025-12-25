@@ -74,7 +74,6 @@ from io import BytesIO
 from PyPoE.poe.file.shared import AbstractFileReadOnly
 from PyPoE.poe.file.shared.cache import AbstractFileCache
 from PyPoE.poe.file.specification.data import stable
-from PyPoE.poe.file.specification.data.poe2 import specification
 from PyPoE.poe.file.specification.errors import SpecificationError, SpecificationWarning
 from PyPoE.poe.file.specification.fields import Specification
 
@@ -407,6 +406,15 @@ class DatRecord(list):
                 return value
             else:
                 raise KeyError(f"No column {item} found in {self.parent.file_name}")
+
+        if item == 0:
+            # rr.index has a different shape depending on if a column is marked as unique in the schema.
+            # this is a common source of bugs (changes in the upstream schema require exporter code changes)
+            warnings.warn(
+                "Cell 0 of a DatRecord row has been requested - may need to remove "
+                "the `[0]` from a `rr[<table>].index[<col>][<val>][0]` access",
+                SpecificationWarning,
+            )
         return list.__getitem__(self, item)
 
     def __repr__(self):
@@ -1101,7 +1109,7 @@ class RelationalReader(AbstractFileCache[DatFile]):
         * self['Data/DF.dat'] <==> read_file('Data/{language}DF.dat').reader
         * self['DF.dat64'] <==> self['DF.datc64']
         """
-        data_dir = "Data/Balance/" if specification.sequel == 2 else "Data/"
+        data_dir = "Data/Balance/" if self.specification.sequel == 2 else "Data/"
         if item.startswith(data_dir):
             item = item[len(data_dir) :]
         item = item.replace(".dat64", ".datc64")

@@ -736,9 +736,8 @@ specification = Specification(
                     file_ext=".ais",
                 ),
                 Field(
-                    name="MinionType",
+                    name="Key0",
                     type="ref|out",
-                    key="MinionType.dat",
                 ),
                 Field(
                     name="Flag6",
@@ -5583,6 +5582,30 @@ specification = Specification(
                     name="Achievement",
                     type="ref|out",
                     key="AchievementItems.dat",
+                ),
+            ),
+        ),
+        "BrequelPassiveSubTrees.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                    key="ClientStrings.dat",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                    key="ClientStrings.dat",
+                ),
+                Field(
+                    name="Key2",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
                 ),
             ),
         ),
@@ -13068,6 +13091,10 @@ specification = Specification(
                     name="Unknown0",
                     type="int",
                 ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
             ),
         ),
         "GemTags.dat": File(
@@ -17335,8 +17362,13 @@ specification = Specification(
                     file_ext=".dds",
                 ),
                 Field(
-                    name="Key0",
+                    name="SoundEffect",
                     type="ref|out",
+                    key="SoundEffects.dat",
+                ),
+                Field(
+                    name="CanTakeCurrency",
+                    type="bool",
                 ),
             ),
         ),
@@ -17379,16 +17411,22 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Key0",
+                    name="MiscObject",
                     type="ref|out",
+                    key="MiscObjects.dat",
                 ),
                 Field(
                     name="Description",
                     type="ref|string",
                 ),
                 Field(
-                    name="Key1",
+                    name="SoundEffect",
                     type="ref|out",
+                    key="SoundEffects.dat",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
                 ),
             ),
         ),
@@ -17437,12 +17475,17 @@ specification = Specification(
                     file_ext=".dds",
                 ),
                 Field(
-                    name="Key0",
+                    name="Mod",
                     type="ref|out",
+                    key="Mods.dat",
                 ),
                 Field(
-                    name="Data0",
+                    name="ModValues",
                     type="ref|list|int",
+                ),
+                Field(
+                    name="Description2",
+                    type="ref|string",
                 ),
             ),
         ),
@@ -17505,6 +17548,10 @@ specification = Specification(
                 ),
                 Field(
                     name="AreaLevel",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown0",
                     type="int",
                 ),
             ),
@@ -19310,6 +19357,18 @@ specification = Specification(
                 Field(
                     name="Key1",
                     type="ref|out",
+                ),
+                Field(
+                    name="Key2",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Flag4",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag5",
+                    type="bool",
                 ),
             ),
         ),
@@ -21410,6 +21469,16 @@ specification = Specification(
                 ),
             ),
             virtual_fields=(
+                VirtualField(
+                    name="HellscapeTier",
+                    fields=("ScourgeTier",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="LakeTier",
+                    fields=("KalandraTier",),
+                    alias=True,
+                ),
                 VirtualField(
                     name="AncestralTier",
                     fields=("AncestorTier",),
@@ -24178,7 +24247,7 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Unknown18",
+                    name="SpawnLevel_Override",
                     type="int",
                 ),
                 Field(
@@ -25436,7 +25505,7 @@ specification = Specification(
                 ),
             ),
         ),
-        "MonsterShapeshift.dat": File(
+        "MonsterShapeShift.dat": File(
             fields=(
                 Field(
                     name="Id",
@@ -28457,6 +28526,35 @@ specification = Specification(
                     name="Glow",
                     type="ref|string",
                 ),
+                Field(
+                    name="Unknown0",
+                    type="ref|generic",
+                    key="PassiveJewelRadiiArt.dat",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown2",
+                    type="int",
+                ),
+                Field(
+                    name="Inverse1",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown3",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown4",
+                    type="int",
+                ),
+                Field(
+                    name="Inverse2",
+                    type="ref|string",
+                ),
             ),
         ),
         "PassiveJewelSlots.dat": File(
@@ -29192,6 +29290,26 @@ specification = Specification(
                     type="ref|out",
                     key="PassiveSkillTreeUIArt.dat",
                 ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown4",
+                    type="float",
+                ),
+                Field(
+                    name="Unknown5",
+                    type="float",
+                ),
+                Field(
+                    name="Unknown6",
+                    type="float",
+                ),
             ),
         ),
         "PassiveSkills.dat": File(
@@ -29421,12 +29539,12 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Data0",
+                    name="UnlockedBy",
                     type="ref|list|ref|generic",
                     key="PassiveSkills.dat",
                 ),
                 Field(
-                    name="AscendancyUnlock",
+                    name="VisibleForAscendancy",
                     type="ref|out",
                     key="Ascendancy.dat",
                 ),
@@ -29435,8 +29553,9 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Key0",
+                    name="NodeFrameArt",
                     type="ref|out",
+                    key="PassiveSkillTreeNodeFrameArt.dat",
                 ),
             ),
             virtual_fields=(
@@ -32877,7 +32996,7 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="MinionGlobalSkillLevelStat",
+                    name="GlobalSkillLevelStat",
                     type="ref|out",
                     key="Stats.dat",
                 ),
@@ -32970,7 +33089,7 @@ specification = Specification(
                     type="ref|list|ref|out",
                 ),
                 Field(
-                    name="tier",
+                    name="Tier",
                     type="int",
                 ),
             ),
@@ -37997,30 +38116,6 @@ specification = Specification(
                 Field(
                     name="Flag0",
                     type="bool",
-                ),
-            ),
-        ),
-        "brequelpassivesubtrees.dat": File(
-            fields=(
-                Field(
-                    name="Id",
-                    type="ref|string",
-                    unique=True,
-                ),
-                Field(
-                    name="Key0",
-                    type="ref|out",
-                    key="ClientStrings.dat",
-                ),
-                Field(
-                    name="Key1",
-                    type="ref|out",
-                    key="ClientStrings.dat",
-                ),
-                Field(
-                    name="Key2",
-                    type="ref|out",
-                    key="BaseItemTypes.dat",
                 ),
             ),
         ),
