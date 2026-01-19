@@ -29,7 +29,7 @@ class FileSet(AbstractFile):
                     v["prefix"] = m.group("prefix").split()
                 if m.group("suffix"):
                     v["suffix"] = m.group("suffix").split()
-                    self.files.append(v)
+                self.files.append(v)
             elif not line or line.isspace() or line.startswith("//"):
                 pass
             else:
