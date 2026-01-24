@@ -8,7 +8,7 @@ class FileSet(AbstractFile):
     Representation of a .rs (roomset) or .tst (tileset) file
     """
 
-    _re_version = re.compile(r"^version ([0-9]+)$")
+    _re_version = re.compile(r"^\s*version ([0-9]+)$")
     _re_data = re.compile(r'^(?P<prefix>[^"]*)"(?P<file>[^"]*)"(?P<suffix>[^"]*)$')
 
     def _read(self, buffer, *args, **kwargs):
