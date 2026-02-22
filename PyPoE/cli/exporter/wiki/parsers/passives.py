@@ -79,35 +79,26 @@ def normalize(id):
 
 
 class PassiveSkillCommandHandler(ExporterHandler):
-    def __init__(self, sub_parser):
+    def __init__(self, sub_parser, *args, **kwargs):
+        super().__init__(self, sub_parser, *args, **kwargs)
         self.parser = sub_parser.add_parser(
             "passive",
             help="Passive skill exporter",
         )
         self.parser.set_defaults(func=lambda args: self.parser.print_help())
+        passive_sub = self.parser.add_subparsers()
 
-        self.add_default_subparser_filters(
-            sub_parser=self.parser.add_subparsers(),
-            cls=PassiveSkillParser,
-        )
+        # Passives
+        parser = passive_sub.add_parser("passive", help="Export passive skills")
+        parser.set_defaults(func=lambda args: parser.print_help())
+        sub = parser.add_subparsers()
+        self.add_default_subparser_filters(sub, cls=PassiveSkillParser)
 
-        # filtering
-        """a_filter = sub.add_parser(
-            'filter',
-            help='Extract passives using filters.'
-        )
-        self.add_default_parsers(
-            parser=a_filter,
-            cls=PassiveSkillParser,
-            func=PassiveSkillParser.by_filter,
-        )
-
-        a_filter.add_argument(
-            '-ft-id', '--filter-id', '--filter-metadata-id',
-            help='Regular expression on the id',
-            type=str,
-            dest='re_id',
-        )"""
+        # Alternate Passives
+        parser = passive_sub.add_parser("alternate", help="Export alternate passive skills")
+        parser.set_defaults(func=lambda args: parser.print_help())
+        sub = parser.add_subparsers()
+        self.add_default_subparser_filters(sub, cls=AlternatePassiveSkillParser)
 
     def add_default_parsers(self, *args, **kwargs):
         super().add_default_parsers(*args, **kwargs)
@@ -339,6 +330,7 @@ class PassiveSkillParser(parser.BaseParser):
 
         for passive in passives:
             data = OrderedDict()
+
             # Print out the row number every 100 rows, and every 1/100th of completion,
             # with a minimum increment of 1
             print_increment = max(len(passives) // 100, 1)
@@ -487,6 +479,198 @@ class PassiveSkillParser(parser.BaseParser):
                     },
                 ],
                 wiki_message="Passive skill updater",
+            )
+
+        return r
+
+
+class AlternatePassiveSkillParser(parser.BaseParser):
+    _files = [
+        "AlternatePassiveSkills.datc64",
+    ]
+
+    _passive_column_index_filter = partialmethod(
+        parser.BaseParser._column_index_filter,
+        dat_file_name="AlternatePassiveSkills.dat64",
+        error_msg="Several passives have not been found:\n%s",
+    )
+
+    _MAX_STAT_ID = 2
+
+    _COPY_KEYS = (
+        (
+            "Id",
+            {
+                "template": "id",
+            },
+        ),
+        (
+            "Name",
+            {
+                "template": "name",
+            },
+        ),
+        (
+            "FlavourText",
+            {
+                "template": "flavour_text",
+                "default": "",
+            },
+        ),
+        (
+            "AlternateTreeVersionsKey",
+            {
+                "template": "alternate_tree",
+                "format": lambda v: v["Id"],
+            },
+        ),
+    )
+
+    def _apply_filter(self, parsed_args, passives):
+        if parsed_args.re_id:
+            parsed_args.re_id = re.compile(parsed_args.re_id, flags=re.UNICODE)
+        else:
+            return passives
+
+        new = []
+
+        for passive in passives:
+            if parsed_args.re_id and not parsed_args.re_id.match(passive["Id"]):
+                continue
+
+            new.append(passive)
+
+        return new
+
+    def by_rowid(self, parsed_args):
+        return self.export(
+            parsed_args,
+            self.rr["AlternatePassiveSkills.dat64"][parsed_args.start : parsed_args.end],
+        )
+
+    def by_id(self, parsed_args):
+        return self.export(
+            parsed_args, self._passive_column_index_filter(column_id="Id", arg_list=parsed_args.id)
+        )
+
+    def by_name(self, parsed_args):
+        return self.export(
+            parsed_args,
+            self._passive_column_index_filter(column_id="Name", arg_list=parsed_args.name),
+        )
+
+    def export(self, parsed_args, passives):
+        r = ExporterResult()
+
+        passives = self._apply_filter(parsed_args, passives)
+
+        if passives:
+            console(f"Found {len(passives)} passives, parsing...")
+        else:
+            console(
+                "No passives found for the specified parameters. Quitting.",
+                msg=Msg.warning,
+            )
+            return r
+
+        self._image_init(parsed_args)
+
+        for passive in passives:
+            data = OrderedDict()
+
+            # Copy over simple fields from the .dat
+            for row_key, copy_data in self._COPY_KEYS:
+                value = passive[row_key]
+
+                condition = copy_data.get("condition")
+                if condition is not None and not condition(passive):
+                    continue
+
+                # Skip default values to reduce size of template
+                if value == copy_data.get("default"):
+                    continue
+
+                fmt = copy_data.get("format")
+                if fmt:
+                    value = fmt(value)
+                data[copy_data["template"]] = value
+
+            # Set passive type flags
+            for i in range(len(passive["PassiveType"])):
+                if passive["PassiveType"][i] == 4:
+                    data["is_keystone"] = True
+                elif passive["PassiveType"][i] == 3:
+                    data["is_notable"] = True
+
+            data["int_id"] = 0
+
+            # Handle icon paths
+            if passive["DDSIcon"]:
+                icon = passive["DDSIcon"].split("/")
+                if passive["DDSIcon"].startswith("Art/2DArt/SkillIcons/passives/"):
+                    if icon[-2] == "passives":
+                        data["icon"] = icon[-1]
+                    else:
+                        data["icon"] = "%s (%s)" % (icon[-1], icon[-2])
+                else:
+                    data["icon"] = icon[-1]
+            else:
+                data["icon"] = ""
+                warnings.warn(f"Icon path file not found for {passive['Id']}: {passive['Name']}")
+
+            data["icon"] = data["icon"].replace(".dds", "")
+
+            # Handle Stats
+            stat_ids = []
+            values = []
+
+            j = 0
+            for i in range(0, self._MAX_STAT_ID):
+                try:
+                    stat = passive["StatsKeys"][i]
+                except IndexError:
+                    break
+                j = i + 1
+                stat_ids.append(stat["Id"])
+                data["stat%s_id" % j] = stat["Id"]
+                value = passive["Stat%sMin" % j], passive["Stat%sMax" % j]
+                values.append(value)
+                data["stat%s_min" % j] = passive["Stat%sMin" % j]
+                data["stat%s_max" % j] = passive["Stat%sMax" % j]
+
+            data["stat_text"] = "<br>".join(
+                self._get_stats(
+                    stat_ids, values, translation_file=get_translation_file(passive["Id"])
+                )
+            )
+
+            # extract icons if specified
+            if parsed_args.store_images and data["icon"] != "":
+                fn = data["icon"] + " passive skill icon"
+                dds = os.path.join(self._img_path, fn + ".dds")
+                png = os.path.join(self._img_path, fn + ".png")
+                if not (os.path.exists(dds) or os.path.exists(png)):
+                    self._write_dds(
+                        data=self.file_system.get_file(passive["DDSIcon"]),
+                        out_path=dds,
+                        parsed_args=parsed_args,
+                    )
+
+            cond = WikiCondition(
+                data=data,
+                cmdargs=parsed_args,
+            )
+
+            r.add_result(
+                text=cond,
+                out_file="passive_skill_%s.txt" % data["id"],
+                wiki_page=[
+                    {
+                        "page": "Passive Skill:" + self._format_wiki_title(data["id"]),
+                        "condition": cond,
+                    },
+                ],
+                wiki_message="Alternate passive skill updater",
             )
 
         return r
