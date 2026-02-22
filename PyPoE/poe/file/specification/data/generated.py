@@ -16268,25 +16268,21 @@ specification = Specification(
         "ItemNoteCode.dat": File(
             fields=(
                 Field(
-                    name="BaseItem",
+                    name="CurrencyItem",
                     type="ref|out",
-                    key="BaseItemTypes.dat",
+                    key="CurrencyItems.dat",
                 ),
                 Field(
                     name="Code",
                     type="ref|string",
                 ),
                 Field(
-                    name="Order1",
-                    type="int",
-                ),
-                Field(
-                    name="Show",
+                    name="Flag0",
                     type="bool",
                 ),
                 Field(
-                    name="Order2",
-                    type="int",
+                    name="Flag1",
+                    type="bool",
                 ),
             ),
         ),
