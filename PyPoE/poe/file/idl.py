@@ -46,13 +46,13 @@ import re
 
 # self
 from PyPoE.poe.file.shared import AbstractFile
-from PyPoE.shared.containers import Record, TypedList, TypedContainerMeta
+from PyPoE.shared.containers import Record, TypedContainerMeta, TypedList
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-__all__ = ['IDLRecord', 'IDLFile']
+__all__ = ["IDLRecord", "IDLFile"]
 
 # =============================================================================
 # Classes
@@ -76,7 +76,8 @@ class IDLRecord(Record):
     y2 :  int
         Lower right y coordinate
     """
-    __slots__ = ['destination', 'source', 'x1', 'y1', 'x2', 'y2']
+
+    __slots__ = ["destination", "source", "x1", "y1", "x2", "y2"]
 
     def __init__(self, destination, source, x1, y1, x2, y2):
         """
@@ -149,18 +150,18 @@ class IDLFile(AbstractFile, TypedList, metaclass=TypedContainerMeta):
 
     ACCEPTED_TYPES = IDLRecord
 
-    EXTENSION = '.idl'
+    EXTENSION = ".idl"
 
     _regex_parse = re.compile(
-        r'^'
+        r"^"
         r'"(?P<destination>[\w\./_ ]+)"[ ]+'
         r'"(?P<source>[\w\./_ ]+)"[ ]+'
-        r'(?P<x1>[0-9]+)[ ]+'
-        r'(?P<y1>[0-9]+)[ ]+'
-        r'(?P<x2>[0-9]+)[ ]+'
-        r'(?P<y2>[0-9]+)[ \r\n]*'
-        r'$',
-        re.UNICODE | re.MULTILINE
+        r"(?P<x1>[0-9]+)[ ]+"
+        r"(?P<y1>[0-9]+)[ ]+"
+        r"(?P<x2>[0-9]+)[ ]+"
+        r"(?P<y2>[0-9]+)[ \r\n]*"
+        r"$",
+        re.UNICODE | re.MULTILINE,
     )
 
     def __init__(self):
@@ -171,7 +172,7 @@ class IDLFile(AbstractFile, TypedList, metaclass=TypedContainerMeta):
         # Reset
         TypedList.__init__(self)
 
-        data = buffer.read().decode('utf-16')
+        data = buffer.read().decode("utf-16")
 
         for match in self._regex_parse.finditer(data):
             self.append(IDLRecord(**match.groupdict()))
@@ -180,9 +181,9 @@ class IDLFile(AbstractFile, TypedList, metaclass=TypedContainerMeta):
         lines = []
         for record in self:
             lines.append(str(record))
-            lines.append('\n')
+            lines.append("\n")
 
-        buffer.write(codecs.BOM_UTF16_LE + ''.join(lines).encode('utf-16_le'))
+        buffer.write(codecs.BOM_UTF16_LE + "".join(lines).encode("utf-16_le"))
 
     def as_dict(self):
         """

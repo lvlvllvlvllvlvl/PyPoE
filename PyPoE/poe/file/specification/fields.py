@@ -194,18 +194,19 @@ Documentation
 from collections import OrderedDict
 from typing import Tuple
 
-# 3rd-party
-
 # self
 from PyPoE.poe import constants
-from PyPoE.shared.mixins import ReprMixin
 from PyPoE.poe.file.specification.errors import SpecificationError
+from PyPoE.shared.mixins import ReprMixin
+
+# 3rd-party
+
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-__all__ = ['Specification', 'File', 'Field', 'VirtualField']
+__all__ = ["Specification", "File", "Field", "VirtualField"]
 
 # =============================================================================
 # Classes
@@ -223,11 +224,14 @@ class _Common:
         return {k: getattr(self, k) for k in self.__slots__}
 
 
-class Specification(dict):
+class Specification(dict[str, "File"]):
     """
     Specification file
     """
-    def __init__(self, *args, **kwargs):
+
+    def __init__(self, sequel: int, *args, **kwargs):
+        self.sequel = sequel
+        self.constants = constants.sequel(sequel)
         super().__init__(*args, **kwargs)
 
     def validate(self):
@@ -250,47 +254,49 @@ class Specification(dict):
                     if field.key not in self:
                         raise SpecificationError(
                             SpecificationError.ERRORS.INVALID_FOREIGN_KEY_FILE,
-                            '%(dat_file)s->%(field)s->key: %(other)s is not in '
-                            'specification' % {
-                                'dat_file': file_name,
-                                'field': field_name,
-                                'other': field.key,
-                            }
+                            "%(dat_file)s->%(field)s->key: %(other)s is not in specification"
+                            % {
+                                "dat_file": file_name,
+                                "field": field_name,
+                                "other": field.key,
+                            },
                         )
 
-                    other_key = field['key_id']
-                    if other_key and other_key not in self[field.key]['fields']:
+                    other_key = field["key_id"]
+                    if other_key and other_key not in self[field.key]["fields"]:
                         raise SpecificationError(
                             SpecificationError.ERRORS.INVALID_FOREIGN_KEY_ID,
-                            '%(dat_file)s->%(field)s->key_id: %(other)s->'
-                            '%(other_key)s not in specification' % {
-                                'dat_file': file_name,
-                                'field': field_name,
-                                'other': field.key,
-                                'other_key': other_key,
-                            }
+                            "%(dat_file)s->%(field)s->key_id: %(other)s->"
+                            "%(other_key)s not in specification"
+                            % {
+                                "dat_file": file_name,
+                                "field": field_name,
+                                "other": field.key,
+                                "other_key": other_key,
+                            },
                         )
 
                 if field.enum:
                     if field.key:
                         raise SpecificationError(
                             SpecificationError.ERRORS.INVALID_ARGUMENT_COMBINATION,
-                            '%(dat_file)s->%(field)s->enum: Either key or enum can '
-                            'be specified but never both.' % {
-                                'dat_file': file_name,
-                                'field': field_name,
-                            }
+                            "%(dat_file)s->%(field)s->enum: Either key or enum can "
+                            "be specified but never both."
+                            % {
+                                "dat_file": file_name,
+                                "field": field_name,
+                            },
                         )
-                    if not hasattr(constants, field.enum):
+                    if not hasattr(self.constants, field.enum):
                         raise SpecificationError(
                             SpecificationError.ERRORS.INVALID_ENUM_NAME,
-                            '%(dat_file)s->%(field)s->enum: Invalid constant enum '
+                            "%(dat_file)s->%(field)s->enum: Invalid constant enum "
                             '""%(enum)s" specified'
                             % {
-                                'dat_file': file_name,
-                                'field': field_name,
-                                'enum': field.enum,
-                            }
+                                "dat_file": file_name,
+                                "field": field_name,
+                                "enum": field.enum,
+                            },
                         )
 
             for field_name, virtual_field in file.virtual_fields.items():
@@ -298,49 +304,50 @@ class Specification(dict):
                 if field_name in file.fields:
                     raise SpecificationError(
                         SpecificationError.ERRORS.VIRTUAL_KEY_DUPLICATE,
-                        '%(dat_file)s->virtual_fields->%(field)s use the same name '
-                        'as a key specified in %(dat_file)s->fields' %
-                        {
-                            'dat_file': file_name,
-                            'field': field_name,
-                        }
+                        "%(dat_file)s->virtual_fields->%(field)s use the same name "
+                        "as a key specified in %(dat_file)s->fields"
+                        % {
+                            "dat_file": file_name,
+                            "field": field_name,
+                        },
                     )
 
                 if not virtual_field.fields:
                     raise SpecificationError(
                         SpecificationError.ERRORS.VIRTUAL_KEY_EMPTY,
-                        '%(dat_file)s->virtual_fields->%(field)s->fields is empty' %
-                        {
-                            'dat_file': file_name,
-                            'field': field_name,
-                        }
+                        "%(dat_file)s->virtual_fields->%(field)s->fields is empty"
+                        % {
+                            "dat_file": file_name,
+                            "field": field_name,
+                        },
                     )
 
                 for other_field in virtual_field.fields:
-                    if other_field not in file.fields and \
-                                    other_field not in file.virtual_fields:
+                    if other_field not in file.fields and other_field not in file.virtual_fields:
                         raise SpecificationError(
                             SpecificationError.ERRORS.VIRTUAL_KEY_INVALID_KEY,
-                            '%(dat_file)s->virtual_fields->%(field)s->fields: '
-                            'Field "%(other_field)s" does not exist' %
-                            {
-                                'dat_file': file_name,
-                                'field': field_name,
-                                'other_field': other_field,
-                            }
+                            "%(dat_file)s->virtual_fields->%(field)s->fields: "
+                            'Field "%(other_field)s" does not exist'
+                            % {
+                                "dat_file": file_name,
+                                "field": field_name,
+                                "other_field": other_field,
+                            },
                         )
-                    if virtual_field.zip and other_field in file.fields and \
-                            not file.fields[other_field].type.startswith(
-                                'ref|list'):
+                    if (
+                        virtual_field.zip
+                        and other_field in file.fields
+                        and not file.fields[other_field].type.startswith("ref|list")
+                    ):
                         raise SpecificationError(
                             SpecificationError.ERRORS.VIRTUAL_KEY_INVALID_DATA_TYPE,
-                            '%(dat_file)s->virtual_fields->%(field)s->zip: The zip '
-                            'option requires "%(other_field)s" to be a list' %
-                            {
-                                'dat_file': file_name,
-                                'field': field_name,
-                                'other_field': other_field,
-                            }
+                            "%(dat_file)s->virtual_fields->%(field)s->zip: The zip "
+                            'option requires "%(other_field)s" to be a list'
+                            % {
+                                "dat_file": file_name,
+                                "field": field_name,
+                                "other_field": other_field,
+                            },
                         )
 
     def as_dict(self) -> dict:
@@ -350,9 +357,7 @@ class Specification(dict):
         dict
             Returns itself as dictionary without any class references
         """
-        return {
-            k: v.as_dict() for k, v in self.items()
-        }
+        return {k: v.as_dict() for k, v in self.items()}
 
 
 class File:
@@ -380,19 +385,18 @@ class File:
     """
 
     __slots__ = [
-        'fields',
-        'virtual_fields',
-        'columns',
-        'columns_all',
-        'columns_data',
-        'columns_unique',
-        'columns_zip',
+        "fields",
+        "virtual_fields",
+        "columns",
+        "columns_all",
+        "columns_data",
+        "columns_unique",
+        "columns_zip",
     ]
 
-    def __init__(self,
-                 fields: Tuple['Field', ...] = None,
-                 virtual_fields: Tuple['VirtualField', ...] = None
-                 ):
+    def __init__(
+        self, fields: Tuple["Field", ...] = None, virtual_fields: Tuple["VirtualField", ...] = None
+    ):
         """
         Parameters
         ----------
@@ -403,16 +407,22 @@ class File:
             OrderedDict containing the field name as key and a
             :class:`VirtualField` instance as value
         """
+        starting_fields_length = 0
         if fields is None:
-            fields = OrderedDict()
+            self.fields = OrderedDict[str, Field]()
         else:
-            fields = OrderedDict(((field.name, field) for field in fields))
-        self.fields = fields
+            starting_fields_length = len(fields)
+            self.fields = OrderedDict(((field.name, field) for field in fields))
+        assert starting_fields_length == len(
+            fields
+        ), "Field names must be unique within each file definition."
+        fields = self.fields
+
         if virtual_fields is None:
-            virtual_fields = OrderedDict()
+            self.virtual_fields = OrderedDict[str, VirtualField]()
         else:
-            virtual_fields = OrderedDict(((field.name, field) for field in virtual_fields))
-        self.virtual_fields = virtual_fields
+            self.virtual_fields = OrderedDict(((field.name, field) for field in virtual_fields))
+        virtual_fields = self.virtual_fields
 
         # Set utility columns from the given data
         self.columns = OrderedDict()
@@ -448,7 +458,8 @@ class File:
                     pass
 
             for item in delete_zip:
-                del self.columns_zip[item]
+                if item in self.columns_zip:
+                    del self.columns_zip[item]
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -463,7 +474,7 @@ class File:
         out = {}
         for k in self.__slots__:
             v = getattr(self, k)
-            if k in ('fields', 'virtual_fields'):
+            if k in ("fields", "virtual_fields"):
                 out[k] = OrderedDict([(ok, ov.as_dict()) for ok, ov in v.items()])
             else:
                 out[k] = v
@@ -507,7 +518,7 @@ class Field(_Common, ReprMixin):
 
     Variable/Pointer types:
         ref|<other>
-            32 bit value, unsigned
+            32 or 64 bit value, unsigned
 
             a pointer to the data section
         ref|list|<other>
@@ -521,24 +532,36 @@ class Field(_Common, ReprMixin):
             utf16_le encoded string
 
     """
+
     __slots__ = [
-        'type', 'key', 'key_id', 'key_offset', 'enum', 'unique', 'file_path',
-        'file_ext', 'display', 'display_type', 'description'
+        "type",
+        "key",
+        "key_id",
+        "key_offset",
+        "enum",
+        "unique",
+        "file_path",
+        "file_ext",
+        "display",
+        "display_type",
+        "description",
     ]
 
-    def __init__(self,
-                 type: str,
-                 key: str = None,
-                 key_id: str = None,
-                 key_offset: int = 0,
-                 enum: str = None,
-                 unique: bool = False,
-                 file_path: bool = False,
-                 file_ext: str = None,
-                 display: str = None,
-                 display_type: str = None,
-                 description: str = None,
-                 name: str = None):
+    def __init__(
+        self,
+        type: str,
+        key: str = None,
+        key_id: str = None,
+        key_offset: int = 0,
+        enum: str = None,
+        unique: bool = False,
+        file_path: bool = False,
+        file_ext: str = None,
+        display: str = None,
+        display_type: str = None,
+        description: str = None,
+        name: str = None,
+    ):
         """
         All parameters except type are optional.
 
@@ -596,10 +619,10 @@ class Field(_Common, ReprMixin):
         self.name = name
 
         if display_type is None:
-            if type == 'float':
-                self.display_type = '{0:.6f}'
+            if type == "float":
+                self.display_type = "{0:.6f}"
             else:
-                self.display_type = '{0}'
+                self.display_type = "{0}"
         else:
             self.display_type = display_type
 
@@ -607,17 +630,15 @@ class Field(_Common, ReprMixin):
         return getattr(self, item)
 
 
-class VirtualField(_Common):
+class VirtualField(_Common, ReprMixin):
     """
     Virtual fields are based off other Field instances and provide additional
     convenience options such as grouping certain fields together.
     """
-    __slots__ = ['name', 'fields', 'zip']
 
-    def __init__(self,
-                 name: str,
-                 fields: Tuple[str, ...],
-                 zip: bool = False):
+    __slots__ = ["name", "fields", "zip", "alias"]
+
+    def __init__(self, name: str, fields: Tuple[str, ...], zip: bool = False, alias: bool = False):
         """
 
         Parameters
@@ -631,10 +652,23 @@ class VirtualField(_Common):
         zip
              Whether to zip the fields together.
              This option requires each of the referenced fields to be a list.
+        alias
+             Returns the first non-null field value instead of a list of all values.
         """
         self.name = name
         self.fields = fields
         self.zip = zip
+        self.alias = alias
 
     def __getitem__(self, item):
         return getattr(self, item)
+
+
+class Alias(VirtualField):
+    def __init__(self, name: str, target: str):
+        super().__init__(name, (target,), alias=True)
+
+
+class Zip(VirtualField):
+    def __init__(self, name: str, fields: Tuple[str, str]):
+        super().__init__(name, fields, zip=True)

@@ -1,72 +1,78 @@
-
 class CustomizedField:
-    def __init__(self,
-                 enum: str = None):
+    def __init__(self, enum: str = None):
         self.enum = enum
 
 
 custom_attributes = {
-    'BaseItemTypes.dat': {
-        'ModDomainsKey': CustomizedField(
-            enum='MOD_DOMAIN',
+    "BaseItemTypes.dat": {
+        "ModDomainsKey": CustomizedField(
+            enum="MOD_DOMAIN",
         ),
     },
-    'BestiaryRecipeComponent.dat': {
-        'RarityKey': CustomizedField(
-            enum='RARITY',
+    "BestiaryRecipes.dat": {
+        "GameMode": CustomizedField(
+            enum="GAME_MODES",
         ),
     },
-    'BetrayalUpgrades.dat': {
-        'BetrayalUpgradeSlotsKey': CustomizedField(
-            enum='BETRAYAL_UPGRADE_SLOTS',
+    "BestiaryRecipeComponent.dat": {
+        "RarityKey": CustomizedField(
+            enum="RARITY",
         ),
     },
-    'DelveUpgrades.dat': {
-        'DelveUpgradeTypeKey': CustomizedField(
-            enum='DELVE_UPGRADE_TYPE',
+    "BetrayalUpgrades.dat": {
+        "BetrayalUpgradeSlotsKey": CustomizedField(
+            enum="BETRAYAL_UPGRADE_SLOTS",
         ),
     },
-    'GrantedEffectsPerLevel.dat': {
-        'StatInterpolationTypesKeys': CustomizedField(
-            enum='STAT_INTERPOLATION_TYPES',
+    "DelveUpgrades.dat": {
+        "DelveUpgradeTypeKey": CustomizedField(
+            enum="DELVE_UPGRADE_TYPE",
         ),
     },
-    'HarvestObjects.dat': {
-        'ObjectType': CustomizedField(
-            enum='HARVEST_OBJECT_TYPES',
+    "GrantedEffectsPerLevel.dat": {
+        "StatInterpolationTypesKeys": CustomizedField(
+            enum="STAT_INTERPOLATION_TYPES",
         ),
     },
-    'MapFragmentMods.dat': {
-        'MapFragmentFamilies': CustomizedField(
-            enum='MAP_FRAGMENT_FAMILIES',
+    "HarvestObjects.dat": {
+        "ObjectType": CustomizedField(
+            enum="HARVEST_OBJECT_TYPES",
         ),
     },
-    'Mods.dat': {
-        'Domain': CustomizedField(
-            enum='MOD_DOMAIN',
-        ),
-        'GenerationType': CustomizedField(
-            enum='MOD_GENERATION_TYPE',
+    "Maps.dat": {
+        "MapGeneration": CustomizedField(
+            enum="MAP_GENERATION",
         ),
     },
-    'Scarabs.dat': {
-        'ScarabType': CustomizedField(
-            enum='SCARAB_TYPES',
+    "Mods.dat": {
+        "Domain": CustomizedField(
+            enum="MOD_DOMAIN",
+        ),
+        "GenerationType": CustomizedField(
+            enum="MOD_GENERATION_TYPE",
+        ),
+        "GameMode": CustomizedField(
+            enum="GAME_MODES",
         ),
     },
-    'ShopPaymentPackage.dat': {
-        'ShopPackagePlatformKeys': CustomizedField(
-            enum='SHOP_PACKAGE_PLATFORM',
+    "Scarabs.dat": {
+        "ScarabType": CustomizedField(
+            enum="SCARAB_TYPES",
         ),
     },
-    'SupporterPackSets.dat': {
-        'ShopPackagePlatformKey': CustomizedField(
-            enum='SHOP_PACKAGE_PLATFORM',
+    "ShopPaymentPackage.dat": {
+        "ShopPackagePlatformKeys": CustomizedField(
+            enum="SHOP_PACKAGE_PLATFORM",
         ),
     },
-    'Words.dat': {
-        'WordlistsKey': CustomizedField(
-            enum='WORDLISTS',
+    "SupporterPackSets.dat": {
+        "ShopPackagePlatformKey": CustomizedField(
+            enum="SHOP_PACKAGE_PLATFORM",
+        ),
+    },
+    "Words.dat": {
+        "WordlistsKey": CustomizedField(
+            enum="WORDLISTS",
         ),
     },
 }

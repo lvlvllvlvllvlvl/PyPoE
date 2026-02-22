@@ -41,7 +41,7 @@ from PyPoE.ui.shared import main
 # Globals
 # =============================================================================
 
-__all__ = ['GGPKViewerMainWindow']
+__all__ = ["GGPKViewerMainWindow"]
 
 # =============================================================================
 # Classes
@@ -51,5 +51,5 @@ __all__ = ['GGPKViewerMainWindow']
 # Functions
 # =============================================================================
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main(GGPKViewerMainWindow)

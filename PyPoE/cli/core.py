@@ -60,13 +60,13 @@ from enum import Enum
 from time import strftime
 
 # 3rd Party
-from colorama import Style, Fore
+from colorama import Fore, Style
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-__all__ = ['Msg', 'OutputHook', 'run', 'console']
+__all__ = ["Msg", "OutputHook", "run", "console"]
 
 # =============================================================================
 # Classes
@@ -86,6 +86,7 @@ class Msg(Enum):
     error
         red error message
     """
+
     default = Style.RESET_ALL
     error = Style.BRIGHT + Fore.RED
     warning = Style.BRIGHT + Fore.YELLOW
@@ -95,6 +96,7 @@ class OutputHook:
     """
     Warning hook to reformat / restyle warning messages properly.
     """
+
     def __init__(self, show_warning):
         self._orig_show_warning = show_warning
         self._orig_format_warning = warnings.formatwarning
@@ -103,21 +105,25 @@ class OutputHook:
 
     def format_warning(self, message, category, filename, lineno, line=None):
         kwargs = {
-            'message': message,
-            'category': category.__name__,
-            'filename': filename,
-            'lineno': lineno,
-            'line': line,
+            "message": message,
+            "category": category.__name__,
+            "filename": filename,
+            "lineno": lineno,
+            "line": line,
         }
         f = "%(filename)s:%(lineno)s:\n%(category)s: %(message)s\n" % kwargs
         return console(f, msg=Msg.warning, rtr=True)
+
     #
     def show_warning(self, *args, **kwargs):
         self._orig_show_warning(*args, **kwargs)
 
+
 # =============================================================================
 # Functions
 # =============================================================================
+
+quiet = False
 
 
 def run(parser, config):
@@ -140,10 +146,23 @@ def run(parser, config):
         config object to use for the CLI application wide config
     """
     args = parser.parse_args()
-    if hasattr(args, 'func'):
+
+    if args.quiet:
+        global quiet
+        quiet = True
+        warnings.simplefilter("ignore")
+
+    if args.mem:
+        import resource
+
+        limit = args.mem * 1024 * 1024
+        console(f"memory limit {limit} bytes", msg=Msg.default)
+        resource.setrlimit(resource.RLIMIT_AS, (limit, limit))
+
+    if hasattr(args, "func"):
         try:
             code = args.func(args)
-        except Exception as e:
+        except Exception:
             console(traceback.format_exc(), msg=Msg.error)
             code = -1
     else:
@@ -178,9 +197,9 @@ def console(message, msg=Msg.default, rtr=False, raw=False):
     if raw:
         f = message
     else:
-        f = msg.value + strftime('%X ') + message + Msg.default.value
+        f = msg.value + strftime("%X ") + message + Msg.default.value
     if rtr:
         return f
-    else:
+    global quiet
+    if not quiet or msg == Msg.error:
         print(f)
-

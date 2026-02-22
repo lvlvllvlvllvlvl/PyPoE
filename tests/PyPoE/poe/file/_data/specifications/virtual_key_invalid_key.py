@@ -31,37 +31,39 @@ See PyPoE/LICENSE
 # 3rd-party
 
 # self
-from PyPoE.poe.file.specification.fields import *
+from PyPoE.poe.file.specification.fields import Field, File, Specification, VirtualField
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-specification = Specification({
-    'Main.dat': File(
-        fields=(
-            Field(
-                name='One',
-                type='int',
+specification = Specification(
+    {
+        "Main.dat": File(
+            fields=(
+                Field(
+                    name="One",
+                    type="int",
+                ),
+                Field(
+                    name="Two",
+                    type="int",
+                ),
+                Field(
+                    name="Three",
+                    type="int",
+                ),
+                Field(
+                    name="Four",
+                    type="int",
+                ),
             ),
-            Field(
-                name='Two',
-                type='int',
-            ),
-            Field(
-                name='Three',
-                type='int',
-            ),
-            Field(
-                name='Four',
-                type='int',
+            virtual_fields=(
+                VirtualField(
+                    name="Virtual",
+                    fields=("Five", "Six"),
+                ),
             ),
         ),
-        virtual_fields=(
-            VirtualField(
-                name='Virtual',
-                fields=('Five', 'Six'),
-            ),
-        ),
-    ),
-})
+    }
+)

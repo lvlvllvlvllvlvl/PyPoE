@@ -50,7 +50,7 @@ from PySide2.QtWidgets import *
 # Globals
 # =============================================================================
 
-__all__ = ['SettingsWindow', 'SettingFrame', 'Setting', 'BoolSetting']
+__all__ = ["SettingsWindow", "SettingFrame", "Setting", "BoolSetting"]
 
 # =============================================================================
 # Classes
@@ -61,13 +61,11 @@ class SettingsWindow(QDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.action_open = QAction(self, text=self.tr('Settings'))
-        self.action_open.setStatusTip(self.tr(
-            'Opens the settings window'
-        ))
+        self.action_open = QAction(self, text=self.tr("Settings"))
+        self.action_open.setStatusTip(self.tr("Opens the settings window"))
         self.action_open.triggered.connect(self._action_open)
 
-        self.setWindowTitle(self.tr('Settings'))
+        self.setWindowTitle(self.tr("Settings"))
 
         self.base_layout = QHBoxLayout()
         self.setLayout(self.base_layout)
@@ -99,26 +97,26 @@ class SettingsWindow(QDialog):
         if self.current_frame:
             self.layout.removeWidget(self.current_frame)
 
-        self.layout.addWidget(self.sections[index.row()]['frame'])
-        self.current_frame = self.sections[index.row()]['frame']
+        self.layout.addWidget(self.sections[index.row()]["frame"])
+        self.current_frame = self.sections[index.row()]["frame"]
 
     def add_config_section(self, tr, qframe, order=0):
-        self.sections.append({
-            'text': tr,
-            'frame': qframe,
-            'order': order,
-        })
+        self.sections.append(
+            {
+                "text": tr,
+                "frame": qframe,
+                "order": order,
+            }
+        )
         self.changed = True
 
     def _action_open(self):
         if self.changed:
-            self.sections.sort(key=lambda x: x['order'])
+            self.sections.sort(key=lambda x: x["order"])
             model = QStringListModel()
-            model.setStringList([row['text'] for row in self.sections])
+            model.setStringList([row["text"] for row in self.sections])
             self.section_list.setModel(model)
-            self.section_list.setSelectionMode(
-                QAbstractItemView.SingleSelection
-            )
+            self.section_list.setSelectionMode(QAbstractItemView.SingleSelection)
             self.changed = False
 
         self.exec_()
@@ -151,9 +149,7 @@ class BaseSetting:
         self.value = self.get()
 
     def setting_path(self):
-        return '/'.join(
-            (self.parent.KEY, self.KEY)
-        )
+        return "/".join((self.parent.KEY, self.KEY))
 
     def _get_cast(self, value):
         raise NotImplementedError
@@ -199,7 +195,7 @@ class BoolSetting(BaseSetting):
         elif state == Qt.Checked:
             self.value = True
         else:
-            raise ValueError('Invalid Qt::CheckState')
+            raise ValueError("Invalid Qt::CheckState")
 
         self.set()
 
@@ -224,6 +220,8 @@ class ComboBoxSetting(BaseSetting):
     def _update(self, value):
         self.value = self.data[self.combobox.itemText(value)]
         self.set(self.value)
+
+
 # =============================================================================
 # Functions
 # =============================================================================

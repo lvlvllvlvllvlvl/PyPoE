@@ -3,7 +3,7 @@ Overview
 ===============================================================================
 
 +----------+------------------------------------------------------------------+
-| Path     | PyPoE/poe/sim/formula.py                                         |
+| Path     | PyPoE/poe/sim/poe1formula.py                                     |
 +----------+------------------------------------------------------------------+
 | Version  | 1.0.0a0                                                          |
 +----------+------------------------------------------------------------------+
@@ -40,6 +40,7 @@ Documentation
 
 .. autofunction:: gem_stat_requirement
 """
+
 # =============================================================================
 # Imports
 # =============================================================================
@@ -48,13 +49,12 @@ Documentation
 from enum import Enum
 
 # self
-from PyPoE.shared.mixins import ReprMixin
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-__all__ = ['GemTypes', 'gem_stat_requirement']
+__all__ = ["GemTypes", "gem_stat_requirement"]
 
 # =============================================================================
 # Classes
@@ -70,8 +70,10 @@ class GemTypes(Enum):
     active
         Active Skill Gem
     """
+
     support = 1
     active = 2
+
 
 # =============================================================================
 # Functions
@@ -215,6 +217,8 @@ def gem_stat_requirement(level, gtype=GemTypes.support, multi=100):
     else:
         raise ValueError("Invalid gtype '%s'. Valid types are:\n%s" % (gtype, GemTypes))
 
-    result = round(level*a+b)
+    if level is None:
+        return 0
+    result = round(level * a + b)
     # Gems seem to have no requirements lower then 14
     return 0 if result < 14 else result

@@ -1,11 +1,11 @@
 """
-
+Core Wiki Exporter
 
 Overview
 ===============================================================================
 
 +----------+------------------------------------------------------------------+
-| Path     | translations.py                                                |
+| Path     | PyPoE/cli/exporter/poe2wiki/core.py                              |
 +----------+------------------------------------------------------------------+
 | Version  | 1.0.0a0                                                          |
 +----------+------------------------------------------------------------------+
@@ -17,7 +17,7 @@ Overview
 Description
 ===============================================================================
 
-
+Core Wiki Exporter
 
 Agreement
 ===============================================================================
@@ -31,44 +31,33 @@ See PyPoE/LICENSE
 
 # Python
 
-# 3rd-party
-from line_profiler import LineProfiler
-
 # self
-from PyPoE.poe.file import translations
+from PyPoE.cli.exporter.poe2wiki.admin import ADMIN_HANDLERS
+from PyPoE.cli.exporter.poe2wiki.parsers import WIKI_HANDLERS
+from PyPoE.cli.handler import BaseHandler
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-__all__ = []
+__all__ = ["WikiHandler"]
 
 # =============================================================================
 # Classes
 # =============================================================================
 
-# =============================================================================
-# Functions
-# =============================================================================
 
-# =============================================================================
-# Init
-# =============================================================================
+class WikiHandler(BaseHandler):
+    def __init__(self, sub_parser):
+        # TODO Config Options
 
-if __name__ == '__main__':
-    profiler = LineProfiler()
+        # Parser
+        self.parser = sub_parser.add_parser("poe2wiki", help="PoE2 Wiki Exporter")
+        self.parser.set_defaults(func=lambda args: self.parser.print_help())
+        wiki_sub = self.parser.add_subparsers()
 
-    #profiler.add_function(translations.TranslationFile.get_translation)
-    #profiler.add_function(translations.TranslationFile._read)
-    profiler.add_function(translations.TranslationString._set_string)
-    #profiler.add_function(translations.Translation.get_language)
-    #profiler.add_function(translations.TranslationQuantifier.handle)
-    #profiler.add_function(translations.TranslationRange.in_range)
-    #profiler.add_function(translations.TranslationLanguage.get_string)
+        for handler in WIKI_HANDLERS:
+            handler(wiki_sub)
 
-    profiler.run("s = translations.TranslationFile('C:/Temp/MetaData/stat_descriptions.txt')")
-    profiler.run("for i in range(0, 100): t = s.get_translation(tags=['additional_chance_to_take_critical_strike_%', 'additional_chance_to_take_critical_strike_%'], values=((3, 5), 6))")
-
-    profiler.print_stats()
-
-    print('translations.Translation:', t)
+        for handler in ADMIN_HANDLERS:
+            handler(wiki_sub)

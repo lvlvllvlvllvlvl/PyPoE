@@ -64,9 +64,9 @@ __all__ = []
 # Filters
 #
 
-class AbstractFilter:
 
-    NAME = ''
+class AbstractFilter:
+    NAME = ""
 
     def __init__(self, value):
         self.value = value
@@ -90,8 +90,7 @@ class AbstractFilter:
 
 
 class RegexFilter(AbstractFilter):
-
-    NAME = QT_TR_NOOP('Regular Expression Filter')
+    NAME = QT_TR_NOOP("Regular Expression Filter")
 
     def __init__(self, value, flags=0):
         self.value = value
@@ -99,9 +98,7 @@ class RegexFilter(AbstractFilter):
         self.regex = re.compile(value, flags)
 
     def __repr__(self):
-        return '%s(value=%s, flags=%s)' % (
-            self.__class__.__name__, self.value, self.flags
-        )
+        return "%s(value=%s, flags=%s)" % (self.__class__.__name__, self.value, self.flags)
 
     def apply(self, value):
         return self.regex.match(str(value)) is not None
@@ -109,8 +106,8 @@ class RegexFilter(AbstractFilter):
     def set_defaults(self, qwizardpage):
         qwizardpage.regex_edit.setText(self.value)
         for flag_info in qwizardpage.regex_flags._regex_flags:
-            if flag_info['flag'] & self.flags:
-                box = getattr(qwizardpage.regex_flags, flag_info['variable'])
+            if flag_info["flag"] & self.flags:
+                box = getattr(qwizardpage.regex_flags, flag_info["variable"])
                 box.setChecked(True)
 
     @staticmethod
@@ -118,9 +115,7 @@ class RegexFilter(AbstractFilter):
         qwizardpage.regex_flags = RegexFlagsBox(parent=qwizardpage)
         qwizardpage.layout.addWidget(qwizardpage.regex_flags)
 
-        qwizardpage.layout.addWidget(QLabel(qwizardpage.tr(
-            'Enter a regular expression:'
-        )))
+        qwizardpage.layout.addWidget(QLabel(qwizardpage.tr("Enter a regular expression:")))
 
         qwizardpage.regex_edit = QLineEdit(parent=qwizardpage)
         qwizardpage.layout.addWidget(qwizardpage.regex_edit)
@@ -129,65 +124,93 @@ class RegexFilter(AbstractFilter):
     def validate_settings(qwizardpage):
         regex = qwizardpage.regex_edit.text()
         try:
-            obj = RegexFilter(
-                value=regex,
-                flags=qwizardpage.regex_flags.get_flags()
-            )
+            obj = RegexFilter(value=regex, flags=qwizardpage.regex_flags.get_flags())
         except re.error as e:
             QMessageBox.critical(
                 qwizardpage,
-                qwizardpage.tr('RegEx Error'),
-                qwizardpage.tr('Regular Expression error:\n %s') % e.args[0]
+                qwizardpage.tr("RegEx Error"),
+                qwizardpage.tr("Regular Expression error:\n %s") % e.args[0],
             )
-            #TODO log error
+            # TODO log error
             return
 
         return obj
 
 
 class TypedFilter(AbstractFilter):
-    operations = OrderedDict((
-        ('lt', {
-            'name': '<',
-            'tooltip': QT_TR_NOOP('less than'),
-        }),
-        ('le', {
-            'name': '<=',
-            'tooltip': QT_TR_NOOP('less than or equal to'),
-        }),
-        ('eq', {
-            'name': '==',
-            'tooltip': QT_TR_NOOP('equal to'),
-        }),
-        ('ne', {
-            'name': '!=',
-            'tooltip': QT_TR_NOOP('not equal to'),
-        }),
-        ('ge', {
-            'name': '>=',
-            'tooltip': QT_TR_NOOP('greater than or equal to'),
-        }),
-        ('gt', {
-            'name': '>',
-            'tooltip': QT_TR_NOOP('greater than'),
-        }),
-    ))
-    types = OrderedDict((
-        (int, {
-            'name': QT_TR_NOOP('Integer'),
-            'tooltip': QT_TR_NOOP('Any kind of whole number'),
-        }),
-        (float, {
-            'name': QT_TR_NOOP('Float'),
-            'tooltip': QT_TR_NOOP('Any kind of floating point number.'),
-        }),
-        (str, {
-            'name': QT_TR_NOOP('String'),
-            'tooltip': QT_TR_NOOP('Any kind of string.'),
-        }),
-    ))
+    operations = OrderedDict(
+        (
+            (
+                "lt",
+                {
+                    "name": "<",
+                    "tooltip": QT_TR_NOOP("less than"),
+                },
+            ),
+            (
+                "le",
+                {
+                    "name": "<=",
+                    "tooltip": QT_TR_NOOP("less than or equal to"),
+                },
+            ),
+            (
+                "eq",
+                {
+                    "name": "==",
+                    "tooltip": QT_TR_NOOP("equal to"),
+                },
+            ),
+            (
+                "ne",
+                {
+                    "name": "!=",
+                    "tooltip": QT_TR_NOOP("not equal to"),
+                },
+            ),
+            (
+                "ge",
+                {
+                    "name": ">=",
+                    "tooltip": QT_TR_NOOP("greater than or equal to"),
+                },
+            ),
+            (
+                "gt",
+                {
+                    "name": ">",
+                    "tooltip": QT_TR_NOOP("greater than"),
+                },
+            ),
+        )
+    )
+    types = OrderedDict(
+        (
+            (
+                int,
+                {
+                    "name": QT_TR_NOOP("Integer"),
+                    "tooltip": QT_TR_NOOP("Any kind of whole number"),
+                },
+            ),
+            (
+                float,
+                {
+                    "name": QT_TR_NOOP("Float"),
+                    "tooltip": QT_TR_NOOP("Any kind of floating point number."),
+                },
+            ),
+            (
+                str,
+                {
+                    "name": QT_TR_NOOP("String"),
+                    "tooltip": QT_TR_NOOP("Any kind of string."),
+                },
+            ),
+        )
+    )
 
-    NAME = QT_TR_NOOP('Simple Operation Filter')
+    NAME = QT_TR_NOOP("Simple Operation Filter")
 
     def __init__(self, value, operation, type):
         if type not in self.types:
@@ -201,11 +224,14 @@ class TypedFilter(AbstractFilter):
 
         self.operation = operation
         # will raise an exception accordingly
-        self._operation_func = getattr(self.type, '__' + operation + '__')
+        self._operation_func = getattr(self.type, "__" + operation + "__")
 
     def __repr__(self):
-        return '%s(value=%s, operation=%s, type=%s)' % (
-            self.__class__.__name__, self.value, self.operation, self.type
+        return "%s(value=%s, operation=%s, type=%s)" % (
+            self.__class__.__name__,
+            self.value,
+            self.operation,
+            self.type,
         )
 
     def apply(self, value):
@@ -215,9 +241,7 @@ class TypedFilter(AbstractFilter):
             return False
 
     def set_defaults(self, qwizardpage):
-        qwizardpage.type_box.setCurrentIndex(
-            list(self.types.keys()).index(self.type)
-        )
+        qwizardpage.type_box.setCurrentIndex(list(self.types.keys()).index(self.type))
 
         qwizardpage.operation_box.setCurrentIndex(
             list(self.operations.keys()).index(self.operation)
@@ -227,39 +251,37 @@ class TypedFilter(AbstractFilter):
 
     @staticmethod
     def generate_settings(qwizardpage):
-        for k in ('type', 'operation'):
+        for k in ("type", "operation"):
             box = QComboBox(parent=qwizardpage)
 
-            for i, info in enumerate(getattr(TypedFilter, k + 's').values()):
-                box.addItem(info['name'])
-                box.setItemData(i, info['tooltip'], Qt.ToolTipRole)
+            for i, info in enumerate(getattr(TypedFilter, k + "s").values()):
+                box.addItem(info["name"])
+                box.setItemData(i, info["tooltip"], Qt.ToolTipRole)
             qwizardpage.layout.addWidget(box)
 
-            setattr(qwizardpage, '%s_box' % k, box)
+            setattr(qwizardpage, "%s_box" % k, box)
 
-        qwizardpage.layout.addWidget(
-            QLabel(qwizardpage.tr('Enter value:'), parent=qwizardpage)
-        )
+        qwizardpage.layout.addWidget(QLabel(qwizardpage.tr("Enter value:"), parent=qwizardpage))
         qwizardpage.value_edit = QLineEdit(parent=qwizardpage)
         qwizardpage.layout.addWidget(qwizardpage.value_edit)
 
     @staticmethod
     def validate_settings(qwizardpage):
         kwargs = {
-            'value': qwizardpage.value_edit.text(),
-            'operation': list(TypedFilter.operations.keys())[qwizardpage.operation_box.currentIndex()],
-            'type': list(TypedFilter.types.keys())[qwizardpage.type_box.currentIndex()],
+            "value": qwizardpage.value_edit.text(),
+            "operation": list(TypedFilter.operations.keys())[
+                qwizardpage.operation_box.currentIndex()
+            ],
+            "type": list(TypedFilter.types.keys())[qwizardpage.type_box.currentIndex()],
         }
 
         try:
             obj = TypedFilter(**kwargs)
         except Exception as e:
             QMessageBox.critical(
-                qwizardpage,
-                qwizardpage.tr('Error\n'),
-                qwizardpage.tr('Error:\n %s') % e.args[0]
+                qwizardpage, qwizardpage.tr("Error\n"), qwizardpage.tr("Error:\n %s") % e.args[0]
             )
-            #TODO log error
+            # TODO log error
             return
 
         return obj
@@ -283,7 +305,7 @@ class FilterWizard(QWizard):
 
         self.filter_proxy = filter_proxy
 
-        self.setWindowTitle(self.tr('Modify filters'))
+        self.setWindowTitle(self.tr("Modify filters"))
         self.setPage(
             self.PAGE_COLUMN_SELECTION,
             FilterWizardColumnPage(parent=self),
@@ -315,7 +337,7 @@ class FilterWizardPageShared(QWizardPage):
 class FilterWizardColumnPage(FilterWizardPageShared):
     def __init__(self, *args, **kwargs):
         QWizardPage.__init__(self, *args, **kwargs)
-        self.setTitle(self.tr('Select a column'))
+        self.setTitle(self.tr("Select a column"))
 
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
@@ -323,39 +345,45 @@ class FilterWizardColumnPage(FilterWizardPageShared):
         self.column_list = QComboBox(parent=self)
         fp = self.parent().filter_proxy
         for column_id in range(0, fp.sourceModel().columnCount()):
-            self.column_list.addItem(self.tr('%s: %s (%s filters)') % (
-                column_id,
-                fp.sourceModel().headerData(column_id, Qt.Horizontal),
-                len(fp.filters[column_id]),
-            ))
-        self.registerField('COLUMN_LIST', self.column_list)
+            self.column_list.addItem(
+                self.tr("%s: %s (%s filters)")
+                % (
+                    column_id,
+                    fp.sourceModel().headerData(column_id, Qt.Horizontal),
+                    len(fp.filters[column_id]),
+                )
+            )
+        self.registerField("COLUMN_LIST", self.column_list)
         self.layout.addWidget(self.column_list)
 
 
 class FilterWizardFilterSelectionPage(FilterWizardPageShared):
     def __init__(self, *args, **kwargs):
         QWizardPage.__init__(self, *args, **kwargs)
-        self.setTitle(self.tr('Select a filter'))
+        self.setTitle(self.tr("Select a filter"))
 
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
         self.filter_list = QComboBox(parent=self)
-        self.registerField('FILTER_LIST', self.filter_list)
+        self.registerField("FILTER_LIST", self.filter_list)
         self.layout.addWidget(self.filter_list)
 
     def initializePage(self):
         self.filter_list.clear()
-        for i, filter in enumerate(self.get_filters()[self.field('COLUMN_LIST')]):
-            self.filter_list.addItem(self.tr('%s: %s') % (
-                i,
-                repr(filter),
-            ))
-        self.filter_list.addItem(self.tr('Add new filter'))
+        for i, filter in enumerate(self.get_filters()[self.field("COLUMN_LIST")]):
+            self.filter_list.addItem(
+                self.tr("%s: %s")
+                % (
+                    i,
+                    repr(filter),
+                )
+            )
+        self.filter_list.addItem(self.tr("Add new filter"))
 
     def nextId(self):
-        filters = self.get_filters()[self.field('COLUMN_LIST')]
-        filter_id = self.field('FILTER_LIST')
+        filters = self.get_filters()[self.field("COLUMN_LIST")]
+        filter_id = self.field("FILTER_LIST")
         if filter_id < len(filters):
             return FilterWizard.PAGE_FILTER_SETTINGS
         else:
@@ -365,20 +393,19 @@ class FilterWizardFilterSelectionPage(FilterWizardPageShared):
 class FilterWizardFilterSettingsPage(FilterWizardPageShared):
     def __init__(self, *args, **kwargs):
         QWizardPage.__init__(self, *args, **kwargs)
-        self.setTitle(self.tr('Modify filter settings'))
+        self.setTitle(self.tr("Modify filter settings"))
         self.setFinalPage(True)
 
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
     def _get_filter(self):
-        return self.get_filters()[self.field('COLUMN_LIST')][self.field('FILTER_LIST')]
+        return self.get_filters()[self.field("COLUMN_LIST")][self.field("FILTER_LIST")]
 
     def nextId(self):
         return -1
 
     def cleanupPage(self):
-
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
@@ -395,7 +422,7 @@ class FilterWizardFilterSettingsPage(FilterWizardPageShared):
         if obj is None:
             return False
 
-        filter_list = self.get_filters()[self.field('COLUMN_LIST')]
+        filter_list = self.get_filters()[self.field("COLUMN_LIST")]
         # Replace the filter (will be class or old object)
         filter_list[-1] = obj
 
@@ -407,7 +434,7 @@ class FilterWizardFilterSettingsPage(FilterWizardPageShared):
 class FilterWizardCreateFilterPage(FilterWizardPageShared):
     def __init__(self, *args, **kwargs):
         QWizardPage.__init__(self, *args, **kwargs)
-        self.setTitle(self.tr('Create a new filter'))
+        self.setTitle(self.tr("Create a new filter"))
 
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
@@ -420,12 +447,12 @@ class FilterWizardCreateFilterPage(FilterWizardPageShared):
 
     def cleanupPage(self):
         try:
-            self.get_filters()[self.field('COLUMN_LIST')].pop(-1)
+            self.get_filters()[self.field("COLUMN_LIST")].pop(-1)
         except IndexError:
             pass
 
     def validatePage(self):
-        self.get_filters()[self.field('COLUMN_LIST')].append(
+        self.get_filters()[self.field("COLUMN_LIST")].append(
             FILTERS[self.filter_type_list.currentIndex()]
         )
 
@@ -474,7 +501,7 @@ class FilterMenu(QMenu):
             filter_proxy=self.proxy_model,
             parent=self,
         )
-        wizard.setField('COLUMN_LIST', index)
+        wizard.setField("COLUMN_LIST", index)
         wizard.setStartId(FilterWizard.PAGE_FILTER_SELECTION)
         wizard.show()
 
@@ -506,12 +533,13 @@ class FilterProxyModel(QSortFilterProxyModel):
 
     def add_filter(self, row, filter):
         if row not in self.filters:
-            self.filters[row] = [filter, ]
+            self.filters[row] = [
+                filter,
+            ]
         else:
             self.filters[row].append(filter)
 
     def _get_data(self, row, column, parent):
-
         # Should probably not use data()
         return self.sourceModel().index(row, column, parent).data()
 
@@ -525,6 +553,7 @@ class FilterProxyModel(QSortFilterProxyModel):
                     return False
 
         return accepted
+
 
 # =============================================================================
 # Functions

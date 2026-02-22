@@ -38,18 +38,18 @@ TODO
 import pytest
 
 # self
-from PyPoE.poe.sim import formula
+from PyPoE.poe.sim import poe1formula
 
 # =============================================================================
 # Test Data
 # =============================================================================
 
 gems = {
-    'Herald of Ice': {
-        'gtype': formula.GemTypes.active,
-        'multi': [60, 40],
+    "Herald of Ice": {
+        "gtype": poe1formula.GemTypes.active,
+        "multi": [60, 40],
         # gem level, level requirement, dex, int
-        'result': [
+        "result": [
             [20, 70, 98, 68],
             [19, 68, 95, 66],
             [18, 66, 92, 64],
@@ -70,14 +70,13 @@ gems = {
             [3, 24, 37, 25],
             [2, 20, 31, 22],
             [1, 16, 26, 18],
-
-        ]
+        ],
     },
-    'Freezing Pulse': {
-        'gtype': formula.GemTypes.active,
-        'multi': [100],
+    "Freezing Pulse": {
+        "gtype": poe1formula.GemTypes.active,
+        "multi": [100],
         # gem level, level requirement, int
-        'result': [
+        "result": [
             [20, 70, 155],
             [19, 67, 148],
             [18, 64, 142],
@@ -98,13 +97,13 @@ gems = {
             [3, 4, 16],
             [2, 2, 0],
             [1, 1, 0],
-        ]
+        ],
     },
-    'Additional Accuracy': {
-        'gtype': formula.GemTypes.support,
-        'multi': [40, 60],
+    "Additional Accuracy": {
+        "gtype": poe1formula.GemTypes.support,
+        "multi": [40, 60],
         # gem level, level requirement, str, dex
-        'result': [
+        "result": [
             [21, 72, 50, 72],
             [20, 70, 48, 70],
             [19, 67, 46, 67],
@@ -126,13 +125,13 @@ gems = {
             [3, 13, 0, 16],
             [2, 10, 0, 0],
             [1, 8, 0, 0],
-        ]
+        ],
     },
-    'Stun': {
-        'gtype': formula.GemTypes.support,
-        'multi': [100],
+    "Stun": {
+        "gtype": poe1formula.GemTypes.support,
+        "multi": [100],
         # gem level, level requirement, str
-        'result': [
+        "result": [
             [21, 72, 114],
             [20, 70, 111],
             [19, 67, 106],
@@ -164,32 +163,36 @@ gems = {
 
 cmp_tests = []
 for gem in gems:
-    #if gem != 'Freezing Pulse': continue
+    # if gem != 'Freezing Pulse': continue
 
     g = gems[gem]
-    for i, multi in enumerate(g['multi']):
-        for row in g['result']:
-            cmp_tests.append((row[1], g['gtype'], multi, row[2+i]))
+    for i, multi in enumerate(g["multi"]):
+        for row in g["result"]:
+            cmp_tests.append((row[1], g["gtype"], multi, row[2 + i]))
 
 # =============================================================================
 # Tests
 # =============================================================================
 
-@pytest.mark.parametrize('lvl,gtype,multi,result', cmp_tests)
+
+@pytest.mark.parametrize("lvl,gtype,multi,result", cmp_tests)
 def test_stat_requirement(lvl, gtype, multi, result):
-    r = formula.gem_stat_requirement(level=lvl, gtype=gtype, multi=multi)
+    r = poe1formula.gem_stat_requirement(level=lvl, gtype=gtype, multi=multi)
     assert r == result, 'Result mismatch "%s" vs expected "%s"' % (r, result)
-    #print("%s %.2f (%d) %s" % (round(r)==result, r, round(r), result))
+    # print("%s %.2f (%d) %s" % (round(r)==result, r, round(r), result))
+
 
 def test_stat_requirement_invalid_gtype():
     with pytest.raises(ValueError):
-        formula.gem_stat_requirement(1, 5, 100)
+        poe1formula.gem_stat_requirement(1, 5, 100)
+
 
 def test_stat_requirement_invalid_multi():
     with pytest.raises(ValueError):
-        formula.gem_stat_requirement(1, formula.GemTypes.active, -1)
+        poe1formula.gem_stat_requirement(1, poe1formula.GemTypes.active, -1)
 
-'''import numpy
+
+"""import numpy
 
 for gem in gems:
     x = []
@@ -203,4 +206,4 @@ for gem in gems:
 
     A = numpy.vstack([x, numpy.ones(len(x))]).T
     for y0 in y:
-        print(gem, numpy.linalg.lstsq(A, y0)[0])'''
+        print(gem, numpy.linalg.lstsq(A, y0)[0])"""

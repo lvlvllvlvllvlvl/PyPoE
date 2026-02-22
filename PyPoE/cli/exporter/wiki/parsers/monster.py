@@ -32,13 +32,13 @@ Documentation
 
 # Python
 import re
-from functools import partialmethod
 from collections import OrderedDict
+from functools import partialmethod
 
 # Self
-from PyPoE.cli.core import console, Msg
-from PyPoE.cli.exporter.wiki.handler import ExporterHandler, ExporterResult
+from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter.wiki import parser
+from PyPoE.cli.exporter.wiki.handler import ExporterHandler, ExporterResult
 
 # =============================================================================
 # Globals
@@ -53,12 +53,17 @@ __all__ = []
 
 class MonsterWikiCondition(parser.WikiCondition):
     COPY_KEYS = (
-        'main_page',
-        'release_version',
-        'screenshot_ext',
+        "main_page",
+        "release_version",
+        "screenshot_ext",
     )
+    COPY_CONDITIONS = {
+        "tags": parser.WikiCondition.tagsets_equal,
+        "mod_ids": parser.WikiCondition.tagsets_equal,
+        "skill_ids": parser.WikiCondition.tagsets_equal,
+    }
 
-    NAME = 'Monster'
+    NAME = "Monster"
     ADD_INCLUDE = False
     INDENT = 33
 
@@ -66,75 +71,62 @@ class MonsterWikiCondition(parser.WikiCondition):
 class MonsterCommandHandler(ExporterHandler):
     def __init__(self, sub_parser):
         self.parser = sub_parser.add_parser(
-            'monster',
-            help='Monster exporter (non-lua)',
+            "monster",
+            help="Monster exporter (non-lua)",
         )
         self.parser.set_defaults(func=lambda args: self.parser.print_help())
 
         sub = self.parser.add_subparsers()
 
         # By id
-        a_id = sub.add_parser(
-            'id',
-            help='Extract monsters by their metadata id.'
-        )
+        a_id = sub.add_parser("id", help="Extract monsters by their metadata id.")
         self.add_default_parsers(
             parser=a_id,
             cls=MonsterParser,
             func=MonsterParser.by_id,
         )
         a_id.add_argument(
-            'monster_id',
-            help='Monster id',
-            nargs='+',
+            "monster_id",
+            help="Monster id",
+            nargs="+",
         )
 
         # by name
-        a_name = sub.add_parser(
-            'name',
-            help='Extract areas by their name.'
-        )
+        a_name = sub.add_parser("name", help="Extract areas by their name.")
         self.add_default_parsers(
             parser=a_name,
             cls=MonsterParser,
             func=MonsterParser.by_name,
         )
         a_name.add_argument(
-            'monster_name',
-            help='Visible name of the area (localized), can be specified '
-                 'multiple times.',
-            nargs='+',
+            "monster_name",
+            help="Visible name of the area (localized), can be specified multiple times.",
+            nargs="+",
         )
 
         # by row ID
-        a_rid = sub.add_parser(
-            'rowid',
-            help='Extract monsters by rowid.'
-        )
+        a_rid = sub.add_parser("rowid", help="Extract monsters by rowid.")
         self.add_default_parsers(
             parser=a_rid,
             cls=MonsterParser,
             func=MonsterParser.by_rowid,
         )
         a_rid.add_argument(
-            'start',
-            help='Starting index',
-            nargs='?',
+            "start",
+            help="Starting index",
+            nargs="?",
             type=int,
             default=0,
         )
         a_rid.add_argument(
-            'end',
-            nargs='?',
-            help='Ending index',
+            "end",
+            nargs="?",
+            help="Ending index",
             type=int,
         )
 
         # filtering
-        a_filter = sub.add_parser(
-            'filter',
-            help='Extract monsters using filters.'
-        )
+        a_filter = sub.add_parser("filter", help="Extract monsters using filters.")
         self.add_default_parsers(
             parser=a_filter,
             cls=MonsterParser,
@@ -142,122 +134,182 @@ class MonsterCommandHandler(ExporterHandler):
         )
 
         a_filter.add_argument(
-            '-ft-id', '--filter-id', '--filter-metadata-id',
-            help='Regular expression on the id',
+            "-ft-id",
+            "--filter-id",
+            "--filter-metadata-id",
+            help="Regular expression on the id",
             type=str,
-            dest='re_id',
+            dest="re_id",
         )
 
     def add_default_parsers(self, *args, **kwargs):
         super().add_default_parsers(*args, **kwargs)
-        parser = kwargs['parser']
+        parser = kwargs["parser"]
         self.add_format_argument(parser)
 
 
 class MonsterParser(parser.BaseParser):
     _files = [
-        'MonsterVarieties.dat',
+        "MonsterVarieties.datc64",
     ]
 
     _area_column_index_filter = partialmethod(
         parser.BaseParser._column_index_filter,
-        dat_file_name='MonsterVarieties.dat',
-        error_msg='Several monsters have not been found:\n%s',
+        dat_file_name="MonsterVarieties.datc64",
+        error_msg="Several monsters have not been found:\n%s",
     )
 
-    _COPY_KEYS = OrderedDict((
-        ('Id', {
-            'template': 'metadata_id',
-        }),
-        ('MonsterTypesKey', {
-            'template': 'monster_type_id',
-            'format': lambda v: v['Id'],
-        }),
-        ('ModsKeys', {
-            'template': 'mod_ids',
-            'format': lambda v: ', '.join([r['Id'] for r in v]),
-        }),
-        ('Part1_ModsKeys', {
-            'template': 'part1_mod_ids',
-            'format': lambda v: ', '.join([r['Id'] for r in v]),
-        }),
-        ('Part2_ModsKeys', {
-            'template': 'part2_mod_ids',
-            'format': lambda v: ', '.join([r['Id'] for r in v]),
-        }),
-        ('Endgame_ModsKeys', {
-            'template': 'endgame_mod_ids',
-            'format': lambda v: ', '.join([r['Id'] for r in v]),
-        }),
-        ('TagsKeys', {
-            'template': 'tags',
-            'format': lambda v: ', '.join([r['Id'] for r in v]),
-        }),
-        ('GrantedEffectsKeys', {
-            'template': 'skill_ids',
-            'format': lambda v: ', '.join([r['Id'] for r in v]),
-        }),
-        ('Name', {
-            'template': 'name',
-        }),
-        ('ObjectSize', {
-            'template': 'size',
-        }),
-        ('MinimumAttackDistance', {
-            'template': 'minimum_attack_distance',
-        }),
-        ('MaximumAttackDistance', {
-            'template': 'maximum_attack_distance',
-        }),
-        ('ModelSizeMultiplier', {
-            'template': 'model_size_multiplier',
-            'format': lambda v: v/100,
-        }),
-        ('ExperienceMultiplier', {
-            'template': 'experience_multiplier',
-            'format': lambda v: v/100,
-        }),
-        ('DamageMultiplier', {
-            'template': 'damage_multiplier',
-            'format': lambda v: v/100,
-        }),
-        ('LifeMultiplier', {
-            'template': 'health_multiplier',
-            'format': lambda v: v/100,
-        }),
-        ('CriticalStrikeChance', {
-            'template': 'critical_strike_chance',
-            'format': lambda v: v/100,
-        }),
-        ('AttackSpeed', {
-            'template': 'attack_speed',
-            'format': lambda v: v/1000,
-        }),
-    ))
+    _COPY_KEYS = OrderedDict(
+        (
+            (
+                "Id",
+                {
+                    "template": "metadata_id",
+                },
+            ),
+            (
+                "MonsterTypesKey",
+                {
+                    "template": "monster_type_id",
+                    "format": lambda v: v["Id"],
+                },
+            ),
+            (
+                "ModsKeys",
+                {
+                    "template": "mod_ids",
+                    "format": lambda v: ", ".join([r["Id"] for r in v]),
+                },
+            ),
+            (
+                "Part1_ModsKeys",
+                {
+                    "template": "part1_mod_ids",
+                    "format": lambda v: ", ".join([r["Id"] for r in v]),
+                },
+            ),
+            (
+                "Part2_ModsKeys",
+                {
+                    "template": "part2_mod_ids",
+                    "format": lambda v: ", ".join([r["Id"] for r in v]),
+                },
+            ),
+            (
+                "Endgame_ModsKeys",
+                {
+                    "template": "endgame_mod_ids",
+                    "format": lambda v: ", ".join([r["Id"] for r in v]),
+                },
+            ),
+            (
+                "TagsKeys",
+                {
+                    "template": "tags",
+                    "format": lambda v: ", ".join([r["Id"] for r in v]),
+                },
+            ),
+            (
+                "GrantedEffectsKeys",
+                {
+                    "template": "skill_ids",
+                    "format": lambda v: ", ".join([r["Id"] for r in v]),
+                },
+            ),
+            (
+                "Name",
+                {
+                    "template": "name",
+                },
+            ),
+            (
+                "ObjectSize",
+                {
+                    "template": "size",
+                },
+            ),
+            (
+                "MinimumAttackDistance",
+                {
+                    "template": "minimum_attack_distance",
+                },
+            ),
+            (
+                "MaximumAttackDistance",
+                {
+                    "template": "maximum_attack_distance",
+                },
+            ),
+            (
+                "ModelSizeMultiplier",
+                {
+                    "template": "model_size_multiplier",
+                    "format": lambda v: v / 100,
+                },
+            ),
+            (
+                "ExperienceMultiplier",
+                {
+                    "template": "experience_multiplier",
+                    "format": lambda v: v / 100,
+                },
+            ),
+            (
+                "DamageMultiplier",
+                {
+                    "template": "damage_multiplier",
+                    "format": lambda v: v / 100,
+                },
+            ),
+            (
+                "LifeMultiplier",
+                {
+                    "template": "health_multiplier",
+                    "format": lambda v: v / 100,
+                },
+            ),
+            (
+                "CriticalStrikeChance",
+                {
+                    "template": "critical_strike_chance",
+                    "format": lambda v: v / 100,
+                },
+            ),
+            (
+                "AttackSpeed",
+                {
+                    "template": "attack_speed",
+                    "format": lambda v: v / 1000,
+                },
+            ),
+        )
+    )
 
     def by_rowid(self, parsed_args):
         return self.export(
             parsed_args,
-            self.rr['MonsterVarieties.dat'][parsed_args.start:parsed_args.end],
+            self.rr["MonsterVarieties.dat64"][parsed_args.start : parsed_args.end],
         )
 
     def by_id(self, parsed_args):
-        return self.export(parsed_args, self._area_column_index_filter(
-            column_id='Id', arg_list=parsed_args.monster_id
-        ))
+        return self.export(
+            parsed_args,
+            self._area_column_index_filter(column_id="Id", arg_list=parsed_args.monster_id),
+        )
 
     def by_name(self, parsed_args):
-        return self.export(parsed_args, self._area_column_index_filter(
-            column_id='Name', arg_list=parsed_args.monster_name
-        ))
+        return self.export(
+            parsed_args,
+            self._area_column_index_filter(column_id="Name", arg_list=parsed_args.monster_name),
+        )
 
     def by_filter(self, parsed_args):
         re_id = re.compile(parsed_args.re_id) if parsed_args.re_id else None
 
         out = []
-        for row in self.rr['MonsterVarieties.dat']:
+        for row in self.rr["MonsterVarieties.dat64"]:
             if re_id:
-                if not re_id.match(row['Id']):
+                if not re_id.match(row["Id"]):
                     continue
             out.append(row)
 
@@ -268,14 +320,14 @@ class MonsterParser(parser.BaseParser):
 
         if not monsters:
             console(
-                'No monsters found for the specified parameters. Quitting.',
+                "No monsters found for the specified parameters. Quitting.",
                 msg=Msg.warning,
             )
             return r
 
-        console('Found %s monsters, parsing...' % len(monsters))
+        console("Found %s monsters, parsing..." % len(monsters))
 
-        console('Accessing additional data...')
+        console("Accessing additional data...")
 
         for monster in monsters:
             data = OrderedDict()
@@ -283,16 +335,16 @@ class MonsterParser(parser.BaseParser):
             for row_key, copy_data in self._COPY_KEYS.items():
                 value = monster[row_key]
 
-                condition = copy_data.get('condition')
+                condition = copy_data.get("condition")
                 if condition is not None and not condition(monster):
                     continue
 
-                fmt = copy_data.get('format')
+                fmt = copy_data.get("format")
                 if fmt:
                     value = fmt(value)
 
                 if value:
-                    data[copy_data['template']] = value
+                    data[copy_data["template"]] = value
 
             cond = MonsterWikiCondition(
                 data=data,
@@ -301,19 +353,18 @@ class MonsterParser(parser.BaseParser):
 
             r.add_result(
                 text=cond,
-                out_file='monster_%s.txt' % data['metadata_id'].replace(
-                    '/', '_'),
+                out_file="monster_%s.txt" % data["metadata_id"].replace("/", "_"),
                 wiki_page=[
                     {
-                        'page': 'Monster:' +
-                                self._format_wiki_title(data['metadata_id']),
-                        'condition': cond,
+                        "page": "Monster:" + self._format_wiki_title(data["metadata_id"]),
+                        "condition": cond,
                     },
                 ],
-                wiki_message='Monster updater',
+                wiki_message="Monster updater",
             )
 
         return r
+
 
 # =============================================================================
 # Functions

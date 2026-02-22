@@ -29,9 +29,10 @@ See PyPoE/LICENSE
 # Imports
 # =============================================================================
 
+import os
+
 # Python
 import platform
-import os
 import warnings
 
 # =============================================================================
@@ -39,26 +40,27 @@ import warnings
 # =============================================================================
 
 __all__ = [
-    'APP_DIR',
-    'DIR',
-    'DATA_DIR',
+    "APP_DIR",
+    "DIR",
+    "DATA_DIR",
 ]
-__version__ = '1.0.0a0'
+__version__ = "1.0.0a0"
 
 # =============================================================================
 # Functions
 # =============================================================================
 
+
 def _get_app_dir():
     osys = platform.system()
-    if osys == 'Windows':
-        vars = ['APPDATA']
-        subdir = 'PyPoE'
-    elif osys == 'Linux':
-        vars = ['HOME', 'PWD']
-        subdir = '.PyPoE'
+    if osys == "Windows":
+        vars = ["APPDATA"]
+        subdir = "PyPoE"
+    elif osys in ["Linux", "Darwin"]:
+        vars = ["HOME", "PWD"]
+        subdir = ".PyPoE"
     else:
-        raise RuntimeError('Unsupported Operating System')
+        raise RuntimeError("Unsupported Operating System")
 
     dir = None
     for var in vars:
@@ -70,7 +72,7 @@ def _get_app_dir():
         break
 
     if dir is None:
-        raise RuntimeError('Home/user directory not found')
+        raise RuntimeError("Home/user directory not found")
 
     dir = os.path.join(dir, subdir)
     if not os.path.exists(dir):
@@ -78,11 +80,12 @@ def _get_app_dir():
 
     return dir
 
+
 # =============================================================================
 # Init
 # =============================================================================
 
-warnings.simplefilter('default', DeprecationWarning)
+warnings.simplefilter("default", DeprecationWarning)
 APP_DIR = _get_app_dir()
 DIR = os.path.join(os.path.dirname(__file__))
-DATA_DIR = os.path.join(DIR, '_data')
+DATA_DIR = os.path.join(DIR, "_data")

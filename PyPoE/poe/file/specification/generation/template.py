@@ -21,12 +21,14 @@ Agreement
 See PyPoE/LICENSE
 """
 
+# flake8: noqa
+
 # =============================================================================
 # Imports
 # =============================================================================
 
 # 3rd-party
-from PyPoE.poe.file.specification.fields import *
+from PyPoE.poe.file.specification.fields import Field, File, Specification, VirtualField
 
 # self
 
@@ -34,10 +36,13 @@ from PyPoE.poe.file.specification.fields import *
 # Globals
 # =============================================================================
 
-__all__ = ['specification', ]
+__all__ = [
+    "specification",
+]
 
-specification = Specification({
-    'SkillTotems.dat': File(
-    ),
-    # <specification>
-})
+specification = Specification(
+    0,  # <version>
+    {
+        # <specification>
+    },
+)

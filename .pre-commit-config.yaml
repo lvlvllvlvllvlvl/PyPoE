@@ -1,0 +1,31 @@
+default_language_version:
+  python: python3
+default_stages:
+  - commit
+  - push
+repos:
+  # Pre-commit and plugins
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: no-commit-to-branch
+        name: Don't commit to master
+  # Using this mirror lets us use mypyc-compiled black, which is about 2x faster
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 24.10.0
+    hooks:
+      - id: black
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ["--profile", "black", "--filter-files"]
+        name: Sort imports with isort
+  # Linter
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.1
+    hooks:
+      - id: flake8
+        exclude: ^PyPoE/ui/
+        entry: flake8
+        name: "Linting using Flake8"

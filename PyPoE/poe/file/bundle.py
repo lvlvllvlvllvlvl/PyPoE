@@ -57,55 +57,48 @@ Index Records
 # Imports
 # =============================================================================
 
+
 # python
 import struct
-import os
 from enum import IntEnum
 from io import BytesIO
-from tempfile import TemporaryDirectory
-from typing import List, Union, Dict, Tuple
+from typing import Dict, List, Tuple, Union
+
+import ooz
 
 # 3rd party
 from fnvhash import fnv1a_64
 
-try:
-    import cffi
-except ImportError:
-    cffi = None
+from PyPoE.poe.file.shared import AbstractFileReadOnly
+from PyPoE.shared.mixins import ReprMixin
 
 # self
-from PyPoE.shared.mixins import ReprMixin
-from PyPoE.shared.decorators import doc
-from PyPoE.poe.file.shared import AbstractFileReadOnly
+from PyPoE.shared.murmur2 import murmur2_64a
 
 # =============================================================================
 # Setup
 # =============================================================================
 
 __all__ = [
-    'ENCODE_TYPES', 'ENCODE_TYPES_HEX', 'PATH_TYPES',
-
-    'IndexRecord', 'BundleRecord', 'FileRecord', 'DirectoryRecord',
-
-    'Bundle', 'Index'
+    "ENCODE_TYPES",
+    "ENCODE_TYPES_HEX",
+    "PATH_TYPES",
+    "IndexRecord",
+    "BundleRecord",
+    "FileRecord",
+    "DirectoryRecord",
+    "Bundle",
+    "Index",
 ]
-
-if cffi:
-    ffi = cffi.FFI()
-    ffi.cdef("""int Ooz_Decompress(uint8_t const* src_buf, int src_len, 
-            uint8_t* dst, size_t dst_size, int, int, int, uint8_t*, size_t, 
-            void*, void*, void*, size_t, int);""")
-    try:
-        ooz = ffi.dlopen(r'libooz.dll')
-    except OSError:
-        cffi = None
-        ooz = None
-else:
-    ooz = None
 
 # =============================================================================
 # Classes
 # =============================================================================
+
+
+class HASH_ALGORITHM(IntEnum):
+    FNV1A64 = 1
+    MURMURHASH64A = 2
 
 
 class ENCODE_TYPES_HEX(IntEnum):
@@ -166,15 +159,16 @@ class Bundle(AbstractFileReadOnly):
 
     def _read(self, buffer: BytesIO):
         if self.is_decompressed:
-            raise ValueError('Bundle has been decompressed already')
+            raise ValueError("Bundle has been decompressed already")
 
         raw = buffer.read()
 
-        self.uncompressed_size, self.data_size, self.head_size = \
-            struct.unpack_from('<III', raw, offset=0)
+        self.uncompressed_size, self.data_size, self.head_size = struct.unpack_from(
+            "<III", raw, offset=0
+        )
         offset = 12
 
-        data = struct.unpack_from('<IIQQIIIIII', raw, offset=offset)
+        data = struct.unpack_from("<IIQQIIIIII", raw, offset=offset)
         offset += 48
 
         self.encoder = ENCODE_TYPES(data[0])
@@ -188,9 +182,8 @@ class Bundle(AbstractFileReadOnly):
         self.unknown5 = data[8]
         self.unknown6 = data[9]
 
-        self.chunks = struct.unpack_from(
-            '<%sI' % self.entry_count, raw, offset=offset)
-        offset += self.entry_count*4
+        self.chunks = struct.unpack_from("<%sI" % self.entry_count, raw, offset=offset)
+        offset += self.entry_count * 4
 
         for i in range(0, self.entry_count):
             offset2 = offset + self.chunks[i]
@@ -201,9 +194,6 @@ class Bundle(AbstractFileReadOnly):
     def decompress(self, start: int = 0, end: int = None):
         """
         Decompresses this bundle's contents.
-
-        This requires either the oozdll to be available or the ooz commandline
-        tool.
 
         Parameters
         ----------
@@ -219,54 +209,16 @@ class Bundle(AbstractFileReadOnly):
             end = self.entry_count
 
         last = self.entry_count - 1
-        if ooz:
-            for i in range(start, end):
-                if i != last:
-                    size = self.chunk_size
-                else:
-                    size = self.size_decompressed % self.chunk_size
+        for i in range(start, end):
+            if i != last:
+                size = self.chunk_size
+            else:
+                size = self.size_decompressed % self.chunk_size
 
-                out = ffi.new('uint8_t[]', size+64)
-                rtrcode = ooz.Ooz_Decompress(
-                    self.data[i],  # src_buff
-                    len(self.data[i]),  # src_len
-                    out,  # dst
-                    size,  # dst_size
-                    0,
-                    0,
-                    0,
-                    ffi.cast('uint8_t *', 0),
-                    0,
-                    ffi.cast('void *', 0),
-                    ffi.cast('void *', 0),
-                    ffi.cast('void *', 0),
-                    0,
-                    0,
-                )
+            out = ooz.decompress(self.data[i], size)
+            self.data[i] = bytes(out)
 
-                if rtrcode == 0:
-                    raise ValueError('Decode error - returned 0 bytes')
-
-                self.data[i] = ffi.buffer(out)[:-64]
-        else:
-            with TemporaryDirectory() as tempdir:
-                for i in range(start, end):
-                    fn = os.path.join(tempdir,'chunk%s' % i)
-
-                    with open('%s.in' % fn, 'wb') as f:
-                        if i != last:
-                            size = 262144
-                        else:
-                            size = self.size_decompressed % 262144
-                        f.write(struct.pack('<Q', size))
-                        f.write(self.data[i])
-
-                    os.system('ooz -d %(fn)s.in %(fn)s.out' % {'fn': fn})
-
-                    with open('%s.out' % fn, 'rb') as f:
-                        self.data[i] = f.read()
-
-        self.data = b''.join(self.data.values())
+        self.data = b"".join(self.data.values())
 
 
 class PATH_TYPES(IntEnum):
@@ -288,20 +240,19 @@ class BundleRecord(IndexRecord):
     contents : Bundle
     BYTES : int
     """
-    __slots__ = ['parent', 'name', 'size',  'contents', 'BYTES']
+
+    __slots__ = ["parent", "name", "size", "contents", "BYTES"]
 
     _REPR_EXTRA_ATTRIBUTES = {x: None for x in __slots__}
 
-    def __init__(self, raw: bytes, parent: 'Index', offset: int):
+    def __init__(self, raw: bytes, parent: "Index", offset: int):
         self.parent: Index = parent
 
-        name_length = struct.unpack_from('<I', raw, offset=offset)[0]
+        name_length = struct.unpack_from("<I", raw, offset=offset)[0]
 
-        self.name: str = struct.unpack_from(
-            '%ss' % name_length, raw, offset=offset+4)[0].decode()
+        self.name: str = struct.unpack_from("%ss" % name_length, raw, offset=offset + 4)[0].decode()
 
-        self.size: int = \
-            struct.unpack_from('<I', raw, offset=offset+4+name_length)[0]
+        self.size: int = struct.unpack_from("<I", raw, offset=offset + 4 + name_length)[0]
 
         self.BYTES: int = name_length + 8
 
@@ -314,7 +265,7 @@ class BundleRecord(IndexRecord):
         -------
         The full filename of this bundle file
         """
-        return self.name + '.bundle.bin'
+        return self.name + ".bundle.bin"
 
     @property
     def ggpk_path(self) -> str:
@@ -323,7 +274,7 @@ class BundleRecord(IndexRecord):
         -------
         The path relative to the content.ggpk
         """
-        return 'Bundles2/' + self.file_name
+        return "Bundles2/" + self.file_name
 
     def read(self, file_path_or_raw: Union[str, bytes]):
         """
@@ -350,13 +301,14 @@ class FileRecord(IndexRecord):
     file_offset: int
     file_size: int
     """
-    __slots__ = ['parent', 'hash', 'bundle', 'file_offset', 'file_size']
+
+    __slots__ = ["parent", "hash", "bundle", "file_offset", "file_size"]
 
     _REPR_EXTRA_ATTRIBUTES = {x: None for x in __slots__}
     SIZE = 20
 
-    def __init__(self, raw: bytes, parent: 'Index', offset: int):
-        data = struct.unpack_from('<QIII', raw, offset=offset)
+    def __init__(self, raw: bytes, parent: "Index", offset: int):
+        data = struct.unpack_from("<QIII", raw, offset=offset)
 
         self.parent: Index = parent
         self.hash: int = data[0]
@@ -373,8 +325,7 @@ class FileRecord(IndexRecord):
         -------
         The contents of the file associated with this record.
         """
-        return self.bundle.contents.data[
-               self.file_offset:self.file_offset+self.file_size]
+        return self.bundle.contents.data[self.file_offset : self.file_offset + self.file_size]
 
 
 class DirectoryRecord(IndexRecord):
@@ -387,14 +338,15 @@ class DirectoryRecord(IndexRecord):
     size: int
     unknown: int
     """
-    __slots__ = ['parent', 'hash', 'offset', 'size', 'unknown', '_paths']
+
+    __slots__ = ["parent", "hash", "offset", "size", "unknown", "_paths"]
 
     _REPR_EXTRA_ATTRIBUTES = {x: None for x in __slots__}
     SIZE = 20
 
-    def __init__(self, raw: bytes, parent: 'Index', offset: int):
+    def __init__(self, raw: bytes, parent: "Index", offset: int):
         self.parent: Index = parent
-        data = struct.unpack_from('<QIII', raw, offset=offset)
+        data = struct.unpack_from("<QIII", raw, offset=offset)
 
         self.hash: int = data[0]
         self.offset: int = data[1]
@@ -411,9 +363,9 @@ class DirectoryRecord(IndexRecord):
         """
         # Paths can be empty
         if self._paths:
-            return self.paths[0].rsplit('/', maxsplit=1)[0]
+            return self.paths[0].rsplit("/", maxsplit=1)[0]
         else:
-            return ''
+            return ""
 
     @property
     def paths(self) -> List[str]:
@@ -432,11 +384,22 @@ class DirectoryRecord(IndexRecord):
         -------
             A list of files contained in this directory.
         """
-        return [x.rsplit('/', maxsplit=1)[-1] for x in self.paths]
+        return [x.rsplit("/", maxsplit=1)[-1] for x in self.paths]
+
+
+def _hash_path_3_21_2(path, seed):
+    if isinstance(path, str):
+        path = path.encode("utf-8")
+    elif not isinstance(path, bytes):
+        raise TypeError("path must be a string")
+    if path.endswith(b"/"):
+        path = path.strip(b"/")
+    path = path.lower()
+    return murmur2_64a(path, seed)
 
 
 class Index(Bundle):
-    PATH = 'Bundles2/_.index.bin'
+    PATH = "Bundles2/_.index.bin"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -494,7 +457,7 @@ class Index(Bundle):
 
     def get_hash(self, path: Union[str, bytes], type: PATH_TYPES = None) -> int:
         """
-        Calculates the 64 bit FNA1a hash value for a given path
+        Calculates the 64 bit FNA1a or MurmurHash64A hash value for a given path
 
         Parameters
         ----------
@@ -507,32 +470,34 @@ class Index(Bundle):
 
         Returns
         -------
-        Calculated 64bit FNV1a hash value
+        Calculated 64bit hash value
         """
-        if isinstance(path, str):
-            path = path.encode('utf-8')
-        elif not isinstance(path, bytes):
-            raise TypeError('path must be a string')
+        if self.hash_algorithm == HASH_ALGORITHM.FNV1A64:
+            if isinstance(path, str):
+                path = path.encode("utf-8")
+            elif not isinstance(path, bytes):
+                raise TypeError("path must be a string")
+            if path.endswith(b"/"):
+                if type is None:
+                    type = PATH_TYPES.DIR
+                path = path.strip(b"/")
+            # If type wasn't set before, assume this is a file
+            if type == PATH_TYPES.FILE or type is None:
+                path = path.lower()
+            path += b"++"
 
-        if path.endswith(b'/'):
-            if type is None:
-                type = PATH_TYPES.DIR
-            path = path.strip(b'/')
-        # If type wasn't set before, assume this is a file
-        if type == PATH_TYPES.FILE or type is None:
-            path = path.lower()
-        path += b'++'
-
-        return fnv1a_64(path)
+            return fnv1a_64(path)
+        elif self.hash_algorithm == HASH_ALGORITHM.MURMURHASH64A:
+            return _hash_path_3_21_2(path, self.hash_seed)
 
     def _read(self, buffer: BytesIO):
         if self.bundles:
-            raise ValueError('Index bundle has been read already.')
+            raise ValueError("Index bundle has been read already.")
         super()._read(buffer)
         self.decompress()
         raw = self.data
 
-        bundle_count = struct.unpack_from('<I', raw)[0]
+        bundle_count = struct.unpack_from("<I", raw)[0]
         offset = 4
 
         for i in range(0, bundle_count):
@@ -541,7 +506,7 @@ class Index(Bundle):
             self.bundles[i] = br
             offset += br.BYTES
 
-        file_count = struct.unpack_from('<I', raw, offset=offset)[0]
+        file_count = struct.unpack_from("<I", raw, offset=offset)[0]
         offset += 4
 
         for i in range(0, file_count):
@@ -549,7 +514,7 @@ class Index(Bundle):
             self.files[fr.hash] = fr
             offset += fr.SIZE
 
-        count = struct.unpack_from('<I', raw, offset=offset)[0]
+        count = struct.unpack_from("<I", raw, offset=offset)[0]
         offset += 4
         for i in range(0, count):
             dr = DirectoryRecord(raw, self, offset)
@@ -563,10 +528,24 @@ class Index(Bundle):
         for directory_record in self.directories.values():
             directory_record._paths = self._make_paths(
                 directory_bundle.data[
-                    directory_record.offset:
-                    directory_record.offset + directory_record.size
+                    directory_record.offset : directory_record.offset + directory_record.size
                 ]
             )
+
+        self.hash_algorithm = None
+        if len(dirs := self.directories) > 0:
+            dir_iter = iter(dirs.values())
+            root_entry = next(dir_iter)
+            if root_entry.hash == 0x07E47507B4A92E53:
+                self.hash_algorithm = HASH_ALGORITHM.FNV1A64
+            else:
+                h = root_entry.hash
+                # Find seed from root directory hash via inverses
+                h ^= h >> 47
+                h = (h * 0x5F7A0EA7E59B19BD) % 2**64
+                h ^= h >> 47
+                self.hash_algorithm = HASH_ALGORITHM.MURMURHASH64A
+                self.hash_seed = h
 
     def _make_paths(self, raw: bytes) -> List[bytes]:
         """
@@ -584,9 +563,9 @@ class Index(Bundle):
         paths = []
         base = False
         offset = 0
-        rawlen = len(raw)-4
+        rawlen = len(raw) - 4
         while offset <= rawlen:
-            index = struct.unpack_from('<I', raw, offset=offset)[0]
+            index = struct.unpack_from("<I", raw, offset=offset)[0]
             offset += 4
 
             if index == 0:
@@ -597,9 +576,9 @@ class Index(Bundle):
             else:
                 index -= 1
 
-            end_offset = raw.find(b'\x00', offset)
+            end_offset = raw.find(b"\x00", offset)
             string = raw[offset:end_offset]
-            offset = end_offset+1
+            offset = end_offset + 1
 
             try:
                 string = temp[index] + string
@@ -615,19 +594,15 @@ class Index(Bundle):
         return paths
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ind = Index()
-    ind.read('C:/Temp/Bundles2/_.index.bin')
+    ind.read("C:/Temp/Bundles2/_.index.bin")
 
-    print(ind['Metadata/minimap_colours.txt'])
+    print(ind["Metadata/minimap_colours.txt"])
 
-    '''b.decompress()
+    """b.decompress()
     for var in dir(b):
         if var.startswith('_'):
             continue
         print(var, getattr(b, var))
-    '''
-
-    #pprint.pprint(Index._make_paths(None, b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00Art/Microtransactions/spell/arc/crimson/models/\x00\x01\x00\x00\x00crimson\x00\x02\x00\x00\x00impact.a\x00\x02\x00\x00\x00arcvaalbuff.a\x00\x02\x00\x00\x00arc.a\x00\x00\x00\x00\x00\x01\x00\x00\x00rig_b722958b.smd\x00\x03\x00\x00\x00md\x00\x03\x00\x00\x00st\x00\x04\x00\x00\x00md\x00\x04\x00\x00\x00st\x00\x02\x00\x00\x00arc.sm\x00\x05\x00\x00\x00md\x00\x05\x00\x00\x00st\x00\x00\x00\x00\x00\x01\x00\x00\x00Art/Microtransactions/spell/arc/crimson/textures/\x00\x01\x00\x00\x00buff_\x00\x01\x00\x00\x00core_\x00\x01\x00\x00\x00dark_ink_3.\x00\x01\x00\x00\x00flash.\x00\x01\x00\x00\x00impact_\x00\x01\x00\x00\x00light\x00\x01\x00\x00\x00red_sparks.\x00\x01\x00\x00\x00thunder_flash.\x00\x07\x00\x00\x00ning_\x00\n\x00\x00\x00bolts.\x00\n\x00\x00\x00random.\x00\x07\x00\x00\x00_gradient.\x00\x07\x00\x00\x00_strong.\x00\x07\x00\x00\x00_sub.\x00\x06\x00\x00\x00flash\x00\x06\x00\x00\x00trail.\x00\x10\x00\x00\x00_sub.\x00\x03\x00\x00\x00trail.\x00\x03\x00\x00\x00mini.\x00\x03\x00\x00\x00mini_impact.\x00\x02\x00\x00\x00light.\x00\x02\x00\x00\x00trail.\x00\x00\x00\x00\x00\t\x00\x00\x00dds\x00\t\x00\x00\x00mat\x00\x08\x00\x00\x00dds\x00\x08\x00\x00\x00mat\x00\x0c\x00\x00\x00dds\x00\x0c\x00\x00\x00mat\x00\n\x00\x00\x00orb.dds\x00\n\x00\x00\x00orb.mat\x00\x0b\x00\x00\x00dds\x00\x0b\x00\x00\x00mat\x00\x0f\x00\x00\x00dds\x00\x0f\x00\x00\x00mat\x00\x0e\x00\x00\x00dds\x00\x0e\x00\x00\x00mat\x00\r\x00\x00\x00dds\x00\r\x00\x00\x00mat\x00\x11\x00\x00\x00dds\x00\x11\x00\x00\x00mat\x00\x12\x00\x00\x00dds\x00\x12\x00\x00\x00mat\x00\x10\x00\x00\x00.dds\x00\x10\x00\x00\x00.mat\x00\x05\x00\x00\x00dds\x00\x05\x00\x00\x00mat\x00\x04\x00\x00\x00dds\x00\x04\x00\x00\x00mat\x00\x13\x00\x00\x00dds\x00\x13\x00\x00\x00mat\x00\x03\x00\x00\x00sub.dds\x00\x03\x00\x00\x00subc.mat\x00\x15\x00\x00\x00dds\x00\x15\x00\x00\x00mat\x00\x14\x00\x00\x00dds\x00\x14\x00\x00\x00mat\x00\x17\x00\x00\x00dds\x00\x17\x00\x00\x00mat\x00\x02\x00\x00\x00sub.dds\x00\x02\x00\x00\x00sub.mat\x00\x16\x00\x00\x00dds\x00\x16\x00\x00\x00mat\x00')
-
-    #              )
+    """

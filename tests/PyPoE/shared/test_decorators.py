@@ -29,9 +29,6 @@ See PyPoE/LICENSE
 # Imports
 # =============================================================================
 
-# Python
-import sys
-
 # 3rd-party
 import pytest
 
@@ -41,6 +38,7 @@ from PyPoE.shared import decorators
 # =============================================================================
 # Utility functions
 # =============================================================================
+
 
 def make_test_list(stuff):
     parsed_data = []
@@ -62,21 +60,19 @@ def make_test_list(stuff):
 def make_objects(uncallables=False):
     def function(*args, **kwargs):
         pass
-    
+
     class A:
         """A"""
+
         def __call__(self, *args, **kwargs):
             """__call__"""
-            pass
-    
+
         def method(self, *args, **kwargs):
             """method"""
-            pass
-    
+
         @classmethod
         def classmethod(cls, *args, **kwargs):
             """classmethod"""
-            pass
 
     data = [
         # callable object, instance object
@@ -91,6 +87,7 @@ def make_objects(uncallables=False):
 
     return data
 
+
 # =============================================================================
 # Tests
 # =============================================================================
@@ -101,67 +98,67 @@ class TestDeprecated:
         with pytest.warns(DeprecationWarning) as record:
             o = decorator(callobj)
             args = (1, 2, 3)
-            kwargs = {'a': 1, 'b': 2, 'c': 3}
+            kwargs = {"a": 1, "b": 2, "c": 3}
             if obj:
                 o(obj(), *args, **kwargs)
             else:
                 o(*args, **kwargs)
             return record
 
-    @pytest.mark.parametrize('callobj,obj', make_objects())
+    @pytest.mark.parametrize("callobj,obj", make_objects())
     def test_simple(self, callobj, obj):
         self.run_test(decorators.deprecated, callobj, obj)
 
-    @pytest.mark.parametrize('callobj,obj', make_objects())
+    @pytest.mark.parametrize("callobj,obj", make_objects())
     def test_empty_args(self, callobj, obj):
         self.run_test(decorators.deprecated(), callobj, obj)
 
-    @pytest.mark.parametrize('callobj,obj', make_objects())
+    @pytest.mark.parametrize("callobj,obj", make_objects())
     def test_message_arg(self, callobj, obj):
-        deco = decorators.deprecated(message='Test')
+        deco = decorators.deprecated(message="Test")
 
         for warn in self.run_test(deco, callobj, obj):
-            assert warn.message.args[0] == 'Test'
+            assert warn.message.args[0] == "Test"
 
-    @pytest.mark.parametrize('callobj,obj', make_objects())
-    def test_message_arg(self, callobj, obj):
-        deco = decorators.deprecated(doc_message='Test')
+    @pytest.mark.parametrize("callobj,obj", make_objects())
+    def test_message_arg_2(self, callobj, obj):
+        deco = decorators.deprecated(doc_message="Test")
 
         self.run_test(deco, callobj, obj)
-        assert callobj.__doc__.startswith('Test')
+        assert callobj.__doc__.startswith("Test")
 
 
 class TestDoc:
     """Test"""
 
-    @pytest.mark.parametrize('callobj,obj', make_objects(True))
+    @pytest.mark.parametrize("callobj,obj", make_objects(True))
     def test_simple(self, callobj, obj):
-        o = decorators.doc(callobj)
+        decorators.doc(callobj)
 
-    @pytest.mark.parametrize('callobj,obj', make_objects(True))
+    @pytest.mark.parametrize("callobj,obj", make_objects(True))
     def test_empty_args(self, callobj, obj):
-        o = decorators.doc()(callobj)
+        decorators.doc()(callobj)
 
-    @pytest.mark.parametrize('callobj,obj', make_objects(True))
+    @pytest.mark.parametrize("callobj,obj", make_objects(True))
     def test_arg_prepend(self, callobj, obj):
-        o = decorators.doc(prepend='Test')(callobj)
+        o = decorators.doc(prepend="Test")(callobj)
 
-        assert o.__doc__.startswith('Test')
+        assert o.__doc__.startswith("Test")
 
-    @pytest.mark.parametrize('callobj,obj', make_objects(True))
+    @pytest.mark.parametrize("callobj,obj", make_objects(True))
     def test_arg_append(self, callobj, obj):
-        o = decorators.doc(append='Test')(callobj)
+        o = decorators.doc(append="Test")(callobj)
 
-        assert o.__doc__.endswith('Test')
+        assert o.__doc__.endswith("Test")
 
-    @pytest.mark.parametrize('callobj,obj', make_objects(True))
+    @pytest.mark.parametrize("callobj,obj", make_objects(True))
     def test_arg_doc_with_str(self, callobj, obj):
-        o = decorators.doc(doc='Test')(callobj)
+        o = decorators.doc(doc="Test")(callobj)
 
-        assert o.__doc__ == 'Test'
+        assert o.__doc__ == "Test"
 
-    @pytest.mark.parametrize('callobj,obj', make_objects(True))
+    @pytest.mark.parametrize("callobj,obj", make_objects(True))
     def test_arg_doc_with_obj(self, callobj, obj):
         o = decorators.doc(doc=TestDoc)(callobj)
 
-        assert o.__doc__ == 'Test'
+        assert o.__doc__ == "Test"

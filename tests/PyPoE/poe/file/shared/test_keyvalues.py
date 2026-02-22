@@ -37,76 +37,80 @@ from tempfile import TemporaryDirectory
 # 3rd-party
 import pytest
 
+from PyPoE.poe.file.file_system import FileSystem
+
 # self
 from PyPoE.poe.file.shared import keyvalues
-from PyPoE.poe.file.file_system import FileSystem
 
 # =============================================================================
 # Setup
 # =============================================================================
 
-data_dir = os.path.join(os.path.split(os.path.split(os.path.realpath(__file__))[0])[0], '_data')
+data_dir = os.path.join(os.path.split(os.path.split(os.path.realpath(__file__))[0])[0], "_data")
 
 data = {
-    'Append': {
-        'key': [1, 2, 3],
+    "Append": {
+        "key": [1, 2, 3],
     },
-    'Override': {
-        'key': 42,
-        'warning': 42,
+    "Override": {
+        "key": 42,
+        "warning": 42,
     },
-    'OverrideGeneric': {
-        'key': 42,
-        'no_warning': 42,
+    "OverrideGeneric": {
+        "key": 42,
+        "no_warning": 42,
     },
-    'Extra': {
-        'key': -42,
-        'key_+': 42,
-        'key_-': 42,
-        'key_%': 42,
-        'key_inherited': 1337,
+    "Extra": {
+        "key": -42,
+        "key_+": 42,
+        "key_-": 42,
+        "key_%": 42,
+        "key_inherited": 1337,
     },
-    'Hash': {
-        'key': OrderedDict(((1, True), (2, True), (3, True))),
-    }
+    "Hash": {
+        "key": OrderedDict(((1, True), (2, True), (3, True))),
+    },
 }
 
 
 class KeyValuesSectionAppend(keyvalues.AbstractKeyValueSection):
-    NAME = 'Append'
-    APPEND_KEYS = {'key'}
+    NAME = "Append"
+    APPEND_KEYS = {"key"}
 
 
 class KeyValuesSectionOverride(keyvalues.AbstractKeyValueSection):
-    NAME = 'Override'
+    NAME = "Override"
 
 
 class KeyValuesSectionOverrideGeneric(keyvalues.AbstractKeyValueSection):
-    NAME = 'OverrideGeneric'
+    NAME = "OverrideGeneric"
 
 
 class KeyValuesSectionHash(keyvalues.AbstractKeyValueSection):
-    NAME = 'Hash'
-    ORDERED_HASH_KEYS = {'key'}
+    NAME = "Hash"
+    ORDERED_HASH_KEYS = {"key"}
 
 
 class KeyValuesFile(keyvalues.AbstractKeyValueFile):
+    EXTENSION = ".kv"
 
-    EXTENSION = '.kv'
+    SECTIONS = dict(
+        (s.NAME, s)
+        for s in [
+            KeyValuesSectionAppend,
+            KeyValuesSectionOverride,
+            KeyValuesSectionOverrideGeneric,
+            KeyValuesSectionHash,
+        ]
+    )
 
-    SECTIONS = dict((s.NAME, s) for s in [
-        KeyValuesSectionAppend,
-        KeyValuesSectionOverride,
-        KeyValuesSectionOverrideGeneric,
-        KeyValuesSectionHash,
-    ])
 
-
-class KeyValuesFileCache(keyvalues.AbstractKeyValueFileCache):
+class KeyValuesFileCache(keyvalues.AbstractKeyValueFileCache[KeyValuesFile]):
     FILE_TYPE = KeyValuesFile
 
-_read_file_name = 'keyvalues.kv'
-_write_file_name = 'keyvalues_write.kv'
+
+_read_file_name = "keyvalues.kv"
+_write_file_name = "keyvalues_write.kv"
 
 # =============================================================================
 # Fixtures
@@ -116,9 +120,13 @@ _write_file_name = 'keyvalues_write.kv'
 # Tests
 # =============================================================================
 
-class TestKeyValuesFile:
 
-    data = [(section, key, value) for section, keyvalues in data.items() for key, value in keyvalues.items()]
+class TestKeyValuesFile:
+    data = [
+        (section, key, value)
+        for section, keyvalues in data.items()
+        for key, value in keyvalues.items()
+    ]
 
     @pytest.fixture
     def kf_file(self):
@@ -131,22 +139,18 @@ class TestKeyValuesFile:
         kf = KeyValuesFile()
         kf.version = 2
         kf.extends = None
-        kf['Section1'] = keyvalues.AbstractKeyValueSection(
-            parent=kf, name='Section'
-        )
-        kf['Section2'] = keyvalues.AbstractKeyValueSection(
-            parent=kf, name='Section'
-        )
-        kf['Section1']['key'] = 42
-        kf['Section2']['key'] = 42
+        kf["Section1"] = keyvalues.AbstractKeyValueSection(parent=kf, name="Section")
+        kf["Section2"] = keyvalues.AbstractKeyValueSection(parent=kf, name="Section")
+        kf["Section1"]["key"] = 42
+        kf["Section2"]["key"] = 42
 
         return kf
 
     def test_read_attrs(self, kf_file):
         assert kf_file.version == 2
-        assert kf_file.extends == 'keyvalues_base'
+        assert kf_file.extends == "keyvalues_base"
 
-    @pytest.mark.parametrize('section,key,value', data)
+    @pytest.mark.parametrize("section,key,value", data)
     def test_read_keyvalues(self, kf_file, section, key, value):
         assert kf_file[section][key] == value
 
@@ -174,5 +178,3 @@ class TestKeyValuesFileCache:
     def test_cache_get_file(self, kf_cache):
         kf = kf_cache.get_file(_read_file_name)
         assert kf is kf_cache.get_file(_read_file_name)
-
-

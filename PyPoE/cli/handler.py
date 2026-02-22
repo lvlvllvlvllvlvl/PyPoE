@@ -46,14 +46,16 @@ from validate import ValidateError
 
 # self
 from PyPoE.cli.config import ConfigError
-from PyPoE.cli.core import console, Msg
+from PyPoE.cli.core import Msg, console
 
 # =============================================================================
 # Globals
 # =============================================================================
 
 __all__ = [
-    'BaseHandler', 'ConfigHandler', 'SetupHandler',
+    "BaseHandler",
+    "ConfigHandler",
+    "SetupHandler",
 ]
 
 # =============================================================================
@@ -65,6 +67,7 @@ class BaseHandler:
     """
     Other handlers should inherit this one.
     """
+
     def __init__(self, sub_parser, *args, **kwargs):
         pass
 
@@ -73,14 +76,11 @@ class BaseHandler:
         return 0
 
     def _show_error(self, e):
-        console("%s: %s" % (
-            e.__class__.__name__,
-            ''.join(e.args)
-        ), msg=Msg.error)
+        console("%s: %s" % (e.__class__.__name__, "".join(e.args)), msg=Msg.error)
         return -1
 
-    def print_sep(self, char='-'):
-        console(char*70)
+    def print_sep(self, char="-"):
+        console(char * 70)
 
 
 class ConfigHandler(BaseHandler):
@@ -92,6 +92,7 @@ class ConfigHandler(BaseHandler):
     .. warning::
         Should be included in any application that uses the cli config
     """
+
     def __init__(self, sub_parser, config):
         """
         Parameters
@@ -109,44 +110,42 @@ class ConfigHandler(BaseHandler):
         # Config
         self.config = config
         if not self.config.validate(config.validator):
-            raise ConfigError('Config validation failed.')
+            raise ConfigError("Config validation failed.")
 
         # Parsing stuff
-        self.parser = sub_parser.add_parser('config', help='Edit config options')
+        self.parser = sub_parser.add_parser("config", help="Edit config options")
         self.parser.set_defaults(func=self._help)
         config_sub = self.parser.add_subparsers()
 
         print_debug_parser = config_sub.add_parser(
-            'print_debug',
-            help='Prints out all registered and internal options for debugging.'
+            "print_debug", help="Prints out all registered and internal options for debugging."
         )
         print_debug_parser.set_defaults(func=self.print_debug)
 
         print_all_parser = config_sub.add_parser(
-            'print_all',
-            help='Prints out all registered config options'
+            "print_all", help="Prints out all registered config options"
         )
         print_all_parser.set_defaults(func=self.print_all)
 
-        get_parser = config_sub.add_parser('get', help='Get config option')
+        get_parser = config_sub.add_parser("get", help="Get config option")
         get_parser.set_defaults(func=self.get)
         get_parser.add_argument(
-            'variable',
+            "variable",
             choices=config.optionspec.keys(),
-            help='Variable to set',
+            help="Variable to set",
         )
 
-        set_parser = config_sub.add_parser('set', help='Set config option')
+        set_parser = config_sub.add_parser("set", help="Set config option")
         set_parser.set_defaults(func=self.set)
         set_parser.add_argument(
-            'variable',
+            "variable",
             choices=config.optionspec.keys(),
-            help='Variable to set',
+            help="Variable to set",
         )
         set_parser.add_argument(
-            'value',
-            action='store',
-            help='Value to set',
+            "value",
+            action="store",
+            help="Value to set",
         )
 
     def print_debug(self, args):
@@ -183,25 +182,23 @@ class ConfigHandler(BaseHandler):
         spec = set(self.config.optionspec.keys())
         real = set(self.config.option.keys())
 
-
         missing = spec.difference(real)
         extra = real.difference(spec)
         configured = spec.difference(missing)
 
-
-        console('Current stored config variables:')
+        console("Current stored config variables:")
         for key in sorted(list(configured)):
             console("%s: %s" % (key, self.config.option[key]))
 
         if missing:
-            console('', raw=True)
-            console('Missing config variables (require config set):', msg=Msg.error)
+            console("", raw=True)
+            console("Missing config variables (require config set):", msg=Msg.error)
             for key in sorted(list(missing)):
-                console("%s" % (key, ), Msg.error)
+                console("%s" % (key,), Msg.error)
 
         if extra:
-            console('', raw=True)
-            console('Extra variables (unused):', msg=Msg.warning)
+            console("", raw=True)
+            console("Extra variables (unused):", msg=Msg.warning)
             for key in sorted(list(extra)):
                 console("%s: %s" % (key, self.config.option[key]), msg=Msg.warning)
 
@@ -221,7 +218,10 @@ class ConfigHandler(BaseHandler):
         int
             success code
         """
-        console('Config setting "%s" is currently set to:\n%s' % (args.variable, self.config.option[args.variable]))
+        console(
+            'Config setting "%s" is currently set to:\n%s'
+            % (args.variable, self.config.option[args.variable])
+        )
         return 0
 
     def set(self, args):
@@ -247,8 +247,8 @@ class ConfigHandler(BaseHandler):
         console('Config setting "%s" has been set to:\n%s' % (args.variable, args.value))
 
         if self.config.needs_setup(args.variable) and not self.config.is_setup(args.variable):
-            console('', raw=True)
-            console('Variable needs setup. Please run:\nsetup perform')
+            console("", raw=True)
+            console("Variable needs setup. Please run:\nsetup perform")
 
         return 0
 
@@ -262,6 +262,7 @@ class SetupHandler(BaseHandler):
     .. warning::
         Should be included in any application that uses the cli config
     """
+
     def __init__(self, sub_parser, config):
         """
         Parameters
@@ -272,15 +273,12 @@ class SetupHandler(BaseHandler):
             config instance
         """
         self.config = config
-        self.parser = sub_parser.add_parser('setup', help='CLI Interface Setup')
+        self.parser = sub_parser.add_parser("setup", help="CLI Interface Setup")
         self.parser.set_defaults(func=self._help)
 
         setup_sub = self.parser.add_subparsers()
 
-        setup_perform = setup_sub.add_parser(
-            'perform',
-            help='Perform setup'
-        )
+        setup_perform = setup_sub.add_parser("perform", help="Perform setup")
         setup_perform.set_defaults(func=self.setup)
 
     def setup(self, args):
@@ -297,20 +295,20 @@ class SetupHandler(BaseHandler):
         int
             success code
         """
-        console('Performing setup. This may take a while - please wait...')
+        console("Performing setup. This may take a while - please wait...")
         self.print_sep()
-        for key in self.config['Setup']:
-            section = self.config['Setup'][key]
-            if section['performed']:
+        for key in self.config["Setup"]:
+            section = self.config["Setup"][key]
+            if section["performed"]:
                 continue
-            console('Performing setup for: %s' % key)
+            console("Performing setup for: %s" % key)
             try:
                 for func in section.functions:
                     func(args)
-            except Exception as e:
-                console('Unexpected error occured during setup:\n')
+            except Exception:
+                console("Unexpected error occured during setup:\n")
                 console(traceback.format_exc(), msg=Msg.error)
                 continue
-            self.config['Setup'][key]['performed'] = True
+            self.config["Setup"][key]["performed"] = True
             self.print_sep()
-        console('Done.')
+        console("Done.")

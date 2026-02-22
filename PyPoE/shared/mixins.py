@@ -50,7 +50,7 @@ from collections import OrderedDict
 # Globals
 # =============================================================================
 
-__all__ = ['ReprMixin']
+__all__ = ["ReprMixin"]
 
 # =============================================================================
 # Classes
@@ -96,7 +96,7 @@ class ReprMixin:
     def __get_repr_obj(self, name, test_private):
         if not hasattr(self, name):
             if test_private and self._REPR_PRIVATE_ATTRIBUTES:
-                name = '_' + name
+                name = "_" + name
                 if not hasattr(self, name):
                     return
             else:
@@ -125,16 +125,17 @@ class ReprMixin:
             if s is None:
                 continue
 
-            args.append('%s=%s' % (parameter.name, s))
+            args.append("%s=%s" % (parameter.name, s))
 
         for k, v in self._REPR_EXTRA_ATTRIBUTES.items():
-            args.append('%s=%s' % (k, self.__get_repr_obj(v or k, False)))
+            args.append("%s=%s" % (k, self.__get_repr_obj(v or k, False)))
 
-        return '%s<%s>(%s)' % (
+        return "%s<%s>(%s)" % (
             self.__class__.__name__,
             hex(id(self)),
-            ', '.join(args),
+            ", ".join(args),
         )
+
 
 # =============================================================================
 # Functions

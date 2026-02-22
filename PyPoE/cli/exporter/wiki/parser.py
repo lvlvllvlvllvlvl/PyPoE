@@ -52,1349 +52,2065 @@ Functions
 # Imports
 # =============================================================================
 
-# Python
+import os
 import re
 import warnings
-import os
 from collections import OrderedDict
 from functools import partial
 
+# Python
+from hashlib import md5
+from math import copysign
+from typing import Callable
+
+import PIL
+
+# 3rd-party
+from dds import decode_dds
+
 # self
-from PyPoE.cli.core import console, Msg
+from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
-from PyPoE.cli.exporter.util import get_content_path, fix_path
-from PyPoE.poe.constants import MOD_DOMAIN, WORDLISTS, MOD_STATS_RANGE
-from PyPoE.poe.text import parse_description_tags
-from PyPoE.poe.file.dat import RelationalReader, set_default_spec
+from PyPoE.cli.exporter.util import fix_path, get_content_path
+from PyPoE.poe import poe1constants as constants
+from PyPoE.poe.file.dat import RelationalReader
+from PyPoE.poe.file.file_system import FileSystem
+from PyPoE.poe.file.it import ITFileCache
+from PyPoE.poe.file.ot import OTFileCache
+from PyPoE.poe.file.specification import load
 from PyPoE.poe.file.translations import (
-    TranslationFileCache,
     MissingIdentifierWarning,
+    TranslationFileCache,
     get_custom_translation_file,
     get_hardcoded_translation_file,
     install_data_dependant_quantifiers,
 )
-from PyPoE.poe.file.file_system import FileSystem
-from PyPoE.poe.file.ot import OTFileCache
 from PyPoE.poe.sim.mods import get_translation_file_from_domain
+from PyPoE.poe.text import parse_description_tags
 
 # =============================================================================
 # Globals
 # =============================================================================
 
 __all__ = [
-    'BaseParser',
-    'WikiCondition',
-    'TagHandler',
-
-    'find_template',
-    'format_result_rows',
-    'make_inter_wiki_links',
-    'parse_and_handle_description_tags',
+    "BaseParser",
+    "WikiCondition",
+    "TagHandler",
+    "find_template",
+    "format_result_rows",
+    "make_inter_wiki_links",
+    "parse_and_handle_description_tags",
 ]
 
 DEFAULT_INDENT = 32
 
 _inter_wiki_map = {
-    'English': (
-        #
-        # Skills
-        #
-        ('Abyssal Cry', {'link': 'Abyssal Cry'}),
-        ('Ancestral Protector', {'link': 'Ancestral Protector'}),
-        ('Ancestral Warchief', {'link': 'Ancestral Warchief'}),
-        ('Anger', {'link': 'Anger'}),
-        ('Animate(?:|d) Guardian', {'link': 'Animate Guardian'}),
-        ('Animate(?:|d) Weapon', {'link': 'Animate Weapon'}),
-        ('(?:Arc | Arc)', {'link': 'Arc'}),
-        ('Arctic Armour', {'link': 'Arctic Armour'}),
-        ('Arctic Breath', {'link': 'Arctic Breath'}),
-        ('Assassin\'s Mark', {'link': 'Assassin\'s Mark'}),
-        ('Ball Lightning', {'link': 'Ball Lightning'}),
-        ('Barrage', {'link': 'Barrage'}),
-        ('Bear Trap', {'link': 'Bear Trap'}),
-        ('Blade Flurry', {'link': 'Blade Flurry'}),
-        ('Blade Trap', {'link': 'Blade Trap'}),
-        ('Blade Vortex', {'link': 'Blade Vortex'}),
-        ('Bladefall', {'link': 'Bladefall'}),
-        ('Blast Rain', {'link': 'Blast Rain'}),
-        ('Blight', {'link': 'Blight'}),
-        ('Blink Arrow', {'link': 'Blink Arrow'}),
-        ('Blood Rage', {'link': 'Blood Rage'}),
-        ('Bone Offering', {'link': 'Bone Offering'}),
-        ('Burning Arrow', {'link': 'Burning Arrow'}),
-        ('Caustic Arrow', {'link': 'Caustic Arrow'}),
-        ('Charged Dash', {'link': 'Charged Dash'}),
-        ('Clarity', {'link': 'Clarity'}),
-        ('Cleave', {'link': 'Cleave'}),
-        ('Cold Snap', {'link': 'Cold Snap'}),
-        ('Conductivity', {'link': 'Conductivity'}),
-        ('Contagion', {'link': 'Contagion'}),
-        ('Conversion Trap', {'link': 'Conversion Trap'}),
-        ('Convocation', {'link': 'Convocation'}),
-        ('Cyclone', {'link': 'Cyclone'}),
-        ('Damage Infusion', {'link': 'Damage Infusion'}),
-        ('Dark Pact', {'link': 'Dark Pact'}),
-        ('Decoy Totem', {'link': 'Decoy Totem'}),
-        ('Desecrate', {'link': 'Desecrate'}),
-        ('Determination', {'link': 'Determination'}),
-        ('Detonate Dead', {'link': 'Detonate Dead'}),
-        ('Detonate Mines', {'link': 'Detonate Mines'}),
-        ('Devouring Totem', {'link': 'Devouring Totem'}),
-        ('Discharge', {'link': 'Discharge'}),
-        ('Discipline', {'link': 'Discipline'}),
-        ('Dominating Blow', {'link': 'Dominating Blow'}),
-        ('Doom Arrow', {'link': 'Doom Arrow'}),
-        ('Double Strike', {'link': 'Double Strike'}),
-        ('Dual Strike', {'link': 'Dual Strike'}),
-        ('Earthquake', {'link': 'Earthquake'}),
-        ('Elemental Hit', {'link': 'Elemental Hit'}),
-        ('Elemental Weakness', {'link': 'Elemental Weakness'}),
-        ('Enduring Cry', {'link': 'Enduring Cry'}),
-        ('Energy Beam', {'link': 'Energy Beam'}),
-        ('Enfeeble', {'link': 'Enfeeble'}),
-        ('Essence Drain', {'link': 'Essence Drain'}),
-        ('Ethereal Knives', {'link': 'Ethereal Knives'}),
-        ('Explosive Arrow', {'link': 'Explosive Arrow'}),
-        ('Fire Nova Mine', {'link': 'Fire Nova Mine'}),
-        ('Fire Trap', {'link': 'Fire Trap'}),
-        ('Fire Weapon', {'link': 'Fire Weapon'}),
-        ('Fireball', {'link': 'Fireball'}),
-        ('Firestorm', {'link': 'Firestorm'}),
-        ('Flame Dash', {'link': 'Flame Dash'}),
-        ('Flame Surge', {'link': 'Flame Surge'}),
-        ('Flame Totem', {'link': 'Flame Totem'}),
-        ('Flameblast', {'link': 'Flameblast'}),
-        ('Flammability', {'link': 'Flammability'}),
-        ('Flesh Offering', {'link': 'Flesh Offering'}),
-        ('Flicker Strike', {'link': 'Flicker Strike'}),
-        ('Freeze Mine', {'link': 'Freeze Mine'}),
-        ('Freezing Pulse', {'link': 'Freezing Pulse'}),
-        ('Frenzy(?! Charge)', {'link': 'Frenzy'}),
-        ('Frostbolt', {'link': 'Frostbolt'}),
-        ('Frost Blades', {'link': 'Frost Blades'}),
-        ('Frost Bomb', {'link': 'Frost Bomb'}),
-        ('Frost Wall', {'link': 'Frost Wall'}),
-        ('Frostbite', {'link': 'Frostbite'}),
-        ('Glacial Cascade', {'link': 'Glacial Cascade'}),
-        ('Glacial Hammer', {'link': 'Glacial Hammer'}),
-        ('Grace', {'link': 'Grace'}),
-        ('Ground Slam', {'link': 'Ground Slam'}),
-        ('Haste', {'link': 'Haste'}),
-        ('Hatred', {'link': 'Hatred'}),
-        ('Heavy Strike', {'link': 'Heavy Strike'}),
-        ('Herald of Ash', {'link': 'Herald of Ash'}),
-        ('Herald of Blood', {'link': 'Herald of Blood'}),
-        ('Herald of Ice', {'link': 'Herald of Ice'}),
-        ('Herald of Thunder', {'link': 'Herald of Thunder'}),
-        ('Ice Crash', {'link': 'Ice Crash'}),
-        ('Ice Nova', {'link': 'Ice Nova'}),
-        ('Ice Shot', {'link': 'Ice Shot'}),
-        ('Ice Spear', {'link': 'Ice Spear'}),
-        ('Ice Trap', {'link': 'Ice Trap'}),
-        ('Immortal Call', {'link': 'Immortal Call'}),
-        ('Incinerate', {'link': 'Incinerate'}),
-        ('Infernal Blow', {'link': 'Infernal Blow'}),
-        ('Kinetic Blast', {'link': 'Kinetic Blast'}),
-        ('Lacerate', {'link': 'Lacerate'}),
-        ('Leap Slam', {'link': 'Leap Slam'}),
-        ('Lightning Arrow', {'link': 'Lightning Arrow'}),
-        ('Lightning Channel', {'link': 'Lightning Channel'}),
-        ('Lightning Circle', {'link': 'Lightning Circle'}),
-        ('Lightning Strike', {'link': 'Lightning Strike'}),
-        ('Lightning Tendrils', {'link': 'Lightning Tendrils'}),
-        ('Lightning Trap', {'link': 'Lightning Trap'}),
-        ('Lightning Warp', {'link': 'Lightning Warp'}),
-        ('Magma Orb', {'link': 'Magma Orb'}),
-        ('Meat Shield', {'link': 'Meat Shield'}),
-        ('Mirror Arrow', {'link': 'Mirror Arrow'}),
-        ('Molten Shell', {'link': 'Molten Shell'}),
-        ('Molten Strike', {'link': 'Molten Strike'}),
-        ('Orb of Storms', {'link': 'Orb of Storms'}),
-        ('Phase Run', {'link': 'Phase Run'}),
-        ('Poacher\'s Mark', {'link': 'Poacher\'s Mark'}),
-        ('Portal', {'link': 'Portal'}),
-        ('Power Siphon', {'link': 'Power Siphon'}),
-        ('Projectile Weakness', {'link': 'Projectile Weakness'}),
-        ('Puncture', {'link': 'Puncture'}),
-        ('Punishment', {'link': 'Punishment'}),
-        ('Purity of Elements', {'link': 'Purity of Elements'}),
-        ('Purity of Fire', {'link': 'Purity of Fire'}),
-        ('Purity of Ice', {'link': 'Purity of Ice'}),
-        ('Purity of Lightning', {'link': 'Purity of Lightning'}),
-        ('Rain of Arrows', {'link': 'Rain of Arrows'}),
-        ('Raise Spectre', {'link': 'Raise Spectre'}),
-        ('Raise Zombie', {'link': 'Raise Zombie'}),
-        ('Rallying Cry', {'link': 'Rallying Cry'}),
-        ('Reave', {'link': 'Reave'}),
-        ('Reckoning', {'link': 'Reckoning'}),
-        ('Rejuvenation Totem', {'link': 'Rejuvenation Totem'}),
-        ('Righteous Fire', {'link': 'Righteous Fire'}),
-        ('Righteous Lightning', {'link': 'Righteous Lightning'}),
-        ('Riposte', {'link': 'Riposte'}),
-        ('Scorching Ray', {'link': 'Scorching Ray'}),
-        ('Searing Bond', {'link': 'Searing Bond'}),
-        ('Shadow Blades', {'link': 'Shadow Blades'}),
-        ('Shield Charge', {'link': 'Shield Charge'}),
-        ('Shock Nova', {'link': 'Shock Nova'}),
-        ('Shockwave Totem', {'link': 'Shockwave Totem'}),
-        ('Shrapnel Shot', {'link': 'Shrapnel Shot'}),
-        ('Siege Ballista', {'link': 'Siege Ballista'}),
-        ('Smoke Mine', {'link': 'Smoke Mine'}),
-        ('Spark', {'link': 'Spark'}),
-        ('Spectral Throw', {'link': 'Spectral Throw'}),
-        ('Spirit Offering', {'link': 'Spirit Offering'}),
-        ('Split Arrow', {'link': 'Split Arrow'}),
-        ('Static Strike', {'link': 'Static Strike'}),
-        ('Static Tether', {'link': 'Static Tether'}),
-        ('Storm Burst', {'link': 'Storm Burst'}),
-        ('Storm Call', {'link': 'Storm Call'}),
-        ('(?:Summon |)Chaos Golem(?:|s)', {'link': 'Summon Chaos Golem'}),
-        ('(?:Summon |)Flame Golem(?:|s)', {'link': 'Summon Flame Golem'}),
-        ('(?:Summon |)Ice Golem(?:|s)', {'link': 'Summon Ice Golem'}),
-        ('(?:Summon |)Lightning Golem(?:|s)', {
-            'link': 'Summon Lightning Golem'
-        }),
-        ('Summon Raging Spirit', {'link': 'Summon Raging Spirit'}),
-        ('Summon Skeleton', {'link': 'Summon Skeleton'}),
-        ('(?:Summon |)Stone Golem(?:|s)', {'link': 'Summon Stone Golem'}),
-        ('Sunder', {'link': 'Sunder'}),
-        ('Sweep', {'link': 'Sweep'}),
-        ('Tempest Shield', {'link': 'Tempest Shield'}),
-        ('Temporal Chains', {'link': 'Temporal Chains'}),
-        ('Tornado Shot', {'link': 'Tornado Shot'}),
-        ('Vaal Arc', {'link': 'Vaal Arc'}),
-        ('Vaal Burning Arrow', {'link': 'Vaal Burning Arrow'}),
-        ('Vaal Clarity', {'link': 'Vaal Clarity'}),
-        ('Vaal Cold Snap', {'link': 'Vaal Cold Snap'}),
-        ('Vaal Cyclone', {'link': 'Vaal Cyclone'}),
-        ('Vaal Detonate Dead', {'link': 'Vaal Detonate Dead'}),
-        ('Vaal Discipline', {'link': 'Vaal Discipline'}),
-        ('Vaal Double Strike', {'link': 'Vaal Double Strike'}),
-        ('Vaal FireTrap', {'link': 'Vaal FireTrap'}),
-        ('Vaal Fireball', {'link': 'Vaal Fireball'}),
-        ('Vaal Flameblast', {'link': 'Vaal Flameblast'}),
-        ('Vaal Glacial Hammer', {'link': 'Vaal Glacial Hammer'}),
-        ('Vaal Grace', {'link': 'Vaal Grace'}),
-        ('Vaal Ground Slam', {'link': 'Vaal Ground Slam'}),
-        ('Vaal Haste', {'link': 'Vaal Haste'}),
-        ('Vaal Heavy Strike', {'link': 'Vaal Heavy Strike'}),
-        ('Vaal Ice Nova', {'link': 'Vaal Ice Nova'}),
-        ('Vaal Immortal Call', {'link': 'Vaal Immortal Call'}),
-        ('Vaal Impurity of Fire', {'link': 'Vaal Impurity of Fire'}),
-        ('Vaal Impurity of Ice', {'link': 'Vaal Impurity of Ice'}),
-        ('Vaal Impurity of Lightning', {'link': 'Vaal Impurity of Lightning'}),
-        ('Vaal Lightning Strike', {'link': 'Vaal Lightning Strike'}),
-        ('Vaal Lightning Trap', {'link': 'Vaal Lightning Trap'}),
-        ('Vaal Lightning Warp', {'link': 'Vaal Lightning Warp'}),
-        ('Vaal Molten Shell', {'link': 'Vaal Molten Shell'}),
-        ('Vaal Power Siphon', {'link': 'Vaal Power Siphon'}),
-        ('Vaal Rain of Arrows', {'link': 'Vaal Rain of Arrows'}),
-        ('Vaal Reave', {'link': 'Vaal Reave'}),
-        ('Vaal Righteous Fire', {'link': 'Vaal Righteous Fire'}),
-        ('Vaal Spark', {'link': 'Vaal Spark'}),
-        ('Vaal Spectral Throw', {'link': 'Vaal Spectral Throw'}),
-        ('Vaal Storm Call', {'link': 'Vaal Storm Call'}),
-        ('Vaal Summon Skeletons', {'link': 'Vaal Summon Skeletons'}),
-        ('Vaal Sweep', {'link': 'Vaal Sweep'}),
-        ('Vengeance', {'link': 'Vengeance'}),
-        ('Vigilant Strike', {'link': 'Vigilant Strike'}),
-        ('Viper Strike', {'link': 'Viper Strike'}),
-        ('Vitality', {'link': 'Vitality'}),
-        ('Vortex', {'link': 'Vortex'}),
-        ('Vulnerability', {'link': 'Vulnerability'}),
-        ('Warlord\'s Mark', {'link': 'Warlord\'s Mark'}),
-        ('Whirling Blades', {'link': 'Whirling Blades'}),
-        ('Wild Strike', {'link': 'Wild Strike'}),
-        ('Wither', {'link': 'Wither'}),
-        ('Wrath', {'link': 'Wrath'}),
-        #
-        # Enchantment skills
-        #
-        ('Commandment of Blades', {'link': 'Commandment of Blades'}),
-        ('Commandment of Flames', {'link': 'Commandment of Flames'}),
-        ('Commandment of Force', {'link': 'Commandment of Force'}),
-        ('Commandment of Frost', {'link': 'Commandment of Frost'}),
-        ('Commandment of Fury', {'link': 'Commandment of Fury'}),
-        ('Commandment of Inferno', {'link': 'Commandment of Inferno'}),
-        ('Commandment of Ire', {'link': 'Commandment of Ire'}),
-        ('Commandment of Light', {'link': 'Commandment of Light'}),
-        ('Commandment of Reflection', {'link': 'Commandment of Reflection'}),
-        ('Commandment of Spite', {'link': 'Commandment of Spite'}),
-        ('Commandment of Thunder', {'link': 'Commandment of Thunder'}),
-        ('Commandment of War', {'link': 'Commandment of War'}),
-        ('Commandment of Winter', {'link': 'Commandment of Winter'}),
-        ('Commandment of the Grave', {'link': 'Commandment of the Grave'}),
-        ('Commandment of the Tempest', {'link': 'Commandment of the Tempest'}),
-        ('Decree of Blades', {'link': 'Decree of Blades'}),
-        ('Decree of Flames', {'link': 'Decree of Flames'}),
-        ('Decree of Force', {'link': 'Decree of Force'}),
-        ('Decree of Frost', {'link': 'Decree of Frost'}),
-        ('Decree of Fury', {'link': 'Decree of Fury'}),
-        ('Decree of Inferno', {'link': 'Decree of Inferno'}),
-        ('Decree of Ire', {'link': 'Decree of Ire'}),
-        ('Decree of Light', {'link': 'Decree of Light'}),
-        ('Decree of Reflection', {'link': 'Decree of Reflection'}),
-        ('Decree of Spite', {'link': 'Decree of Spite'}),
-        ('Decree of Thunder', {'link': 'Decree of Thunder'}),
-        ('Decree of War', {'link': 'Decree of War'}),
-        ('Decree of Winter', {'link': 'Decree of Winter'}),
-        ('Decree of the Grave', {'link': 'Decree of the Grave'}),
-        ('Decree of the Tempest', {'link': 'Decree of the Tempest'}),
-        ('Edict of Blades', {'link': 'Edict of Blades'}),
-        ('Edict of Flames', {'link': 'Edict of Flames'}),
-        ('Edict of Force', {'link': 'Edict of Force'}),
-        ('Edict of Frost', {'link': 'Edict of Frost'}),
-        ('Edict of Fury', {'link': 'Edict of Fury'}),
-        ('Edict of Inferno', {'link': 'Edict of Inferno'}),
-        ('Edict of Ire', {'link': 'Edict of Ire'}),
-        ('Edict of Light', {'link': 'Edict of Light'}),
-        ('Edict of Reflection', {'link': 'Edict of Reflection'}),
-        ('Edict of Spite', {'link': 'Edict of Spite'}),
-        ('Edict of Thunder', {'link': 'Edict of Thunder'}),
-        ('Edict of War', {'link': 'Edict of War'}),
-        ('Edict of Winter', {'link': 'Edict of Winter'}),
-        ('Edict of the Grave', {'link': 'Edict of the Grave'}),
-        ('Edict of the Tempest', {'link': 'Edict of the Tempest'}),
-        ('Word of Blades', {'link': 'Word of Blades'}),
-        ('Word of Flames', {'link': 'Word of Flames'}),
-        ('Word of Force', {'link': 'Word of Force'}),
-        ('Word of Frost', {'link': 'Word of Frost'}),
-        ('Word of Fury', {'link': 'Word of Fury'}),
-        ('Word of Inferno', {'link': 'Word of Inferno'}),
-        ('Word of Ire', {'link': 'Word of Ire'}),
-        ('Word of Light', {'link': 'Word of Light'}),
-        ('Word of Reflection', {'link': 'Word of Reflection'}),
-        ('Word of Spite', {'link': 'Word of Spite'}),
-        ('Word of Thunder', {'link': 'Word of Thunder'}),
-        ('Word of War', {'link': 'Word of War'}),
-        ('Word of Winter', {'link': 'Word of Winter'}),
-        ('Word of the Grave', {'link': 'Word of the Grave'}),
-        ('Word of the Tempest', {'link': 'Word of the Tempest'}),
+    # Important: These patterns must NOT contain any capturing groups
+    # or else replacement will have buggy results!
+    "English": (
         #
         # Support gems
         #
-        ('(?:level [0-9]+) Added Chaos Damage', {
-            'link': 'Added Chaos Damage Support'}),
-        ('(?:level [0-9]+) Added Cold Damage', {
-            'link': 'Added Cold Damage Support'}),
-        ('(?:level [0-9]+) Added Fire Damage', {
-            'link': 'Added Fire Damage Support'}),
-        ('(?:level [0-9]+) Added Lightning Damage', {
-            'link': 'Added Lightning Damage Support'}),
-        ('(?:level [0-9]+) Additional Accuracy', {
-            'link': 'Additional Accuracy Support'}),
-        ('(?:level [0-9]+) Arcane Surge', {'link': 'Arcane Surge Support'}),
-        ('(?:level [0-9]+) Blasphemy', {'link': 'Blasphemy Support'}),
-        ('(?:level [0-9]+) Blind', {'link': 'Blind Support'}),
-        ('(?:level [0-9]+) Block Chance Reduction', {
-            'link': 'Block Chance Reduction Support'}),
-        ('(?:level [0-9]+) Blood Magic', {'link': 'Blood Magic Support'}),
-        ('(?:level [0-9]+) Bloodlust', {'link': 'Bloodlust Support'}),
-        ('(?:level [0-9]+) Brutality', {'link': 'Brutality Support'}),
-        ('(?:level [0-9]+) Burning Damage', {'link': 'Burning Damage Support'}),
-        ('(?:level [0-9]+) Cast On Critical Strike', {
-            'link': 'Cast On Critical Strike Support'}),
-        ('(?:level [0-9]+) Cast on Death', {'link': 'Cast on Death Support'}),
-        ('(?:level [0-9]+) Cast on Melee Kill', {
-            'link': 'Cast on Melee Kill Support'}),
-        ('(?:level [0-9]+) Cast when Damage Taken', {
-            'link': 'Cast when Damage Taken Support'}),
-        ('(?:level [0-9]+) Cast when Stunned', {
-            'link': 'Cast when Stunned Support'}),
-        ('(?:level [0-9]+) Chain', {'link': 'Chain Support'}),
-        ('(?:level [0-9]+) Chance to Bleed', {
-            'link': 'Chance to Bleed Support'}),
-        ('(?:level [0-9]+) Chance to Flee', {'link': 'Chance to Flee Support'}),
-        ('(?:level [0-9]+) Chance to Ignite', {
-            'link': 'Chance to Ignite Support'}),
-        ('(?:level [0-9]+) Cluster Traps', {'link': 'Cluster Traps Support'}),
-        ('(?:level [0-9]+) Cold Penetration', {
-            'link': 'Cold Penetration Support'}),
-        ('(?:level [0-9]+) Cold to Fire', {'link': 'Cold to Fire Support'}),
-        ('(?:level [0-9]+) Concentrated Effect', {
-            'link': 'Concentrated Effect Support'}),
-        ('(?:level [0-9]+) Controlled Destruction', {
-            'link': 'Controlled Destruction Support'}),
-        ('(?:level [0-9]+) Culling Strike', {'link': 'Culling Strike Support'}),
-        ('(?:level [0-9]+) Curse On Hit', {'link': 'Curse On Hit Support'}),
-        ('(?:level [0-9]+) Damage on Full Life', {
-            'link': 'Damage on Full Life Support'}),
-        ('(?:level [0-9]+) Deadly Ailments', {
-            'link': 'Deadly Ailments Support'}),
-        ('(?:level [0-9]+) Decay', {'link': 'Decay Support'}),
-        ('(?:level [0-9]+) Efficacy', {'link': 'Efficacy Support'}),
-        ('(?:level [0-9]+) Elemental Focus', {
-            'link': 'Elemental Focus Support'}),
-        ('(?:level [0-9]+) Elemental Proliferation', {
-            'link': 'Elemental Proliferation Support'}),
-        ('(?:level [0-9]+) Empower', {'link': 'Empower Support'}),
-        ('(?:level [0-9]+) Endurance Charge on Melee Stun', {
-            'link': 'Endurance Charge on Melee Stun Support'}),
-        ('(?:level [0-9]+) Enhance', {'link': 'Enhance Support'}),
-        ('(?:level [0-9]+) Enlighten', {'link': 'Enlighten Support'}),
-        ('(?:level [0-9]+) Elemental Damage with Attacks', {
-            'link': 'Elemental Damage with Attacks Support'}),
-        ('(?:level [0-9]+) Faster Attacks', {
-            'link': 'Faster Attacks Support'}),
-        ('(?:level [0-9]+) Faster Casting', {
-            'link': 'Faster Casting Support'}),
-        ('(?:level [0-9]+) Faster Projectiles', {
-            'link': 'Faster Projectiles Support'}),
-        ('(?:level [0-9]+) Fire Penetration', {
-            'link': 'Fire Penetration Support'}),
-        ('(?:level [0-9]+) Fork', {'link': 'Fork Support'}),
-        ('(?:level [0-9]+) Fortify', {'link': 'Fortify Support'}),
-        ('(?:level [0-9]+) Generosity', {'link': 'Generosity Support'}),
-        ('(?:level [0-9]+) Greater Multiple Projectiles', {
-            'link': 'Greater Multiple Projectiles Support'}),
-        ('(?:level [0-9]+) Hypothermia', {'link': 'Hypothermia Support'}),
-        ('(?:level [0-9]+) Ice Bite', {'link': 'Ice Bite Support'}),
-        ('(?:level [0-9]+) Increased Area of Effect', {
-            'link': 'Increased Area of Effect Support'}),
-        ('(?:level [0-9]+) Increased Critical Damage', {
-            'link': 'Increased Critical Damage Support'}),
-        ('(?:level [0-9]+) Increased Critical Strikes', {
-            'link': 'Increased Critical Strikes Support'}),
-        ('(?:level [0-9]+) Increased Duration', {
-            'link': 'Increased Duration Support'}),
-        ('(?:level [0-9]+) Innervate', {'link': 'Innervate Support'}),
-        ('(?:level [0-9]+) Ignite Proliferation', {
-            'link': 'Ignite Proliferation Support'}),
-        ('(?:level [0-9]+) Iron Grip', {'link': 'Iron Grip Support'}),
-        ('(?:level [0-9]+) Iron Will', {'link': 'Iron Will Support'}),
-        ('(?:level [0-9]+) Item Quantity', {'link': 'Item Quantity Support'}),
-        ('(?:level [0-9]+) Item Rarity', {'link': 'Item Rarity Support'}),
-        ('(?:level [0-9]+) Immolate', {'link': 'Immolate Support'}),
-        ('(?:level [0-9]+) Knockback', {'link': 'Knockback Support'}),
-        ('(?:level [0-9]+) Less Duration', {'link': 'Less Duration Support'}),
-        ('(?:level [0-9]+) Lesser Multiple Projectiles', {
-            'link': 'Lesser Multiple Projectiles Support'}),
-        ('(?:level [0-9]+) Lesser Poison', {'link': 'Lesser Poison Support'}),
-        ('(?:level [0-9]+) Life Gain on Hit', {
-            'link': 'Life Gain on Hit Support'}),
-        ('(?:level [0-9]+) Life Leech', {'link': 'Life Leech Support'}),
-        ('(?:level [0-9]+) Lightning Penetration', {
-            'link': 'Lightning Penetration Support'}),
-        ('(?:level [0-9]+) Maim', {'link': 'Maim Support'}),
-        ('(?:level [0-9]+) Mana Leech', {'link': 'Mana Leech Support'}),
-        ('(?:level [0-9]+) Melee Physical Damage', {
-            'link': 'Melee Physical Damage Support'}),
-        ('(?:level [0-9]+) Melee Splash', {'link': 'Melee Splash Support'}),
-        ('(?:level [0-9]+) Minefield', {'link': 'Minefield Support'}),
-        ('(?:level [0-9]+) Minion Damage', {'link': 'Minion Damage Support'}),
-        ('(?:level [0-9]+) Minion Life', {'link': 'Minion Life Support'}),
-        ('(?:level [0-9]+) Minion Speed', {'link': 'Minion Speed Support'}),
-        ('(?:level [0-9]+) Minion and Totem Elemental Resistance', {
-            'link': 'Minion and Totem Elemental Resistance Support'}),
-        ('(?:level [0-9]+) Multiple Traps', {'link': 'Multiple Traps Support'}),
-        ('(?:level [0-9]+) Multistrike', {'link': 'Multistrike Support'}),
-        ('(?:level [0-9]+) Onslaught', {'link': 'Onslaught Support'}),
-        ('(?:level [0-9]+) Physical Projectile Attack Damage', {
-            'link': 'Physical Projectile Attack Damage Support'}),
-        ('(?:level [0-9]+) Physical to Lightning', {
-            'link': 'Physical to Lightning Support'}),
-        ('(?:level [0-9]+) Pierce', {'link': 'Pierce Support'}),
-        ('(?:level [0-9]+) Point Blank', {'link': 'Point Blank Support'}),
-        ('(?:level [0-9]+) Poison', {'link': 'Poison Support'}),
-        ('(?:level [0-9]+) Power Charge On Critical', {
-            'link': 'Power Charge On Critical Support'}),
-        ('(?:level [0-9]+) Ranged Attack Totem', {
-            'link': 'Ranged Attack Totem Support'}),
-        ('(?:level [0-9]+) Reduced Mana', {'link': 'Reduced Mana Support'}),
-        ('(?:level [0-9]+) Remote Mine', {'link': 'Remote Mine Support'}),
-        ('(?:level [0-9]+) Return Projectiles', {
-            'link': 'Return Projectiles Support'}),
-        ('(?:level [0-9]+) Ruthless', {'link': 'Ruthless Support'}),
-        ('(?:level [0-9]+) Slower Projectiles', {
-            'link': 'Slower Projectiles Support'}),
-        ('(?:level [0-9]+) Spell Echo', {'link': 'Spell Echo Support'}),
-        ('(?:level [0-9]+) Spell Totem', {'link': 'Spell Totem Support'}),
-        ('(?:level [0-9]+) Split Projectiles', {
-            'link': 'Split Projectiles Support'}),
-        ('(?:level [0-9]+) Stun', {'link': 'Stun Support'}),
-        ('(?:level [0-9]+) Swift Affliction', {
-            'link': 'Swift Affliction Support'}),
-        ('(?:level [0-9]+) Trap', {'link': 'Trap Support'}),
-        ('(?:level [0-9]+) Trap Cooldown', {'link': 'Trap Cooldown Support'}),
-        ('(?:level [0-9]+) Trap and Mine Damage', {
-            'link': 'Trap and Mine Damage Support'}),
-        ('(?:level [0-9]+) Unbound Ailments', {
-            'link': 'Unbound Ailments Support'}),
-        ('(?:level [0-9]+) Vile Toxins', {'link': 'Vile Toxins Support'}),
-        ('(?:level [0-9]+) Void Manipulation', {
-            'link': 'Void Manipulation Support'}),
+        (
+            "(?<=level [0-9] |evel [0-9][0-9] )Added Chaos Damage",
+            {"link": "Added Chaos Damage Support"},
+        ),
+        (
+            "(?<=level [0-9] |evel [0-9][0-9] )Added Cold Damage",
+            {"link": "Added Cold Damage Support"},
+        ),
+        (
+            "(?<=level [0-9] |evel [0-9][0-9] )Added Fire Damage",
+            {"link": "Added Fire Damage Support"},
+        ),
+        (
+            "(?<=level [0-9] |evel [0-9][0-9] )Added Lightning Damage",
+            {"link": "Added Lightning Damage Support"},
+        ),
+        ("(?<=[0-9] )Additional Accuracy", {"link": "Additional Accuracy Support"}),
+        ("(?<=[0-9] )Advanced Traps", {"link": "Advanced Traps Support"}),
+        ("(?<=[0-9] )Ancestral Call", {"link": "Ancestral Call Support"}),
+        ("(?<=[0-9] )Arcane Surge", {"link": "Arcane Surge Support"}),
+        ("(?<=[0-9] )Archmage", {"link": "Archmage Support"}),
+        ("(?<=[0-9] )Arrogance", {"link": "Arrogance Support"}),
+        ("(?<=[0-9] )Arrow Nova", {"link": "Arrow Nova Support"}),
+        ("(?<=[0-9] )Ballista Totem", {"link": "Ballista Totem Support"}),
+        ("(?<=[0-9] )Barrage", {"link": "Barrage Support"}),
+        ("(?<=[0-9] )Behead", {"link": "Behead Support"}),
+        ("(?<=[0-9] )Blasphemy", {"link": "Blasphemy Support"}),
+        ("(?<=[0-9] )Blastchain Mine", {"link": "Blastchain Mine Support"}),
+        ("(?<=[0-9] )Blind", {"link": "Blind Support"}),
+        ("(?<=[0-9] )Block Chance Reduction", {"link": "Block Chance Reduction Support"}),
+        ("(?<=[0-9] )Bloodlust", {"link": "Bloodlust Support"}),
+        ("(?<=[0-9] )Bloodthirst", {"link": "Bloodthirst Support"}),
+        ("(?<=[0-9] )Bonechill", {"link": "Bonechill Support"}),
+        ("(?<=[0-9] )Brutality", {"link": "Brutality Support"}),
+        ("(?<=[0-9] )Burning Damage", {"link": "Burning Damage Support"}),
+        ("(?<=[0-9] )Cast On Critical Strike", {"link": "Cast On Critical Strike Support"}),
+        ("(?<=[0-9] )Cast on Death", {"link": "Cast on Death Support"}),
+        ("(?<=[0-9] )Cast on Melee Kill", {"link": "Cast on Melee Kill Support"}),
+        ("(?<=[0-9] )Cast when Damage Taken", {"link": "Cast when Damage Taken Support"}),
+        ("(?<=[0-9] )Cast when Stunned", {"link": "Cast when Stunned Support"}),
+        ("(?<=[0-9] )Cast while Channelling", {"link": "Cast while Channelling Support"}),
+        ("(?<=[0-9] )Chain", {"link": "Chain Support"}),
+        ("(?<=[0-9] )Chance to Bleed", {"link": "Chance to Bleed Support"}),
+        ("(?<=[0-9] )Chance to Flee", {"link": "Chance to Flee Support"}),
+        ("(?<=[0-9] )Chance to Poison", {"link": "Chance to Poison Support"}),
+        ("(?<=[0-9] )Charged Mines", {"link": "Charged Mines Support"}),
+        ("(?<=[0-9] )Charged Traps", {"link": "Charged Traps Support"}),
+        ("(?<=[0-9] )Close Combat", {"link": "Close Combat Support"}),
+        ("(?<=[0-9] )Cluster Traps", {"link": "Cluster Traps Support"}),
+        ("(?<=[0-9] )Cold Penetration", {"link": "Cold Penetration Support"}),
+        ("(?<=[0-9] )Cold to Fire", {"link": "Cold to Fire Support"}),
+        ("(?<=[0-9] )Combustion", {"link": "Combustion Support"}),
+        ("(?<=[0-9] )Concentrated Effect", {"link": "Concentrated Effect Support"}),
+        ("(?<=[0-9] )Controlled Blaze", {"link": "Controlled Blaze Support"}),
+        ("(?<=[0-9] )Controlled Destruction", {"link": "Controlled Destruction Support"}),
+        ("(?<=[0-9] )Corrupting Cry", {"link": "Corrupting Cry Support"}),
+        ("(?<=[0-9] )Critical Strike Affliction", {"link": "Critical Strike Affliction Support"}),
+        ("(?<=[0-9] )Cruelty", {"link": "Cruelty Support"}),
+        ("(?<=[0-9] )Culling Strike", {"link": "Culling Strike Support"}),
+        ("(?<=[0-9] )Cursed Ground", {"link": "Cursed Ground Support"}),
+        ("(?<=[0-9] )Damage on Full Life", {"link": "Damage on Full Life Support"}),
+        ("(?<=[0-9] )Deadly Ailments", {"link": "Deadly Ailments Support"}),
+        ("(?<=[0-9] )Decay", {"link": "Decay Support"}),
+        ("(?<=[0-9] )Devour", {"link": "Devour Support"}),
+        ("(?<=[0-9] )Efficacy", {"link": "Efficacy Support"}),
+        ("(?<=[0-9] )Elemental Army", {"link": "Elemental Army Support"}),
+        (
+            "(?<=[0-9] )Elemental Damage with Attacks",
+            {"link": "Elemental Damage with Attacks Support"},
+        ),
+        ("(?<=[0-9] )Elemental Focus", {"link": "Elemental Focus Support"}),
+        ("(?<=[0-9] )Elemental Penetration", {"link": "Elemental Penetration Support"}),
+        ("(?<=[0-9] )Elemental Proliferation", {"link": "Elemental Proliferation Support"}),
+        ("(?<=[0-9] )Empower", {"link": "Empower Support"}),
+        (
+            "(?<=[0-9] )Endurance Charge on Melee Stun",
+            {"link": "Endurance Charge on Melee Stun Support"},
+        ),
+        ("(?<=[0-9] )Energy Leech", {"link": "Energy Leech Support"}),
+        ("(?<=[0-9] )Enhance", {"link": "Enhance Support"}),
+        ("(?<=[0-9] )Enlighten", {"link": "Enlighten Support"}),
+        ("(?<=[0-9] )Eternal Blessing", {"link": "Eternal Blessing Support"}),
+        ("(?<=[0-9] )Expert Retaliation", {"link": "Expert Retaliation Support"}),
+        ("(?<=[0-9] )Faster Attacks", {"link": "Faster Attacks Support"}),
+        ("(?<=[0-9] )Faster Casting", {"link": "Faster Casting Support"}),
+        ("(?<=[0-9] )Faster Projectiles", {"link": "Faster Projectiles Support"}),
+        ("(?<=[0-9] )Feeding Frenzy", {"link": "Feeding Frenzy Support"}),
+        ("(?<=[0-9] )Fire Penetration", {"link": "Fire Penetration Support"}),
+        ("(?<=[0-9] )Fist of War", {"link": "Fist of War Support"}),
+        ("(?<=[0-9] )Flamewood", {"link": "Flamewood Support"}),
+        ("(?<=[0-9] )Focused Ballista", {"link": "Focused Ballista Support"}),
+        ("(?<=[0-9] )Focused Channelling", {"link": "Focused Channelling Support"}),
+        ("(?<=[0-9] )Fork", {"link": "Fork Support"}),
+        ("(?<=[0-9] )Fortify", {"link": "Fortify Support"}),
+        ("(?<=[0-9] )Fresh Meat", {"link": "Fresh Meat Support"}),
+        ("(?<=[0-9] )Frigid Bond", {"link": "Frigid Bond Support"}),
+        ("(?<=[0-9] )Generosity", {"link": "Generosity Support"}),
+        (
+            "(?<=[0-9] )Greater Multiple Projectiles",
+            {"link": "Greater Multiple Projectiles Support"},
+        ),
+        ("(?<=[0-9] )Greater Volley", {"link": "Greater Volley Support"}),
+        ("(?<=[0-9] )Guardian's Blessing", {"link": "Guardian's Blessing Support"}),
+        ("(?<=[0-9] )Hex Bloom", {"link": "Hex Bloom Support"}),
+        ("(?<=[0-9] )Hextouch", {"link": "Hextouch Support"}),
+        ("(?<=[0-9] )High-Impact Mine", {"link": "High-Impact Mine Support"}),
+        ("(?<=[0-9] )Hypothermia", {"link": "Hypothermia Support"}),
+        ("(?<=[0-9] )Ice Bite", {"link": "Ice Bite Support"}),
+        ("(?<=[0-9] )Ignite Proliferation", {"link": "Ignite Proliferation Support"}),
+        ("(?<=[0-9] )Immolate", {"link": "Immolate Support"}),
+        ("(?<=[0-9] )Impale", {"link": "Impale Support"}),
+        ("(?<=[0-9] )Impending Doom", {"link": "Impending Doom Support"}),
+        ("(?<=[0-9] )Increased Area of Effect", {"link": "Increased Area of Effect Support"}),
+        ("(?<=[0-9] )Increased Critical Damage", {"link": "Increased Critical Damage Support"}),
+        ("(?<=[0-9] )Increased Critical Strikes", {"link": "Increased Critical Strikes Support"}),
+        ("(?<=[0-9] )Infernal Legion", {"link": "Infernal Legion Support"}),
+        ("(?<=[0-9] )Infused Channelling", {"link": "Infused Channelling Support"}),
+        ("(?<=[0-9] )Innervate", {"link": "Innervate Support"}),
+        ("(?<=[0-9] )Inspiration", {"link": "Inspiration Support"}),
+        ("(?<=[0-9] )Intensify", {"link": "Intensify Support"}),
+        ("(?<=[0-9] )Iron Grip", {"link": "Iron Grip Support"}),
+        ("(?<=[0-9] )Iron Will", {"link": "Iron Will Support"}),
+        ("(?<=[0-9] )Item Quantity", {"link": "Item Quantity Support"}),
+        ("(?<=[0-9] )Item Rarity", {"link": "Item Rarity Support"}),
+        ("(?<=[0-9] )Knockback", {"link": "Knockback Support"}),
+        ("(?<=[0-9] )Less Duration", {"link": "Less Duration Support"}),
+        ("(?<=[0-9] )Lesser Multiple Projectiles", {"link": "Lesser Multiple Projectiles Support"}),
+        ("(?<=[0-9] )Life Gain on Hit", {"link": "Life Gain on Hit Support"}),
+        ("(?<=[0-9] )Life Leech", {"link": "Life Leech Support"}),
+        ("(?<=[0-9] )Lifetap", {"link": "Lifetap Support"}),
+        ("(?<=[0-9] )Lightning Penetration", {"link": "Lightning Penetration Support"}),
+        ("(?<=[0-9] )Locus Mine", {"link": "Locus Mine Support"}),
+        ("(?<=[0-9] )Maim", {"link": "Maim Support"}),
+        ("(?<=[0-9] )Mana Leech", {"link": "Mana Leech Support"}),
+        ("(?<=[0-9] )Manaforged Arrows", {"link": "Manaforged Arrows Support"}),
+        ("(?<=[0-9] )Mark On Hit", {"link": "Mark On Hit Support"}),
+        ("(?<=[0-9] )Meat Shield", {"link": "Meat Shield Support"}),
+        ("(?<=[0-9] )Melee Physical Damage", {"link": "Melee Physical Damage Support"}),
+        ("(?<=[0-9] )Melee Splash", {"link": "Melee Splash Support"}),
+        ("(?<=[0-9] )Minefield", {"link": "Minefield Support"}),
+        ("(?<=[0-9] )Minion Damage", {"link": "Minion Damage Support"}),
+        ("(?<=[0-9] )Minion Life", {"link": "Minion Life Support"}),
+        ("(?<=[0-9] )Minion Speed", {"link": "Minion Speed Support"}),
+        ("(?<=[0-9] )Mirage Archer", {"link": "Mirage Archer Support"}),
+        ("(?<=[0-9] )Momentum", {"link": "Momentum Support"}),
+        ("(?<=[0-9] )More Duration", {"link": "More Duration Support"}),
+        ("(?<=[0-9] )Multiple Totems", {"link": "Multiple Totems Support"}),
+        ("(?<=[0-9] )Multiple Traps", {"link": "Multiple Traps Support"}),
+        ("(?<=[0-9] )Multistrike", {"link": "Multistrike Support"}),
+        ("(?<=[0-9] )Nightblade", {"link": "Nightblade Support"}),
+        ("(?<=[0-9] )Overcharge", {"link": "Overcharge Support"}),
+        ("(?<=[0-9] )Overexertion", {"link": "Overexertion Support"}),
+        ("(?<=[0-9] )Physical to Lightning", {"link": "Physical to Lightning Support"}),
+        ("(?<=[0-9] )Pierce", {"link": "Pierce Support"}),
+        ("(?<=[0-9] )Pinpoint", {"link": "Pinpoint Support"}),
+        ("(?<=[0-9] )Point Blank", {"link": "Point Blank Support"}),
+        ("(?<=[0-9] )Power Charge On Critical", {"link": "Power Charge On Critical Support"}),
+        ("(?<=[0-9] )Predator", {"link": "Predator Support"}),
+        ("(?<=[0-9] )Prismatic Burst", {"link": "Prismatic Burst Support"}),
+        ("(?<=[0-9] )Pulverise", {"link": "Pulverise Support"}),
+        ("(?<=[0-9] )Rage", {"link": "Rage Support"}),
+        ("(?<=[0-9] )Returning Projectiles", {"link": "Returning Projectiles Support"}),
+        ("(?<=[0-9] )Rupture", {"link": "Rupture Support"}),
+        ("(?<=[0-9] )Ruthless", {"link": "Ruthless Support"}),
+        ("(?<=[0-9] )Sacred Wisps", {"link": "Sacred Wisps Support"}),
+        ("(?<=[0-9] )Sacrifice", {"link": "Sacrifice Support"}),
+        ("(?<=[0-9] )Sadism", {"link": "Sadism Support"}),
+        ("(?<=[0-9] )Second Wind", {"link": "Second Wind Support"}),
+        ("(?<=[0-9] )Shockwave", {"link": "Shockwave Support"}),
+        ("(?<=[0-9] )Slower Projectiles", {"link": "Slower Projectiles Support"}),
+        ("(?<=[0-9] )Spell Cascade", {"link": "Spell Cascade Support"}),
+        ("(?<=[0-9] )Spell Echo", {"link": "Spell Echo Support"}),
+        ("(?<=[0-9] )Spell Totem", {"link": "Spell Totem Support"}),
+        ("(?<=[0-9] )Spellblade", {"link": "Spellblade Support"}),
+        ("(?<=[0-9] )Stun", {"link": "Stun Support"}),
+        ("(?<=[0-9] )Summon Phantasm", {"link": "Summon Phantasm Support"}),
+        ("(?<=[0-9] )Swift Affliction", {"link": "Swift Affliction Support"}),
+        ("(?<=[0-9] )Swift Assembly", {"link": "Swift Assembly Support"}),
+        ("(?<=[0-9] )Swiftbrand", {"link": "Swiftbrand Support"}),
+        ("(?<=[0-9] )Trap and Mine Damage", {"link": "Trap and Mine Damage Support"}),
+        ("(?<=[0-9] )Trap", {"link": "Trap Support"}),
+        ("(?<=[0-9] )Trauma", {"link": "Trauma Support"}),
+        ("(?<=[0-9] )Trinity", {"link": "Trinity Support"}),
+        ("(?<=[0-9] )Unbound Ailments", {"link": "Unbound Ailments Support"}),
+        ("(?<=[0-9] )Unleash", {"link": "Unleash Support"}),
+        ("(?<=[0-9] )Urgent Orders", {"link": "Urgent Orders Support"}),
+        ("(?<=[0-9] )Vicious Projectiles", {"link": "Vicious Projectiles Support"}),
+        ("(?<=[0-9] )Vile Toxins", {"link": "Vile Toxins Support"}),
+        ("(?<=[0-9] )Void Manipulation", {"link": "Void Manipulation Support"}),
+        ("(?<=[0-9] )Volatility", {"link": "Volatility Support"}),
+        ("(?<=[0-9] )Volley", {"link": "Volley Support"}),
+        ("(?<=[0-9] )Withering Touch", {"link": "Withering Touch Support"}),
         #
-        # Attibutes
+        # Other supports
         #
-        ('Dexterity', {'link': 'Dexterity'}),
-        ('Intelligence', {'link': 'Intelligence'}),
-        ('Strength', {'link': 'Strength'}),
+        ("(?<=[0-9] )Divine Blessing", {"link": "Divine Blessing Support"}),
+        ("(?<=[0-9] )Earthbreaker", {"link": "Earthbreaker Support"}),
+        ("(?<=[0-9] )Greater Spell Echo", {"link": "Greater Spell Echo Support"}),
         #
-        # Offense stats
+        # Cluster jewel notables
         #
-        ('Accuracy Rating', {'link': 'Accuracy Rating'}),
-        ('Accuracy', {'link': 'Accuracy'}),
-        ('Attack Speed', {'link': 'Attack Speed'}),
-        ('Cast Speed', {'link': 'Cast Speed'}),
-        ('Critical Strike Chance', {'link': 'Critical Strike Chance'}),
-        ('Critical Strike Multiplier', {'link': 'Critical Strike Multiplier'}),
-        ('Critical Strike', {'link': 'Critical Strike'}),
-        ('Movement Speed', {'link': 'Movement Speed'}),
-        ('Leech', {'link': 'Leech'}),  # Life Leech, Mana Leech
-        ('Low Life', {'link': 'Low Life'}),
-        ('Full Life', {'link': 'Full Life'}),
-        ('Life', {'link': 'Life'}),
-        ('Mana Reservation', {'link': 'Mana Reservation'}),
-        ('Low Mana', {'link': 'Low Mana'}),
-        ('Full Mana', {'link': 'Full Mana'}),
-        ('Mana', {'link': 'Mana'}),
-        # Just damage
-        # ('Damage', {'link': 'Damage'}),
+        ("(?<=ll is )Adrenaline", {"link": "Adrenaline (passive skill)"}),
+        ("(?<=ll is )Blacksmith", {"link": "Blacksmith (passive skill)"}),
+        ("(?<=ll is )Eye of the Storm", {"link": "Eye of the Storm (passive skill)"}),
+        ("(?<=ll is )Feast of Flesh", {"link": "Feast of Flesh (passive skill)"}),
+        ("(?<=ll is )Intensity", {"link": "Intensity (passive skill)"}),
+        ("(?<=ll is )(?!a Jewel).+", {"link": "{text}"}),
         #
-        # Defenses
+        # Crucible notables
         #
-        ('Armour Rating', {'link': 'Armour Rating'}),
-        ('Armour', {'link': 'Armour'}),
-        ('Energy Shield', {'link': 'Energy Shield'}),
-        ('Evasion Rating', {'link': 'Evasion Rating'}),
-        ('Evasion', {'link': 'Evasion'}),
-        ('Spell Block', {'link': 'Spell Block'}),
-        ('Block', {'link': 'Block'}),
-        ('Spell Dodge', {'link': 'Spell Dodge'}),
-        ('Dodge', {'link': 'Dodge'}),
+        ("(?<=Allocates ).+", {"link": "{text}"}),
         #
-        ('Chaos Resistance(?:|s)', {'link': 'Chaos Resistance'}),
-        ('Cold Resistance(?:|s)', {'link': 'Cold Resistance'}),
-        ('Fire Resistance(?:|s)', {'link': 'Fire Resistance'}),
-        ('Lightning Resistance(?:|s)', {'link': 'Lightning Resistance'}),
-        ('Elemental Resistance(?:|s)', {'link': 'Elemental Resistance'}),
+        # Enchantment skills
+        #
+        ("Commandment of Blades", {"link": "Commandment of Blades"}),
+        ("Commandment of Flames", {"link": "Commandment of Flames"}),
+        ("Commandment of Force", {"link": "Commandment of Force"}),
+        ("Commandment of Frost", {"link": "Commandment of Frost"}),
+        ("Commandment of Fury", {"link": "Commandment of Fury"}),
+        ("Commandment of Inferno", {"link": "Commandment of Inferno"}),
+        ("Commandment of Ire", {"link": "Commandment of Ire"}),
+        ("Commandment of Light", {"link": "Commandment of Light"}),
+        ("Commandment of Reflection", {"link": "Commandment of Reflection"}),
+        ("Commandment of Spite", {"link": "Commandment of Spite"}),
+        ("Commandment of Thunder", {"link": "Commandment of Thunder"}),
+        ("Commandment of War", {"link": "Commandment of War"}),
+        ("Commandment of Winter", {"link": "Commandment of Winter"}),
+        ("Commandment of the Grave", {"link": "Commandment of the Grave"}),
+        ("Commandment of the Tempest", {"link": "Commandment of the Tempest"}),
+        ("Decree of Blades", {"link": "Decree of Blades"}),
+        ("Decree of Flames", {"link": "Decree of Flames"}),
+        ("Decree of Force", {"link": "Decree of Force"}),
+        ("Decree of Frost", {"link": "Decree of Frost"}),
+        ("Decree of Fury", {"link": "Decree of Fury"}),
+        ("Decree of Inferno", {"link": "Decree of Inferno"}),
+        ("Decree of Ire", {"link": "Decree of Ire"}),
+        ("Decree of Light", {"link": "Decree of Light"}),
+        ("Decree of Reflection", {"link": "Decree of Reflection"}),
+        ("Decree of Spite", {"link": "Decree of Spite"}),
+        ("Decree of Thunder", {"link": "Decree of Thunder"}),
+        ("Decree of War", {"link": "Decree of War"}),
+        ("Decree of Winter", {"link": "Decree of Winter"}),
+        ("Decree of the Grave", {"link": "Decree of the Grave"}),
+        ("Decree of the Tempest", {"link": "Decree of the Tempest"}),
+        ("Edict of Blades", {"link": "Edict of Blades"}),
+        ("Edict of Flames", {"link": "Edict of Flames"}),
+        ("Edict of Force", {"link": "Edict of Force"}),
+        ("Edict of Frost", {"link": "Edict of Frost"}),
+        ("Edict of Fury", {"link": "Edict of Fury"}),
+        ("Edict of Inferno", {"link": "Edict of Inferno"}),
+        ("Edict of Ire", {"link": "Edict of Ire"}),
+        ("Edict of Light", {"link": "Edict of Light"}),
+        ("Edict of Reflection", {"link": "Edict of Reflection"}),
+        ("Edict of Spite", {"link": "Edict of Spite"}),
+        ("Edict of Thunder", {"link": "Edict of Thunder"}),
+        ("Edict of War", {"link": "Edict of War"}),
+        ("Edict of Winter", {"link": "Edict of Winter"}),
+        ("Edict of the Grave", {"link": "Edict of the Grave"}),
+        ("Edict of the Tempest", {"link": "Edict of the Tempest"}),
+        ("Word of Blades", {"link": "Word of Blades"}),
+        ("Word of Flames", {"link": "Word of Flames"}),
+        ("Word of Force", {"link": "Word of Force"}),
+        ("Word of Frost", {"link": "Word of Frost"}),
+        ("Word of Fury", {"link": "Word of Fury"}),
+        ("Word of Inferno", {"link": "Word of Inferno"}),
+        ("Word of Ire", {"link": "Word of Ire"}),
+        ("Word of Light", {"link": "Word of Light"}),
+        ("Word of Reflection", {"link": "Word of Reflection"}),
+        ("Word of Spite", {"link": "Word of Spite"}),
+        ("Word of Thunder", {"link": "Word of Thunder"}),
+        ("Word of War", {"link": "Word of War"}),
+        ("Word of Winter", {"link": "Word of Winter"}),
+        ("Word of the Grave", {"link": "Word of the Grave"}),
+        ("Word of the Tempest", {"link": "Word of the Tempest"}),
+        #
+        # Vaal Skills
+        #
+        ("Vaal Absolution", {"link": "Vaal Absolution"}),
+        ("Vaal Animate Weapon", {"link": "Vaal Animate Weapon"}),
+        ("Vaal Arctic Armour", {"link": "Vaal Arctic Armour"}),
+        ("Vaal Arc", {"link": "Vaal Arc"}),
+        ("Vaal Blade Flurry", {"link": "Vaal Blade Flurry"}),
+        ("Vaal Blade Vortex", {"link": "Vaal Blade Vortex"}),
+        ("Vaal Blight", {"link": "Vaal Blight"}),
+        ("Vaal Breach", {"link": "Vaal Breach"}),
+        ("Vaal Burning Arrow", {"link": "Vaal Burning Arrow"}),
+        ("Vaal Caustic Arrow", {"link": "Vaal Caustic Arrow"}),
+        ("Vaal Clarity", {"link": "Vaal Clarity"}),
+        ("Vaal Cleave", {"link": "Vaal Cleave"}),
+        ("Vaal Cold Snap", {"link": "Vaal Cold Snap"}),
+        ("Vaal Cyclone", {"link": "Vaal Cyclone"}),
+        ("Vaal Detonate Dead", {"link": "Vaal Detonate Dead"}),
+        ("Vaal Discipline", {"link": "Vaal Discipline"}),
+        ("Vaal Domination", {"link": "Vaal Domination"}),
+        ("Vaal Double Strike", {"link": "Vaal Double Strike"}),
+        ("Vaal Earthquake", {"link": "Vaal Earthquake"}),
+        ("Vaal Fireball", {"link": "Vaal Fireball"}),
+        ("Vaal Firestorm", {"link": "Vaal Firestorm"}),
+        ("Vaal Flameblast", {"link": "Vaal Flameblast"}),
+        ("Vaal Flicker Strike", {"link": "Vaal Flicker Strike"}),
+        ("Vaal Glacial Hammer", {"link": "Vaal Glacial Hammer"}),
+        ("Vaal Grace", {"link": "Vaal Grace"}),
+        ("Vaal Ground Slam", {"link": "Vaal Ground Slam"}),
+        ("Vaal Haste", {"link": "Vaal Haste"}),
+        ("Vaal Ice Nova", {"link": "Vaal Ice Nova"}),
+        ("Vaal Ice Shot", {"link": "Vaal Ice Shot"}),
+        ("Vaal Immortal Call", {"link": "Vaal Immortal Call"}),
+        ("Vaal Impurity of Fire", {"link": "Vaal Impurity of Fire"}),
+        ("Vaal Impurity of Ice", {"link": "Vaal Impurity of Ice"}),
+        ("Vaal Impurity of Lightning", {"link": "Vaal Impurity of Lightning"}),
+        ("Vaal Lightning Arrow", {"link": "Vaal Lightning Arrow"}),
+        ("Vaal Lightning Strike", {"link": "Vaal Lightning Strike"}),
+        ("Vaal Lightning Trap", {"link": "Vaal Lightning Trap"}),
+        ("Vaal Lightning Warp", {"link": "Vaal Lightning Warp"}),
+        ("Vaal Molten Shell", {"link": "Vaal Molten Shell"}),
+        ("Vaal Molten Strike", {"link": "Vaal Molten Strike"}),
+        ("Vaal Power Siphon", {"link": "Vaal Power Siphon"}),
+        ("Vaal Rain of Arrows", {"link": "Vaal Rain of Arrows"}),
+        ("Vaal Reap", {"link": "Vaal Reap"}),
+        ("Vaal Reave", {"link": "Vaal Reave"}),
+        ("Vaal Rejuvenation Totem", {"link": "Vaal Rejuvenation Totem"}),
+        ("Vaal Righteous Fire", {"link": "Vaal Righteous Fire"}),
+        ("Vaal Spark", {"link": "Vaal Spark"}),
+        ("Vaal Spectral Throw", {"link": "Vaal Spectral Throw"}),
+        ("Vaal Storm Call", {"link": "Vaal Storm Call"}),
+        ("Vaal Summon Skeletons", {"link": "Vaal Summon Skeletons"}),
+        ("Vaal Venom Gyre", {"link": "Vaal Venom Gyre"}),
+        ("Vaal Volcanic Fissure", {"link": "Vaal Volcanic Fissure"}),
+        #
+        # Skills
+        #
+        ("Alchemist's Mark", {"link": "Alchemist's Mark"}),
+        ("Ancestral Cry", {"link": "Ancestral Cry"}),
+        ("Ancestral Protector", {"link": "Ancestral Protector"}),
+        ("Ancestral Warchief", {"link": "Ancestral Warchief"}),
+        ("Anger", {"link": "Anger"}),
+        ("Animate(?:|d) Guardian(?!'s Weapon)", {"link": "Animate Guardian"}),
+        ("Animate(?:|d) Weapon(?:|s)", {"link": "Animate Weapon"}),
+        ("Arcane Cloak", {"link": "Arcane Cloak"}),
+        ("Arcanist Brand", {"link": "Arcanist Brand"}),
+        ("Arctic Armour", {"link": "Arctic Armour"}),
+        ("Armageddon Brand", {"link": "Armageddon Brand"}),
+        ("Artillery Ballista", {"link": "Artillery Ballista"}),
+        ("Assassin's Mark", {"link": "Assassin's Mark"}),
+        ("Autoexertion", {"link": "Autoexertion"}),
+        ("Automation", {"link": "Automation"}),
+        ("Ball Lightning", {"link": "Ball Lightning"}),
+        ("Bane", {"link": "Bane"}),
+        ("Barrage", {"link": "Barrage"}),
+        ("Battlemage's Cry", {"link": "Battlemage's Cry"}),
+        ("Bear Trap", {"link": "Bear Trap"}),
+        ("Berserk", {"link": "Berserk"}),
+        ("Blade Blast", {"link": "Blade Blast"}),
+        ("Blade Flurry", {"link": "Blade Flurry"}),
+        ("Blade Trap", {"link": "Blade Trap"}),
+        ("Blade Vortex", {"link": "Blade Vortex"}),
+        ("Bladefall", {"link": "Bladefall"}),
+        ("Bladestorm", {"link": "Bladestorm"}),
+        ("Blast Rain", {"link": "Blast Rain"}),
+        ("Blazing Salvo", {"link": "Blazing Salvo"}),
+        ("Blink Arrow", {"link": "Blink Arrow"}),
+        ("Blood and Sand", {"link": "Blood and Sand"}),
+        ("Blood Rage", {"link": "Blood Rage"}),
+        ("Bodyswap", {"link": "Bodyswap"}),
+        ("Bone Offering", {"link": "Bone Offering"}),
+        ("Boneshatter", {"link": "Boneshatter"}),
+        ("Brand Recall", {"link": "Brand Recall"}),
+        ("Burning Arrow", {"link": "Burning Arrow"}),
+        ("Caustic Arrow", {"link": "Caustic Arrow"}),
+        ("Chain Hook", {"link": "Chain Hook"}),
+        ("Charged Dash", {"link": "Charged Dash"}),
+        ("Clarity", {"link": "Clarity"}),
+        ("Cleave", {"link": "Cleave"}),
+        ("Cobra Lash", {"link": "Cobra Lash"}),
+        ("Cold Snap", {"link": "Cold Snap"}),
+        ("Conductivity", {"link": "Conductivity"}),
+        ("Consecrated Path", {"link": "Consecrated Path"}),
+        ("Contagion", {"link": "Contagion"}),
+        ("Conversion Trap", {"link": "Conversion Trap"}),
+        ("Convocation", {"link": "Convocation"}),
+        ("Corrupting Fever", {"link": "Corrupting Fever"}),
+        ("Crackling Lance", {"link": "Crackling Lance"}),
+        ("Creeping Frost", {"link": "Creeping Frost"}),
+        ("Cremation", {"link": "Cremation"}),
+        ("Crushing Fist", {"link": "Crushing Fist"}),
+        ("Cyclone", {"link": "Cyclone"}),
+        ("Dark Pact", {"link": "Dark Pact"}),
+        ("Decoy Totem", {"link": "Decoy Totem"}),
+        ("Defiance Banner", {"link": "Defiance Banner"}),
+        ("Desecrate", {"link": "Desecrate"}),
+        ("Despair", {"link": "Despair"}),
+        ("Destructive Link", {"link": "Destructive Link"}),
+        ("Determination", {"link": "Determination"}),
+        ("Detonate Dead", {"link": "Detonate Dead"}),
+        ("Detonate Mines", {"link": "Detonate Mines"}),
+        ("Devouring Totem", {"link": "Devouring Totem"}),
+        ("Discharge", {"link": "Discharge"}),
+        ("Discipline", {"link": "Discipline"}),
+        ("Divine Ire", {"link": "Divine Ire"}),
+        ("Divine Retribution", {"link": "Divine Retribution"}),
+        ("Dominating Blow", {"link": "Dominating Blow"}),
+        ("Double Strike", {"link": "Double Strike"}),
+        ("Dread Banner", {"link": "Dread Banner"}),
+        ("Dual Strike", {"link": "Dual Strike"}),
+        ("Earthquake", {"link": "Earthquake"}),
+        ("Earthshatter", {"link": "Earthshatter"}),
+        ("Elemental Hit", {"link": "Elemental Hit"}),
+        ("Elemental Weakness", {"link": "Elemental Weakness"}),
+        ("Enduring Cry", {"link": "Enduring Cry"}),
+        ("Energy Blade", {"link": "Energy Blade"}),
+        ("Enfeeble", {"link": "Enfeeble"}),
+        ("Ensnaring Arrow", {"link": "Ensnaring Arrow"}),
+        ("Essence Drain", {"link": "Essence Drain"}),
+        ("Ethereal Knives", {"link": "Ethereal Knives"}),
+        ("Eviscerate", {"link": "Eviscerate"}),
+        ("Explosive Arrow", {"link": "Explosive Arrow"}),
+        ("Explosive Concoction", {"link": "Explosive Concoction"}),
+        ("Explosive Trap", {"link": "Explosive Trap"}),
+        ("Exsanguinate", {"link": "Exsanguinate"}),
+        ("Eye of Winter", {"link": "Eye of Winter"}),
+        ("Fire Trap", {"link": "Fire Trap"}),
+        ("Fireball", {"link": "Fireball"}),
+        ("Firestorm", {"link": "Firestorm"}),
+        ("Flame Dash", {"link": "Flame Dash"}),
+        ("Flame Link", {"link": "Flame Link"}),
+        ("Flame Surge", {"link": "Flame Surge"}),
+        ("Flame Wall", {"link": "Flame Wall"}),
+        ("Flameblast", {"link": "Flameblast"}),
+        ("Flamethrower Trap", {"link": "Flamethrower Trap"}),
+        ("Flammability", {"link": "Flammability"}),
+        ("Flesh and Stone", {"link": "Flesh and Stone"}),
+        ("Flesh Offering", {"link": "Flesh Offering"}),
+        ("Flicker Strike", {"link": "Flicker Strike"}),
+        ("Forbidden Rite", {"link": "Forbidden Rite"}),
+        ("Freezing Pulse", {"link": "Freezing Pulse"}),
+        ("Frost Blades", {"link": "Frost Blades"}),
+        ("Frost Bomb", {"link": "Frost Bomb"}),
+        ("Frost Shield", {"link": "Frost Shield"}),
+        ("Frost Wall", {"link": "Frost Wall"}),
+        ("Frostbite", {"link": "Frostbite"}),
+        ("Frostblink", {"link": "Frostblink"}),
+        ("Frostbolt", {"link": "Frostbolt"}),
+        ("Frozen Legion", {"link": "Frozen Legion"}),
+        ("Galvanic Arrow", {"link": "Galvanic Arrow"}),
+        ("Galvanic Field", {"link": "Galvanic Field"}),
+        ("General's Cry", {"link": "General's Cry"}),
+        ("Glacial Cascade", {"link": "Glacial Cascade"}),
+        ("Glacial Hammer", {"link": "Glacial Hammer"}),
+        ("Glacial Shield Swipe", {"link": "Glacial Shield Swipe"}),
+        ("Grace", {"link": "Grace"}),
+        ("Ground Slam", {"link": "Ground Slam"}),
+        ("Haste", {"link": "Haste"}),
+        ("Hatred", {"link": "Hatred"}),
+        ("Heavy Strike", {"link": "Heavy Strike"}),
+        ("Herald of Agony", {"link": "Herald of Agony"}),
+        ("Herald of Ash", {"link": "Herald of Ash"}),
+        ("Herald of Ice", {"link": "Herald of Ice"}),
+        ("Herald of Purity", {"link": "Herald of Purity"}),
+        ("Herald of Thunder", {"link": "Herald of Thunder"}),
+        ("Hexblast", {"link": "Hexblast"}),
+        ("Holy Flame Totem", {"link": "Holy Flame Totem"}),
+        ("Hydrosphere", {"link": "Hydrosphere"}),
+        ("Ice Crash", {"link": "Ice Crash"}),
+        ("Ice Nova", {"link": "Ice Nova"}),
+        ("Ice Shot", {"link": "Ice Shot"}),
+        ("Ice Spear", {"link": "Ice Spear"}),
+        ("Ice Trap", {"link": "Ice Trap"}),
+        ("Icicle Mine", {"link": "Icicle Mine"}),
+        ("Immortal Call", {"link": "Immortal Call"}),
+        ("Incinerate", {"link": "Incinerate"}),
+        ("Infernal Blow", {"link": "Infernal Blow"}),
+        ("Infernal Cry", {"link": "Infernal Cry"}),
+        ("Intimidating Cry", {"link": "Intimidating Cry"}),
+        ("Intuitive Link", {"link": "Intuitive Link"}),
+        ("Kinetic Blast", {"link": "Kinetic Blast"}),
+        ("Kinetic Bolt", {"link": "Kinetic Bolt"}),
+        ("Lacerate", {"link": "Lacerate"}),
+        ("Lancing Steel", {"link": "Lancing Steel"}),
+        ("Leap Slam", {"link": "Leap Slam"}),
+        ("Lightning Arrow", {"link": "Lightning Arrow"}),
+        ("Lightning Conduit", {"link": "Lightning Conduit"}),
+        ("Lightning Spire Trap", {"link": "Lightning Spire Trap"}),
+        ("Lightning Strike", {"link": "Lightning Strike"}),
+        ("Lightning Tendrils", {"link": "Lightning Tendrils"}),
+        ("Lightning Trap", {"link": "Lightning Trap"}),
+        ("Lightning Warp", {"link": "Lightning Warp"}),
+        ("Malevolence", {"link": "Malevolence"}),
+        ("Manabond", {"link": "Manabond"}),
+        ("Mirror Arrow", {"link": "Mirror Arrow"}),
+        ("Molten Shell", {"link": "Molten Shell"}),
+        ("Molten Strike", {"link": "Molten Strike"}),
+        ("Orb of Storms", {"link": "Orb of Storms"}),
+        ("Penance Brand", {"link": "Penance Brand"}),
+        ("Perforate", {"link": "Perforate"}),
+        ("Pestilent Strike", {"link": "Pestilent Strike"}),
+        ("Petrified Blood", {"link": "Petrified Blood"}),
+        ("Phase Run", {"link": "Phase Run"}),
+        ("Plague Bearer", {"link": "Plague Bearer"}),
+        ("Poacher's Mark", {"link": "Poacher's Mark"}),
+        ("Poisonous Concoction", {"link": "Poisonous Concoction"}),
+        ("Portal", {"link": "Portal"}),
+        ("Power Siphon", {"link": "Power Siphon"}),
+        ("Precision", {"link": "Precision"}),
+        ("Pride", {"link": "Pride"}),
+        ("Protective Link", {"link": "Protective Link"}),
+        ("Puncture", {"link": "Puncture"}),
+        ("Punishment", {"link": "Punishment"}),
+        ("Purifying Flame", {"link": "Purifying Flame"}),
+        ("Purity of Elements", {"link": "Purity of Elements"}),
+        ("Purity of Fire", {"link": "Purity of Fire"}),
+        ("Purity of Ice", {"link": "Purity of Ice"}),
+        ("Purity of Lightning", {"link": "Purity of Lightning"}),
+        ("Pyroclast Mine", {"link": "Pyroclast Mine"}),
+        ("Quickstep", {"link": "Quickstep"}),
+        ("Rage Vortex", {"link": "Rage Vortex"}),
+        ("Rain of Arrows", {"link": "Rain of Arrows"}),
+        ("Raise(?:|d) Spectre(?:|s)", {"link": "Raise Spectre"}),
+        ("Raise(?:|d) Zombie(?:|s)", {"link": "Raise Zombie"}),
+        ("Rallying Cry", {"link": "Rallying Cry"}),
+        ("Reave", {"link": "Reave"}),
+        ("Rejuvenation Totem", {"link": "Rejuvenation Totem"}),
+        ("Righteous Fire", {"link": "Righteous Fire"}),
+        ("Rolling Magma", {"link": "Rolling Magma"}),
+        ("Scorching Ray", {"link": "Scorching Ray"}),
+        ("Scourge Arrow", {"link": "Scourge Arrow"}),
+        ("Searing Bond", {"link": "Searing Bond"}),
+        ("Seismic Cry", {"link": "Seismic Cry"}),
+        ("Seismic Trap", {"link": "Seismic Trap"}),
+        ("Shattering Steel", {"link": "Shattering Steel"}),
+        ("Shield Charge", {"link": "Shield Charge"}),
+        ("Shield Crush", {"link": "Shield Crush"}),
+        ("Shock Nova", {"link": "Shock Nova"}),
+        ("Shockwave Totem", {"link": "Shockwave Totem"}),
+        ("Shrapnel Ballista", {"link": "Shrapnel Ballista"}),
+        ("Siege Ballista", {"link": "Siege Ballista"}),
+        ("Sigil of Power", {"link": "Sigil of Power"}),
+        ("Siphoning Trap", {"link": "Siphoning Trap"}),
+        ("Smite", {"link": "Smite"}),
+        ("Smoke Mine", {"link": "Smoke Mine"}),
+        ("Snipe", {"link": "Snipe"}),
+        ("Sniper's Mark", {"link": "Sniper's Mark"}),
+        ("Soul Link", {"link": "Soul Link"}),
+        ("Soulrend", {"link": "Soulrend"}),
+        ("Spark", {"link": "Spark"}),
+        ("Spectral Helix", {"link": "Spectral Helix"}),
+        ("Spectral Shield Throw", {"link": "Spectral Shield Throw"}),
+        ("Spectral Throw", {"link": "Spectral Throw"}),
+        ("Spellslinger", {"link": "Spellslinger"}),
+        ("Spirit Offering", {"link": "Spirit Offering"}),
+        ("Split Arrow", {"link": "Split Arrow"}),
+        ("Splitting Steel", {"link": "Splitting Steel"}),
+        ("Static Strike", {"link": "Static Strike"}),
+        ("Steelskin", {"link": "Steelskin"}),
+        ("Storm Brand", {"link": "Storm Brand"}),
+        ("Storm Burst", {"link": "Storm Burst"}),
+        ("Storm Call", {"link": "Storm Call"}),
+        ("Storm Rain", {"link": "Storm Rain"}),
+        ("Stormbind", {"link": "Stormbind"}),
+        ("Stormblast Mine", {"link": "Stormblast Mine"}),
+        ("Summon(?:|ed) Carrion Golem(?:|s)", {"link": "Summon Carrion Golem"}),
+        ("Summon(?:|ed) Chaos Golem(?:|s)", {"link": "Summon Chaos Golem"}),
+        ("Summon(?:|ed) Flame Golem(?:|s)", {"link": "Summon Flame Golem"}),
+        ("Summon(?:|ed) Holy Relic(?:|s)", {"link": "Summon Holy Relic"}),
+        ("Summon(?:|ed) Ice Golem(?:|s)", {"link": "Summon Ice Golem"}),
+        ("Summon(?:|ed) Lightning Golem(?:|s)", {"link": "Summon Lightning Golem"}),
+        ("Summon(?:|ed) Raging Spirit(?:|s)", {"link": "Summon Raging Spirit"}),
+        ("Summon(?:|ed) Reaper(?:|s)", {"link": "Summon Reaper"}),
+        ("Summon(?:|ed) Skeleton(?:|s)", {"link": "Summon Skeletons"}),
+        ("Summon(?:|ed) Skitterbot(?:|s)", {"link": "Summon Skitterbots"}),
+        ("Summon(?:|ed) Stone Golem(?:|s)", {"link": "Summon Stone Golem"}),
+        ("Sunder", {"link": "Sunder"}),
+        ("Sweep", {"link": "Sweep"}),
+        ("Swordstorm", {"link": "Swordstorm"}),
+        ("Tectonic Slam", {"link": "Tectonic Slam"}),
+        ("Tempest Shield", {"link": "Tempest Shield"}),
+        ("Temporal Chains", {"link": "Temporal Chains"}),
+        ("Temporal Rift", {"link": "Temporal Rift"}),
+        ("Tornado Shot", {"link": "Tornado Shot"}),
+        ("Tornado", {"link": "Tornado"}),
+        ("Toxic Rain", {"link": "Toxic Rain"}),
+        ("Unearth", {"link": "Unearth"}),
+        ("Vampiric Link", {"link": "Vampiric Link"}),
+        ("Vengeful Cry", {"link": "Vengeful Cry"}),
+        ("Venom Gyre", {"link": "Venom Gyre"}),
+        ("Vigilant Strike", {"link": "Vigilant Strike"}),
+        ("Viper Strike", {"link": "Viper Strike"}),
+        ("Vitality", {"link": "Vitality"}),
+        ("Void Sphere", {"link": "Void Sphere"}),
+        ("Volatile Dead", {"link": "Volatile Dead"}),
+        ("Volcanic Fissure", {"link": "Volcanic Fissure"}),
+        ("Voltaxic Burst", {"link": "Voltaxic Burst"}),
+        ("Vortex", {"link": "Vortex"}),
+        ("Vulnerability", {"link": "Vulnerability"}),
+        ("War Banner", {"link": "War Banner"}),
+        ("Warlord's Mark", {"link": "Warlord's Mark"}),
+        ("Wave of Conviction", {"link": "Wave of Conviction"}),
+        ("Whirling Blades", {"link": "Whirling Blades"}),
+        ("Wild Strike", {"link": "Wild Strike"}),
+        ("Winter Orb", {"link": "Winter Orb"}),
+        ("Wintertide Brand", {"link": "Wintertide Brand"}),
+        ("Wither", {"link": "Wither"}),
+        ("Withering Step", {"link": "Withering Step"}),
+        ("Wrath", {"link": "Wrath"}),
+        ("Zealotry", {"link": "Zealotry"}),
+        #
+        # Other skills
+        #
+        ("Abberath's Fury", {"link": "Abberath's Fury"}),
+        ("Animate Guardian's Weapon", {"link": "Animate Guardian's Weapon"}),
+        ("Approaching Flames", {"link": "Approaching Flames"}),
+        ("Arcane Wake", {"link": "Arcane Wake"}),
+        ("Aspect of the Avian", {"link": "Aspect of the Avian"}),
+        ("Aspect of the Cat", {"link": "Aspect of the Cat"}),
+        ("Aspect of the Crab", {"link": "Aspect of the Crab"}),
+        ("Aspect of the Spider", {"link": "Aspect of the Spider"}),
+        ("Avenging Flame", {"link": "Avenging Flame"}),
+        ("Barkskin", {"link": "Barkskin"}),
+        ("Blood Offering", {"link": "Blood Offering"}),
+        ("Blood Sacrament", {"link": "Blood Sacrament"}),
+        ("Bone Corpses", {"link": "Bone Corpses"}),
+        ("Bone Nova", {"link": "Bone Nova"}),
+        ("Brandsurge", {"link": "Brandsurge"}),
+        ("Call of Steel", {"link": "Call of Steel"}),
+        ("Cold Aegis", {"link": "Cold Aegis"}),
+        ("Consecrate", {"link": "Consecrate"}),
+        ("Contaminate", {"link": "Contaminate"}),
+        ("Corpse Walk", {"link": "Corpse Walk"}),
+        ("Create Lesser Shrine", {"link": "Create Lesser Shrine"}),
+        ("Death Aura", {"link": "Death Aura"}),
+        ("Death Walk", {"link": "Death Walk"}),
+        ("Death Wish", {"link": "Death Wish"}),
+        ("Doom Blast", {"link": "Doom Blast"}),
+        ("Doryani's Touch", {"link": "Doryani's Touch"}),
+        ("Elemental Aegis", {"link": "Elemental Aegis"}),
+        ("Elemental Warding", {"link": "Elemental Warding"}),
+        ("Embrace Madness", {"link": "Embrace Madness"}),
+        ("Envy", {"link": "Envy"}),
+        ("Feast of Flesh", {"link": "Feast of Flesh"}),
+        ("Fire Aegis", {"link": "Fire Aegis"}),
+        ("Fire Burst", {"link": "Fire Burst"}),
+        ("Fiery Impact", {"link": "Fiery Impact"}),
+        ("Flames of Judgement", {"link": "Flames of Judgement"}),
+        ("Fog of War", {"link": "Fog of War"}),
+        ("Frozen Sweep", {"link": "Frozen Sweep"}),
+        ("Glimpse of Eternity", {"link": "Glimpse of Eternity"}),
+        ("Gluttony of Elements", {"link": "Gluttony of Elements"}),
+        ("Gore Shockwave", {"link": "Gore Shockwave"}),
+        ("Gravity Sphere", {"link": "Gravity Sphere"}),
+        ("Icestorm", {"link": "Icestorm"}),
+        ("Icicle Burst", {"link": "Icicle Burst"}),
+        ("Illusory Warp", {"link": "Illusory Warp"}),
+        ("Lightning Aegis", {"link": "Lightning Aegis"}),
+        ("Lightning Bolt", {"link": "Lightning Bolt"}),
+        ("Manifest Dancing Dervishes", {"link": "Manifest Dancing Dervishes"}),
+        ("Molten Burst", {"link": "Molten Burst"}),
+        ("Pacify", {"link": "Pacify"}),
+        ("Penance Mark", {"link": "Penance Mark"}),
+        ("Petrification Statue", {"link": "Petrification Statue"}),
+        ("Physical Aegis", {"link": "Physical Aegis"}),
+        ("Primal Aegis", {"link": "Primal Aegis"}),
+        ("Queen's Demand", {"link": "Queen's Demand"}),
+        ("Raise(?:|d) Spider(?:|s)", {"link": "Raise Spiders"}),
+        ("Ravenous", {"link": "Ravenous"}),
+        ("Shade Form", {"link": "Shade Form"}),
+        ("Shield Shatter", {"link": "Shield Shatter"}),
+        ("Shock Ground", {"link": "Shock Ground"}),
+        ("Shockwave", {"link": "Shockwave (skill)"}),
+        ("Signal Prey", {"link": "Signal Prey"}),
+        ("Spectral Spirits", {"link": "Spectral Spirits"}),
+        ("Spirit Burst", {"link": "Spirit Burst"}),
+        ("Stalking Pustule", {"link": "Stalking Pustule"}),
+        ("Stance Swap", {"link": "Stance Swap"}),
+        ("Starfall", {"link": "Starfall"}),
+        ("Storm of Judgement", {"link": "Storm of Judgement"}),
+        ("Summon(?:|ed) Arbalist(?:|s)", {"link": "Summon Arbalists"}),
+        ("Summon Bestial Rhoa", {"link": "Summon Bestial Rhoa"}),
+        ("Summon Bestial Snake", {"link": "Summon Bestial Snake"}),
+        ("Summon Bestial Ursa", {"link": "Summon Bestial Ursa"}),
+        ("Summon Doedre's Effigy", {"link": "Summon Doedre's Effigy"}),
+        ("Summon Elemental Relic", {"link": "Summon Elemental Relic"}),
+        (
+            "Summon Greater Harbinger of Brutality",
+            {"link": "Summon Greater Harbinger of Brutality"},
+        ),
+        (
+            "Summon Greater Harbinger of Directions",
+            {"link": "Summon Greater Harbinger of Directions"},
+        ),
+        ("Summon Greater Harbinger of Focus", {"link": "Summon Greater Harbinger of Focus"}),
+        ("Summon Greater Harbinger of Storms", {"link": "Summon Greater Harbinger of Storms"}),
+        (
+            "Summon Greater Harbinger of the Arcane",
+            {"link": "Summon Greater Harbinger of the Arcane"},
+        ),
+        ("Summon Greater Harbinger of Time", {"link": "Summon Greater Harbinger of Time"}),
+        ("Summon Harbinger of Brutality", {"link": "Summon Harbinger of Brutality"}),
+        ("Summon Harbinger of Directions", {"link": "Summon Harbinger of Directions"}),
+        ("Summon Harbinger of Focus", {"link": "Summon Harbinger of Focus"}),
+        ("Summon Harbinger of Storms", {"link": "Summon Harbinger of Storms"}),
+        ("Summon Harbinger of the Arcane", {"link": "Summon Harbinger of the Arcane"}),
+        ("Summon Harbinger of Time", {"link": "Summon Harbinger of Time"}),
+        ("Summon Phantasm", {"link": "Summon Phantasm"}),
+        ("Summon Sentinel of Radiance", {"link": "Summon Sentinel of Radiance"}),
+        ("Summon Shaper Memory", {"link": "Summon Shaper Memory"}),
+        ("Summon(?:|ed) Spectral (?:Wolf|Wolves)", {"link": "Summon Spectral Wolf"}),
+        ("Summon Spirit of Ahuana", {"link": "Summon Spirit of Ahuana"}),
+        ("Summon Spirit of Akoya", {"link": "Summon Spirit of Akoya"}),
+        ("Summon Spirit of Ikiaho", {"link": "Summon Spirit of Ikiaho"}),
+        ("Summon Spirit of Kahuturoa", {"link": "Summon Spirit of Kahuturoa"}),
+        ("Summon Spirit of Kaom", {"link": "Summon Spirit of Kaom"}),
+        ("Summon Spirit of Kiloava", {"link": "Summon Spirit of Kiloava"}),
+        ("Summon Spirit of Maata", {"link": "Summon Spirit of Maata"}),
+        ("Summon Spirit of Rakiata", {"link": "Summon Spirit of Rakiata"}),
+        ("Summon Spirit of Tawhanuku", {"link": "Summon Spirit of Tawhanuku"}),
+        ("Summon Spirit of Utula", {"link": "Summon Spirit of Utula"}),
+        ("Summon Taunting Contraption", {"link": "Summon Taunting Contraption"}),
+        ("Summon Triggerbots", {"link": "Summon Triggerbots"}),
+        ("Summon Void Spawn", {"link": "Summon Void Spawn"}),
+        ("(?:Summon )?Volatile Anomaly", {"link": "Volatile Anomaly"}),
+        ("Tawhoa's Chosen", {"link": "Tawhoa's Chosen"}),
+        ("Tentacle Whip", {"link": "Tentacle Whip"}),
+        ("Thirst for Blood", {"link": "Thirst for Blood"}),
+        ("Twister", {"link": "Twister"}),
+        ("Unbound Avatar", {"link": "Unbound Avatar"}),
+        ("Unhinge", {"link": "Unhinge"}),
+        ("Unseen Strike", {"link": "Unseen Strike"}),
+        ("Void Gaze", {"link": "Void Gaze"}),
+        ("Void Shot", {"link": "Void Shot"}),
+        #
+        # Minions
+        #
+        ("Agony Crawler", {"link": "Agony Crawler"}),
+        ("Sentinel(?:|s) of Absolution", {"link": "Sentinel of Absolution"}),
+        ("Sentinel(?:|s) of Dominance", {"link": "Sentinel of Dominance"}),
+        ("Sentinel(?:|s) of Purity", {"link": "Sentinel of Purity"}),
+        ("Sentinel(?:|s) of Radiance", {"link": "Sentinel of Radiance"}),
+        ("Summoned Golem(?:|s)", {"link": "Golem"}),
+        ("Summoned Phantasm(?:|s)", {"link": "Summon Phantasm Support"}),
+        #
+        # Passive skills
+        #
+        ("Crucible Passive Skill Tree", {"link": "Crucible Passive Skill Tree"}),
+        ("Crucible Passive Skill(?:|s)", {"link": "Crucible Passive Skill"}),
+        ("Passive Skill Tree", {"link": "Passive Skill Tree"}),
+        ("Passive Skill(?:|s)|Passives", {"link": "Passive Skill"}),
+        ("Jewel Socket(?:|s)", {"link": "Jewel Socket"}),
+        # Ordinary keystones
+        ("Acrobatics", {"link": "Acrobatics"}),
+        ("Ancestral Bond", {"link": "Ancestral Bond"}),
+        ("Arrow Dancing", {"link": "Arrow Dancing"}),
+        ("Arsenal of Vengeance", {"link": "Arsenal of Vengeance"}),
+        ("Avatar of Fire", {"link": "Avatar of Fire"}),
+        ("Blood Magic", {"link": "Blood Magic"}),
+        ("Bloodsoaked Blade", {"link": "Bloodsoaked Blade"}),
+        ("Call to Arms", {"link": "Call to Arms"}),
+        ("Chaos Inoculation", {"link": "Chaos Inoculation"}),
+        ("Conduit", {"link": "Conduit"}),
+        ("Crimson Dance", {"link": "Crimson Dance"}),
+        ("Divine Shield", {"link": "Divine Shield"}),
+        ("Eldritch Battery", {"link": "Eldritch Battery"}),
+        ("Elemental Equilibrium", {"link": "Elemental Equilibrium"}),
+        ("Elemental Overload", {"link": "Elemental Overload"}),
+        ("Eternal Youth", {"link": "Eternal Youth"}),
+        ("Ghost Dance", {"link": "Ghost Dance"}),
+        ("Ghost Reaver", {"link": "Ghost Reaver"}),
+        ("Glancing Blows", {"link": "Glancing Blows"}),
+        ("Hex Master", {"link": "Hex Master"}),
+        ("Imbalanced Guard", {"link": "Imbalanced Guard"}),
+        ("Iron Grip", {"link": "Iron Grip"}),
+        ("Iron Reflexes", {"link": "Iron Reflexes"}),
+        ("Iron Will", {"link": "Iron Will"}),
+        ("Lethe Shade", {"link": "Lethe Shade"}),
+        ("Magebane", {"link": "Magebane"}),
+        ("Mind Over Matter", {"link": "Mind Over Matter"}),
+        ("Minion Instability", {"link": "Minion Instability"}),
+        ("Necromantic Aegis", {"link": "Necromantic Aegis"}),
+        ("Pain Attunement", {"link": "Pain Attunement"}),
+        ("Perfect Agony", {"link": "Perfect Agony"}),
+        ("Point Blank", {"link": "Point Blank"}),
+        ("Precise Technique", {"link": "Precise Technique"}),
+        ("Resolute Technique", {"link": "Resolute Technique"}),
+        ("Runebinder", {"link": "Runebinder"}),
+        ("Solipsism", {"link": "Solipsism"}),
+        ("Supreme Ego", {"link": "Supreme Ego"}),
+        ("The Agnostic", {"link": "The Agnostic"}),
+        ("The Impaler", {"link": "The Impaler"}),
+        ("Unwavering Stance", {"link": "Unwavering Stance"}),
+        ("Vaal Pact", {"link": "Vaal Pact"}),
+        ("Versatile Combatant", {"link": "Versatile Combatant"}),
+        ("Wicked Ward", {"link": "Wicked Ward"}),
+        ("Wind Dancer", {"link": "Wind Dancer"}),
+        ("Zealot's Oath", {"link": "Zealot's Oath"}),
+        # Timeless jewel keystones
+        ("Chainbreaker", {"link": "Chainbreaker"}),
+        ("Corrupted Soul", {"link": "Corrupted Soul"}),
+        ("Dance with Death", {"link": "Dance with Death"}),
+        ("Divine Flesh", {"link": "Divine Flesh"}),
+        ("Immortal Ambition", {"link": "Immortal Ambition"}),
+        ("Inner Conviction", {"link": "Inner Conviction"}),
+        ("Power of Purpose", {"link": "Power of Purpose"}),
+        ("Second Sight", {"link": "Second Sight"}),
+        ("Strength of Blood", {"link": "Strength of Blood"}),
+        ("Supreme Decadence", {"link": "Supreme Decadence"}),
+        ("Supreme Grandstanding", {"link": "Supreme Grandstanding"}),
+        ("Supreme Ostentation", {"link": "Supreme Ostentation"}),
+        ("Tempered by War", {"link": "Tempered by War"}),
+        ("The Traitor", {"link": "The Traitor"}),
+        ("Transcendence", {"link": "Transcendence"}),
+        # Cluster jewel keystones
+        ("Disciple of Kitava", {"link": "Disciple of Kitava"}),
+        ("Hollow Palm Technique", {"link": "Hollow Palm Technique"}),
+        ("Kineticism", {"link": "Kineticism"}),
+        ("Lone Messenger", {"link": "Lone Messenger"}),
+        ("Nature's Patience", {"link": "Nature's Patience"}),
+        ("Secrets of Suffering", {"link": "Secrets of Suffering"}),
+        ("Veteran's Awareness", {"link": "Veteran's Awareness"}),
+        #
+        # Charges
+        #
+        (
+            "(?:Endurance|Frenzy|Power), (?:Endurance|Frenzy|Power)(?:|,) (?:and|or) (?:Endurance|Frenzy|Power) Charge(?:|s)",  # noqa
+            {"link": "Charge"},
+        ),
+        ("Endurance Charge(?:|s)", {"link": "Endurance Charge"}),
+        ("Frenzy Charge(?:|s)", {"link": "Frenzy Charge"}),
+        ("Power Charge(?:|s)", {"link": "Power Charge"}),
+        ("Brutal Charge(?:|s)", {"link": "Brutal Charge"}),
+        ("Affliction Charge(?:|s)", {"link": "Affliction Charge"}),
+        ("Absorption Charge(?:|s)", {"link": "Absorption Charge"}),
+        ("Spirit Charge(?:|s)", {"link": "Spirit Charge"}),
+        ("Divine Charge(?:|s)", {"link": "Divine Charge"}),
+        ("Void Charge(?:|s)", {"link": "Void Charge"}),
+        ("Siphoning Charge(?:|s)", {"link": "Siphoning Charge"}),
+        ("Fanatic Charge(?:|s)", {"link": "Fanatic Charge"}),
+        ("Inspiration Charge(?:|s)", {"link": "Inspiration Charge"}),
+        ("Blood Charge(?:|s)", {"link": "Blood Charge"}),
+        ("Fanatic Charge(?:|s)", {"link": "Fanatic Charge"}),
         #
         # Buffs
         #
-
-        # Charges
-        ('Endurance Charge(?:|s)', {'link': 'Endurance Charge'}),
-        ('Frenzy Charge(?:|s)', {'link': 'Frenzy Charge'}),
-        ('Power Charge(?:|s)', {'link': 'Power Charge'}),
-
         # Friendly
-        ('Rampage', {'link': 'Rampage'}),
-
+        ("Adrenaline", {"link": "Adrenaline"}),
+        ("Arcane Surge", {"link": "Arcane Surge"}),
+        ("Fortify|Fortified", {"link": "Fortify"}),
+        ("Fortification", {"link": "Fortification"}),
+        ("Onslaught", {"link": "Onslaught"}),
+        ("Tailwind", {"link": "Tailwind"}),
+        ("Phasing", {"link": "Phasing"}),
+        ("Elusive", {"link": "Elusive"}),
+        ("Unholy Might", {"link": "Unholy Might"}),
+        ("Soul Eater", {"link": "Soul Eater"}),
+        ("Shaper's Presence", {"link": "Shaper's Presence"}),
+        ("Maddening Presence", {"link": "Maddening Presence"}),
+        ("Alchemist's Genius", {"link": "Alchemist's Genius"}),
+        ("Igniting Conflux", {"link": "Igniting Conflux"}),
+        ("Chilling Conflux", {"link": "Chilling Conflux"}),
+        ("Shocking Conflux", {"link": "Shocking Conflux"}),
+        ("Elemental Conflux", {"link": "Elemental Conflux"}),
+        ("Scorching Conflux", {"link": "Scorching Conflux"}),
+        ("Brittle Conflux", {"link": "Brittle Conflux"}),
+        ("Sapping Conflux", {"link": "Sapping Conflux"}),
+        ("Sacrificial Zeal", {"link": "Sacrificial Zeal"}),
+        ("Rampage", {"link": "Rampage"}),
+        ("Gale Force", {"link": "Gale Force"}),
+        ("Avian's Flight", {"link": "Avian's Flight"}),
+        ("Avian's Might", {"link": "Avian's Might"}),
+        ("Cat's Agility", {"link": "Cat's Agility"}),
+        ("Cat's Stealth", {"link": "Cat's Stealth"}),
+        ("Glorious Madness", {"link": "Glorious Madness"}),
+        ("Phantasmal Might", {"link": "Phantasmal Might"}),
+        ("Blood Stance", {"link": "Blood Stance"}),
+        ("Sand Stance", {"link": "Sand Stance"}),
         # Hostile
-        ('Corrupted Blood', {'link': 'Corrupted Blood'}),
-
+        ("Blind(?:|ed)", {"link": "Blind"}),
+        ("Maim(?:|ed)", {"link": "Maim"}),
+        ("Hinder(?:|ed)", {"link": "Hinder"}),
+        ("Intimidate(?:|d)", {"link": "Intimidate"}),
+        ("Unnerve(?:|d)", {"link": "Unnerve"}),
+        ("Covered in Ash", {"link": "Covered in Ash"}),
+        ("Cover Enemies in Ash", {"link": "Covered in Ash"}),
+        ("Covered in Frost", {"link": "Covered in Frost"}),
+        ("Cover Enemies in Frost", {"link": "Covered in Frost"}),
+        ("Fire Exposure", {"link": "Fire Exposure"}),
+        ("Cold Exposure", {"link": "Cold Exposure"}),
+        ("Lightning Exposure", {"link": "Lightning Exposure"}),
+        ("Exposure", {"link": "Exposure"}),
+        ("Taunt(?:|s|ed)", {"link": "Taunt"}),
+        ("Withered", {"link": "Withered"}),
+        ("Grasping Vines", {"link": "Grasping Vines"}),
+        ("Malediction", {"link": "Malediction"}),
+        ("Debilitate", {"link": "Debilitate"}),
+        ("Impale(?:|s|d)", {"link": "Impale"}),
+        ("Corrosion", {"link": "Corrosion"}),
+        ("Corrupted Blood", {"link": "Corrupted Blood"}),
+        ("Mana Burn", {"link": "Mana Burn"}),
+        ("Marked for Death", {"link": "Marked for Death"}),
+        ("Malignant Madness", {"link": "Malignant Madness"}),
+        # Ground effects
+        ("Burning Ground", {"link": "Burning Ground"}),
+        ("Desecrated Ground", {"link": "Desecrated Ground"}),
+        ("Caustic Ground", {"link": "Caustic Ground"}),
+        ("Spreads Tar", {"link": "Tarred Ground"}),
+        ("Chilled Ground", {"link": "Chilled Ground"}),
+        ("Shocked Ground", {"link": "Shocked Ground"}),
+        ("Scorched Ground", {"link": "Scorched Ground"}),
+        ("Brittle Ground", {"link": "Brittle Ground"}),
+        ("Sapped Ground", {"link": "Sapped Ground"}),
+        ("Consecrated Ground", {"link": "Consecrated Ground"}),
+        ("Profane Ground", {"link": "Profane Ground"}),
+        ("Fungal Ground", {"link": "Fungal Ground"}),
+        ("Smoke Cloud", {"link": "Smoke Cloud"}),
         #
-        # Misc stats
+        # Stats
         #
-
-        ('Character Size', {'link': 'Character Size'}),
-
-
+        ("Accuracy Rating", {"link": "Accuracy Rating"}),
+        ("Accuracy", {"link": "Accuracy"}),
+        ("Attack Speed", {"link": "Attack Speed"}),
+        ("Cast Speed", {"link": "Cast Speed"}),
+        ("Critical Strike Chance", {"link": "Critical Strike Chance"}),
+        ("Critical Strike Multiplier", {"link": "Critical Strike Multiplier"}),
+        ("Critical Strike(?:|s)", {"link": "Critical Strike"}),
+        ("Movement Speed", {"link": "Movement Speed"}),
+        ("Leech(?:|ed|ing)", {"link": "Leech"}),
+        ("Low Life", {"link": "Low Life"}),
+        ("Full Life", {"link": "Full Life"}),
+        ("Life", {"link": "Life"}),
+        ("Low Mana", {"link": "Low Mana"}),
+        ("Full Mana", {"link": "Full Mana"}),
+        ("Mana", {"link": "Mana"}),
+        ("Reservation|Reserve(?:|d)", {"link": "Reservation"}),
+        ("Regeneration|Regenerate(?:|d)", {"link": "Regeneration"}),
+        ("Chaos Resistance(?:|s)", {"link": "Chaos Resistance"}),
+        ("Cold Resistance(?:|s)", {"link": "Cold Resistance"}),
+        ("Fire Resistance(?:|s)", {"link": "Fire Resistance"}),
+        ("Lightning Resistance(?:|s)", {"link": "Lightning Resistance"}),
+        ("Elemental Resistance(?:|s)", {"link": "Elemental Resistance"}),
+        ("Flask Charge(?:|s)", {"link": "Flask Charge"}),
+        ("(?<!are |ain | to )Charge(?:|s)(?! Duration)", {"link": "Flask Charge"}),
+        ("Character Size", {"link": "Character Size"}),
+        ("Hits can't be Evaded", {"link": "Hits can't be Evaded"}),
+        ("Far Shot", {"link": "Far Shot"}),
+        ("Area of Effect", {"link": "Area of Effect"}),
+        ("Projectile Speed", {"link": "Projectile Speed"}),
+        ("Action Speed", {"link": "Action Speed"}),
+        ("Culling Strike", {"link": "Culling Strike"}),
+        ("Stun Duration", {"link": "Stun Duration"}),
+        ("Stun Threshold", {"link": "Stun Threshold"}),
+        ("Stun(?:|s|ned|ning)", {"link": "Stun"}),
+        ("Soul Gain Prevention", {"link": "Soul Gain Prevention"}),
+        ("Hex Reflection", {"link": "Hex Reflection"}),
+        ("Physical Damage Reduction", {"link": "Physical Damage Reduction"}),
+        ("Elemental Damage Reduction", {"link": "Elemental Damage Reduction"}),
+        ("Damage Reduction", {"link": "Damage Reduction"}),
+        ("Item Quantity|Quantity of Items", {"link": "IIQ"}),
+        ("Item Rarity|Rarity of Items", {"link": "IIR"}),
+        ("Cooldown", {"link": "Cooldown"}),
+        ("Rage", {"link": "Rage"}),
+        ("Armour Rating", {"link": "Armour Rating"}),
+        ("Energy Shield", {"link": "Energy Shield"}),
+        ("Evasion Rating", {"link": "Evasion Rating"}),
+        ("Evasion", {"link": "Evasion"}),
+        ("Ward", {"link": "Ward"}),
+        ("Block(?:|ed)", {"link": "Block"}),
+        ("Dodge", {"link": "Dodge"}),
+        ("Suppress(?:|ed)", {"link": "Suppress"}),
+        ("Avoid", {"link": "Avoid"}),
+        ("Defence(?:|s)", {"link": "Defences"}),
+        ("Double Damage(?:|s)", {"link": "Double Damage"}),
+        ("Triple Damage(?:|s)", {"link": "Triple Damage"}),
+        ("Omniscience", {"link": "Omniscience"}),
         #
-        # Groups
+        # Grouped skills
         #
-        ('Physical(?:Skill|Gem)', {'link': 'Physical Skills'}),
-        ('Fire (?:Skill|Gem)', {'link': 'Fire Skills'}),
-        ('Cold (?:Skill|Gem)', {'link': 'Cold Skills'}),
-        ('Lightning (?:Skill|Gem)', {'link': 'Lightning Skills'}),
-        ('Chaos (?:Skill|Gem)', {'link': 'Chaos Skills'}),
-        ('Area (?:Skill|Gem)', {'link': 'Area Skills'}),
-        ('Melee (?:Skill|Gem)', {'link': 'Melee Skills'}),
-        ('Bow (?:Skill|Gem)', {'link': 'Bow Skills'}),
-        ('Minion (?:Skill|Gem)', {'link': 'Minion Skills'}),
-
+        # Attribute
+        ("Strength (?:Skill|Gem)(?:|s)", {"link": "Strength Gems"}),
+        ("Dexterity (?:Skill|Gem)(?:|s)", {"link": "Dexterity Gems"}),
+        ("Intelligence (?:Skill|Gem)(?:|s)", {"link": "Intelligence Gems"}),
+        # Gem tag
+        ("AoE (?:Skill|Gem)(?:|s)", {"link": "AoE (gem tag)"}),
+        ("Arcane (?:Skill|Gem)(?:|s)", {"link": "Arcane (gem tag)"}),
+        ("Attack (?:Skill|Gem)(?:|s)", {"link": "Attack (gem tag)"}),
+        ("Aura (?:Skill|Gem)(?:|s)", {"link": "Aura (gem tag)"}),
+        ("Blessing (?:Skill|Gem)(?:|s)", {"link": "Blessing (gem tag)"}),
+        ("Blink (?:Skill|Gem)(?:|s)", {"link": "Blink (gem tag)"}),
+        ("Bow (?:Skill|Gem)(?:|s)", {"link": "Bow (gem tag)"}),
+        ("Brand (?:Skill|Gem)(?:|s)", {"link": "Brand (gem tag)"}),
+        ("Chaining (?:Skill|Gem)(?:|s)", {"link": "Chaining (gem tag)"}),
+        ("Channelling (?:Skill|Gem)(?:|s)", {"link": "Channelling (gem tag)"}),
+        ("Chaos (?:Skill|Gem)(?:|s)", {"link": "Chaos (gem tag)"}),
+        ("Cold (?:Skill|Gem)(?:|s)", {"link": "Cold (gem tag)"}),
+        ("Critical (?:Skill|Gem)(?:|s)", {"link": "Critical (gem tag)"}),
+        ("Curse (?:Skill|Gem)(?:|s)", {"link": "Curse (gem tag)"}),
+        ("Duration (?:Skill|Gem)(?:|s)", {"link": "Duration (gem tag)"}),
+        ("Fire (?:Skill|Gem)(?:|s)", {"link": "Fire (gem tag)"}),
+        ("Golem (?:Skill|Gem)(?:|s)", {"link": "Golem (gem tag)"}),
+        ("Guard (?:Skill|Gem)(?:|s)", {"link": "Guard (gem tag)"}),
+        ("Herald (?:Skill|Gem)(?:|s)", {"link": "Herald (gem tag)"}),
+        ("Hex (?:Skill|Gem)(?:|s)", {"link": "Hex (gem tag)"}),
+        ("Lightning (?:Skill|Gem)(?:|s)", {"link": "Lightning (gem tag)"}),
+        ("Link (?:Skill|Gem)(?:|s)", {"link": "Link (gem tag)"}),
+        ("Mark (?:Skill|Gem)(?:|s)", {"link": "Mark (gem tag)"}),
+        ("Melee (?:Skill|Gem)(?:|s)", {"link": "Melee (gem tag)"}),
+        ("Mine (?:Skill|Gem)(?:|s)", {"link": "Mine (gem tag)"}),
+        ("Minion (?:Skill|Gem)(?:|s)", {"link": "Minion (gem tag)"}),
+        ("Movement (?:Skill|Gem)(?:|s)", {"link": "Movement (gem tag)"}),
+        ("Nova (?:Skill|Gem)(?:|s)", {"link": "Nova (gem tag)"}),
+        ("Orb (?:Skill|Gem)(?:|s)", {"link": "Orb (gem tag)"}),
+        ("Physical (?:Skill|Gem)(?:|s)", {"link": "Physical (gem tag)"}),
+        ("Prismatic (?:Skill|Gem)(?:|s)", {"link": "Prismatic (gem tag)"}),
+        ("Projectile (?:Skill|Gem)(?:|s)", {"link": "Projectile (gem tag)"}),
+        ("Retaliation (?:Skill|Gem)(?:|s)", {"link": "Retaliation (gem tag)"}),
+        ("Slam (?:Skill|Gem)(?:|s)", {"link": "Slam (gem tag)"}),
+        ("Spell (?:Skill|Gem)(?:|s)", {"link": "Spell (gem tag)"}),
+        ("Stance (?:Skill|Gem)(?:|s)", {"link": "Stance (gem tag)"}),
+        ("Strike (?:Skill|Gem)(?:|s)", {"link": "Strike (gem tag)"}),
+        ("Totem (?:Skill|Gem)(?:|s)", {"link": "Totem (gem tag)"}),
+        ("Trap (?:Skill|Gem)(?:|s)", {"link": "Trap (gem tag)"}),
+        ("Travel (?:Skill|Gem)(?:|s)", {"link": "Travel (gem tag)"}),
+        ("Trigger(?:|ed) (?:Skill|Gem)(?:|s)", {"link": "Trigger (gem tag)"}),
+        ("Vaal (?:Skill|Gem)(?:|s)", {"link": "Vaal (gem tag)"}),
+        ("Warcry (?:Skill|Gem)(?:|s)", {"link": "Warcry (gem tag)"}),
         #
         # Damage
         #
         # Base types
-        ('Chaos Damage', {'link': 'Chaos Damage'}),
-        ('Cold Damage', {'link': 'Cold Damage'}),
-        ('Fire Damage', {'link': 'Fire Damage'}),
-        ('Lightning Damage', {'link': 'Lightning Damage'}),
-        ('Physical Damage', {'link': 'Physical Damage'}),
+        ("Chaos Damage", {"link": "Chaos Damage"}),
+        ("Cold Damage", {"link": "Cold Damage"}),
+        ("Fire Damage", {"link": "Fire Damage"}),
+        ("Lightning Damage", {"link": "Lightning Damage"}),
+        ("Physical Damage", {"link": "Physical Damage"}),
         # Mixed and special
-        ('Attack Damage', {'link': 'Attack Damage'}),
-        ('Spell Damage', {'link': 'Spell Damage'}),
-        ('Elemental Damage', {'link': 'Elemental Damage'}),
-        ('Minion Damage', {'link': 'Minion Damage'}),
-
-        #
-        # Armour & weapon types
-        #
-
-        # Generic
-        ('Two Handed Melee Weapon(?:|s)', {'link': 'Two Handed Melee Weapons'}),
-
-        # Armour
-        ('Shield(?:|s)', {'link': 'Shield'}),
-
-        # Melee
-        ('Axe(?:|s)', {'link': 'Axe'}),
-        ('Claw(?:|s)', {'link': 'Claw'}),
-        ('Dagger(?:|s)', {'link': 'Dagger'}),
-        ('Mace(?:|s)', {'link': 'Mace'}),
-        ('Staff|Staves', {'link': 'Staff'}),
-        ('Sword(?:|s)', {'link': 'Sword'}),
-
-        # Range
-        ('Bow(?:|s)', {'link': 'Bow'}),
-        ('Wand(?:|s)', {'link': 'Axe'}),
-        #
-        # Status
-        #
-
-        ('Shock(?:|s|ed)', {'link': 'Shock'}),
-        ('Ignite(?:|s|ed)', {'link': 'Ignite'}),
-        ('Frozen|Freeze(?:|s)', {'link': 'Freeze'}),
-        ('Poison(?:|s|ed)', {'link': 'Poison'}),
-
-        #
-        # Misc
-        #
-        ('Curse(?:|s|ed)', {'link': 'Curse'}),
-        ('Socket(?:|s|ed)', {'link': 'Item socket'}),
-        ('Recently', {'link': 'Recently'}),
-        ('Skill(?:|s)', {'link': 'Skill'}),
-        ('Spell(?:|s)', {'link': 'Spell'}),
-        ('Attack(?:|s)', {'link': 'Attack'}),
-        ('Minion(?:|s)', {'link': 'Minion'}),
-        ('Mine(?:|s)', {'link': 'Mine'}),
-        ('Totem(?:|s)', {'link': 'Totem'}),
-        ('Trap(?:|s)', {'link': 'Trap'}),
-        ('Dual Wield(?:|ing)', {'link': 'Dual Wield'}),
-        ('Level', {'link': 'Level'}),
-        ('PvP', {'link': 'PvP'}),
-        ('Hit(?:|s)', {'link': 'Hit'}),
-        ('Kill(?:|s)', {'link': 'Kill'}),
-        ('Charge(?:|s)', {'link': 'Charge'}),
-        ('Lucky', {'link': 'Lucky'}),
-        ('Unlucky', {'link': 'Unlucky'}),
-    ),
-    'Russian': (
-        #
-        # Skills
-        #
-        ('Клич(?:|а) бездны', {'link': 'Клич бездны'}),
-        ('Защитник(?:|а) предков', {'link': 'Защитник предков'}),
-        ('Вожд(?:|ь|я) предков', {'link': 'Вождь предков'}),
-        ('Жгуч(?:|ая|ей) злоб(?:|а|ы|ой)', {'link': 'Жгучая злоба'}),
-        ('Аниматрон(?:|а|ы)', {'link': 'Аниматрон'}),
-        ('(?:Живо(?:|е|го)|оживл(?:|е|ё)нно(?:|е|го)) оружи(?:|е|я)',
-         {'link': 'Живое оружие'}),
-        ('Цеп(?:|ь|и) молний', {'link': 'Цепь молний'}),
-        ('Северн(?:|ая|ой) брон(?:|я|и|ёй)', {'link': 'Северная броня'}),
-        ('Северно(?:|е|го) дыхани(?:|е|я)', {'link': 'Северное дыхание'}),
-        ('Артиллерийск(?:|ая|ой) баллист(?:|а|ы)',
-         {'link': 'Артиллерийская баллиста'}),
-        ('Метк(?:|а|и|ой) убийцы', {'link': 'Метка убийцы'}),
-        ('Шаров(?:|ая|ой) молни(?:|я|и)', {'link': 'Шаровая молния'}),
-        ('Очеред(?:|ь|и)', {'link': 'Очередь'}),
-        ('Медвеж(?:|ий|ьего) капкан(?:|а)', {'link': 'Медвежий капкан'}),
-        ('Порыв(?:|а) клинков', {'link': 'Порыв клинков'}),
-        ('Ловушка лезвий', {'link': 'Ловушка лезвий'}),
-        ('Вихр(?:|ь|ю|я) клинков', {'link': 'Вихрь клинков'}),
-        ('Мечепад(?:|а|у)', {'link': 'Мечепад'}),
-        ('Дожд(?:|ь|ю|я) взрывов', {'link': 'Дождь взрывов'}),
-        ('Мор(?:|а)', {'link': 'Мор'}),
-        ('Стрел(?:|а|е|ы)-телепорт(?:|а|у)', {'link': 'Стрела-телепорт'}),
-        ('Кровавый угар', {'link': 'Кровавый угар'}),
-        ('Подношени(?:|е|я) костей', {'link': 'Подношение костей'}),
-        ('Горящ(?:|ая|ей) стрел(?:|а|ы)', {'link': 'Горящая стрела'}),
-        ('Едк(?:|ая|ой) стрел(?:|а|е|ы)', {'link': 'Едкая стрела'}),
-        ('Рыв(?:|ок|ка)', {'link': 'Рывок'}),
-        ('Заряженн(?:|ый|ого) рыв(?:|ок|ка)', {'link': 'Заряженный рывок'}),
-        ('Ясност(?:|ь|и|ью) ума', {'link': 'Ясность ума'}),
-        ('Рассечени(?:|е|я)', {'link': 'Рассечение'}),
-        ('Бросок кобры', {'link': 'Бросок кобры'}),
-        ('Укус(?:|а) стужи', {'link': 'Укус стужи'}),
-        ('Проводимост(?:|ь|и|ью)', {'link': 'Проводимость'}),
-        ('Инфекци(?:|и|я)', {'link': 'Инфекция'}),
-        ('Ловушк(?:|а|и) переманивания', {'link': 'Ловушка переманивания'}),
-        ('Сбор(?:|а)', {'link': 'Сбор'}),
-        ('Вихр(?:|ь|я|ю)', {'link': 'Вихрь'}),
-        ('Вливание урона', {'link': 'Вливание урона'}),
-        ('Т(?:|е|ё)мн(?:|ый|ого) договор(?:|а)', {'link': 'Тёмный договор'}),
-        ('Тотем(?:|а)-приманк(?:|а|и)', {'link': 'Тотем-приманка'}),
-        ('Осквернение', {'link': 'Осквернение'}),
-        ('Решимост(?:|и|ь|ью)', {'link': 'Решимость'}),
-        ('Подрыв(?:|а|е) трупа', {'link': 'Подрыв трупа'}),
-        ('Подрыв мин', {'link': 'Подрыв мин'}),
-        ('Поглощающ(?:|ий|его) тотем(?:|а)', {'link': 'Поглощающий тотем'}),
-        ('Разряд(?:|а)', {'link': 'Разряд'}),
-        ('Дисциплин(?:|а|ы|ой)', {'link': 'Дисциплина'}),
-        ('Удар(?:|а) власти', {'link': 'Удар власти'}),
-        ('Стрела рока', {'link': 'Стрела рока'}),
-        ('Двойн(?:|ой|ым|ого) удар(?:|а|ом)', {'link': 'Двойной удар'}),
-        ('Парн(?:|ый|ым|ого) удар(?:|а|ом)', {'link': 'Парный удар'}),
-        ('Землетрясени(?:|е|ю|я)', {'link': 'Землетрясение'}),
-        ('Удар(?:|а|ом) стихии', {'link': 'Удар стихии'}),
-        ('Уязвимост(?:|и|ь|ью) к стихиям', {'link': 'Уязвимость к стихиям'}),
-        ('Клич(?:|а) стойкости', {'link': 'Клич стойкости'}),
-        ('Слабост(?:|и|ь|ью)', {'link': 'Слабость'}),
-        ('Похищени(?:|е|я) сущности', {'link': 'Похищение сущности'}),
-        ('Бесплотны(?:|е|х) нож(?:|и|ей)', {'link': 'Бесплотные ножи'}),
-        ('Взрывн(?:|ая|ой|ые) стрел(?:|а|ы)', {'link': 'Взрывная стрела'}),
-        (
-        'Пирокластов(?:|ая|ой|ые) мин(?:|а|ы)', {'link': 'Пирокластовая мина'}),
-        ('Огненн(?:|ая|ой) ловушк(?:|а|и)', {'link': 'Огненная ловушка'}),
-        ('Горящее оружие', {'link': 'Горящее оружие'}),
-        ('Огненн(?:|ый|ого) шар(?:|а)', {'link': 'Огненный шар'}),
-        ('Огненн(?:|ый|ого) шторм(?:|а)', {'link': 'Огненный шторм'}),
-        ('Огненн(?:|ый|ого|ому) рыв(?:|ок|ка|ку)', {'link': 'Огненный рывок'}),
-        ('Выброс(?:|а) пламени', {'link': 'Выброс пламени'}),
-        ('Тотем(?:|а|ом) священного огня', {'link': 'Тотем священного огня'}),
-        ('Пламенн(?:|ый|ого) взрыв(?:|а)', {'link': 'Пламенный взрыв'}),
-        ('Горючест(?:|и|ь|ью)', {'link': 'Горючесть'}),
-        ('Подношени(?:|е|я) плоти', {'link': 'Подношение плоти'}),
-        ('Внезапн(?:|ый|ым|ого) удар(?:|а|ом)', {'link': 'Внезапный удар'}),
-        ('Шквальн(?:|ая|ой) мин(?:|а|ы)', {'link': 'Шквальная мина'}),
-        ('Волн(?:|а|ы) холода', {'link': 'Волна холода'}),
-        ('Бешенств(?:|а|о)', {'link': 'Бешенство'}),
-        ('Морозн(?:|ый|ого) шар(?:|а)', {'link': 'Морозный шар'}),
-        ('Ледяны(?:|е|х|ми) клинк(?:|и|ов|ами)', {'link': 'Ледяные клинки'}),
-        ('Морозн(?:|ая|ой) бомб(?:|а|ы)', {'link': 'Морозная бомба'}),
-        ('Стен(?:|а|ы) льда', {'link': 'Стена льда'}),
-        ('Обморожени(?:|е|ю|я|ем)', {'link': 'Обморожение'}),
-        ('Ледян(?:|ой|ым|ого) каскад(?:|а|ом)', {'link': 'Ледяной каскад'}),
-        ('Леденящ(?:|ий|им|его) молот(?:|а|ом)', {'link': 'Леденящий молот'}),
-        ('Граци(?:|и|я|ей)', {'link': 'Грация'}),
-        ('Сотрясени(?:|е|я)', {'link': 'Сотрясение'}),
-        ('Спешк(?:|а|и|ой)', {'link': 'Спешка'}),
-        (
-        'Холодн(?:|ая|ой) ненавист(?:|ь|и|ью)', {'link': 'Холодная ненависть'}),
-        ('Тяж(?:|е|ё)л(?:|ый|ого) удар(?:|а|ой)', {'link': 'Тяжёлый удар'}),
-        ('Вестник(?:|а|у|ом) пепла', {'link': 'Вестник пепла'}),
-        ('Вестник(?:|а|у|ом) крови', {'link': 'Вестник крови'}),
-        ('Вестник(?:|а|у|ом) льда', {'link': 'Вестник льда'}),
-        ('Вестник(?:|а|у|ом) грома', {'link': 'Вестник грома'}),
-        ('Вестник(?:|а|у|ом) агонии', {'link': 'Вестник агонии'}),
-        ('Вестник(?:|а|у|ом) чистоты', {'link': 'Вестник чистоты'}),
-        ('Ледяно(?:|е|го) сокрушени(?:|е|я)', {'link': 'Ледяное сокрушение'}),
-        ('Кольц(?:|а|о|ом) льда', {'link': 'Кольцо льда'}),
-        ('Ледяно(?:|й|го) выстрел(?:|а)', {'link': 'Ледяной выстрел'}),
-        ('Ледян(?:|ое|ым|ого) копь(?:|е|ё|я|ем|ём)', {'link': 'Ледяное копье'}),
-        ('Ледян(?:|ая|ой) ловушк(?:|а|е|и)', {'link': 'Ледяная ловушка'}),
-        ('Призыв(?:|а|у) к бессмертию', {'link': 'Призыв к бессмертию'}),
-        ('Испепелени(?:|е|я)', {'link': 'Испепеление'}),
-        ('Удар(?:|а) преисподней', {'link': 'Удар преисподней'}),
-        ('Кинетическ(?:|ий|ого) взрыв(?:|а)', {'link': 'Кинетический взрыв'}),
-        ('Разрубани(?:|е|я)', {'link': 'Разрубание'}),
-        ('Наскок(?:|а)', {'link': 'Наскок'}),
-        ('Стрел(?:|а|е|ы) молни(?:|и|й)', {'link': 'Стрела молнии'}),
-        ('Поток(?:|а) молни(?:|и|й)', {'link': 'Поток молний'}),
-        ('Круг(?:|а) молни(?:|и|й)', {'link': 'Круг молний'}),
-        ('Удар(?:|а) молни(?:|и|й)', {'link': 'Удар молнии'}),
-        ('Побег(?:|и|ов) молни(?:|и|й)', {'link': 'Побеги молний'}),
-        ('Ловушк(?:|а|и) молни(?:|и|й)', {'link': 'Ловушка молний'}),
-        ('Грозов(?:|ой|ого) переход(?:|а)', {'link': 'Грозовой переход'}),
-        ('Магмов(?:|ый|ого) шар(?:|а)', {'link': 'Магмовый шар'}),
-        ('Стрел(?:|а|е|ы)-двойник(?:|а|у)', {'link': 'Стрела-двойник'}),
-        ('Расплавленн(?:|ый|ого) панцир(?:|ь|я)',
-         {'link': 'Расплавленный панцирь'}),
-        ('Магмов(?:|ый|ого) удар(?:|а)', {'link': 'Магмовый удар'}),
-        ('Сфер(?:|а|ы) бурь', {'link': 'Сфера бурь'}),
-        ('Призрачн(?:|ый|ого) бег(?:|а)', {'link': 'Призрачный бег'}),
-        ('Метк(?:|а|и|ой) браконьера', {'link': 'Метка браконьера'}),
-        ('Портал', {'link': 'Портал (камень умения)'}),
-        ('Перелив(?:|а|ом) энергии', {'link': 'Перелив энергии'}),
-        ('Уязвимост(?:|и|ь|ью) к снарядам', {'link': 'Уязвимость к снарядам'}),
-        ('Надрез(?:|а)', {'link': 'Надрез'}),
-        ('Наказани(?:|е|я)', {'link': 'Наказание'}),
-        ('Спасени(?:|е|я|ем) от стихий', {'link': 'Спасение от стихий'}),
-        ('Спасени(?:|е|я|ем) от огня', {'link': 'Спасение от огня'}),
-        ('Спасени(?:|е|я|ем) от холода', {'link': 'Спасение от холода'}),
-        ('Спасени(?:|е|я|ем) от молни(?:|и|й)', {'link': 'Спасение от молний'}),
-        ('Лив(?:|ня|ень) стрел', {'link': 'Ливень стрел'}),
-        ('Сотвор(?:|е|ё)н(?:|ие|ием|ные) призрак(?:|а|и|ов)',
-         {'link': 'Сотворение призрака'}),
-        ('Поднят(?:|ие|ия|ые|ых|ого) зомби', {'link': 'Поднятие зомби'}),
-        ('Клич(?:|а) сплочения', {'link': 'Клич сплочения'}),
-        ('Опустошени(?:|е|я)', {'link': 'Опустошение'}),
-        ('Возмезди(?:|е|я)', {'link': 'Возмездие'}),
-        ('Восполняющ(?:|ий|им|его) тотем(?:|а|ом)',
-         {'link': 'Восполняющий тотем'}),
-        ('Праведн(?:|ый|ого) ог(?:|ня|онь)', {'link': 'Праведный огонь'}),
-        ('Праведн(?:|ая|ой) молни(?:|и|я)', {'link': 'Праведная молния'}),
-        ('Парировани(?:|е|я)', {'link': 'Парирование'}),
-        ('Опаляющ(?:|ий|его|ему) луч(?:|а|у)', {'link': 'Опаляющий луч'}),
-        ('Обжигающи(?:|е|х) уз(?:|ы)', {'link': 'Обжигающие узы'}),
-        ('Клинки тени', {'link': 'Клинки тени'}),
-        ('Удар(?:|а) щитом', {'link': 'Удар щитом'}),
-        ('Кольц(?:|а|о|ом) молни(?:|и|й)', {'link': 'Кольцо молний'}),
-        ('Сотрясающ(?:|ий|им|его) тотем(?:|а|ом)',
-         {'link': 'Сотрясающий тотем'}),
-        ('Электризующ(?:|ая|ей) стрел(?:|а|ы)',
-         {'link': 'Электризующая стрела'}),
-        ('Осадн(?:|ая|ой) баллист(?:|а|ы)', {'link': 'Осадная баллиста'}),
-        ('Дымов(?:|ая|ой) мин(?:|а|ы)', {'link': 'Дымовая мина'}),
-        ('Искр(?:|а|ы)', {'link': 'Искра'}),
-        ('Призрачн(?:|ый|ого) брос(?:|ок|ка)', {'link': 'Призрачный бросок'}),
-        ('Подношени(?:|е|я) духа', {'link': 'Подношение духа'}),
-        ('Расколот(?:|ая|ой) стрел(?:|а|е|ы)', {'link': 'Расколотая стрела'}),
-        ('Статичн(?:|ый|ого) разряд(?:|а)', {'link': 'Статичный разряд'}),
-        ('Статичная связь', {'link': 'Статичная связь'}),
-        ('Грозов(?:|ой|ого) взрыв(?:|а)', {'link': 'Грозовой взрыв'}),
-        ('Призыв(?:|а) бури', {'link': 'Призыв бури'}),
-        ('(?:Призыв |Призванные |)голем(?:|а|ы|ов|ами) хаоса',
-         {'link': 'Призыв голема хаоса'}),
-        ('(?:Призыв |Призванные |)трупн(?:|ые|ый|ого|ыми) голем(?:|а|ы|ов|ами)',
-         {'link': 'Призыв трупного голема'}),
-        ('(?:Призыв |Призванные |)голем(?:|а|ы|ов|ами) огня',
-         {'link': 'Призыв голема огня'}),
-        ('(?:Призыв |Призванные |)голем(?:|а|ы|ов|ами) льда',
-         {'link': 'Призыв голема льда'}),
-        ('(?:Призыв |Призванные |)голем(?:|а|ы|ов|ами) молнии',
-         {'link': 'Призыв голема молнии'}),
-        ('Приз(?:|ванные|ванных|ыв|ыва) неистов(?:|ые|ых|ого) дух(?:|а|и|ов)',
-         {'link': 'Призыв неистового духа'}),
-        ('Сотворен(?:|ие|ия|ного|ные) скелет(?:|а|ы|ов)',
-         {'link': 'Сотворение скелетов'}),
-        (
-        '(?:Призыв |Призванные |)каменн(?:|ые|ый|ых|ого|ыми) голем(?:|а|ы|ов|ами)',
-        {'link': 'Призыв каменного голема'}),
-        ('Раскол(?:|а|у)', {'link': 'Раскол'}),
-        ('Кругов(?:|ой|ым|ого|ому) взмах(?:|а|у|ом)',
-         {'link': 'Круговой взмах'}),
-        ('Щит(?:|а|у) бури', {'link': 'Щит бури'}),
-        ('Пут(?:|ы|ами) времени', {'link': 'Путы времени'}),
-        ('Вихр(?:|ь|я) стрел', {'link': 'Вихрь стрел'}),
-        ('Цепь молний ваал', {'link': 'Цепь молний ваал'}),
-        ('Горящая стрела ваал', {'link': 'Горящая стрела ваал'}),
-        ('Ясность ума ваал', {'link': 'Ясность ума ваал'}),
-        ('Укус стужи ваал', {'link': 'Укус стужи ваал'}),
-        ('Вихрь ваал', {'link': 'Вихрь ваал'}),
-        ('Подрыв трупа ваал', {'link': 'Подрыв трупа ваал'}),
-        ('Дисциплина ваал', {'link': 'Дисциплина ваал'}),
-        ('Двойной удар ваал', {'link': 'Двойной удар ваал'}),
-        ('Огненная ловушка ваал', {'link': 'Огненная ловушка ваал'}),
-        ('Огненный шар ваал', {'link': 'Огненный шар ваал'}),
-        ('Пламенный взрыв ваал', {'link': 'Пламенный взрыв ваал'}),
-        ('Леденящий молот ваал', {'link': 'Леденящий молот ваал'}),
-        ('Грация ваал', {'link': 'Грация ваал'}),
-        ('Сотрясение ваал', {'link': 'Сотрясение ваал'}),
-        ('Спешка ваал', {'link': 'Спешка ваал'}),
-        ('Тяжелый удар ваал', {'link': 'Тяжелый удар ваал'}),
-        ('Кольцо льда ваал', {'link': 'Кольцо льда ваал'}),
-        ('Призыв к бессмертию ваал', {'link': 'Призыв к бессмертию ваал'}),
-        ('Удар молнии ваал', {'link': 'Удар молнии ваал'}),
-        ('Ловушка молний ваал', {'link': 'Ловушка молний ваал'}),
-        ('Грозовой переход ваал', {'link': 'Грозовой переход ваал'}),
-        ('Расплавленный панцирь ваал', {'link': 'Расплавленный панцирь ваал'}),
-        ('Перелив энергии ваал', {'link': 'Перелив энергии ваал'}),
-        ('Ливень стрел ваал', {'link': 'Ливень стрел ваал'}),
-        ('Опустошение ваал', {'link': 'Опустошение ваал'}),
-        ('Праведный огонь ваал', {'link': 'Праведный огонь ваал'}),
-        ('Искра ваал', {'link': 'Искра ваал'}),
-        ('Призрачный бросок ваал', {'link': 'Призрачный бросок ваал'}),
-        ('Призыв бури ваал', {'link': 'Призыв бури ваал'}),
-        ('Сотворение скелетов ваал', {'link': 'Сотворение скелетов ваал'}),
-        ('Круговой взмах ваал', {'link': 'Круговой взмах ваал'}),
-        ('Отмщени(?:|е|я)', {'link': 'Отмщение'}),
-        ('Расчётлив(?:|ый|ого) удар(?:|а)', {'link': 'Расчётливый удар'}),
-        ('Удар(?:|а) гадюки', {'link': 'Удар гадюки'}),
-        ('Живучест(?:|и|ь|ью)', {'link': 'Живучесть'}),
-        ('Пург(?:|а|и)', {'link': 'Пурга'}),
-        ('Беззащитност(?:|и|ь|ью)', {'link': 'Беззащитность'}),
-        ('Метк(?:|а|и|ой) вождя', {'link': 'Метка вождя'}),
-        ('Шквал(?:|а) клинков', {'link': 'Шквал клинков'}),
-        ('Шальн(?:|ой|ого) удар(?:|а)', {'link': 'Шальной удар'}),
-        ('Увядани(?:|е|я)', {'link': 'Увядание'}),
-        ('Грозн(?:|ый|ым|ого) гнев(?:|а|ом)', {'link': 'Грозный гнев'}),
-        ('Круг(?:|а) яда', {'link': 'Круг яда'}),
-        ('Брос(?:|ок|ка) призрачного щита', {'link': 'Бросок призрачного щита'}),
-        ('Взрывная ловушка', {'link': 'Взрывная ловушка'}),
-        ('Губительн(?:|ый|ого) шаг(?:|а)', {'link': 'Губительный шаг'}),
-        ('Дробящая сталь', {'link': 'Дробящая сталь'}),
-        ('Кремаци(?:|и|я)', {'link': 'Кремация'}),
-        ('Ловушка-огнемёт', {'link': 'Ловушка-огнемёт'}),
-        ('Моров(?:|ой|ого) удар(?:|а)', {'link': 'Моровой удар'}),
-        ('Нестабильн(?:|ый|ого) труп(?:|а)', {'link': 'Нестабильный труп'}),
-        ('Носител(?:|ь|я) чумы', {'link': 'Носитель чумы'}),
-        ('Осколочн(?:|ая|ой) баллист(?:|а|ы)', {'link': 'Осколочная баллиста'}),
-        ('Пронзающ(?:|ая|ей) стал(?:|и|ь)', {'link': 'Пронзающая сталь'}),
-        ('Сейсмическая ловушка', {'link': 'Сейсмическая ловушка'}),
-        ('Стрел(?:|а|ы) ловчего', {'link': 'Стрела ловчего'}),
-        ('Стрела скверны', {'link': 'Стрела скверны'}),
-        ('Токсичный дождь', {'link': 'Токсичный дождь'}),
-        ('Точност(?:|и|ь|ью)', {'link': 'Точность'}),
-        ('Эксгумаци(?:|и|я)', {'link': 'Эксгумация'}),
-        ('Божественн(?:|ый|ого) гнев(?:|а)', {'link': 'Божественный гнев'}),
-        ('Возврат клейм', {'link': 'Возврат клейм'}),
-        ('Волн(?:|а|ы|ой) осуждения', {'link': 'Волна осуждения'}),
-        ('Зимн(?:|ей|яя) сфер(?:|а|ы)', {'link': 'Зимняя сфера'}),
-        ('Злорадств(?:|а|о|ом)', {'link': 'Злорадство'}),
-        ('Клейм(?:|а|о) Армагеддона', {'link': 'Клеймо Армагеддона'}),
-        ('Клейм(?:|а|о) бури', {'link': 'Клеймо бури'}),
-        ('Ледян(?:|ой|ого) скач(?:|а|ок)', {'link': 'Ледяной скачок'}),
-        ('Ловушк(?:|а|и) переливания', {'link': 'Ловушка переливания'}),
-        #
-        # Enchantment skills
-        #
-        ('Приказ(?:|а) клинков', {'link': 'Приказ клинков'}),
-        ('Приказ(?:|а) огня', {'link': 'Приказ огня'}),
-        ('Приказ(?:|а) силы', {'link': 'Приказ силы'}),
-        ('Приказ(?:|а) холода', {'link': 'Приказ холода'}),
-        ('Приказ(?:|а) ярости', {'link': 'Приказ ярости'}),
-        ('Приказ(?:|а) ада', {'link': 'Приказ ада'}),
-        ('Приказ(?:|а) гнева', {'link': 'Приказ гнева'}),
-        ('Приказ(?:|а) света', {'link': 'Приказ света'}),
-        ('Приказ(?:|а) отражения', {'link': 'Приказ отражения'}),
-        ('Приказ(?:|а) злобы', {'link': 'Приказ злобы'}),
-        ('Приказ(?:|а) грома', {'link': 'Приказ грома'}),
-        ('Приказ(?:|а) войны', {'link': 'Приказ войны'}),
-        ('Приказ(?:|а) зимы', {'link': 'Приказ зимы'}),
-        ('Приказ(?:|а) смерти', {'link': 'Приказ смерти'}),
-        ('Приказ(?:|а) бури', {'link': 'Приказ бури'}),
-        ('Указ(?:|а) клинков', {'link': 'Указ клинков'}),
-        ('Указ(?:|а) огня', {'link': 'Указ огня'}),
-        ('Указ(?:|а) силы', {'link': 'Указ силы'}),
-        ('Указ(?:|а) холода', {'link': 'Указ холода'}),
-        ('Указ(?:|а) ярости', {'link': 'Указ ярости'}),
-        ('Указ(?:|а) ада', {'link': 'Указ ада'}),
-        ('Указ(?:|а) гнева', {'link': 'Указ гнева'}),
-        ('Указ(?:|а) света', {'link': 'Указ света'}),
-        ('Указ(?:|а) отражения', {'link': 'Указ отражения'}),
-        ('Указ(?:|а) злобы', {'link': 'Указ злобы'}),
-        ('Указ(?:|а) грома', {'link': 'Указ грома'}),
-        ('Указ(?:|а) войны', {'link': 'Указ войны'}),
-        ('Указ(?:|а) зимы', {'link': 'Указ зимы'}),
-        ('Указ(?:|а) смерти', {'link': 'Указ смерти'}),
-        ('Указ(?:|а) бури', {'link': 'Указ бури'}),
-        ('Эдикт(?:|а) клинков', {'link': 'Эдикт клинков'}),
-        ('Эдикт(?:|а) огня', {'link': 'Эдикт огня'}),
-        ('Эдикт(?:|а) силы', {'link': 'Эдикт силы'}),
-        ('Эдикт(?:|а) холода', {'link': 'Эдикт холода'}),
-        ('Эдикт(?:|а) ярости', {'link': 'Эдикт ярости'}),
-        ('Эдикт(?:|а) ада', {'link': 'Эдикт ада'}),
-        ('Эдикт(?:|а) гнева', {'link': 'Эдикт гнева'}),
-        ('Эдикт(?:|а) света', {'link': 'Эдикт света'}),
-        ('Эдикт(?:|а) отражения', {'link': 'Эдикт отражения'}),
-        ('Эдикт(?:|а) злобы', {'link': 'Эдикт злобы'}),
-        ('Эдикт(?:|а) грома', {'link': 'Эдикт грома'}),
-        ('Эдикт(?:|а) войны', {'link': 'Эдикт войны'}),
-        ('Эдикт(?:|а) зимы', {'link': 'Эдикт зимы'}),
-        ('Эдикт(?:|а) смерти', {'link': 'Эдикт смерти'}),
-        ('Эдикт(?:|а) бури', {'link': 'Эдикт бури'}),
-        ('Слов(?:|а|о) клинков', {'link': 'Слово клинков'}),
-        ('Слов(?:|а|о) огня', {'link': 'Слово огня'}),
-        ('Слов(?:|а|о) силы', {'link': 'Слово силы'}),
-        ('Слов(?:|а|о) холода', {'link': 'Слово холода'}),
-        ('Слов(?:|а|о) ярости', {'link': 'Слово ярости'}),
-        ('Слов(?:|а|о) ада', {'link': 'Слово ада'}),
-        ('Слов(?:|а|о) гнева', {'link': 'Слово гнева'}),
-        ('Слов(?:|а|о) света', {'link': 'Слово света'}),
-        ('Слов(?:|а|о) отражения', {'link': 'Слово отражения'}),
-        ('Слов(?:|а|о) злобы', {'link': 'Слово злобы'}),
-        ('Слов(?:|а|о) грома', {'link': 'Слово грома'}),
-        ('Слов(?:|а|о) войны', {'link': 'Слово войны'}),
-        ('Слов(?:|а|о) зимы', {'link': 'Слово зимы'}),
-        ('Слов(?:|а|о) смерти', {'link': 'Слово смерти'}),
-        ('Слов(?:|а|о) бури', {'link': 'Слово бури'}),
-        #
-        # Support gems
-        #
-        ('Уроном хаосом (?:[0-9]+ уровня)', {'link': 'Урон хаосом'}),
-        ('Уроном холодом  (?:[0-9]+ уровня)', {'link': 'Урон холодом'}),
-        ('(?:Уроном от огня|Уроном огнем) (?:[0-9]+ уровня)',
-         {'link': 'Урон огнем'}),
-        ('(?:Уроном от молнии|Уроном молнией) (?:[0-9]+ уровня)',
-         {'link': 'Урон молнией'}),
-        ('Меткостью (?:[0-9]+ уровня)', {'link': 'Меткость'}),
-        (
-        'Колдовским выбросом (?:[0-9]+ уровня)', {'link': 'Колдовской выброс'}),
-        ('Богохульством (?:[0-9]+ уровня)', {'link': 'Богохульство'}),
-        ('Ослеплением (?:[0-9]+ уровня)', {'link': 'Ослепление'}),
-        ('Затруднением блока (?:[0-9]+ уровня)', {'link': 'Затруднение блока'}),
-        ('Магией крови (?:[0-9]+ уровня)', {'link': 'Магия крови'}),
-        ('Жаждой крови (?:[0-9]+ уровня)', {'link': 'Жажда крови'}),
-        ('Жестокостью (?:[0-9]+ уровня)', {'link': 'Жестокость'}),
-        ('Уроном от горения (?:[0-9]+ уровня)', {'link': 'Урон от горения'}),
-        ('Сотворением чар при критическом ударе (?:[0-9]+ уровня)',
-         {'link': 'Сотворение чар при критическом ударе'}),
-        ('Сотворением чар при смерти (?:[0-9]+ уровня)',
-         {'link': 'Сотворение чар при смерти'}),
-        ('Сотворением чар при убийстве в ближнем бою (?:[0-9]+ уровня)',
-         {'link': 'Сотворение чар при убийстве в ближнем бою'}),
-        ('Сотворением чар при получении урона (?:[0-9]+ уровня)',
-         {'link': 'Сотворение чар при получении урона'}),
-        ('Сотворением чар при оглушении (?:[0-9]+ уровня)',
-         {'link': 'Сотворение чар при оглушении'}),
-        ('Сотворением чар при поддержании (?:[0-9]+ уровня)',
-         {'link': 'Сотворение чар при поддержании'}),
-        ('Цепью (?:[0-9]+ уровня)', {'link': 'Цепь'}),
-        (
-        'Шансом кровотечения (?:[0-9]+ уровня)', {'link': 'Шанс кровотечения'}),
-        ('Паникой (?:[0-9]+ уровня)', {'link': 'Паника'}),
-        ('Воспламенением (?:[0-9]+ уровня)', {'link': 'Воспламенение'}),
-        ('Кассетными ловушками (?:[0-9]+ уровня)',
-         {'link': 'Кассетные ловушки'}),
-        ('Пронизывающим холодом (?:[0-9]+ уровня)',
-         {'link': 'Пронизывающий холод'}),
-        ('Холодом в огонь (?:[0-9]+ уровня)', {'link': 'Холод в огонь'}),
-        ('Средоточием (?:[0-9]+ уровня)', {'link': 'Средоточие'}),
-        ('Контролируемым разрушением (?:[0-9]+ уровня)',
-         {'link': 'Контролируемое разрушение'}),
-        ('Добиванием (?:[0-9]+ уровня)', {'link': 'Добивание'}),
-        ('Проклятием при попадании (?:[0-9]+ уровня)',
-         {'link': 'Проклятие при попадании'}),
-        ('Уроном при полном здоровье (?:[0-9]+ уровня)',
-         {'link': 'Урон при полном здоровье'}),
-        ('Смертельными состояниями (?:[0-9]+ уровня)',
-         {'link': 'Смертельные состояния'}),
-        ('Разложением (?:[0-9]+ уровня)', {'link': 'Разложение'}),
-        ('Эффективностью (?:[0-9]+ уровня)', {'link': 'Эффективность'}),
-        ('Концентрацией стихий (?:[0-9]+ уровня)',
-         {'link': 'Концентрация стихий'}),
-        ('Разгулом стихий (?:[0-9]+ уровня)', {'link': 'Разгул стихий'}),
-        ('Усилителем (?:[0-9]+ уровня)', {'link': 'Усилитель'}),
-        ('Зарядом выносливости при оглушении в ближнем бою (?:[0-9]+ уровня)',
-         {'link': 'Заряд выносливости при оглушении в ближнем бою'}),
-        ('Улучшителем (?:[0-9]+ уровня)', {'link': 'Улучшитель'}),
-        ('Наставником (?:[0-9]+ уровня)', {'link': 'Наставник'}),
-        ('Уроном от стихий атаками (?:[0-9]+ уровня)',
-         {'link': 'Урон от стихий атаками'}),
-        ('Ускорением атак (?:[0-9]+ уровня)', {'link': 'Ускорение атак'}),
-        ('Ускоренным сотворением чар (?:[0-9]+ уровня)',
-         {'link': 'Ускоренное сотворение чар'}),
-        ('Ускорением снарядов (?:[0-9]+ уровня)',
-         {'link': 'Ускорение снарядов'}),
-        (
-        'Пронизывающим жаром (?:[0-9]+ уровня)', {'link': 'Пронизывающий жар'}),
-        ('Разветвлением (?:[0-9]+ уровня)', {'link': 'Разветвление'}),
-        ('Укреплением (?:[0-9]+ уровня)', {'link': 'Укрепление'}),
-        ('Щедростью (?:[0-9]+ уровня)', {'link': 'Щедрость'}),
-        ('Множеством дополнительных снарядов (?:[0-9]+ уровня)',
-         {'link': 'Много дополнительных снарядов'}),
-        ('Переохлаждением (?:[0-9]+ уровня)', {'link': 'Переохлаждение'}),
-        ('Укусом Льда (?:[0-9]+ уровня)', {'link': 'Укус льда'}),
-        ('Расширенной областью действия (?:[0-9]+ уровня)',
-         {'link': 'Расширенная область действия'}),
-        ('Усилением критических ударов (?:[0-9]+ уровня)',
-         {'link': 'Усиление критических ударов'}),
-        ('Учащением критических ударов (?:[0-9]+ уровня)',
-         {'link': 'Учащение критических ударов'}),
-        ('Продлением (?:[0-9]+ уровня)', {'link': 'Продление'}),
-        ('Возбуждением (?:[0-9]+ уровня)', {'link': 'Возбуждение'}),
-        ('Распространением поджога (?:[0-9]+ уровня)',
-         {'link': 'Распространение поджога'}),
-        ('Железной хваткой (?:[0-9]+ уровня)', {'link': 'Железная хватка'}),
-        ('Железной волей (?:[0-9]+ уровня)', {'link': 'Железная воля'}),
-        ('Количеством предметов (?:[0-9]+ уровня)',
-         {'link': 'Количество предметов'}),
-        ('Редкостью предметов (?:[0-9]+ уровня)',
-         {'link': 'Редкость предметов'}),
-        ('Жертвенностью (?:[0-9]+ уровня)', {'link': 'Жертвенность'}),
-        ('Отбрасыванием (?:[0-9]+ уровня)', {'link': 'Отбрасывание'}),
-        ('Сокращением (?:[0-9]+ уровня)', {'link': 'Сокращение'}),
-        ('Дополнительными снарядами (?:[0-9]+ уровня)',
-         {'link': 'Дополнительные снаряды'}),
-        ('Меньшим ядом (?:[0-9]+ уровня)', {'link': 'Меньший яд'}),
-        ('Здоровьем за удар (?:[0-9]+ уровня)', {'link': 'Здоровье за удар'}),
-        ('(?:Похищением|Вытягиванием) здоровья (?:[0-9]+ уровня)',
-         {'link': 'Вытягивание здоровья'}),
-        ('Пронизывающими молниями (?:[0-9]+ уровня)',
-         {'link': 'Пронизывающие молнии'}),
-        ('Увечьем (?:[0-9]+ уровня)', {'link': 'Увечье'}),
-        ('(?:Похищением|Вытягиванием) маны (?:[0-9]+ уровня)',
-         {'link': 'Вытягивание маны'}),
-        ('Физическим урон ближнего боя (?:[0-9]+ уровня)',
-         {'link': 'Физический урон ближнего боя'}),
-        ('Раскатистым ударом (?:[0-9]+ уровня)', {'link': 'Раскатистый удар'}),
-        ('Минным полем (?:[0-9]+ уровня)', {'link': 'Минное поле'}),
-        (
-        'Уроном приспешников (?:[0-9]+ уровня)', {'link': 'Урон приспешников'}),
-        ('Здоровьем приспешников (?:[0-9]+ уровня)',
-         {'link': 'Здоровье приспешников'}),
-        ('Скоростью приспешников (?:[0-9]+ уровня)',
-         {'link': 'Скорость приспешников'}),
-        ('Стихийным войском (?:[0-9]+ уровня)', {'link': 'Стихийное войско'}),
-        ('Дополнительными ловушками (?:[0-9]+ уровня)',
-         {'link': 'Дополнительные ловушки'}),
-        ('Градом ударов (?:[0-9]+ уровня)', {'link': 'Град ударов'}),
-        ('Боевым ражем (?:[0-9]+ уровня)', {'link': 'Боевой раж'}),
-        ('Яростными снарядами (?:[0-9]+ уровня)', {'link': 'Яростные снаряды'}),
-        ('Физическим уроном в молнии (?:[0-9]+ уровня)',
-         {'link': 'Физический урон в молнии'}),
-        ('Пронзанием (?:[0-9]+ уровня)', {'link': 'Пронзание'}),
-        ('Стрельбой в упор (?:[0-9]+ уровня)', {'link': 'Стрельба в упор'}),
-        ('Ядом (?:[0-9]+ уровня)', {'link': 'Яд'}),
-        ('Зарядом энергии при критическом ударе (?:[0-9]+ уровня)',
-         {'link': 'Энергетический заряд при критическом ударе'}),
-        ('Тотемом-баллистой (?:[0-9]+ уровня)', {'link': 'Тотем-баллиста'}),
-        ('Вдохновением (?:[0-9]+ уровня)', {'link': 'Вдохновение'}),
-        ('Цепным подрывом (?:[0-9]+ уровня)', {'link': 'Цепной подрыв'}),
-        ('Возвращающимися снарядами (?:[0-9]+ уровня)',
-         {'link': 'Возвращающиеся снаряды'}),
-        ('Беспощадностью (?:[0-9]+ уровня)', {'link': 'Беспощадность'}),
-        ('Замедленными снарядами (?:[0-9]+ уровня)',
-         {'link': 'Замедленные снаряды'}),
-        ('Эхом (?:магии|чар) (?:[0-9]+ уровня)', {'link': 'Эхо магии'}),
-        ('Колдующим тотемом (?:[0-9]+ уровня)', {'link': 'Колдующий тотем'}),
-        ('Разделением снарядов (?:[0-9]+ уровня)',
-         {'link': 'Разделение снарядов'}),
-        ('Оглушением (?:[0-9]+ уровня)', {'link': 'Оглушение'}),
-        ('Стремительным недугом (?:[0-9]+ уровня)',
-         {'link': 'Стремительный недуг'}),
-        ('Ловушкой (?:[0-9]+ уровня)', {'link': 'Ловушка'}),
-        ('Улучшенными ловушками (?:[0-9]+ уровня)',
-         {'link': 'Улучшенные ловушки'}),
-        ('Уроном ловушек и мин (?:[0-9]+ уровня)',
-         {'link': 'Урон ловушек и мин'}),
-        ('Безграничными состояниями (?:[0-9]+ уровня)',
-         {'link': 'Безграничные состояния'}),
-        ('Едкими токсинами (?:[0-9]+ уровня)', {'link': 'Едкие токсины'}),
-        ('Манипуляцией пустотой (?:[0-9]+ уровня)',
-         {'link': 'Манипуляция пустотой'}),
-        ('Быстрой сборкой (?:[0-9]+ уровня)', {'link': 'Быстрая сборка'}),
-        ('Зовом предков (?:[0-9]+ уровня)', {'link': 'Зов предков'}),
-        ('Кольцом стрел (?:[0-9]+ уровня)', {'link': 'Кольцо стрел'}),
-        ('(?:Очередью|Стрельбой очередями) (?:[0-9]+ уровня)', {'link': 'Стрельба очередями'}),
-        ('Ударной волной (?:[0-9]+ уровня)', {'link': 'Ударная волна'}),
-        ('Леденящим охлаждением (?:[0-9]+ уровня)',
-         {'link': 'Леденящее охлаждение'}),
-        ('Пылающим легионом (?:[0-9]+ уровня)', {'link': 'Пылающий легион'}),
-        ('Заряженными минами (?:[0-9]+ уровня)', {'link': 'Заряженные мины'}),
-        ('Губительным прикосновением (?:[0-9]+ уровня)',
-         {'link': 'Губительное прикосновение'}),
-        ('Похищением энергетического щита (?:[0-9]+ уровня)',
-         {'link': 'Похищение энергетического щита'}),
-        (
-        'Призрачным лучником (?:[0-9]+ уровня)', {'link': 'Призрачный лучник'}),
-        ('Большим залпом (?:[0-9]+ уровня)', {'link': 'Большой залп'}),
-        ('Высвобождением (?:[0-9]+ уровня)', {'link': 'Высвобождение'}),
-        ('Интенсивностью (?:[0-9]+ уровня)', {'link': 'Интенсивность'}),
-        ('Проколом (?:[0-9]+ уровня)', {'link': 'Прокол'}),
-        ('пробуждённым Уроном хаосом (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Урон хаосом'}),
-        ('пробуждённым Уроном холодом (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Урон холодом'}),
-        ('пробуждённым Уроном огнём (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Урон огнем'}),
-        ('пробуждённым Уроном молнией (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Урон молнией'}),
-        ('пробуждённым Зовом предков (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Зов предков'}),
-        ('пробуждённым Кольцом стрел (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Кольцом стрел'}),
-        ('пробуждённым Богохульством (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Богохульство'}),
-        ('пробуждённой Жестокостью (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Жестокость'}),
-        ('пробуждённым Уроном от горения (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Урон от горения'}),
-        ('пробуждённым Сотворением чар при критическом ударе (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Сотворение чар при критическом ударе'}),
-        ('пробуждённым Сотворением чар при поддержании (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Сотворение чар при поддержании'}),
-        (
-        'пробуждённой Цепью (?:[0-9]+ уровня)', {'link': 'Пробужденный: Цепь'}),
-        ('пробуждённым Пронизывающим холодом (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Пронизывающий холод'}),
-        ('пробуждённым Контролируемым разрушением (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Контролируемое разрушение'}),
-        ('пробуждённым Проклятием при попадании (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Проклятие при попадании'}),
-        ('пробуждёнными Смертельными состояниями (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Смертельные состояния'}),
-        ('пробуждённой Концентрацией стихий (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Концентрация стихий'}),
-        ('пробуждённым Пронизывающим жаром (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Пронизывающий жар'}),
-        ('пробуждённым Разветвлением (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Разветвление'}),
-        ('пробуждённой Щедростью (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Щедрость'}),
-        ('пробуждёнными Многими дополнительными снарядами (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Много дополнительных снарядов'}),
-        ('пробуждённой Расширенной областью действия (?:[0-9]+ уровня)',
-         {'link': 'Пробужденный: Расширенная область действия'}),
-
+        ("Attack Damage", {"link": "Attack Damage"}),
+        ("Spell Damage", {"link": "Spell Damage"}),
+        ("Damage over Time", {"link": "Damage over Time"}),
+        ("Melee Damage", {"link": "Melee Damage"}),
+        ("Elemental Damage", {"link": "Elemental Damage"}),
+        ("Minion Damage", {"link": "Minion Damage"}),
+        ("Area Damage", {"link": "Area Damage"}),
+        ("Projectile Damage", {"link": "Projectile Damage"}),
+        ("Mine Damage", {"link": "Mine Damage"}),
+        ("Trap Damage", {"link": "Trap Damage"}),
+        ("Totem Damage", {"link": "Totem Damage"}),
+        ("Damage", {"link": "Damage"}),
         #
         # Attibutes
         #
-        ('ловкост(?:|ь|и)', {'link': 'Ловкость'}),
-        ('интеллект(?:|а|у)', {'link': 'Интеллект'}),
-        ('сил(?:|а|е|ы)', {'link': 'Сила'}),
-        ('характеристик(?:|ам)', {'link': 'Характеристики'}),
+        ("Attribute(?:|s)", {"link": "Attribute"}),
+        ("Dexterity", {"link": "Dexterity"}),
+        ("Intelligence", {"link": "Intelligence"}),
+        ("Strength", {"link": "Strength"}),
+        #
+        # Item types
+        #
+        # Armour
+        ("Body Armour(?:|s)", {"link": "Body Armour"}),
+        ("Boots", {"link": "Boots"}),
+        ("Gloves", {"link": "Gloves"}),
+        ("Helmet(?:|s)", {"link": "Helmet"}),
+        ("Shield(?:|s)", {"link": "Shield"}),
+        # Weapon
+        ("Axe(?:|s)", {"link": "Axe"}),
+        ("Bow(?:|s)", {"link": "Bow"}),
+        ("Claw(?:|s)", {"link": "Claw"}),
+        ("Dagger(?:|s)", {"link": "Dagger"}),
+        ("Fishing Rod(?:|s)", {"link": "Fishing Rod"}),
+        ("Mace(?:|s)", {"link": "Mace"}),
+        ("Sceptre(?:|s)", {"link": "Sceptre"}),
+        ("Staff|Staves", {"link": "Staff"}),
+        ("Sword(?:|s)", {"link": "Sword"}),
+        ("Wand(?:|s)", {"link": "Wand"}),
+        ("One Handed Melee Weapon(?:|s)", {"link": "One Handed Melee Weapon"}),
+        ("Two Handed Melee Weapon(?:|s)", {"link": "Two Handed Melee Weapon"}),
+        ("Melee Weapon(?:|s)", {"link": "Melee Weapon"}),
+        ("Ranged Weapon(?:|s)", {"link": "Ranged Weapon"}),
+        ("Weapon(?:|s)", {"link": "Weapon"}),
+        # Jewellery
+        ("Amulet(?:|s)", {"link": "Amulet"}),
+        ("Belt(?:|s)", {"link": "Belt"}),
+        ("(?<!small |edium |large |ssive )Ring(?:|s)", {"link": "Ring"}),
+        ("Jewellery", {"link": "Jewellery"}),
+        # Jewels
+        ("Murderous Eye Jewel(?:|s)", {"link": "Murderous Eye Jewel"}),
+        ("Ghastly Eye Jewel(?:|s)", {"link": "Ghastly Eye Jewel"}),
+        ("Searching Eye Jewel(?:|s)", {"link": "Searching Eye Jewel"}),
+        ("Hypnotic Eye Jewel(?:|s)", {"link": "Hypnotic Eye Jewel"}),
+        ("Abyss Jewel(?:|s)", {"link": "Abyss Jewel"}),
+        ("Jewel(?:|s)", {"link": "Jewel"}),
+        # Scarabs
+        ("Abyss Scarab(?:|s)", {"link": "Abyss Scarab (disambiguation)"}),
+        ("Ambush Scarab(?:|s)", {"link": "Ambush Scarab (disambiguation)"}),
+        ("Anarchy Scarab(?:|s)", {"link": "Anarchy Scarab (disambiguation)"}),
+        ("Bestiary Scarab(?:|s)", {"link": "Bestiary Scarab (disambiguation)"}),
+        ("Betrayal Scarab(?:|s)", {"link": "Betrayal Scarab (disambiguation)"}),
+        ("Beyond Scarab(?:|s)", {"link": "Beyond Scarab (disambiguation)"}),
+        ("Blight Scarab(?:|s)", {"link": "Blight Scarab (disambiguation)"}),
+        ("Breach Scarab(?:|s)", {"link": "Breach Scarab (disambiguation)"}),
+        ("Cartography Scarab(?:|s)", {"link": "Cartography Scarab (disambiguation)"}),
+        ("Delirium Scarab(?:|s)", {"link": "Delirium Scarab (disambiguation)"}),
+        ("Sulphite Scarab(?:|s)", {"link": "Sulphite Scarab (disambiguation)"}),
+        ("Divination Scarab(?:|s)", {"link": "Divination Scarab (disambiguation)"}),
+        ("Domination Scarab(?:|s)", {"link": "Domination Scarab (disambiguation)"}),
+        ("Essence Scarab(?:|s)", {"link": "Essence Scarab (disambiguation)"}),
+        ("Expedition Scarab(?:|s)", {"link": "Expedition Scarab (disambiguation)"}),
+        ("Harbinger Scarab(?:|s)", {"link": "Harbinger Scarab (disambiguation)"}),
+        ("Harvest Scarab(?:|s)", {"link": "Harvest Scarab (disambiguation)"}),
+        ("Influencing Scarab(?:|s)", {"link": "Influencing Scarab (disambiguation)"}),
+        ("Kalguuran Scarab(?:|s)", {"link": "Kalguuran Scarab (disambiguation)"}),
+        ("Legion Scarab(?:|s)", {"link": "Legion Scarab (disambiguation)"}),
+        ("Ritual Scarab(?:|s)", {"link": "Ritual Scarab (disambiguation)"}),
+        ("Titanic Scarab(?:|s)", {"link": "Titanic Scarab (disambiguation)"}),
+        ("Torment Scarab(?:|s)", {"link": "Torment Scarab (disambiguation)"}),
+        ("Ultimatum Scarab(?:|s)", {"link": "Ultimatum Scarab (disambiguation)"}),
+        ("Horned Scarab(?:|s)", {"link": "Horned Scarab"}),
+        ("Scarab(?:|s)", {"link": "Scarab"}),
+        # Currency items
+        ("Lifeforce", {"link": "Lifeforce"}),
+        ("Remnant(?:|s) of Corruption", {"link": "Remnant of Corruption"}),
+        ("Cartographer's Chisel(?:|s)", {"link": "Cartographer's Chisel"}),
+        ("Glassblower's Bauble(?:|s)", {"link": "Glassblower's Bauble"}),
+        ("Gemcutter's Prism(?:|s)", {"link": "Gemcutter's Prism"}),
+        ("Eldritch Chaos Orb(?:|s)", {"link": "Eldritch Chaos Orb"}),
+        ("Eldritch Orb(?:|s) of Annulment", {"link": "Eldritch Orb of Annulment"}),
+        ("Eldritch Exalted Orb(?:|s)", {"link": "Eldritch Exalted Orb"}),
+        ("Divine Orb(?:|s)", {"link": "Divine Orb"}),
+        ("Exalted Orb(?:|s)", {"link": "Exalted Orb"}),
+        ("Regal Orb(?:|s)", {"link": "Regal Orb"}),
+        ("Chaos Orb(?:|s)", {"link": "Chaos Orb"}),
+        ("Orb(?:|s) of Alteration", {"link": "Orb of Alteration"}),
+        ("Orb(?:|s) of Scouring", {"link": "Orb of Scouring"}),
+        ("Blessed Orb(?:|s)", {"link": "Blessed Orb"}),
+        ("Chromatic Orb(?:|s)", {"link": "Chromatic Orb"}),
+        ("Orb(?:|s) of Fusing", {"link": "Orb of Fusing"}),
+        ("Jeweller's Orb(?:|s)", {"link": "Jeweller's Orb"}),
+        ("Orb(?:|s) of Horizons", {"link": "Orb of Horizons"}),
+        ("Orb(?:|s) of Binding", {"link": "Orb of Binding"}),
+        ("Orb(?:|s) of Unmaking", {"link": "Orb of Unmaking"}),
+        ("Orb(?:|s) of Annulment", {"link": "Orb of Annulment"}),
+        ("Vaal Orb(?:|s)", {"link": "Vaal Orb"}),
+        ("Instilling Orb(?:|s)", {"link": "Instilling Orb"}),
+        ("Enkindling Orb(?:|s)", {"link": "Enkindling Orb"}),
+        ("Orb(?:|s) of Regret", {"link": "Orb of Regret"}),
+        ("Lesser Eldritch Ember(?:|s)", {"link": "Lesser Eldritch Ember"}),
+        ("Greater Eldritch Ember(?:|s)", {"link": "Greater Eldritch Ember"}),
+        ("Grand Eldritch Ember(?:|s)", {"link": "Grand Eldritch Ember"}),
+        ("Exceptional Eldritch Ember(?:|s)", {"link": "Exceptional Eldritch Ember"}),
+        ("Lesser Eldritch Ichor(?:|s)", {"link": "Lesser Eldritch Ichor"}),
+        ("Greater Eldritch Ichor(?:|s)", {"link": "Greater Eldritch Ichor"}),
+        ("Grand Eldritch Ichor(?:|s)", {"link": "Grand Eldritch Ichor"}),
+        ("Exceptional Eldritch Ichor(?:|s)", {"link": "Exceptional Eldritch Ichor"}),
+        ("Basic Currency(?: Item(?:|s))?", {"link": "Basic Currency"}),
+        ("Currency(?: Item(?:|s))?", {"link": "Currency"}),
+        # Other
+        ("Quiver(?:|s)", {"link": "Quiver"}),
+        ("Flask(?:|s)", {"link": "Flask"}),
+        ("Tincture(?:|s)", {"link": "Tincture"}),
+        ("Blight(?:|ed) Map(?:|s)", {"link": "Blighted Map"}),
+        ("Blight-Ravaged Map(?:|s)", {"link": "Blight-Ravaged Map"}),
+        ("Map(?:|s)", {"link": "Map"}),
+        ("Breach Splinter(?:|s)", {"link": "Breach Splinter"}),
+        ("Breachstone(?:|s)", {"link": "Breachstone"}),
+        ("Rogue(?:|'s) Marker(?:|s)", {"link": "Rogue's Marker"}),
+        ("Contract(?:|s)", {"link": "Contract"}),
+        ("Blueprint(?:|s)", {"link": "Blueprint"}),
+        ("Inscribed Ultimatum(?:|s)", {"link": "Inscribed Ultimatum"}),
+        ("Maven(?:|'s) Chisel(?:|s)", {"link": "Maven's Chisel"}),
+        ("Simulacrum Splinter(?:|s)", {"link": "Simulacrum Splinter"}),
+        ("Delirium Orb(?:|s)", {"link": "Delirium Orb"}),
+        ("Divine Vessel(?:|s)", {"link": "Divine Vessel"}),
+        ("Divination Card(?:|s)", {"link": "Divination Card"}),
+        ("Support Gem(?:|s)", {"link": "Support Gem"}),
+        ("Skill Gem(?:|s)", {"link": "Skill Gem"}),
+        ("Improved Offering to the Goddess", {"link": "Improved Offering to the Goddess"}),
+        ("Offering to the Goddess", {"link": "Offering to the Goddess"}),
+        ("Forbidden Tome(?:|s)", {"link": "Forbidden Tome"}),
+        #
+        # Ailments
+        #
+        ("Elemental Ailment(?:|s)", {"link": "Elemental Ailment"}),
+        ("Cold Ailment(?:|s)", {"link": "Cold Ailment"}),
+        ("Fire Ailment(?:|s)", {"link": "Fire Ailment"}),
+        ("Lightning Ailment(?:|s)", {"link": "Lightning Ailment"}),
+        ("Ailment(?:|s)", {"link": "Ailment"}),
+        ("Bleed(?:|ing)", {"link": "Bleeding"}),
+        ("Brittle", {"link": "Brittle"}),
+        ("Chill(?:|s|ed)", {"link": "Chill"}),
+        ("Frozen|Freeze(?:|s)", {"link": "Freeze"}),
+        ("Ignite(?:|s|d)", {"link": "Ignite"}),
+        ("Poison(?:|s|ed)", {"link": "Poison"}),
+        ("Sap(?:|ped)", {"link": "Sapped"}),
+        ("Scorch(?:|ed)", {"link": "Scorch"}),
+        ("Shock(?:|s|ed)", {"link": "Shock"}),
+        #
+        # Area, content, monsters, masters
+        #
+        ("Monster(?:|s)", {"link": "Monster"}),
+        ("Boss(?:|es)", {"link": "Boss"}),
+        ("Abyss(?:|es)", {"link": "Abyss"}),
+        ("Incursion(?:|s)", {"link": "Incursion"}),
+        ("Alva", {"link": "Alva"}),
+        ("Beyond Demon", {"link": "Beyond Demon"}),
+        ("Beyond", {"link": "Beyond"}),
+        ("Breach(?:|es)", {"link": "Breach"}),
+        ("Blight Encounter(?:|s)", {"link": "Blight Encounter"}),
+        ("Blight(?:|ed)(?= Ches| Mons| Towe| Boss| Enem)", {"link": "Blight Encounter"}),
+        ("Beast(?:|s)", {"link": "Beast"}),
+        ("Einhar", {"link": "Einhar"}),
+        ("Harbinger(?:|s)", {"link": "Harbinger"}),
+        ("Niko", {"link": "Niko"}),
+        ("(?:Voltaxic )?Sulphite(?: Vein(?:|s))?", {"link": "Voltaxic Sulphite"}),
+        ("Expedition(?: Encounter(?:|s))?", {"link": "Expedition"}),
+        ("Jun", {"link": "Jun"}),
+        ("(?:Immortal )?Syndicate", {"link": "Immortal Syndicate"}),
+        ("Legion(?: Encounter(?:|s))?", {"link": "Legion"}),
+        ("Delirium(?: Encounter(?:|s))?", {"link": "Delirium"}),
+        ("Essence(?:|s)", {"link": "Essence"}),
+        ("Ore Deposit(?:|s)", {"link": "Ore Deposit"}),
+        ("Ritual(?:|s)", {"link": "Ritual"}),
+        ("Ritual Altar(?:|s)", {"link": "Ritual Altar"}),
+        ("Rogue Exile(?:|s)", {"link": "Rogue Exile"}),
+        ("The Sacred Grove", {"link": "The Sacred Grove"}),
+        ("Harvest(?:|ed)", {"link": "Harvest"}),
+        ("Shrine(?:|s)", {"link": "Shrine"}),
+        ("Smuggler's Cache(?:|s)", {"link": "Smuggler's Cache"}),
+        ("Ultimatum(?: Encounter(?:|s))?", {"link": "Ultimatum"}),
+        ("Strongbox(?:|es)", {"link": "Strongbox"}),
+        ("Tormented Spirit(?:|s)", {"link": "Tormented Spirit"}),
+        ("Wildwood", {"link": "Wildwood"}),
+        ("Map Crafting Option(?:|s)", {"link": "Map Crafting Option"}),
+        ("(?:The )?Maven", {"link": "The Maven"}),
+        ("(?:Eldritch|Searing Exarch|Eater of Worlds) Altar(?:|s)", {"link": "Eldritch Altar"}),
+        ("(?:The )?Searing Exarch", {"link": "The Searing Exarch"}),
+        ("(?:The )?Eater of Worlds", {"link": "The Eater of Worlds"}),
+        ("Vaal Side Area(?:|s)", {"link": "Vaal Side Area"}),
+        ("Vaal Vessel(?:|s)", {"link": "Vaal Vessel"}),
+        ("Tempest(?:|s)", {"link": "Tempest"}),
+        ("Labyrinth Trial(?:|s)", {"link": "Labyrinth Trial"}),
+        ("Area(?:|s)", {"link": "Area"}),
+        #
+        # Other game mechanics
+        #
+        ("Aura(?:|s)", {"link": "Aura"}),
+        ("Herald", {"link": "Herald"}),
+        ("Curse(?:|s|d)", {"link": "Curse"}),
+        ("Hex(?:|es|ed)", {"link": "Hex"}),
+        ("Mark(?:|s|ed)", {"link": "Mark"}),
+        ("Spell(?:|s)", {"link": "Spell"}),
+        ("Attack(?:|s)", {"link": "Attack"}),
+        ("Minion(?:|s)", {"link": "Minion"}),
+        ("Corpse(?:|s)", {"link": "Corpse"}),
+        ("Mine(?:|s)", {"link": "Mine"}),
+        ("Totem(?:|s)", {"link": "Totem"}),
+        ("Trap(?:|s)", {"link": "Trap"}),
+        ("Warcry|Warcries", {"link": "Warcry"}),
+        ("Brand(?:|s)", {"link": "Brand"}),
+        ("(?:Melee )?Strike(?:|s)", {"link": "Strike"}),
+        ("Slam", {"link": "Slam"}),
+        ("Trigger(?:|s|ed)", {"link": "Trigger"}),
+        ("Linked(?= Targ| Play)", {"link": "Link skill"}),
+        ("Stance", {"link": "Stance"}),
+        ("Banner(?:|s)(?: Skill(?:|s))?", {"link": "Banner"}),
+        ("Offering(?:|s)(?: Skill(?:|s))?", {"link": "Offering"}),
+        ("Projectile(?:|s)", {"link": "Projectile"}),
+        ("Pierce(?:|d)|Piercing", {"link": "Pierce"}),
+        ("Chain(?:|ed|ing)", {"link": "Chain"}),
+        ("Fork(?:|ed|ing)", {"link": "Fork"}),
+        ("Return(?= to you)|Returning(?= Projec)", {"link": "Return"}),
+        ("Shrine Buff(?:|s)", {"link": "Shrine"}),
+        ("Guard(?: Buff(?:|s))?", {"link": "Guard skill"}),
+        ("Dual Wield(?:|ing)", {"link": "Dual Wielding"}),
+        ("Unarmed", {"link": "Unarmed"}),
+        ("Unencumbered", {"link": "Unencumbered"}),
+        ("Hit(?:|s)", {"link": "Hit"}),
+        ("Kill(?:|s|ed|ing)", {"link": "Kill"}),
+        ("Lucky", {"link": "Lucky"}),
+        ("Unlucky", {"link": "Unlucky"}),
+        ("Stationary", {"link": "Stationary"}),
+        ("Recently", {"link": "Recently"}),
+        ("Range", {"link": "Range"}),
+        ("Nearby", {"link": "Nearby"}),
+        ("in your Presence", {"link": "In your Presence"}),
+        ("Shatter(?:|ed)", {"link": "Shatter"}),
+        ("Socket(?:|s|ed)", {"link": "Item socket"}),
+        ("Skill(?:|s)", {"link": "Skill"}),
+        ("Buff(?:|s)", {"link": "Buff"}),
+        ("Duration", {"link": "Duration"}),
+        ("Implicit Modifier(?:|s)", {"link": "Implicit Modifier"}),
+        ("Modifier(?:|s)", {"link": "Modifier"}),
+        ("Corrupted", {"link": "Corrupted"}),
+        ("Reflect(?:|s|ed)", {"link": "Reflect"}),
+        ("Penetrate(?:|s)", {"link": "Penetrate"}),
+        ("PvP", {"link": "PvP"}),
+        ("Quality", {"link": "Quality"}),
+        #
+        # Late matching
+        #
+        ("Absolution", {"link": "Absolution"}),
+        ("Affliction", {"link": "Affliction (skill)"}),
+        ("(?<!ng in )Ambush", {"link": "Ambush"}),
+        ("Arc", {"link": "Arc"}),
+        ("Blight", {"link": "Blight"}),
+        ("Dash", {"link": "Dash"}),
+        ("Reap", {"link": "Reap"}),
+        ("Focus", {"link": "Focus"}),
+        ("Focused", {"link": "Focused"}),
+        ("Frenzy", {"link": "Frenzy"}),
+        ("Reflection", {"link": "Reflection"}),
+        ("Armour", {"link": "Armour"}),
+        ("(?<! to )Charge(?:|s)", {"link": "Charge"}),
+        ("Crush(?:|ed)", {"link": "Crushed"}),
+    ),
+    "Russian": (
+        #
+        # Skills
+        #
+        ("Клич(?:|а) бездны", {"link": "Клич бездны"}),
+        ("Защитник(?:|а) предков", {"link": "Защитник предков"}),
+        ("Вожд(?:|ь|я) предков", {"link": "Вождь предков"}),
+        ("Жгуч(?:|ая|ей) злоб(?:|а|ы|ой)", {"link": "Жгучая злоба"}),
+        ("Аниматрон(?:|а|ы)", {"link": "Аниматрон"}),
+        ("(?:Живо(?:|е|го)|оживл(?:|е|ё)нно(?:|е|го)) оружи(?:|е|я)", {"link": "Живое оружие"}),
+        ("Цеп(?:|ь|и) молний", {"link": "Цепь молний"}),
+        ("Северн(?:|ая|ой) брон(?:|я|и|ёй)", {"link": "Северная броня"}),
+        ("Северно(?:|е|го) дыхани(?:|е|я)", {"link": "Северное дыхание"}),
+        ("Артиллерийск(?:|ая|ой) баллист(?:|а|ы)", {"link": "Артиллерийская баллиста"}),
+        ("Метк(?:|а|и|ой) убийцы", {"link": "Метка убийцы"}),
+        ("Шаров(?:|ая|ой) молни(?:|я|и)", {"link": "Шаровая молния"}),
+        ("Очеред(?:|ь|и)", {"link": "Очередь"}),
+        ("Медвеж(?:|ий|ьего) капкан(?:|а)", {"link": "Медвежий капкан"}),
+        ("Порыв(?:|а) клинков", {"link": "Порыв клинков"}),
+        ("Ловушка лезвий", {"link": "Ловушка лезвий"}),
+        ("Вихр(?:|ь|ю|я) клинков", {"link": "Вихрь клинков"}),
+        ("Мечепад(?:|а|у)", {"link": "Мечепад"}),
+        ("Дожд(?:|ь|ю|я) взрывов", {"link": "Дождь взрывов"}),
+        ("Мор(?:|а)", {"link": "Мор"}),
+        ("Стрел(?:|а|е|ы)-телепорт(?:|а|у)", {"link": "Стрела-телепорт"}),
+        ("Кровавый угар", {"link": "Кровавый угар"}),
+        ("Подношени(?:|е|я) костей", {"link": "Подношение костей"}),
+        ("Горящ(?:|ая|ей) стрел(?:|а|ы)", {"link": "Горящая стрела"}),
+        ("Едк(?:|ая|ой) стрел(?:|а|е|ы)", {"link": "Едкая стрела"}),
+        ("Рыв(?:|ок|ка)", {"link": "Рывок"}),
+        ("Заряженн(?:|ый|ого) рыв(?:|ок|ка)", {"link": "Заряженный рывок"}),
+        ("Ясност(?:|ь|и|ью) ума", {"link": "Ясность ума"}),
+        ("Рассечени(?:|е|я)", {"link": "Рассечение"}),
+        ("Бросок кобры", {"link": "Бросок кобры"}),
+        ("Укус(?:|а) стужи", {"link": "Укус стужи"}),
+        ("Проводимост(?:|ь|и|ью)", {"link": "Проводимость"}),
+        ("Инфекци(?:|и|я)", {"link": "Инфекция"}),
+        ("Ловушк(?:|а|и) переманивания", {"link": "Ловушка переманивания"}),
+        ("Сбор(?:|а)", {"link": "Сбор"}),
+        ("Вихр(?:|ь|я|ю)", {"link": "Вихрь"}),
+        ("Вливание урона", {"link": "Вливание урона"}),
+        ("Т(?:|е|ё)мн(?:|ый|ого) договор(?:|а)", {"link": "Тёмный договор"}),
+        ("Тотем(?:|а)-приманк(?:|а|и)", {"link": "Тотем-приманка"}),
+        ("Осквернение", {"link": "Осквернение"}),
+        ("Решимост(?:|и|ь|ью)", {"link": "Решимость"}),
+        ("Подрыв(?:|а|е) трупа", {"link": "Подрыв трупа"}),
+        ("Подрыв мин", {"link": "Подрыв мин"}),
+        ("Поглощающ(?:|ий|его) тотем(?:|а)", {"link": "Поглощающий тотем"}),
+        ("Разряд(?:|а)", {"link": "Разряд"}),
+        ("Дисциплин(?:|а|ы|ой)", {"link": "Дисциплина"}),
+        ("Удар(?:|а) власти", {"link": "Удар власти"}),
+        ("Стрела рока", {"link": "Стрела рока"}),
+        ("Двойн(?:|ой|ым|ого) удар(?:|а|ом)", {"link": "Двойной удар"}),
+        ("Парн(?:|ый|ым|ого) удар(?:|а|ом)", {"link": "Парный удар"}),
+        ("Землетрясени(?:|е|ю|я)", {"link": "Землетрясение"}),
+        ("Удар(?:|а|ом) стихии", {"link": "Удар стихии"}),
+        ("Уязвимост(?:|и|ь|ью) к стихиям", {"link": "Уязвимость к стихиям"}),
+        ("Клич(?:|а) стойкости", {"link": "Клич стойкости"}),
+        ("Слабост(?:|и|ь|ью)", {"link": "Слабость"}),
+        ("Похищени(?:|е|я) сущности", {"link": "Похищение сущности"}),
+        ("Бесплотны(?:|е|х) нож(?:|и|ей)", {"link": "Бесплотные ножи"}),
+        ("Взрывн(?:|ая|ой|ые) стрел(?:|а|ы)", {"link": "Взрывная стрела"}),
+        ("Пирокластов(?:|ая|ой|ые) мин(?:|а|ы)", {"link": "Пирокластовая мина"}),
+        ("Огненн(?:|ая|ой) ловушк(?:|а|и)", {"link": "Огненная ловушка"}),
+        ("Горящее оружие", {"link": "Горящее оружие"}),
+        ("Огненн(?:|ый|ого) шар(?:|а)", {"link": "Огненный шар"}),
+        ("Огненн(?:|ый|ого) шторм(?:|а)", {"link": "Огненный шторм"}),
+        ("Огненн(?:|ый|ого|ому) рыв(?:|ок|ка|ку)", {"link": "Огненный рывок"}),
+        ("Выброс(?:|а) пламени", {"link": "Выброс пламени"}),
+        ("Тотем(?:|а|ом) священного огня", {"link": "Тотем священного огня"}),
+        ("Пламенн(?:|ый|ого) взрыв(?:|а)", {"link": "Пламенный взрыв"}),
+        ("Горючест(?:|и|ь|ью)", {"link": "Горючесть"}),
+        ("Подношени(?:|е|я) плоти", {"link": "Подношение плоти"}),
+        ("Внезапн(?:|ый|ым|ого) удар(?:|а|ом)", {"link": "Внезапный удар"}),
+        ("Шквальн(?:|ая|ой) мин(?:|а|ы)", {"link": "Шквальная мина"}),
+        ("Волн(?:|а|ы) холода", {"link": "Волна холода"}),
+        ("Бешенств(?:|а|о)", {"link": "Бешенство"}),
+        ("Морозн(?:|ый|ого) шар(?:|а)", {"link": "Морозный шар"}),
+        ("Ледяны(?:|е|х|ми) клинк(?:|и|ов|ами)", {"link": "Ледяные клинки"}),
+        ("Морозн(?:|ая|ой) бомб(?:|а|ы)", {"link": "Морозная бомба"}),
+        ("Стен(?:|а|ы) льда", {"link": "Стена льда"}),
+        ("Обморожени(?:|е|ю|я|ем)", {"link": "Обморожение"}),
+        ("Ледян(?:|ой|ым|ого) каскад(?:|а|ом)", {"link": "Ледяной каскад"}),
+        ("Леденящ(?:|ий|им|его) молот(?:|а|ом)", {"link": "Леденящий молот"}),
+        ("Граци(?:|и|я|ей)", {"link": "Грация"}),
+        ("Сотрясени(?:|е|я)", {"link": "Сотрясение"}),
+        ("Спешк(?:|а|и|ой)", {"link": "Спешка"}),
+        ("Холодн(?:|ая|ой) ненавист(?:|ь|и|ью)", {"link": "Холодная ненависть"}),
+        ("Тяж(?:|е|ё)л(?:|ый|ого) удар(?:|а|ой)", {"link": "Тяжёлый удар"}),
+        ("Вестник(?:|а|у|ом) пепла", {"link": "Вестник пепла"}),
+        ("Вестник(?:|а|у|ом) крови", {"link": "Вестник крови"}),
+        ("Вестник(?:|а|у|ом) льда", {"link": "Вестник льда"}),
+        ("Вестник(?:|а|у|ом) грома", {"link": "Вестник грома"}),
+        ("Вестник(?:|а|у|ом) агонии", {"link": "Вестник агонии"}),
+        ("Вестник(?:|а|у|ом) чистоты", {"link": "Вестник чистоты"}),
+        ("Ледяно(?:|е|го) сокрушени(?:|е|я)", {"link": "Ледяное сокрушение"}),
+        ("Кольц(?:|а|о|ом) льда", {"link": "Кольцо льда"}),
+        ("Ледяно(?:|й|го) выстрел(?:|а)", {"link": "Ледяной выстрел"}),
+        ("Ледян(?:|ое|ым|ого) копь(?:|е|ё|я|ем|ём)", {"link": "Ледяное копье"}),
+        ("Ледян(?:|ая|ой) ловушк(?:|а|е|и)", {"link": "Ледяная ловушка"}),
+        ("Призыв(?:|а|у) к бессмертию", {"link": "Призыв к бессмертию"}),
+        ("Испепелени(?:|е|я)", {"link": "Испепеление"}),
+        ("Удар(?:|а) преисподней", {"link": "Удар преисподней"}),
+        ("Кинетическ(?:|ий|ого) взрыв(?:|а)", {"link": "Кинетический взрыв"}),
+        ("Разрубани(?:|е|я)", {"link": "Разрубание"}),
+        ("Наскок(?:|а)", {"link": "Наскок"}),
+        ("Стрел(?:|а|е|ы) молни(?:|и|й)", {"link": "Стрела молнии"}),
+        ("Поток(?:|а) молни(?:|и|й)", {"link": "Поток молний"}),
+        ("Круг(?:|а) молни(?:|и|й)", {"link": "Круг молний"}),
+        ("Удар(?:|а) молни(?:|и|й)", {"link": "Удар молнии"}),
+        ("Побег(?:|и|ов) молни(?:|и|й)", {"link": "Побеги молний"}),
+        ("Ловушк(?:|а|и) молни(?:|и|й)", {"link": "Ловушка молний"}),
+        ("Грозов(?:|ой|ого) переход(?:|а)", {"link": "Грозовой переход"}),
+        ("Магмов(?:|ый|ого) шар(?:|а)", {"link": "Магмовый шар"}),
+        ("Стрел(?:|а|е|ы)-двойник(?:|а|у)", {"link": "Стрела-двойник"}),
+        ("Расплавленн(?:|ый|ого) панцир(?:|ь|я)", {"link": "Расплавленный панцирь"}),
+        ("Магмов(?:|ый|ого) удар(?:|а)", {"link": "Магмовый удар"}),
+        ("Сфер(?:|а|ы) бурь", {"link": "Сфера бурь"}),
+        ("Призрачн(?:|ый|ого) бег(?:|а)", {"link": "Призрачный бег"}),
+        ("Метк(?:|а|и|ой) браконьера", {"link": "Метка браконьера"}),
+        ("Портал", {"link": "Портал (камень умения)"}),
+        ("Перелив(?:|а|ом) энергии", {"link": "Перелив энергии"}),
+        ("Уязвимост(?:|и|ь|ью) к снарядам", {"link": "Уязвимость к снарядам"}),
+        ("Надрез(?:|а)", {"link": "Надрез"}),
+        ("Наказани(?:|е|я)", {"link": "Наказание"}),
+        ("Спасени(?:|е|я|ем) от стихий", {"link": "Спасение от стихий"}),
+        ("Спасени(?:|е|я|ем) от огня", {"link": "Спасение от огня"}),
+        ("Спасени(?:|е|я|ем) от холода", {"link": "Спасение от холода"}),
+        ("Спасени(?:|е|я|ем) от молни(?:|и|й)", {"link": "Спасение от молний"}),
+        ("Лив(?:|ня|ень) стрел", {"link": "Ливень стрел"}),
+        ("Сотвор(?:|е|ё)н(?:|ие|ием|ные) призрак(?:|а|и|ов)", {"link": "Сотворение призрака"}),
+        ("Поднят(?:|ие|ия|ые|ых|ого) зомби", {"link": "Поднятие зомби"}),
+        ("Клич(?:|а) сплочения", {"link": "Клич сплочения"}),
+        ("Опустошени(?:|е|я)", {"link": "Опустошение"}),
+        ("Возмезди(?:|е|я)", {"link": "Возмездие"}),
+        ("Восполняющ(?:|ий|им|его) тотем(?:|а|ом)", {"link": "Восполняющий тотем"}),
+        ("Праведн(?:|ый|ого) ог(?:|ня|онь)", {"link": "Праведный огонь"}),
+        ("Праведн(?:|ая|ой) молни(?:|и|я)", {"link": "Праведная молния"}),
+        ("Парировани(?:|е|я)", {"link": "Парирование"}),
+        ("Опаляющ(?:|ий|его|ему) луч(?:|а|у)", {"link": "Опаляющий луч"}),
+        ("Обжигающи(?:|е|х) уз(?:|ы)", {"link": "Обжигающие узы"}),
+        ("Клинки тени", {"link": "Клинки тени"}),
+        ("Удар(?:|а) щитом", {"link": "Удар щитом"}),
+        ("Кольц(?:|а|о|ом) молни(?:|и|й)", {"link": "Кольцо молний"}),
+        ("Сотрясающ(?:|ий|им|его) тотем(?:|а|ом)", {"link": "Сотрясающий тотем"}),
+        ("Электризующ(?:|ая|ей) стрел(?:|а|ы)", {"link": "Электризующая стрела"}),
+        ("Осадн(?:|ая|ой) баллист(?:|а|ы)", {"link": "Осадная баллиста"}),
+        ("Дымов(?:|ая|ой) мин(?:|а|ы)", {"link": "Дымовая мина"}),
+        ("Искр(?:|а|ы)", {"link": "Искра"}),
+        ("Призрачн(?:|ый|ого) брос(?:|ок|ка)", {"link": "Призрачный бросок"}),
+        ("Подношени(?:|е|я) духа", {"link": "Подношение духа"}),
+        ("Расколот(?:|ая|ой) стрел(?:|а|е|ы)", {"link": "Расколотая стрела"}),
+        ("Статичн(?:|ый|ого) разряд(?:|а)", {"link": "Статичный разряд"}),
+        ("Статичная связь", {"link": "Статичная связь"}),
+        ("Грозов(?:|ой|ого) взрыв(?:|а)", {"link": "Грозовой взрыв"}),
+        ("Призыв(?:|а) бури", {"link": "Призыв бури"}),
+        ("(?:Призыв |Призванные |)голем(?:|а|ы|ов|ами) хаоса", {"link": "Призыв голема хаоса"}),
+        (
+            "(?:Призыв |Призванные |)трупн(?:|ые|ый|ого|ыми) голем(?:|а|ы|ов|ами)",
+            {"link": "Призыв трупного голема"},
+        ),
+        ("(?:Призыв |Призванные |)голем(?:|а|ы|ов|ами) огня", {"link": "Призыв голема огня"}),
+        ("(?:Призыв |Призванные |)голем(?:|а|ы|ов|ами) льда", {"link": "Призыв голема льда"}),
+        ("(?:Призыв |Призванные |)голем(?:|а|ы|ов|ами) молнии", {"link": "Призыв голема молнии"}),
+        (
+            "Приз(?:|ванные|ванных|ыв|ыва) неистов(?:|ые|ых|ого) дух(?:|а|и|ов)",
+            {"link": "Призыв неистового духа"},
+        ),
+        ("Сотворен(?:|ие|ия|ного|ные) скелет(?:|а|ы|ов)", {"link": "Сотворение скелетов"}),
+        (
+            "(?:Призыв |Призванные |)каменн(?:|ые|ый|ых|ого|ыми) голем(?:|а|ы|ов|ами)",
+            {"link": "Призыв каменного голема"},
+        ),
+        ("Раскол(?:|а|у)", {"link": "Раскол"}),
+        ("Кругов(?:|ой|ым|ого|ому) взмах(?:|а|у|ом)", {"link": "Круговой взмах"}),
+        ("Щит(?:|а|у) бури", {"link": "Щит бури"}),
+        ("Пут(?:|ы|ами) времени", {"link": "Путы времени"}),
+        ("Вихр(?:|ь|я) стрел", {"link": "Вихрь стрел"}),
+        ("Цепь молний ваал", {"link": "Цепь молний ваал"}),
+        ("Горящая стрела ваал", {"link": "Горящая стрела ваал"}),
+        ("Ясность ума ваал", {"link": "Ясность ума ваал"}),
+        ("Укус стужи ваал", {"link": "Укус стужи ваал"}),
+        ("Вихрь ваал", {"link": "Вихрь ваал"}),
+        ("Подрыв трупа ваал", {"link": "Подрыв трупа ваал"}),
+        ("Дисциплина ваал", {"link": "Дисциплина ваал"}),
+        ("Двойной удар ваал", {"link": "Двойной удар ваал"}),
+        ("Огненная ловушка ваал", {"link": "Огненная ловушка ваал"}),
+        ("Огненный шар ваал", {"link": "Огненный шар ваал"}),
+        ("Пламенный взрыв ваал", {"link": "Пламенный взрыв ваал"}),
+        ("Леденящий молот ваал", {"link": "Леденящий молот ваал"}),
+        ("Грация ваал", {"link": "Грация ваал"}),
+        ("Сотрясение ваал", {"link": "Сотрясение ваал"}),
+        ("Спешка ваал", {"link": "Спешка ваал"}),
+        ("Тяжелый удар ваал", {"link": "Тяжелый удар ваал"}),
+        ("Кольцо льда ваал", {"link": "Кольцо льда ваал"}),
+        ("Призыв к бессмертию ваал", {"link": "Призыв к бессмертию ваал"}),
+        ("Удар молнии ваал", {"link": "Удар молнии ваал"}),
+        ("Ловушка молний ваал", {"link": "Ловушка молний ваал"}),
+        ("Грозовой переход ваал", {"link": "Грозовой переход ваал"}),
+        ("Расплавленный панцирь ваал", {"link": "Расплавленный панцирь ваал"}),
+        ("Перелив энергии ваал", {"link": "Перелив энергии ваал"}),
+        ("Ливень стрел ваал", {"link": "Ливень стрел ваал"}),
+        ("Опустошение ваал", {"link": "Опустошение ваал"}),
+        ("Праведный огонь ваал", {"link": "Праведный огонь ваал"}),
+        ("Искра ваал", {"link": "Искра ваал"}),
+        ("Призрачный бросок ваал", {"link": "Призрачный бросок ваал"}),
+        ("Призыв бури ваал", {"link": "Призыв бури ваал"}),
+        ("Сотворение скелетов ваал", {"link": "Сотворение скелетов ваал"}),
+        ("Круговой взмах ваал", {"link": "Круговой взмах ваал"}),
+        ("Отмщени(?:|е|я)", {"link": "Отмщение"}),
+        ("Расчётлив(?:|ый|ого) удар(?:|а)", {"link": "Расчётливый удар"}),
+        ("Удар(?:|а) гадюки", {"link": "Удар гадюки"}),
+        ("Живучест(?:|и|ь|ью)", {"link": "Живучесть"}),
+        ("Пург(?:|а|и)", {"link": "Пурга"}),
+        ("Беззащитност(?:|и|ь|ью)", {"link": "Беззащитность"}),
+        ("Метк(?:|а|и|ой) вождя", {"link": "Метка вождя"}),
+        ("Шквал(?:|а) клинков", {"link": "Шквал клинков"}),
+        ("Шальн(?:|ой|ого) удар(?:|а)", {"link": "Шальной удар"}),
+        ("Увядани(?:|е|я)", {"link": "Увядание"}),
+        ("Грозн(?:|ый|ым|ого) гнев(?:|а|ом)", {"link": "Грозный гнев"}),
+        ("Круг(?:|а) яда", {"link": "Круг яда"}),
+        ("Брос(?:|ок|ка) призрачного щита", {"link": "Бросок призрачного щита"}),
+        ("Взрывная ловушка", {"link": "Взрывная ловушка"}),
+        ("Губительн(?:|ый|ого) шаг(?:|а)", {"link": "Губительный шаг"}),
+        ("Дробящая сталь", {"link": "Дробящая сталь"}),
+        ("Кремаци(?:|и|я)", {"link": "Кремация"}),
+        ("Ловушка-огнемёт", {"link": "Ловушка-огнемёт"}),
+        ("Моров(?:|ой|ого) удар(?:|а)", {"link": "Моровой удар"}),
+        ("Нестабильн(?:|ый|ого) труп(?:|а)", {"link": "Нестабильный труп"}),
+        ("Носител(?:|ь|я) чумы", {"link": "Носитель чумы"}),
+        ("Осколочн(?:|ая|ой) баллист(?:|а|ы)", {"link": "Осколочная баллиста"}),
+        ("Пронзающ(?:|ая|ей) стал(?:|и|ь)", {"link": "Пронзающая сталь"}),
+        ("Сейсмическая ловушка", {"link": "Сейсмическая ловушка"}),
+        ("Стрел(?:|а|ы) ловчего", {"link": "Стрела ловчего"}),
+        ("Стрела скверны", {"link": "Стрела скверны"}),
+        ("Токсичный дождь", {"link": "Токсичный дождь"}),
+        ("Точност(?:|и|ь|ью)", {"link": "Точность"}),
+        ("Эксгумаци(?:|и|я)", {"link": "Эксгумация"}),
+        ("Божественн(?:|ый|ого) гнев(?:|а)", {"link": "Божественный гнев"}),
+        ("Возврат клейм", {"link": "Возврат клейм"}),
+        ("Волн(?:|а|ы|ой) осуждения", {"link": "Волна осуждения"}),
+        ("Зимн(?:|ей|яя) сфер(?:|а|ы)", {"link": "Зимняя сфера"}),
+        ("Злорадств(?:|а|о|ом)", {"link": "Злорадство"}),
+        ("Клейм(?:|а|о) Армагеддона", {"link": "Клеймо Армагеддона"}),
+        ("Клейм(?:|а|о) бури", {"link": "Клеймо бури"}),
+        ("Ледян(?:|ой|ого) скач(?:|а|ок)", {"link": "Ледяной скачок"}),
+        ("Ловушк(?:|а|и) переливания", {"link": "Ловушка переливания"}),
+        #
+        # Enchantment skills
+        #
+        ("Приказ(?:|а) клинков", {"link": "Приказ клинков"}),
+        ("Приказ(?:|а) огня", {"link": "Приказ огня"}),
+        ("Приказ(?:|а) силы", {"link": "Приказ силы"}),
+        ("Приказ(?:|а) холода", {"link": "Приказ холода"}),
+        ("Приказ(?:|а) ярости", {"link": "Приказ ярости"}),
+        ("Приказ(?:|а) ада", {"link": "Приказ ада"}),
+        ("Приказ(?:|а) гнева", {"link": "Приказ гнева"}),
+        ("Приказ(?:|а) света", {"link": "Приказ света"}),
+        ("Приказ(?:|а) отражения", {"link": "Приказ отражения"}),
+        ("Приказ(?:|а) злобы", {"link": "Приказ злобы"}),
+        ("Приказ(?:|а) грома", {"link": "Приказ грома"}),
+        ("Приказ(?:|а) войны", {"link": "Приказ войны"}),
+        ("Приказ(?:|а) зимы", {"link": "Приказ зимы"}),
+        ("Приказ(?:|а) смерти", {"link": "Приказ смерти"}),
+        ("Приказ(?:|а) бури", {"link": "Приказ бури"}),
+        ("Указ(?:|а) клинков", {"link": "Указ клинков"}),
+        ("Указ(?:|а) огня", {"link": "Указ огня"}),
+        ("Указ(?:|а) силы", {"link": "Указ силы"}),
+        ("Указ(?:|а) холода", {"link": "Указ холода"}),
+        ("Указ(?:|а) ярости", {"link": "Указ ярости"}),
+        ("Указ(?:|а) ада", {"link": "Указ ада"}),
+        ("Указ(?:|а) гнева", {"link": "Указ гнева"}),
+        ("Указ(?:|а) света", {"link": "Указ света"}),
+        ("Указ(?:|а) отражения", {"link": "Указ отражения"}),
+        ("Указ(?:|а) злобы", {"link": "Указ злобы"}),
+        ("Указ(?:|а) грома", {"link": "Указ грома"}),
+        ("Указ(?:|а) войны", {"link": "Указ войны"}),
+        ("Указ(?:|а) зимы", {"link": "Указ зимы"}),
+        ("Указ(?:|а) смерти", {"link": "Указ смерти"}),
+        ("Указ(?:|а) бури", {"link": "Указ бури"}),
+        ("Эдикт(?:|а) клинков", {"link": "Эдикт клинков"}),
+        ("Эдикт(?:|а) огня", {"link": "Эдикт огня"}),
+        ("Эдикт(?:|а) силы", {"link": "Эдикт силы"}),
+        ("Эдикт(?:|а) холода", {"link": "Эдикт холода"}),
+        ("Эдикт(?:|а) ярости", {"link": "Эдикт ярости"}),
+        ("Эдикт(?:|а) ада", {"link": "Эдикт ада"}),
+        ("Эдикт(?:|а) гнева", {"link": "Эдикт гнева"}),
+        ("Эдикт(?:|а) света", {"link": "Эдикт света"}),
+        ("Эдикт(?:|а) отражения", {"link": "Эдикт отражения"}),
+        ("Эдикт(?:|а) злобы", {"link": "Эдикт злобы"}),
+        ("Эдикт(?:|а) грома", {"link": "Эдикт грома"}),
+        ("Эдикт(?:|а) войны", {"link": "Эдикт войны"}),
+        ("Эдикт(?:|а) зимы", {"link": "Эдикт зимы"}),
+        ("Эдикт(?:|а) смерти", {"link": "Эдикт смерти"}),
+        ("Эдикт(?:|а) бури", {"link": "Эдикт бури"}),
+        ("Слов(?:|а|о) клинков", {"link": "Слово клинков"}),
+        ("Слов(?:|а|о) огня", {"link": "Слово огня"}),
+        ("Слов(?:|а|о) силы", {"link": "Слово силы"}),
+        ("Слов(?:|а|о) холода", {"link": "Слово холода"}),
+        ("Слов(?:|а|о) ярости", {"link": "Слово ярости"}),
+        ("Слов(?:|а|о) ада", {"link": "Слово ада"}),
+        ("Слов(?:|а|о) гнева", {"link": "Слово гнева"}),
+        ("Слов(?:|а|о) света", {"link": "Слово света"}),
+        ("Слов(?:|а|о) отражения", {"link": "Слово отражения"}),
+        ("Слов(?:|а|о) злобы", {"link": "Слово злобы"}),
+        ("Слов(?:|а|о) грома", {"link": "Слово грома"}),
+        ("Слов(?:|а|о) войны", {"link": "Слово войны"}),
+        ("Слов(?:|а|о) зимы", {"link": "Слово зимы"}),
+        ("Слов(?:|а|о) смерти", {"link": "Слово смерти"}),
+        ("Слов(?:|а|о) бури", {"link": "Слово бури"}),
+        #
+        # Support gems
+        #
+        ("Уроном хаосом (?:[0-9]+ уровня)", {"link": "Урон хаосом"}),
+        ("Уроном холодом  (?:[0-9]+ уровня)", {"link": "Урон холодом"}),
+        ("(?:Уроном от огня|Уроном огнем) (?:[0-9]+ уровня)", {"link": "Урон огнем"}),
+        ("(?:Уроном от молнии|Уроном молнией) (?:[0-9]+ уровня)", {"link": "Урон молнией"}),
+        ("Меткостью (?:[0-9]+ уровня)", {"link": "Меткость"}),
+        ("Колдовским выбросом (?:[0-9]+ уровня)", {"link": "Колдовской выброс"}),
+        ("Богохульством (?:[0-9]+ уровня)", {"link": "Богохульство"}),
+        ("Ослеплением (?:[0-9]+ уровня)", {"link": "Ослепление"}),
+        ("Затруднением блока (?:[0-9]+ уровня)", {"link": "Затруднение блока"}),
+        ("Магией крови (?:[0-9]+ уровня)", {"link": "Магия крови"}),
+        ("Жаждой крови (?:[0-9]+ уровня)", {"link": "Жажда крови"}),
+        ("Жестокостью (?:[0-9]+ уровня)", {"link": "Жестокость"}),
+        ("Уроном от горения (?:[0-9]+ уровня)", {"link": "Урон от горения"}),
+        (
+            "Сотворением чар при критическом ударе (?:[0-9]+ уровня)",
+            {"link": "Сотворение чар при критическом ударе"},
+        ),
+        ("Сотворением чар при смерти (?:[0-9]+ уровня)", {"link": "Сотворение чар при смерти"}),
+        (
+            "Сотворением чар при убийстве в ближнем бою (?:[0-9]+ уровня)",
+            {"link": "Сотворение чар при убийстве в ближнем бою"},
+        ),
+        (
+            "Сотворением чар при получении урона (?:[0-9]+ уровня)",
+            {"link": "Сотворение чар при получении урона"},
+        ),
+        (
+            "Сотворением чар при оглушении (?:[0-9]+ уровня)",
+            {"link": "Сотворение чар при оглушении"},
+        ),
+        (
+            "Сотворением чар при поддержании (?:[0-9]+ уровня)",
+            {"link": "Сотворение чар при поддержании"},
+        ),
+        ("Цепью (?:[0-9]+ уровня)", {"link": "Цепь"}),
+        ("Шансом кровотечения (?:[0-9]+ уровня)", {"link": "Шанс кровотечения"}),
+        ("Паникой (?:[0-9]+ уровня)", {"link": "Паника"}),
+        ("Воспламенением (?:[0-9]+ уровня)", {"link": "Воспламенение"}),
+        ("Кассетными ловушками (?:[0-9]+ уровня)", {"link": "Кассетные ловушки"}),
+        ("Пронизывающим холодом (?:[0-9]+ уровня)", {"link": "Пронизывающий холод"}),
+        ("Холодом в огонь (?:[0-9]+ уровня)", {"link": "Холод в огонь"}),
+        ("Средоточием (?:[0-9]+ уровня)", {"link": "Средоточие"}),
+        ("Контролируемым разрушением (?:[0-9]+ уровня)", {"link": "Контролируемое разрушение"}),
+        ("Добиванием (?:[0-9]+ уровня)", {"link": "Добивание"}),
+        ("Проклятием при попадании (?:[0-9]+ уровня)", {"link": "Проклятие при попадании"}),
+        ("Уроном при полном здоровье (?:[0-9]+ уровня)", {"link": "Урон при полном здоровье"}),
+        ("Смертельными состояниями (?:[0-9]+ уровня)", {"link": "Смертельные состояния"}),
+        ("Разложением (?:[0-9]+ уровня)", {"link": "Разложение"}),
+        ("Эффективностью (?:[0-9]+ уровня)", {"link": "Эффективность"}),
+        ("Концентрацией стихий (?:[0-9]+ уровня)", {"link": "Концентрация стихий"}),
+        ("Разгулом стихий (?:[0-9]+ уровня)", {"link": "Разгул стихий"}),
+        ("Усилителем (?:[0-9]+ уровня)", {"link": "Усилитель"}),
+        (
+            "Зарядом выносливости при оглушении в ближнем бою (?:[0-9]+ уровня)",
+            {"link": "Заряд выносливости при оглушении в ближнем бою"},
+        ),
+        ("Улучшителем (?:[0-9]+ уровня)", {"link": "Улучшитель"}),
+        ("Наставником (?:[0-9]+ уровня)", {"link": "Наставник"}),
+        ("Уроном от стихий атаками (?:[0-9]+ уровня)", {"link": "Урон от стихий атаками"}),
+        ("Ускорением атак (?:[0-9]+ уровня)", {"link": "Ускорение атак"}),
+        ("Ускоренным сотворением чар (?:[0-9]+ уровня)", {"link": "Ускоренное сотворение чар"}),
+        ("Ускорением снарядов (?:[0-9]+ уровня)", {"link": "Ускорение снарядов"}),
+        ("Пронизывающим жаром (?:[0-9]+ уровня)", {"link": "Пронизывающий жар"}),
+        ("Разветвлением (?:[0-9]+ уровня)", {"link": "Разветвление"}),
+        ("Укреплением (?:[0-9]+ уровня)", {"link": "Укрепление"}),
+        ("Щедростью (?:[0-9]+ уровня)", {"link": "Щедрость"}),
+        (
+            "Множеством дополнительных снарядов (?:[0-9]+ уровня)",
+            {"link": "Много дополнительных снарядов"},
+        ),
+        ("Переохлаждением (?:[0-9]+ уровня)", {"link": "Переохлаждение"}),
+        ("Укусом Льда (?:[0-9]+ уровня)", {"link": "Укус льда"}),
+        (
+            "Расширенной областью действия (?:[0-9]+ уровня)",
+            {"link": "Расширенная область действия"},
+        ),
+        ("Усилением критических ударов (?:[0-9]+ уровня)", {"link": "Усиление критических ударов"}),
+        ("Учащением критических ударов (?:[0-9]+ уровня)", {"link": "Учащение критических ударов"}),
+        ("Продлением (?:[0-9]+ уровня)", {"link": "Продление"}),
+        ("Возбуждением (?:[0-9]+ уровня)", {"link": "Возбуждение"}),
+        ("Распространением поджога (?:[0-9]+ уровня)", {"link": "Распространение поджога"}),
+        ("Железной хваткой (?:[0-9]+ уровня)", {"link": "Железная хватка"}),
+        ("Железной волей (?:[0-9]+ уровня)", {"link": "Железная воля"}),
+        ("Количеством предметов (?:[0-9]+ уровня)", {"link": "Количество предметов"}),
+        ("Редкостью предметов (?:[0-9]+ уровня)", {"link": "Редкость предметов"}),
+        ("Жертвенностью (?:[0-9]+ уровня)", {"link": "Жертвенность"}),
+        ("Отбрасыванием (?:[0-9]+ уровня)", {"link": "Отбрасывание"}),
+        ("Сокращением (?:[0-9]+ уровня)", {"link": "Сокращение"}),
+        ("Дополнительными снарядами (?:[0-9]+ уровня)", {"link": "Дополнительные снаряды"}),
+        ("Меньшим ядом (?:[0-9]+ уровня)", {"link": "Меньший яд"}),
+        ("Здоровьем за удар (?:[0-9]+ уровня)", {"link": "Здоровье за удар"}),
+        (
+            "(?:Похищением|Вытягиванием) здоровья (?:[0-9]+ уровня)",
+            {"link": "Вытягивание здоровья"},
+        ),
+        ("Пронизывающими молниями (?:[0-9]+ уровня)", {"link": "Пронизывающие молнии"}),
+        ("Увечьем (?:[0-9]+ уровня)", {"link": "Увечье"}),
+        ("(?:Похищением|Вытягиванием) маны (?:[0-9]+ уровня)", {"link": "Вытягивание маны"}),
+        (
+            "Физическим урон ближнего боя (?:[0-9]+ уровня)",
+            {"link": "Физический урон ближнего боя"},
+        ),
+        ("Раскатистым ударом (?:[0-9]+ уровня)", {"link": "Раскатистый удар"}),
+        ("Минным полем (?:[0-9]+ уровня)", {"link": "Минное поле"}),
+        ("Уроном приспешников (?:[0-9]+ уровня)", {"link": "Урон приспешников"}),
+        ("Здоровьем приспешников (?:[0-9]+ уровня)", {"link": "Здоровье приспешников"}),
+        ("Скоростью приспешников (?:[0-9]+ уровня)", {"link": "Скорость приспешников"}),
+        ("Стихийным войском (?:[0-9]+ уровня)", {"link": "Стихийное войско"}),
+        ("Дополнительными ловушками (?:[0-9]+ уровня)", {"link": "Дополнительные ловушки"}),
+        ("Градом ударов (?:[0-9]+ уровня)", {"link": "Град ударов"}),
+        ("Боевым ражем (?:[0-9]+ уровня)", {"link": "Боевой раж"}),
+        ("Яростными снарядами (?:[0-9]+ уровня)", {"link": "Яростные снаряды"}),
+        ("Физическим уроном в молнии (?:[0-9]+ уровня)", {"link": "Физический урон в молнии"}),
+        ("Пронзанием (?:[0-9]+ уровня)", {"link": "Пронзание"}),
+        ("Стрельбой в упор (?:[0-9]+ уровня)", {"link": "Стрельба в упор"}),
+        ("Ядом (?:[0-9]+ уровня)", {"link": "Яд"}),
+        (
+            "Зарядом энергии при критическом ударе (?:[0-9]+ уровня)",
+            {"link": "Энергетический заряд при критическом ударе"},
+        ),
+        ("Тотемом-баллистой (?:[0-9]+ уровня)", {"link": "Тотем-баллиста"}),
+        ("Вдохновением (?:[0-9]+ уровня)", {"link": "Вдохновение"}),
+        ("Цепным подрывом (?:[0-9]+ уровня)", {"link": "Цепной подрыв"}),
+        ("Возвращающимися снарядами (?:[0-9]+ уровня)", {"link": "Возвращающиеся снаряды"}),
+        ("Беспощадностью (?:[0-9]+ уровня)", {"link": "Беспощадность"}),
+        ("Замедленными снарядами (?:[0-9]+ уровня)", {"link": "Замедленные снаряды"}),
+        ("Эхом (?:магии|чар) (?:[0-9]+ уровня)", {"link": "Эхо магии"}),
+        ("Колдующим тотемом (?:[0-9]+ уровня)", {"link": "Колдующий тотем"}),
+        ("Разделением снарядов (?:[0-9]+ уровня)", {"link": "Разделение снарядов"}),
+        ("Оглушением (?:[0-9]+ уровня)", {"link": "Оглушение"}),
+        ("Стремительным недугом (?:[0-9]+ уровня)", {"link": "Стремительный недуг"}),
+        ("Ловушкой (?:[0-9]+ уровня)", {"link": "Ловушка"}),
+        ("Улучшенными ловушками (?:[0-9]+ уровня)", {"link": "Улучшенные ловушки"}),
+        ("Уроном ловушек и мин (?:[0-9]+ уровня)", {"link": "Урон ловушек и мин"}),
+        ("Безграничными состояниями (?:[0-9]+ уровня)", {"link": "Безграничные состояния"}),
+        ("Едкими токсинами (?:[0-9]+ уровня)", {"link": "Едкие токсины"}),
+        ("Манипуляцией пустотой (?:[0-9]+ уровня)", {"link": "Манипуляция пустотой"}),
+        ("Быстрой сборкой (?:[0-9]+ уровня)", {"link": "Быстрая сборка"}),
+        ("Зовом предков (?:[0-9]+ уровня)", {"link": "Зов предков"}),
+        ("Кольцом стрел (?:[0-9]+ уровня)", {"link": "Кольцо стрел"}),
+        ("(?:Очередью|Стрельбой очередями) (?:[0-9]+ уровня)", {"link": "Стрельба очередями"}),
+        ("Ударной волной (?:[0-9]+ уровня)", {"link": "Ударная волна"}),
+        ("Леденящим охлаждением (?:[0-9]+ уровня)", {"link": "Леденящее охлаждение"}),
+        ("Пылающим легионом (?:[0-9]+ уровня)", {"link": "Пылающий легион"}),
+        ("Заряженными минами (?:[0-9]+ уровня)", {"link": "Заряженные мины"}),
+        ("Губительным прикосновением (?:[0-9]+ уровня)", {"link": "Губительное прикосновение"}),
+        (
+            "Похищением энергетического щита (?:[0-9]+ уровня)",
+            {"link": "Похищение энергетического щита"},
+        ),
+        ("Призрачным лучником (?:[0-9]+ уровня)", {"link": "Призрачный лучник"}),
+        ("Большим залпом (?:[0-9]+ уровня)", {"link": "Большой залп"}),
+        ("Высвобождением (?:[0-9]+ уровня)", {"link": "Высвобождение"}),
+        ("Интенсивностью (?:[0-9]+ уровня)", {"link": "Интенсивность"}),
+        ("Проколом (?:[0-9]+ уровня)", {"link": "Прокол"}),
+        ("пробуждённым Уроном хаосом (?:[0-9]+ уровня)", {"link": "Пробужденный: Урон хаосом"}),
+        ("пробуждённым Уроном холодом (?:[0-9]+ уровня)", {"link": "Пробужденный: Урон холодом"}),
+        ("пробуждённым Уроном огнём (?:[0-9]+ уровня)", {"link": "Пробужденный: Урон огнем"}),
+        ("пробуждённым Уроном молнией (?:[0-9]+ уровня)", {"link": "Пробужденный: Урон молнией"}),
+        ("пробуждённым Зовом предков (?:[0-9]+ уровня)", {"link": "Пробужденный: Зов предков"}),
+        ("пробуждённым Кольцом стрел (?:[0-9]+ уровня)", {"link": "Пробужденный: Кольцом стрел"}),
+        ("пробуждённым Богохульством (?:[0-9]+ уровня)", {"link": "Пробужденный: Богохульство"}),
+        ("пробуждённой Жестокостью (?:[0-9]+ уровня)", {"link": "Пробужденный: Жестокость"}),
+        (
+            "пробуждённым Уроном от горения (?:[0-9]+ уровня)",
+            {"link": "Пробужденный: Урон от горения"},
+        ),
+        (
+            "пробуждённым Сотворением чар при критическом ударе (?:[0-9]+ уровня)",
+            {"link": "Пробужденный: Сотворение чар при критическом ударе"},
+        ),
+        (
+            "пробуждённым Сотворением чар при поддержании (?:[0-9]+ уровня)",
+            {"link": "Пробужденный: Сотворение чар при поддержании"},
+        ),
+        ("пробуждённой Цепью (?:[0-9]+ уровня)", {"link": "Пробужденный: Цепь"}),
+        (
+            "пробуждённым Пронизывающим холодом (?:[0-9]+ уровня)",
+            {"link": "Пробужденный: Пронизывающий холод"},
+        ),
+        (
+            "пробуждённым Контролируемым разрушением (?:[0-9]+ уровня)",
+            {"link": "Пробужденный: Контролируемое разрушение"},
+        ),
+        (
+            "пробуждённым Проклятием при попадании (?:[0-9]+ уровня)",
+            {"link": "Пробужденный: Проклятие при попадании"},
+        ),
+        (
+            "пробуждёнными Смертельными состояниями (?:[0-9]+ уровня)",
+            {"link": "Пробужденный: Смертельные состояния"},
+        ),
+        (
+            "пробуждённой Концентрацией стихий (?:[0-9]+ уровня)",
+            {"link": "Пробужденный: Концентрация стихий"},
+        ),
+        (
+            "пробуждённым Пронизывающим жаром (?:[0-9]+ уровня)",
+            {"link": "Пробужденный: Пронизывающий жар"},
+        ),
+        ("пробуждённым Разветвлением (?:[0-9]+ уровня)", {"link": "Пробужденный: Разветвление"}),
+        ("пробуждённой Щедростью (?:[0-9]+ уровня)", {"link": "Пробужденный: Щедрость"}),
+        (
+            "пробуждёнными Многими дополнительными снарядами (?:[0-9]+ уровня)",
+            {"link": "Пробужденный: Много дополнительных снарядов"},
+        ),
+        (
+            "пробуждённой Расширенной областью действия (?:[0-9]+ уровня)",
+            {"link": "Пробужденный: Расширенная область действия"},
+        ),
+        #
+        # Attibutes
+        #
+        ("ловкост(?:|ь|и)", {"link": "Ловкость"}),
+        ("интеллект(?:|а|у)", {"link": "Интеллект"}),
+        ("сил(?:|а|е|ы)", {"link": "Сила"}),
+        ("характеристик(?:|ам)", {"link": "Характеристики"}),
         #
         # Offense stats
         #
-        ('меткост(?:|ь|и)', {'link': 'Меткость (механика)'}),
-        ('скорост(?:|ь|и) атак(?:|и)', {'link': 'Скорость атаки'}),
-        ('скорост(?:|ь|и) сотворения чар', {'link': 'Скорость сотворения чар'}),
-        ('сотворения чар', {'link': 'Скорость сотворения чар'}),
-        (
-        'шанс(?:|а|у) критического удара', {'link': 'Шанс критического удара'}),
-        ('множител(?:|ь|ю|я) критического удара',
-         {'link': 'Множитель критического удара'}),
-        ('критическ(?:|ий|им|ими|их) удар(?:|ом|ами|ов)',
-         {'link': 'Критический удар'}),
-        ('скорост(?:|ь|и) передвижения', {'link': 'Скорость передвижения'}),
-        ('похищ(?:|ение|ения|ается|ать|енного|ают)', {'link': 'Похищение'}),
+        ("меткост(?:|ь|и)", {"link": "Меткость (механика)"}),
+        ("скорост(?:|ь|и) атак(?:|и)", {"link": "Скорость атаки"}),
+        ("скорост(?:|ь|и) сотворения чар", {"link": "Скорость сотворения чар"}),
+        ("сотворения чар", {"link": "Скорость сотворения чар"}),
+        ("шанс(?:|а|у) критического удара", {"link": "Шанс критического удара"}),
+        ("множител(?:|ь|ю|я) критического удара", {"link": "Множитель критического удара"}),
+        ("критическ(?:|ий|им|ими|их) удар(?:|ом|ами|ов)", {"link": "Критический удар"}),
+        ("скорост(?:|ь|и) передвижения", {"link": "Скорость передвижения"}),
+        ("похищ(?:|ение|ения|ается|ать|енного|ают)", {"link": "Похищение"}),
         # Life Leech, Mana Leech
-        ('мало(?:|е|м|го) количеств(?:|о|е|а) здоровья|мало здоровья',
-         {'link': 'Малое количество здоровья'}),
-        ('полн(?:|ое|ом|ым) здоровье(?:|м)', {'link': 'Полное здоровье'}),
-        ('здоровь(?:|е|я)', {'link': 'Здоровье'}),
-        ('удерж(?:|анной|ивают) ман(?:|ы|у)', {'link': 'Удержание маны'}),
-        ('малом количестве маны|мана не на низком уровне',
-         {'link': 'Малое количество маны'}),
-        ('полн(?:|ая|ой) ман(?:|а|е)', {'link': 'Полная мана'}),
-        ('ман(?:|а|у|ы)', {'link': 'Мана'}),
-        ('полном энергетическом щите', {'link': 'Полный энергетический щит'}),
+        (
+            "мало(?:|е|м|го) количеств(?:|о|е|а) здоровья|мало здоровья",
+            {"link": "Малое количество здоровья"},
+        ),
+        ("полн(?:|ое|ом|ым) здоровье(?:|м)", {"link": "Полное здоровье"}),
+        ("здоровь(?:|е|я)", {"link": "Здоровье"}),
+        ("удерж(?:|анной|ивают) ман(?:|ы|у)", {"link": "Удержание маны"}),
+        ("малом количестве маны|мана не на низком уровне", {"link": "Малое количество маны"}),
+        ("полн(?:|ая|ой) ман(?:|а|е)", {"link": "Полная мана"}),
+        ("ман(?:|а|у|ы)", {"link": "Мана"}),
+        ("полном энергетическом щите", {"link": "Полный энергетический щит"}),
         # Just damage
         # ('урон(?:|а)', {'link': 'Урон'}),
         #
         # Defenses
         #
-        ('брон(?:|я|е|и|ю|ей)', {'link': 'Броня'}),
-        ('энергетическ(?:|ий|ого|ом) щит(?:|а|е)',
-         {'link': 'Энергетический щит'}),
-        ('уклонени(?:|е|ю|я)', {'link': 'Уклонение'}),
-        ('(?:за|)блок(?:|а|е|ировать|ировали|ированный)', {'link': 'Блок'}),
-        ('увернуться|уворот(?:|а)', {'link': 'Уворот'}),
+        ("брон(?:|я|е|и|ю|ей)", {"link": "Броня"}),
+        ("энергетическ(?:|ий|ого|ом) щит(?:|а|е)", {"link": "Энергетический щит"}),
+        ("уклонени(?:|е|ю|я)", {"link": "Уклонение"}),
+        ("(?:за|)блок(?:|а|е|ировать|ировали|ированный)", {"link": "Блок"}),
+        ("увернуться|уворот(?:|а)", {"link": "Уворот"}),
         #
-        ('сопротивлени(?:|е|ю|я|ем) хаосу', {'link': 'Сопротивление хаосу'}),
-        ('сопротивлени(?:|е|ю|я|ем) холоду', {'link': 'Сопротивление холоду'}),
-        ('сопротивлени(?:|е|ю|я|ем) огню', {'link': 'Сопротивление огню'}),
-        ('сопротивлени(?:|е|ю|я|ем) молнии', {'link': 'Сопротивление молнии'}),
-        ('сопротивлени(?:|е|ю|я|ем) все(?:|м|х) стихи(?:|й|ям)',
-         {'link': 'Сопротивление стихиям'}),
+        ("сопротивлени(?:|е|ю|я|ем) хаосу", {"link": "Сопротивление хаосу"}),
+        ("сопротивлени(?:|е|ю|я|ем) холоду", {"link": "Сопротивление холоду"}),
+        ("сопротивлени(?:|е|ю|я|ем) огню", {"link": "Сопротивление огню"}),
+        ("сопротивлени(?:|е|ю|я|ем) молнии", {"link": "Сопротивление молнии"}),
+        ("сопротивлени(?:|е|ю|я|ем) все(?:|м|х) стихи(?:|й|ям)", {"link": "Сопротивление стихиям"}),
         #
         # Buffs
         #
-
         # Charges
-        ('заряд(?:|а|ы|ов) выносливости', {'link': 'Заряд выносливости'}),
-        ('заряд(?:|а|ы|ов) ярости', {'link': 'Заряд ярости'}),
-        ('заряд(?:|а|ы|ов) энергии', {'link': 'Заряд энергии'}),
-
+        ("заряд(?:|а|ы|ов) выносливости", {"link": "Заряд выносливости"}),
+        ("заряд(?:|а|ы|ов) ярости", {"link": "Заряд ярости"}),
+        ("заряд(?:|а|ы|ов) энергии", {"link": "Заряд энергии"}),
         # Friendly
-        ('буйств(?:|о|е|а)', {'link': 'Буйство'}),
-
+        ("буйств(?:|о|е|а)", {"link": "Буйство"}),
         # Hostile
-        ('оскверненной крови', {'link': 'Оскверненная кровь'}),
-
+        ("оскверненной крови", {"link": "Оскверненная кровь"}),
         #
         # Misc stats
         #
-
-        ('размер(?:|а) персонажа', {'link': 'Размер персонажа'}),
-
+        ("размер(?:|а) персонажа", {"link": "Размер персонажа"}),
         #
         # Groups
         #
         # ('Physical(?:Skill|Gem)', {'link': 'Physical Skills'}),
-        ('умен(?:|ие|ий|ия|иями) огня', {'link': 'Умения огня'}),
-        ('умен(?:|ие|ий|ия|иями) холода', {'link': 'Умения холода'}),
-        ('умен(?:|ие|ий|ия|иями) молнии', {'link': 'Умения молнии'}),
-        ('умен(?:|ие|ий|ия|иями) хаоса ', {'link': 'Умения хаоса'}),
+        ("умен(?:|ие|ий|ия|иями) огня", {"link": "Умения огня"}),
+        ("умен(?:|ие|ий|ия|иями) холода", {"link": "Умения холода"}),
+        ("умен(?:|ие|ий|ия|иями) молнии", {"link": "Умения молнии"}),
+        ("умен(?:|ие|ий|ия|иями) хаоса ", {"link": "Умения хаоса"}),
         # ('Area (?:Skill|Gem)', {'link': 'Area Skills'}),
-        (
-        'умен(?:|ие|ий|ия|иями) ближнего боя', {'link': 'Умения ближнего боя'}),
-        ('умен(?:|ие|ий|ия|иями) луков', {'link': 'Умения луков'}),
-        (
-        'умен(?:|ие|ий|ия|иями) приспешников', {'link': 'Умения приспешников'}),
-        ('умен(?:|ие|ий|ия|иями) обороны', {'link': 'Умения обороны'}),
-        (
-        'умен(?:|ие|ий|ия|иями) передвижения', {'link': 'Умения передвижения'}),
-        ('поддерживаем(?:|ое|ые|ых|ыми) умен(?:|ие|ий|ия|иями)',
-         {'link': 'Поддерживаемые умения'}),
-        ('умен(?:|ие|ий|ия|иями) атак', {'link': 'Умения атак'}),
-        ('умен(?:|ие|ий|ия|иями) чар', {'link': 'Умения чар'}),
-        ('умен(?:|ие|ий|ия|иями) аур', {'link': 'Умения аур'}),
-        ('умен(?:|ие|ий|ия|иями) клейм(?:|а)', {'link': 'Умения клейм'}),
-        ('умен(?:|ие|ий|ия|иями) знамён', {'link': 'Умения знамён'}),
-        ('умен(?:|ие|ий|ия|иями) подношений', {'link': 'Умения подношений'}),
-        ('умен(?:|ие|ий|ия|иями) вестников', {'link': 'Умения вестников'}),
-
+        ("умен(?:|ие|ий|ия|иями) ближнего боя", {"link": "Умения ближнего боя"}),
+        ("умен(?:|ие|ий|ия|иями) луков", {"link": "Умения луков"}),
+        ("умен(?:|ие|ий|ия|иями) приспешников", {"link": "Умения приспешников"}),
+        ("умен(?:|ие|ий|ия|иями) обороны", {"link": "Умения обороны"}),
+        ("умен(?:|ие|ий|ия|иями) передвижения", {"link": "Умения передвижения"}),
+        ("поддерживаем(?:|ое|ые|ых|ыми) умен(?:|ие|ий|ия|иями)", {"link": "Поддерживаемые умения"}),
+        ("умен(?:|ие|ий|ия|иями) атак", {"link": "Умения атак"}),
+        ("умен(?:|ие|ий|ия|иями) чар", {"link": "Умения чар"}),
+        ("умен(?:|ие|ий|ия|иями) аур", {"link": "Умения аур"}),
+        ("умен(?:|ие|ий|ия|иями) клейм(?:|а)", {"link": "Умения клейм"}),
+        ("умен(?:|ие|ий|ия|иями) знамён", {"link": "Умения знамён"}),
+        ("умен(?:|ие|ий|ия|иями) подношений", {"link": "Умения подношений"}),
+        ("умен(?:|ие|ий|ия|иями) вестников", {"link": "Умения вестников"}),
         #
         # Damage
         #
         # Base types
-        ('урон(?:|а|ом) хаосом', {'link': 'Урон от хаоса'}),
-        ('урон(?:|а|ом) от холода', {'link': 'Урон от холода'}),
-        ('урон(?:|а|ом) от огня', {'link': 'Урон от огня'}),
-        ('урон(?:|а|ом) от молнии', {'link': 'Урон от молнии'}),
-        ('физическ(?:|ий|им|ого) урон(?:|а|ом)', {'link': 'Физический урон'}),
+        ("урон(?:|а|ом) хаосом", {"link": "Урон от хаоса"}),
+        ("урон(?:|а|ом) от холода", {"link": "Урон от холода"}),
+        ("урон(?:|а|ом) от огня", {"link": "Урон от огня"}),
+        ("урон(?:|а|ом) от молнии", {"link": "Урон от молнии"}),
+        ("физическ(?:|ий|им|ого) урон(?:|а|ом)", {"link": "Физический урон"}),
         # Mixed and special
-        ('урон(?:|а) от атак', {'link': 'Урон от атак'}),
-        ('урон(?:|а) от чар', {'link': 'Урон от чар'}),
-        ('урон(?:|а) от стихий', {'link': 'Урон от стихий'}),
-        ('урон(?:|а) приспешников', {'link': 'Урон приспешников'}),
-
+        ("урон(?:|а) от атак", {"link": "Урон от атак"}),
+        ("урон(?:|а) от чар", {"link": "Урон от чар"}),
+        ("урон(?:|а) от стихий", {"link": "Урон от стихий"}),
+        ("урон(?:|а) приспешников", {"link": "Урон приспешников"}),
         #
         # Armour & weapon types
         #
-
         # Generic
-        ('двуручн(?:|ое|ым|ого) оружи(?:|е|я|ем) ближнего боя',
-         {'link': 'Двуручное оружие ближнего боя'}),
-
+        (
+            "двуручн(?:|ое|ым|ого) оружи(?:|е|я|ем) ближнего боя",
+            {"link": "Двуручное оружие ближнего боя"},
+        ),
         # Armour
-        ('щит(?:|а|ы|ом)', {'link': 'Щит'}),
-
+        ("щит(?:|а|ы|ом)", {"link": "Щит"}),
         # Melee
-        ('топор(?:|ы|ом|ами)', {'link': 'Топор'}),
-        ('когт(?:|и|ей|ями)', {'link': 'Когти'}),
-        ('кинжал(?:|ы|ом|ами)', {'link': 'Кинжал'}),
-        ('булав(?:|а|ой|ами)', {'link': 'Булава'}),
-        ('скипетр(?:|а|ом|ами)', {'link': 'Скипетр'}),
-        ('посох(?:|а|ом|ами)', {'link': 'Посох'}),
-        ('меч(?:|а|ом|ами)', {'link': 'Меч'}),
-
+        ("топор(?:|ы|ом|ами)", {"link": "Топор"}),
+        ("когт(?:|и|ей|ями)", {"link": "Когти"}),
+        ("кинжал(?:|ы|ом|ами)", {"link": "Кинжал"}),
+        ("булав(?:|а|ой|ами)", {"link": "Булава"}),
+        ("скипетр(?:|а|ом|ами)", {"link": "Скипетр"}),
+        ("посох(?:|а|ом|ами)", {"link": "Посох"}),
+        ("меч(?:|а|ом|ами)", {"link": "Меч"}),
         # Range
-        ('лук(?:|ов|ами)', {'link': 'Лук'}),
-        ('жезл(?:|ом|ами)', {'link': 'Жезл'}),
-
+        ("лук(?:|ов|ами)", {"link": "Лук"}),
+        ("жезл(?:|ом|ами)", {"link": "Жезл"}),
         #
         # Status
         #
-        ('шок(?:|а|у|ом)', {'link': 'Шок'}),
+        ("шок(?:|а|у|ом)", {"link": "Шок"}),
         (
-        'поджог(?:|а|е|и|у)|подожж(?:|ен|ён|ены|енного|ённого|енные|ённые|енным|ённым|енных|ённых)',
-        {'link': 'Поджог'}),
+            "поджог(?:|а|е|и|у)|подожж(?:|ен|ён|ены|енного|ённого|енные|ённые|енным|ённым|енных|ённых)",  # noqa
+            {"link": "Поджог"},
+        ),
         (
-        'заморо(?:|жен|зка|зке|зки|зку|зить|зили|женные|женным|женных|женного)',
-        {'link': 'Заморозка'}),
+            "заморо(?:|жен|зка|зке|зки|зку|зить|зили|женные|женным|женных|женного)",
+            {"link": "Заморозка"},
+        ),
         (
-        'яд(?:|а|у|ом)|отрав(?:|ить|лены|ление|ления|ленные|ленным|ленных|ляются|ленного)',
-        {'link': 'Отравление'}),
-
+            "яд(?:|а|у|ом)|отрав(?:|ить|лены|ление|ления|ленные|ленным|ленных|ляются|ленного)",
+            {"link": "Отравление"},
+        ),
         #
         # Misc
         #
-        ('прокля(?:|т|ты|сть|тие|тия|тий|тым|того|тому|тыми|тием)',
-         {'link': 'Проклятие'}),
-        ('гн(?:|е|ё)зд(?:|а|о|ах)', {'link': 'Гнездо предмета'}),
-        ('недавно', {'link': 'Недавно'}),
-        ('умени(?:|е|й|я|ем)', {'link': 'Умения'}),
-        ('чар(?:|ы|ами) колец', {'link': 'Чары колец'}),
-        ('чар(?:|ы|ами)', {'link': 'Чары'}),
-        ('атак(?:|а|и)', {'link': 'Атака'}),
-        ('приспешник(?:|а|и|ам|ах|ов|ами)', {'link': 'Приспешник'}),
-        ('мин(?:|а|у|ы|ами)', {'link': 'Мина'}),
-        ('тотем(?:|а|ы|ов|ами)', {'link': 'Тотем'}),
-        ('ловуш(?:|ка|ки|ек|ками)', {'link': 'Ловушки'}),
-        ('парн(?:|ое|ым|ого) оружи(?:|е|я|ем)|парными',
-         {'link': 'Парное оружие'}),
-        ('уров(?:|ня|ень)', {'link': 'Уровень'}),
+        ("прокля(?:|т|ты|сть|тие|тия|тий|тым|того|тому|тыми|тием)", {"link": "Проклятие"}),
+        ("гн(?:|е|ё)зд(?:|а|о|ах)", {"link": "Гнездо предмета"}),
+        ("недавно", {"link": "Недавно"}),
+        ("умени(?:|е|й|я|ем)", {"link": "Умения"}),
+        ("чар(?:|ы|ами) колец", {"link": "Чары колец"}),
+        ("чар(?:|ы|ами)", {"link": "Чары"}),
+        ("атак(?:|а|и)", {"link": "Атака"}),
+        ("приспешник(?:|а|и|ам|ах|ов|ами)", {"link": "Приспешник"}),
+        ("мин(?:|а|у|ы|ами)", {"link": "Мина"}),
+        ("тотем(?:|а|ы|ов|ами)", {"link": "Тотем"}),
+        ("ловуш(?:|ка|ки|ек|ками)", {"link": "Ловушки"}),
+        ("парн(?:|ое|ым|ого) оружи(?:|е|я|ем)|парными", {"link": "Парное оружие"}),
+        ("уров(?:|ня|ень)", {"link": "Уровень"}),
         # ('PvP', {'link': 'PvP'}),
-        ('удар(?:|а|е|ов|ами)', {'link': 'Удар'}),
-        ('убийств(?:|а|е|о)|убиваете|убит(?:|ые)', {'link': 'Убийство'}),
-        ('заряд(?:|а|ы|ов|ами)', {'link': 'Заряд'}),
-        ('удач(?:|а|лив|ливы)', {'link': 'Удача'}),
-        ('неудач(?:|а|лив|ливы)', {'link': 'Неудача'}),
-        ('двойной урон', {'link': 'Двойной урон'}),
-        ('снаряды кольцом', {'link': 'Кольцо снарядов'}),
-        ('област(?:|и|ь) действия', {'link': 'Область действия'}),
+        ("удар(?:|а|е|ов|ами)", {"link": "Удар"}),
+        ("убийств(?:|а|е|о)|убиваете|убит(?:|ые)", {"link": "Убийство"}),
+        ("заряд(?:|а|ы|ов|ами)", {"link": "Заряд"}),
+        ("удач(?:|а|лив|ливы)", {"link": "Удача"}),
+        ("неудач(?:|а|лив|ливы)", {"link": "Неудача"}),
+        ("двойной урон", {"link": "Двойной урон"}),
+        ("снаряды кольцом", {"link": "Кольцо снарядов"}),
+        ("област(?:|и|ь) действия", {"link": "Область действия"}),
     ),
 }
 
-'''_inter_wiki_re = re.compile(
+"""_inter_wiki_re = re.compile(
     r'(?: |^)(?P<text>%s))' % '|'.join([item[0] for item in _inter_wiki_map]),
     re.UNICODE | re.IGNORECASE
-)'''
+)"""
 
 _MAX_RE = 97
 
@@ -1403,17 +2119,19 @@ def _make_inter_wiki_re():
     out = {}
     for language, _inter_wiki_mapping in _inter_wiki_map.items():
         out[language] = []
-        for i in range(0, (len(_inter_wiki_mapping)//_MAX_RE)+1):
-            id = i*_MAX_RE
-            out[language].append(re.compile(
-                r'(?![^\[]*\]\])'
-                r'(?: |^)'
-                r'(?P<text>%s)'
-                r'(?= |$)' %
-                '|'.join(['(%s)' % item[0] for item in _inter_wiki_mapping[id:id+_MAX_RE]]),
-                re.UNICODE | re.IGNORECASE,
-            ))
+        for i in range(0, (len(_inter_wiki_mapping) // _MAX_RE) + 1):
+            id = i * _MAX_RE
+            out[language].append(
+                re.compile(
+                    r"(?![^\[]*\]\])\b(?P<text>%s)\b"
+                    % "|".join(
+                        ["(%s)" % item[0] for item in _inter_wiki_mapping[id : id + _MAX_RE]]
+                    ),
+                    re.UNICODE | re.IGNORECASE,
+                )
+            )
     return out
+
 
 _inter_wiki_re = _make_inter_wiki_re()
 
@@ -1436,14 +2154,14 @@ class BaseParser:
     :type custom: TranslationFile
     """
 
-    _DETAILED_FORMAT = '<abbr title="%s">%s</abbr>'
+    _DETAILED_FORMAT = '<span class="tooltip" title="%s">%s</span>'
 
     _HIDDEN_FORMAT = {
-        'English': '%s (Hidden)',
-        'German': '%s (nicht sichtbar)',
-        'Russian': '%s (скрытый)',
+        "English": "%s (Hidden)",
+        "German": "%s (nicht sichtbar)",
+        "Russian": "%s (скрытый)",
     }
-    _MISSING_MSG = 'Several arguments have not been found:\n%s'
+    _MISSING_MSG = "Several arguments have not been found:\n%s"
 
     _TC_KWARGS = {}
 
@@ -1453,14 +2171,15 @@ class BaseParser:
     def __init__(self, base_path, parsed_args):
         self.parsed_args = parsed_args
         # Make sure to load the appropriate version of the specification
-        set_default_spec(version=config.get_option('version'))
+        self.specification = load(version=config.get_option("version"))
 
         self.base_path = base_path
         self.file_system = FileSystem(root_path=get_content_path())
 
         opt = {
-            'use_dat_value': False,
-            'auto_build_index': True,
+            "use_dat_value": False,
+            "auto_build_index": True,
+            "x64": True,
         }
 
         # Load rr and translations which will be undoubtedly be needed for
@@ -1469,18 +2188,21 @@ class BaseParser:
             path_or_file_system=self.file_system,
             files=self._files,
             read_options=opt,
+            specification=self.specification,
             raise_error_on_missing_relation=False,
-            language=config.get_option('language'),
+            language=config.get_option("language"),
         )
         install_data_dependant_quantifiers(self.rr)
-        self.tc = TranslationFileCache(
-            path_or_file_system=self.file_system,
-            **self._TC_KWARGS
-        )
-        for file_name in self._translations:
-            self.tc[file_name]
+        self.tc = TranslationFileCache(path_or_file_system=self.file_system, **self._TC_KWARGS)
+        if self.specification.sequel == 1:
+            for file_name in self._translations:
+                self.tc[file_name]
 
         self.ot = OTFileCache(
+            path_or_file_system=self.file_system,
+        )
+
+        self.it = ITFileCache(
             path_or_file_system=self.file_system,
         )
 
@@ -1488,10 +2210,9 @@ class BaseParser:
         self.hardcoded = get_hardcoded_translation_file()
 
         self._img_path = None
-        self.lang = config.get_option('language')
+        self.lang = config.get_option("language")
 
-    def _column_index_filter(self, dat_file_name, column_id, arg_list,
-                             error_msg=_MISSING_MSG):
+    def _column_index_filter(self, dat_file_name, column_id, arg_list, error_msg=_MISSING_MSG):
         self.rr[dat_file_name].build_index(column_id)
 
         rows = []
@@ -1504,16 +2225,12 @@ class BaseParser:
 
         for argument in arg_list:
             if argument in self.rr[dat_file_name].index[column_id]:
-                func(
-                    self.rr[dat_file_name].index[column_id][argument]
-                )
+                func(self.rr[dat_file_name].index[column_id][argument])
             else:
                 missing.append(argument)
 
         if missing:
-            console(
-                self._MISSING_MSG % '\n'.join(missing), msg=Msg.warning
-            )
+            console(self._MISSING_MSG % "\n".join(missing), msg=Msg.warning)
 
         return rows
 
@@ -1521,183 +2238,218 @@ class BaseParser:
         return make_inter_wiki_links(self._format_lines(tr.lines))
 
     def _format_lines(self, lines):
-        return '<br>'.join(lines).replace('\n', '<br>')
+        return "<br>".join(lines).replace("\n", "<br>")
 
     def _format_wiki_title(self, title):
-        return title.replace('_', '~').replace('~~~', '_~~_~~_')
+        return title.replace("_", "~").replace("~~~", "_~~_~~_")
 
     def _format_hidden(self, custom):
         return self._HIDDEN_FORMAT[self.lang] % make_inter_wiki_links(custom)
 
     def _format_detailed(self, custom, ingame):
-        return self._DETAILED_FORMAT % (
-            ingame,
-            make_inter_wiki_links(custom)
-        )
+        return self._DETAILED_FORMAT % (custom, ingame)
 
-    def _write_dds(self, data, out_path, parsed_args):
-        out_path = fix_path(out_path.replace('"', "'", 2))
-        with open(out_path, 'wb') as f:
-            f.write(self.file_system.extract_dds(data))
+    def _write_dds(
+        self, data, out_path, parsed_args, process: Callable[[PIL.Image], PIL.Image] = None
+    ):
+        out_path = fix_path(out_path)
+        if parsed_args.convert_images == "md5sum":
+            with open(out_path.replace(".dds", ".md5sum"), "w") as f:
+                f.write(md5(data).hexdigest())
+        elif parsed_args.convert_images:
+            out_img = decode_dds(data)
+            if process:
+                out_img = process(out_img)
+            if out_img:
+                out_img.save(out_path.replace(".dds", parsed_args.convert_images))
+                console('Converted "%s" to png' % out_path)
+        else:
+            with open(out_path, "wb") as f:
+                f.write(self.file_system.extract_dds(data))
 
-            console('Wrote "%s"' % out_path)
-
-        if not parsed_args.convert_images:
-            return
-
-        os.system('process-image convert "%s" "%s"' % (
-            out_path, out_path.replace('.dds', '.png'),
-        ))
-        os.remove(out_path)
-
-        console('Converted "%s" to png' % out_path)
+                console('Wrote "%s"' % out_path)
 
     def _image_init(self, parsed_args):
         if parsed_args.store_images:
-            self._img_path = os.path.join(self.base_path, 'img')
+            self._img_path = os.path.join(self.base_path, "img")
             if not os.path.exists(self._img_path):
                 os.makedirs(self._img_path)
 
-    def _get_stats(self, stats=None, values=None, mod=None,
-                   translation_file=None):
+    def _get_stats(self, stats=None, values=None, mod=None, translation_file=None):
         if translation_file is None:
             if mod is None:
                 raise ValueError(
-                    'Can not automatically determine translation file if mod '
-                    'is not set'
+                    "Can not automatically determine translation file if mod is not set"
                 )
             else:
-                translation_file = get_translation_file_from_domain(
-                    mod['Domain'])
+                translation_file = get_translation_file_from_domain(mod["Domain"], constants)
         if stats is None or values is None:
             if mod is None:
-                raise ValueError(
-                    'Mod must be set if any of stats or values aren\'t set'
-                )
+                raise ValueError("Mod must be set if any of stats or values aren't set")
             else:
                 stats = []
                 values = []
-                for i in MOD_STATS_RANGE:
-                    k = mod['StatsKey%s' % i]
+                for i in constants.MOD_STATS_RANGE:
+                    k = mod["StatsKey%s" % i]
                     if k is None:
                         continue
 
-                    stat = k['Id']
-                    value = mod['Stat%sMin' % i], mod['Stat%sMax' % i]
+                    stat = k["Id"]
+                    value = mod["Stat%sMin" % i], mod["Stat%sMax" % i]
 
                     if value[0] == 0 and value[1] == 0:
                         continue
 
                     stats.append(stat)
                     values.append(value)
+        if mod is not None:
+            values = dict(
+                (stat, self._fix_sign(value, mod["Id"], stat)) for stat, value in zip(stats, values)
+            )
 
-        result = self.tc[translation_file].get_translation(
-            stats, values, full_result=True, lang=self.lang
+        # Check for hardcoded stat descriptions first
+        hardcoded_result = self.hardcoded.get_translation(
+            stats,
+            values,
+            full_result=True,
+            lang=self.lang,
         )
+        out = [make_inter_wiki_links(line) for line in hardcoded_result.lines]
 
-        if mod and mod['Domain'] == MOD_DOMAIN.MONSTER:
-            default = self.tc['stat_descriptions.txt'].get_translation(
-                result.source_ids, result.source_values, full_result=True,
-                lang=self.lang
-            )
-            temp_ids = []
-            temp_trans = []
-
-            for i, tr in enumerate(default.found):
-                for j, tr2 in enumerate(result.found):
-                    if tr.ids != tr2.ids:
-                        continue
-
-                    r1 = tr.get_language(self.lang).format_string(default.values[i])
-                    r2 = tr2.get_language(self.lang).format_string(result.values[j])
-                    if r1 and r2 and r1[0] != r2[0]:
-                        temp_trans.append(self._format_detailed(r1[0], r2[0]))
-                    elif r2 and r2[0]:
-                        temp_trans.append(self._format_hidden(r2[0]))
-                    temp_ids.append(tr.ids)
-
-                is_missing = False
-                for tid in tr.ids:
-                    if tid in result.missing_ids:
-                        is_missing = True
-                        break
-
-                if not is_missing:
-                    continue
-
-                r1 = tr.get_language(self.lang).format_string(default.values[i])
-                if r1 and r1[0]:
-                    temp_trans.append(self._format_hidden(r1[0]))
-                    temp_ids.append(tr.ids)
-
-                for tid in tr.ids:
-                    try:
-                        i = result.missing_ids.index(tid)
-                    except ValueError:
-                        continue
-                    del result.missing_ids[i]
-                    del result.missing_values[i]
-
-            index = 0
-            for i, tr in enumerate(result.found):
-                try:
-                    index = temp_ids.index(tr.ids)
-                except ValueError:
-                    temp_ids.insert(index, tr.ids)
-                    temp_trans.insert(index, make_inter_wiki_links(
-                        tr.get_language(self.lang).format_string(
-                            result.values[i])[0]
-                    ))
-                else:
-                    pass
-
-            out = temp_trans
-        else:
-            out = [make_inter_wiki_links(line) for line in result.lines]
-
-        if result.missing_ids:
-            # Check for a hardcoded result first, using result's missing values.
-            hardcoded_result = self.hardcoded.get_translation(
-                result.missing_ids,
-                result.missing_values,
-                full_result=True,
-                lang=self.lang,
-            )
-
-            # Then check for a custom result, using missing values from the hardcoded results.
-            custom_result = self.custom.get_translation(
+        # Next check the game's translation files
+        if hardcoded_result.missing_ids:
+            result = self.tc[translation_file].get_translation(
                 hardcoded_result.missing_ids,
                 hardcoded_result.missing_values,
                 full_result=True,
                 lang=self.lang,
             )
 
-            if custom_result.missing_ids:
-                warnings.warn(
-                    f'Mod {mod["Id"]}: Missing translations for ids {custom_result.missing_ids} and values {custom_result.missing_values}',
-                    MissingIdentifierWarning,
+            if mod and mod["Domain"] == constants.MOD_DOMAIN.MONSTER:
+                default = self.tc["stat_descriptions.txt"].get_translation(
+                    result.source_ids, result.source_values, full_result=True, lang=self.lang
+                )
+                temp_ids = []
+                temp_trans = []
+
+                for i, tr in enumerate(default.found):
+                    for j, tr2 in enumerate(result.found):
+                        if tr.ids != tr2.ids:
+                            continue
+
+                        r1 = tr.get_language(self.lang).format_string(default.values[i])
+                        r2 = tr2.get_language(self.lang).format_string(result.values[j])
+                        if r1 and r2 and r1[0] != r2[0]:
+                            temp_trans.append(self._format_detailed(r1[0], r2[0]))
+                        elif r2 and r2[0]:
+                            temp_trans.append(self._format_hidden(r2[0]))
+                        temp_ids.append(tr.ids)
+
+                    is_missing = False
+                    for tid in tr.ids:
+                        if tid in result.missing_ids:
+                            is_missing = True
+                            break
+
+                    if not is_missing:
+                        continue
+
+                    r1 = tr.get_language(self.lang).format_string(default.values[i])
+                    if r1 and r1[0]:
+                        temp_trans.append(self._format_hidden(r1[0]))
+                        temp_ids.append(tr.ids)
+
+                    for tid in tr.ids:
+                        try:
+                            i = result.missing_ids.index(tid)
+                        except ValueError:
+                            continue
+                        del result.missing_ids[i]
+                        del result.missing_values[i]
+
+                index = 0
+                for i, tr in enumerate(result.found):
+                    try:
+                        index = temp_ids.index(tr.ids)
+                    except ValueError:
+                        temp_ids.insert(index, tr.ids)
+                        temp_trans.insert(
+                            index,
+                            make_inter_wiki_links(
+                                tr.get_language(self.lang).format_string(result.values[i])[0]
+                            ),
+                        )
+                    else:
+                        pass
+
+                for line in temp_trans:
+                    if line:
+                        out.append(line)
+            else:
+                result_lines = result.lines
+                for client_string in result.client_string_formats:
+                    format: str = self.rr["ClientStrings.dat64"].index["Id"][client_string]["Text"]
+                    # works for now, may need to revisit if different formats are added to _CLIENT_STRINGS_LOOKUP
+                    result_lines = (
+                        [format.format(line) for line in result_lines] if result_lines else [format]
+                    )
+
+                for line in result_lines:
+                    if line:
+                        out.append(make_inter_wiki_links(line))
+
+            if result.missing_ids:
+                # Then check for a custom result, using missing values from the results
+                custom_result = self.custom.get_translation(
+                    result.missing_ids,
+                    result.missing_values,
+                    full_result=True,
+                    lang=self.lang,
                 )
 
-            # Save hardcoded stat lines normally
-            for line in hardcoded_result.lines:
-                if line:
-                    out.append(make_inter_wiki_links(line))
+                if custom_result.missing_ids:
+                    warnings.warn(
+                        f'Mod {mod["Id"] if mod is not None else "??"}: Missing translations for ids'
+                        f" {custom_result.missing_ids} and values {custom_result.missing_values}",
+                        MissingIdentifierWarning,
+                    )
 
-            # Save custom stat lines with "(hidden)" appended
-            for line in custom_result.lines:
-                if line:
-                    out.append(self._HIDDEN_FORMAT[self.lang] % line)
+                # Save custom stat lines with "(hidden)" appended
+                for line in custom_result.lines:
+                    if line:
+                        out.append(self._HIDDEN_FORMAT[self.lang] % line)
 
         finalout = []
         for line in out:
-            if '\n' in line:
+            if "\n" in line:
                 # By request differentiate between breaks from the source file
                 # and different stats
-                finalout.append('<br />'.join(line.split('\n')))
+                finalout.append("<br>".join(line.split("\n")))
             else:
                 finalout.append(line)
 
         return finalout
+
+    _INVERTED_STAT_SIGNS = {
+        "base_maximum_life": -1,
+        "base_maximum_mana": -1,
+        "base_maximum_energy_shield": -1,
+        "base_cold_damage_resistance_%": -1,
+        "base_fire_damage_resistance_%": -1,
+        "base_lightning_damage_resistance_%": -1,
+        "base_mana_cost_+_with_non_channelling_skills": +1,
+        "base_mana_cost_+_with_channelling_skills": +1,
+        "base_minimum_endurance_charges": -1,
+        "base_minimum_frenzy_charges": -1,
+        "base_minimum_power_charges": -1,
+    }
+
+    def _fix_sign(self, values: tuple[int, int], mod_id: str, stat: str):
+        if "Inverted" in mod_id and stat in self._INVERTED_STAT_SIGNS:
+            sign = self._INVERTED_STAT_SIGNS[stat]
+            return int(copysign(values[0], sign)), int(copysign(values[1], sign))
+        else:
+            return values
 
 
 class TagHandler:
@@ -1711,8 +2463,29 @@ class TagHandler:
         :func:`parse_description_tags`
     """
 
-    _IL_FORMAT = '{{iil|%s}}'
-    _C_FORMAT = '{{c|%s|%s}}'
+    _IL_FORMAT = "{{il|%s|html=}}"
+    _IIL_FORMAT = "{{iil|%s}}"
+    _C_FORMAT = "{{c|%s|%s}}"
+
+    # Language should not be necessary as we are checking Words.dat['Text'],
+    # while the translated name is in Text2
+    UNIQ_FORMATS = {
+        "Grand Spectrum": "[[%s]]",
+        "Precursor's Emblem": "[[%s]]",
+        "The Beachhead": "{{iil|The Beachhead (High Tier)|%s}}",
+    }
+
+    CUSTOM_LINKS = {
+        "4x Scarab": "4x [[Scarab]]",
+        "Horned Scarab": "[[Horned Scarab]]",
+        "Cartography Scarab": "[[Cartography Scarab (disambiguation)|Cartography Scarab]]",
+        "Divination Scarab": "[[Divination Scarab (disambiguation)|Divination Scarab]]",
+        "Bestiary Scarab": "[[Bestiary Scarab (disambiguation)|Bestiary Scarab]]",
+        "Sulphite Scarab": "[[Sulphite Scarab (disambiguation)|Sulphite Scarab]]",
+        "Torrent's Reclamation": "{{iil|The Torrent's Reclamation|Torrent's Reclamation}}",
+        "League-Specific Item": "[[League-Specific Item]]",
+        "Replica Item": "[[Replica Item]]",
+    }
 
     def __init__(self, rr):
         """
@@ -1723,22 +2496,26 @@ class TagHandler:
             'real' for linking purposes
         """
         self.rr = rr
-        self.rr['BaseItemTypes.dat'].build_index('Name')
-        self.rr['Words.dat'].build_index('Text')
+        self.rr["BaseItemTypes.dat64"].build_index("Name")
+        self.rr["Words.dat64"].build_index("Text")
 
         self.tag_handlers = {}
         for key, func in self.__class__.tag_handlers.items():
             self.tag_handlers[key] = partial(func, self)
 
     def _check_link(self, string):
-        items = self.rr['BaseItemTypes.dat'].index['Name'][string]
+        if string in self.CUSTOM_LINKS:
+            return self.CUSTOM_LINKS[string]
+        if any(category["Text"] == string for category in self.rr["ItemClassCategories.dat64"]):
+            return "[[%s]]" % string
+        items = self.rr["BaseItemTypes.dat64"].index["Name"][string]
         if items:
-            if items[0]['ItemClassesKey']['Name'] == 'Maps':
+            if items[0]["ItemClassesKey"]["Name"] == "Maps":
                 string = self._IL_FORMAT % string
             elif len(items) > 1:
-                return '[[%s]]' % string
+                return "[[%s]]" % string
             else:
-                string = self._IL_FORMAT % string
+                string = self._IIL_FORMAT % string
         return string
 
     def _basic_handler(self, hstr, parameter, tid):
@@ -1748,61 +2525,56 @@ class TagHandler:
         return self._C_FORMAT % (tid, self._check_link(hstr))
 
     def _link_handler(self, hstr, parameter, tid):
-        return self._C_FORMAT % (tid, '[[%s]]' % hstr)
+        return self._C_FORMAT % (tid, "[[%s]]" % hstr)
 
     def _unique_handler(self, hstr, parameter):
-        words = self.rr['Words.dat'].index['Text'][hstr]
-        if words and words[0]['WordlistsKey'] == WORDLISTS.UNIQUE_ITEM:
+        words = self.rr["Words.dat64"].index["Text"][hstr]
+        if words and words[0]["WordlistsKey"] == constants.WORDLISTS.UNIQUE_ITEM:
             # Check whether unique item name clashes with base item name
-            items = self.rr['BaseItemTypes.dat'].index['Name'][hstr]
+            items = self.rr["BaseItemTypes.dat64"].index["Name"][hstr]
             if len(items) > 0:
-                hstr = '[[%s]]' % hstr
+                hstr = "[[%s]]" % hstr
+            elif hstr in self.UNIQ_FORMATS:
+                hstr = self.UNIQ_FORMATS[hstr] % hstr
             else:
-                hstr = self._IL_FORMAT % hstr
+                hstr = self._IIL_FORMAT % hstr
         else:
             hstr = self._check_link(hstr)
-        return self._C_FORMAT % ('unique', hstr)
+        return self._C_FORMAT % ("unique", hstr)
 
     def _currency_handler(self, hstr, parameter):
-        if 'x ' in hstr:
-            s = hstr.split('x ', maxsplit=1)
-            return self._C_FORMAT % (
-                'currency', '%sx %s' % (s[0], self._check_link(s[1]))
-            )
+        if "x " in hstr:
+            s = hstr.split("x ", maxsplit=1)
+            return self._C_FORMAT % ("currency", "%sx %s" % (s[0], self._check_link(s[1])))
         else:
-            return self._default_handler(hstr, parameter, 'currency')
+            return self._default_handler(hstr, parameter, "currency")
 
     def _pass_through_handler(self, hstr, parameter):
         return hstr
 
     tag_handlers = {
-        'normal': partial(_default_handler, tid='normal'),
-        'default': partial(_default_handler, tid='default'),
-        'augmented': partial(_default_handler, tid='augmented'),
-        'enchanted': partial(_default_handler, tid='enchanted'),
-
-        'size': _pass_through_handler,
-        'smaller': _pass_through_handler,
-
-        'gemitem': partial(_default_handler, tid='gem'),
-        'currencyitem': _currency_handler,
-
-        'whiteitem': partial(_default_handler, tid='white'),
-        'magicitem': partial(_default_handler, tid='magic'),
-        'rareitem': partial(_default_handler, tid='rare'),
-        'uniqueitem': _unique_handler,
-
-        'divination': partial(_default_handler, tid='divination'),
-        'prophecy': partial(_default_handler, tid='prophecy'),
-
-        'corrupted': partial(_link_handler, tid='corrupted'),
+        "normal": partial(_default_handler, tid="normal"),
+        "default": partial(_default_handler, tid="default"),
+        "augmented": partial(_default_handler, tid="augmented"),
+        "enchanted": partial(_default_handler, tid="enchanted"),
+        "size": _pass_through_handler,
+        "smaller": _pass_through_handler,
+        "gemitem": partial(_default_handler, tid="gem"),
+        "currencyitem": _currency_handler,
+        "whiteitem": partial(_default_handler, tid="white"),
+        "magicitem": partial(_default_handler, tid="magic"),
+        "rareitem": partial(_default_handler, tid="rare"),
+        "uniqueitem": _unique_handler,
+        "divination": partial(_default_handler, tid="divination"),
+        "corrupted": partial(_link_handler, tid="corrupted"),
+        "fractured": partial(_link_handler, tid="fractured"),
     }
 
 
 class WikiCondition:
-    COPY_KEYS = (
-    )
+    COPY_KEYS = ()
     COPY_MATCH = None
+    COPY_CONDITIONS: dict[str, Callable[[str, str], bool]] = {}
 
     NAME = NotImplemented
     MATCH = None
@@ -1817,14 +2589,13 @@ class WikiCondition:
         self.template_arguments = None
 
     def __call__(self, *args, **kwargs):
-        page = kwargs.get('page')
+        page = kwargs.get("page")
 
         if page is not None:
             # Abuse this so it can be called as "text" and "condition"
             if self.template_arguments is None:
-                self.template_arguments = find_template(
-                    page.text(), self.MATCH or self.NAME)
-                if len(self.template_arguments['texts']) == 1:
+                self.template_arguments = find_template(page.text(), self.MATCH or self.NAME)
+                if len(self.template_arguments["texts"]) == 1:
                     self.template_arguments = None
                     return False
 
@@ -1832,23 +2603,31 @@ class WikiCondition:
 
             for k in self.COPY_KEYS:
                 try:
-                    self.data[k] = self.template_arguments['kwargs'][k]
+                    self.data[k] = self.template_arguments["kwargs"][k]
                 except KeyError:
                     pass
 
             if self.COPY_MATCH:
-                for k, v in self.template_arguments['kwargs'].items():
+                for k, v in self.template_arguments["kwargs"].items():
                     if self.COPY_MATCH.match(k):
                         self.data[k] = v
 
-            prefix = ''
-            if self.ADD_INCLUDE and '<onlyinclude></onlyinclude>' not in \
-                    page.text():
-                prefix = '<onlyinclude></onlyinclude>'
+            for k, condition in self.COPY_CONDITIONS.items():
+                if k in self.template_arguments["kwargs"] and condition(
+                    self.template_arguments["kwargs"][k], self.data.get(k, None)
+                ):
+                    self.data[k] = self.template_arguments["kwargs"][k]
 
-            return self.handler(prefix + self.template_arguments['texts'][0] + \
-                   self._get_text() + \
-                   ''.join(self.template_arguments['texts'][1:]))
+            prefix = ""
+            if self.ADD_INCLUDE and "<onlyinclude></onlyinclude>" not in page.text():
+                prefix = "<onlyinclude></onlyinclude>"
+
+            return self.handler(
+                prefix
+                + self.template_arguments["texts"][0]
+                + self._get_text()
+                + "".join(self.template_arguments["texts"][1:])
+            )
         else:
             return self.handler(self._get_text())
 
@@ -1863,13 +2642,16 @@ class WikiCondition:
             ordered_dict=self.data,
         )
 
+    def tagsets_equal(page_value: str, new_value: str):
+        return new_value and set(page_value.split(", ")) == set(new_value.split(", "))
+
+
 # =============================================================================
 # Functions
 # =============================================================================
 
 
-def format_result_rows(parsed_args, ordered_dict, template_name,
-                       indent=DEFAULT_INDENT):
+def format_result_rows(parsed_args, ordered_dict, template_name, indent=DEFAULT_INDENT):
     """
     Formats the given result rows as mediawiki template or module.
 
@@ -1889,21 +2671,24 @@ def format_result_rows(parsed_args, ordered_dict, template_name,
     out : str
         formatted string
     """
-    if parsed_args.format == 'template':
-        out = ['{{%s\n' % template_name]
+    if parsed_args.format == "template":
+        out = ["{{%s\n" % template_name]
         for k, v in ordered_dict.items():
             if v is not None:
-                out.append(('|{0: <%s}= {1}\n' % indent).format(k, v))
-        out.append('}}')
-    elif parsed_args.format == 'module':
-        ordered_dict['debug_id'] = 1
-        out = ['{']
+                v = str(v)
+                if "{{" not in v and "[[" not in v:
+                    v = v.replace("|", "{{!}}")
+                out.append(("|{0: <%s}= {1}\n" % indent).format(k, v))
+        out.append("}}")
+    elif parsed_args.format == "module":
+        ordered_dict["debug_id"] = 1
+        out = ["{"]
         for k, v in ordered_dict.items():
             if v is not None:
                 out.append('{0} = "{1}", '.format(k, v))
-        out[-1] = out[-1].strip(', ')
-        out.append('}')
-    return ''.join(out)
+        out[-1] = out[-1].strip(", ")
+        out.append("}")
+    return "".join(out)
 
 
 def make_inter_wiki_links(string):
@@ -1922,32 +2707,32 @@ def make_inter_wiki_links(string):
         String formatted with inter wiki links
     """
 
-    _inter_wiki = _inter_wiki_re.get(config.get_option('language'))
+    _inter_wiki = _inter_wiki_re.get(config.get_option("language"))
 
     if _inter_wiki is None:
         return string
 
-    mapping = _inter_wiki_map.get(config.get_option('language'))
+    mapping = _inter_wiki_map.get(config.get_option("language"))
 
     for i, regex in enumerate(_inter_wiki):
         out = []
         last_index = 0
         for match in regex.finditer(string):
-            text = match.group('text')
+            text = match.group("text")
             # Offset by 1 to account for text group
-            index = match.groups().index(text, 1)-1
-            data = mapping[i*_MAX_RE+index][1]
-
-            out.append(string[last_index:match.start('text')])
-            if text == data['link']:
-                out.append('[[%s]]' % data['link'])
+            index = match.groups().index(text, 1) - 1
+            data = mapping[i * _MAX_RE + index][1]
+            link = data["link"].format(text=text)  # Replace {text} placeholder in link with text
+            out.append(string[last_index : match.start("text")])
+            if link == text:
+                out.append("[[%s]]" % link)
             else:
-                out.append('[[%s|%s]]' % (data['link'], text))
+                out.append("[[%s|%s]]" % (link, text))
 
-            last_index = match.end('text')
+            last_index = match.end("text")
 
         out.append(string[last_index:])
-        string = ''.join(out)
+        string = "".join(out)
 
     return string
 
@@ -1978,27 +2763,32 @@ def find_template(wikitext, template_name):
             appeared in the wikitext
 
     """
+
     def f(scanner, result, tid):
         return tid, scanner.match, result
 
-    scanner = re.Scanner([
-        # Need to have this look ahead to avoid matching templates that start
-        # with the same name.
-        (r'{{%s(?=[^\w}\|]*\||}})' % template_name,
-            partial(f, tid='template')),
-        (r'{{', partial(f, tid='l_brace')),
-        (r'}}', partial(f, tid='r_brace')),
-        (r'\[\[', partial(f, tid='l_brackets')),
-        (r'\]\]', partial(f, tid='r_brackets')),
-        (r'\|', partial(f, tid='pipe')),
-        (r'=', partial(f, tid='equals')),
-        (r'[{}]{1}', partial(f, tid='single_brace')),
-        (r'[\[\]]{1}', partial(f, tid='single_bracket')),
-        (r'[^{}\|=\[\]]+', partial(f, tid='text')),
-    ], re.UNICODE | re.MULTILINE)
+    scanner = re.Scanner(
+        [
+            # Need to have this look ahead to avoid matching templates that start
+            # with the same name.
+            (r"{{%s(?=[^\w}\|]*\||}})" % template_name, partial(f, tid="template")),
+            (r"{{", partial(f, tid="l_brace")),
+            (r"}}", partial(f, tid="r_brace")),
+            (r"\[\[", partial(f, tid="l_brackets")),
+            (r"\]\]", partial(f, tid="r_brackets")),
+            (r"\|", partial(f, tid="pipe")),
+            (r"=", partial(f, tid="equals")),
+            (r"[{}]{1}", partial(f, tid="single_brace")),
+            (r"[\[\]]{1}", partial(f, tid="single_bracket")),
+            (r"[^{}\|=\[\]]+", partial(f, tid="text")),
+        ],
+        re.UNICODE | re.MULTILINE,
+    )
 
     # Returns
-    texts = [[], ]
+    texts = [
+        [],
+    ]
     kw_arguments = OrderedDict()
     arguments = []
 
@@ -2007,56 +2797,61 @@ def find_template(wikitext, template_name):
     pre_equal = True
     brace_count = 0
     bracket_count = 0
-    template_argument = ['', '']
+    template_argument = ["", ""]
 
     for tid, match, text in scanner.scan(wikitext)[0]:
-        if tid == 'template':
+        if tid == "template":
             in_template = True
         elif in_template:
             # r_brace is needed to capture the last argument, as it's not
             # delimited by a pipe
             # It also prevents reaching the second condition in that case
-            if tid in ('pipe', 'r_brace') and brace_count == 0 and \
-                            bracket_count == 0:
+            if tid in ("pipe", "r_brace") and brace_count == 0 and bracket_count == 0:
                 pre_equal = True
                 for i in range(0, 2):
-                    template_argument[i] = template_argument[i].strip(' \n\t')
+                    template_argument[i] = template_argument[i].strip(" \n\t")
 
                 if template_argument[1]:
-                    kw_arguments[template_argument[0]] = \
-                        template_argument[1]
+                    kw_arguments[template_argument[0]] = template_argument[1]
                 elif template_argument[0]:
                     arguments.append([template_argument[0]])
-                template_argument = ['', '']
-            elif tid in ('text', 'l_brace', 'r_brace', 'single_brace', 'pipe',
-                         'l_brackets', 'r_brackets', 'single_bracket') or (
-                    tid == 'equals' and brace_count >= 1):
+                template_argument = ["", ""]
+            elif tid in (
+                "text",
+                "l_brace",
+                "r_brace",
+                "single_brace",
+                "pipe",
+                "l_brackets",
+                "r_brackets",
+                "single_bracket",
+            ) or (tid == "equals" and brace_count >= 1):
                 index = 0 if pre_equal else 1
                 template_argument[index] += text
-            elif tid == 'equals' and brace_count == 0:
+            elif tid == "equals" and brace_count == 0:
                 pre_equal = False
 
             # Brace counting must be done after the text parsing because
             # the previous brace count is needed up there
-            if tid == 'l_brace':
+            if tid == "l_brace":
                 brace_count += 1
-            elif tid == 'r_brace':
+            elif tid == "r_brace":
                 if brace_count == 0:
                     in_template = False
                     texts.append([])
                 else:
                     brace_count -= 1
-            elif tid == 'l_brackets':
+            elif tid == "l_brackets":
                 bracket_count += 1
-            elif tid == 'r_brackets':
+            elif tid == "r_brackets":
                 bracket_count -= 1
         else:
             texts[-1].append(text)
 
     # Don't really need the list anymore
-    texts = [''.join(t) for t in texts]
+    texts = ["".join(t) for t in texts]
 
-    return {'texts': texts, 'args': arguments, 'kwargs': kw_arguments}
+    return {"texts": texts, "args": arguments, "kwargs": kw_arguments}
 
 
 def parse_and_handle_description_tags(rr, text):
@@ -2075,5 +2870,10 @@ def parse_and_handle_description_tags(rr, text):
     str
         Parsed texts with wiki templates/links
     """
-    return parse_description_tags(text).handle_tags(
-        TagHandler(rr).tag_handlers).replace('\n', '<br>').replace('\r', '')
+    return (
+        parse_description_tags(text)
+        .handle_tags(TagHandler(rr).tag_handlers)
+        .replace("{0}", "#")  # Numerical placeholder
+        .replace("\n", "<br>")
+        .replace("\r", "")
+    )

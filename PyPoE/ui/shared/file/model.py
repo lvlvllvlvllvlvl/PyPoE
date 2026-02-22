@@ -41,10 +41,10 @@ from PyPoE.ui.shared.proxy_filter_model import FilterProxyModel
 # =============================================================================
 
 __all__ = [
-    'DatDataModel',
-    'DatTableModel',
-    'DatValueProxyModel',
-    'GGPKModel',
+    "DatDataModel",
+    "DatTableModel",
+    "DatValueProxyModel",
+    "GGPKModel",
 ]
 
 # =============================================================================
@@ -56,10 +56,11 @@ class DatModelShared(QAbstractTableModel):
     """
     TODO: master should be a DatFrame... but circular dependencies
     """
+
     def __init__(self, dat_file, *args, **kwargs):
         QAbstractTableModel.__init__(self, *args, **kwargs)
         if not isinstance(dat_file, DatFile):
-            raise TypeError('datfile must be a DatFile instance')
+            raise TypeError("datfile must be a DatFile instance")
         self._dat_file = dat_file
 
 
@@ -67,7 +68,9 @@ class DatTableModel(DatModelShared):
     def __init__(self, *args, **kwargs):
         DatModelShared.__init__(self, *args, **kwargs)
 
-        self._columns = [(id, item['section']) for id, item in self._dat_file.reader.table_columns.items()]
+        self._columns = [
+            (id, item["section"]) for id, item in self._dat_file.reader.table_columns.items()
+        ]
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._dat_file.reader.table_data)
@@ -85,7 +88,7 @@ class DatTableModel(DatModelShared):
         if c == 0:
             return self._dat_file.reader.table_data[index.row()].rowid
         else:
-            return self._dat_file.reader.table_data[index.row()][c-1]
+            return self._dat_file.reader.table_data[index.row()][c - 1]
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if orientation != Qt.Horizontal:
@@ -93,17 +96,16 @@ class DatTableModel(DatModelShared):
 
         # Is a specification entry
         if section > 0:
-            name, field = self._columns[section-1]
+            name, field = self._columns[section - 1]
         else:
             field = None
             name = None
 
         if role == Qt.DisplayRole:
             if field:
-                return field.display.replace('\\n', '\n') if field.display \
-                    else name
+                return field.display.replace("\\n", "\n") if field.display else name
             else:
-                return self.tr('RowID')
+                return self.tr("RowID")
         elif role == Qt.ToolTipRole and field:
             return field.description
 
@@ -114,10 +116,10 @@ class DatDataModel(DatModelShared):
     def __init__(self, *args, **kwargs):
         DatModelShared.__init__(self, *args, **kwargs)
         self._sections = [
-            (self.tr('Offset\nStart'), self._show_start_offset),
-            (self.tr('Offset\nEnd'), self._show_end_offset),
-            (self.tr('Data\nSize'), self._show_size),
-            (self.tr('Data'), self._show_data),
+            (self.tr("Offset\nStart"), self._show_start_offset),
+            (self.tr("Offset\nEnd"), self._show_end_offset),
+            (self.tr("Data\nSize"), self._show_size),
+            (self.tr("Data"), self._show_data),
         ]
 
         self._data = []
@@ -127,7 +129,7 @@ class DatDataModel(DatModelShared):
             # Remove duplicates for easier reading
             # TODO add option this?
             for item in self._dat_file.reader.data_parsed:
-                #if (last.data_start_offset == item.data_start_offset and
+                # if (last.data_start_offset == item.data_start_offset and
                 #    last.data_end_offset == item.data_end_offset and
                 #    last.data_start_offset == last.data_end_offset):
                 #    continue
@@ -175,7 +177,7 @@ class DatDataModel(DatModelShared):
 class GGPKModel(QAbstractItemModel):
     def __init__(self, data=None):
         QAbstractItemModel.__init__(self)
-        self.headers = (self.tr('Name'), self.tr('Size'), self.tr('Offset'))
+        self.headers = (self.tr("Name"), self.tr("Size"), self.tr("Offset"))
         self._data = data
 
     def index(self, row, column, parent=QModelIndex()):
@@ -217,7 +219,7 @@ class GGPKModel(QAbstractItemModel):
         elif cid == 2:
             # need to str or the program hangs for some reason
             return str(node.record.offset)
-        #elif cid == 3:
+        # elif cid == 3:
         #    return str(node.hash)
         return None
 

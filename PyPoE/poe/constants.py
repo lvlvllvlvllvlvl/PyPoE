@@ -58,7 +58,9 @@ Documentation
 
 # Python
 
-from enum import IntEnum, EnumMeta, Enum
+from enum import Enum, EnumMeta, IntEnum
+
+from PyPoE.poe import poe1constants, poe2constants
 
 # 3rd-party
 
@@ -68,156 +70,135 @@ from enum import IntEnum, EnumMeta, Enum
 # Globals
 # =============================================================================
 
-__all__ = [
-    'BETRAYAL_UPGRADE_SLOTS',
-    'DELVE_UPGRADE_TYPE',
-    'DISTRIBUTOR',
-    'MAP_FRAGMENT_FAMILIES',
-    'MOD_DOMAIN',
-    'MOD_GENERATION_TYPE',
-    'RARITY',
-    'SHOP_PACKAGE_PLATFORM',
-    'SOCKET_COLOUR',
-    'STAT_INTERPOLATION_TYPES',
-    'VERSION',
-    'WORDLISTS',
+__all__ = ["DISTRIBUTOR", "VERSION", "sequel"]
 
-    'MOD_MAX_STATS',
-    'MOD_STATS_RANGE',
-    'MOD_SELL_PRICES',
 
-    'PASSIVE_TYPES',
-]
+def sequel(version):
+    if version == 1:
+        return poe1constants
+    else:
+        return poe2constants
+
 
 MOD_MAX_STATS = 6
-MOD_STATS_RANGE = range(1, MOD_MAX_STATS+1)
+MOD_STATS_RANGE = range(1, MOD_MAX_STATS + 1)
 
 # Apparently GGG doesnt want us to know this, so they removed it in 3.5.0
 MOD_SELL_PRICES = {
-    'Low': {
-        'Metadata/Items/Currency/CurrencyRerollMagicShard': 1,
+    "Low": {
+        "Metadata/Items/Currency/CurrencyRerollMagicShard": 1,
     },
-    'Medium': {
-        'Metadata/Items/Currency/CurrencyRerollMagicShard': 3,
+    "Medium": {
+        "Metadata/Items/Currency/CurrencyRerollMagicShard": 3,
     },
-    'High': {
-        'Metadata/Items/Currency/CurrencyRerollMagicShard': 5,
+    "High": {
+        "Metadata/Items/Currency/CurrencyRerollMagicShard": 5,
     },
-    'VeryHigh': {
-        'Metadata/Items/Currency/CurrencyRerollMagicShard': 7,
+    "VeryHigh": {
+        "Metadata/Items/Currency/CurrencyRerollMagicShard": 7,
     },
-    'Special': {
-        'Metadata/Items/Currency/CurrencyUpgradeToRareShard': 1,
+    "Special": {
+        "Metadata/Items/Currency/CurrencyUpgradeToRareShard": 1,
     },
-    'UniqueLow': {
-        'Metadata/Items/Currency/CurrencyUpgradeToRareShard': 2,
+    "UniqueLow": {
+        "Metadata/Items/Currency/CurrencyUpgradeToRareShard": 2,
     },
-    'UniqueMedium': {
-        'Metadata/Items/Currency/CurrencyUpgradeToRareShard': 4,
+    "UniqueMedium": {
+        "Metadata/Items/Currency/CurrencyUpgradeToRareShard": 4,
     },
-    'UniqueHigh': {
-        'Metadata/Items/Currency/CurrencyUpgradeToRareShard': 6,
+    "UniqueHigh": {
+        "Metadata/Items/Currency/CurrencyUpgradeToRareShard": 6,
     },
-    'UniqueVeryHigh': {
-        'Metadata/Items/Currency/CurrencyUpgradeToRareShard': 8,
+    "UniqueVeryHigh": {
+        "Metadata/Items/Currency/CurrencyUpgradeToRareShard": 8,
     },
-    'Kingmaker': {
-        'Metadata/Items/Currency/CurrencyUpgradeMagicToRare': 1,
+    "Kingmaker": {
+        "Metadata/Items/Currency/CurrencyUpgradeMagicToRare": 1,
     },
-    'BreachFire': {
-        'Metadata/Items/Currency/CurrencyBreachFireShard': 3,
+    "BreachFire": {
+        "Metadata/Items/Currency/CurrencyBreachFireShard": 3,
     },
-    'BreachCold': {
-        'Metadata/Items/Currency/CurrencyBreachColdShard': 3,
+    "BreachCold": {
+        "Metadata/Items/Currency/CurrencyBreachColdShard": 3,
     },
-    'BreachLightning': {
-        'Metadata/Items/Currency/CurrencyBreachLightningShard': 3,
+    "BreachLightning": {
+        "Metadata/Items/Currency/CurrencyBreachLightningShard": 3,
     },
-    'BreachPhysical': {
-        'Metadata/Items/Currency/CurrencyBreachPhysicalShard': 3,
+    "BreachPhysical": {
+        "Metadata/Items/Currency/CurrencyBreachPhysicalShard": 3,
     },
-    'BreachChaos': {
-        'Metadata/Items/Currency/CurrencyBreachChaosShard': 3,
+    "BreachChaos": {
+        "Metadata/Items/Currency/CurrencyBreachChaosShard": 3,
     },
-    'BreachFireUnleashed': {
-        'Metadata/Items/Currency/CurrencyBreachFireShard': 10,
+    "BreachFireUnleashed": {
+        "Metadata/Items/Currency/CurrencyBreachFireShard": 10,
     },
-    'BreachColdUnleashed': {
-        'Metadata/Items/Currency/CurrencyBreachColdShard': 10,
+    "BreachColdUnleashed": {
+        "Metadata/Items/Currency/CurrencyBreachColdShard": 10,
     },
-    'BreachLightningUnleashed': {
-        'Metadata/Items/Currency/CurrencyBreachLightningShard': 10,
+    "BreachLightningUnleashed": {
+        "Metadata/Items/Currency/CurrencyBreachLightningShard": 10,
     },
-    'BreachPhysicalUnleashed': {
-        'Metadata/Items/Currency/CurrencyBreachPhysicalShard': 10,
+    "BreachPhysicalUnleashed": {
+        "Metadata/Items/Currency/CurrencyBreachPhysicalShard": 10,
     },
-    'BreashChaosUnleashed': {
-        'Metadata/Items/Currency/CurrencyBreachChaosShard': 10,
+    "BreashChaosUnleashed": {
+        "Metadata/Items/Currency/CurrencyBreachChaosShard": 10,
     },
-    'DelveFossilSellPrice1': {
-        'Metadata/Items/Currency/CurrencyRerollRare': 3,
+    "DelveFossilSellPrice1": {
+        "Metadata/Items/Currency/CurrencyRerollRare": 3,
     },
-    'DelveFossilSellPrice2': {
-        'Metadata/Items/Currency/CurrencyAddModToRare': 1,
+    "DelveFossilSellPrice2": {
+        "Metadata/Items/Currency/CurrencyAddModToRare": 1,
     },
-    'DelveFossilSellPrice3': {
-        'Metadata/Items/Currency/CurrencyUpgradeToRare': 5,
+    "DelveFossilSellPrice3": {
+        "Metadata/Items/Currency/CurrencyUpgradeToRare": 5,
     },
-    'DelveFossilSellPrice4': {
-        'Metadata/Items/DivinationCards/DivinationCardDeck': 3,
+    "DelveFossilSellPrice4": {
+        "Metadata/Items/DivinationCards/DivinationCardDeck": 3,
     },
-    'DelveFossilSellPrice5': {
-        'Metadata/Items/Currency/CurrencyIdentification': 5,
-        'Metadata/Items/Currency/CurrencyUpgradeToRare': 5,
-        'Metadata/Items/Currency/CurrencyUpgradeRandomly': 5,
-        'Metadata/Items/Currency/CurrencyUpgradeToMagic': 5,
-        'Metadata/Items/Currency/CurrencyRerollMagic': 5,
+    "DelveFossilSellPrice5": {
+        "Metadata/Items/Currency/CurrencyIdentification": 5,
+        "Metadata/Items/Currency/CurrencyUpgradeToRare": 5,
+        "Metadata/Items/Currency/CurrencyUpgradeRandomly": 5,
+        "Metadata/Items/Currency/CurrencyUpgradeToMagic": 5,
+        "Metadata/Items/Currency/CurrencyRerollMagic": 5,
     },
-    'DelveFossilSellPrice6': {
-        'Metadata/Items/Currency/CurrencyRhoaFeather': 5,
+    "DelveFossilSellPrice6": {
+        "Metadata/Items/Currency/CurrencyRhoaFeather": 5,
     },
-    'DelveFossilSellPrice7': {
-        'Metadata/Items/Currency/CurrencyWeaponQuality': 1,
-        'Metadata/Items/Currency/CurrencyIdentification': 1,
-        'Metadata/Items/Currency/CurrencyRerollRare': 1,
-        'Metadata/Items/Currency/CurrencyArmourQuality': 1,
-        'Metadata/Items/Currency/CurrencyUpgradeToRare': 1,
-        'Metadata/Items/Currency/CurrencyUpgradeRandomly': 1,
-        'Metadata/Items/Currency/CurrencyPassiveRefund': 1,
-        'Metadata/Items/Currency/CurrencyUpgradeToMagic': 1,
-        'Metadata/Items/Currency/CurrencyRerollMagic': 1,
-        'Metadata/Items/Currency/CurrencyConvertToNormal': 1,
-        'Metadata/Items/Currency/CurrencyAddModToMagic': 1,
-        'Metadata/Items/Currency/CurrencyPortal': 1,
-        'Metadata/Items/Currency/CurrencyFlaskQuality': 1,
-        'Metadata/Items/Currency/CurrencyGemQuality': 1,
-        'Metadata/Items/Currency/CurrencyRerollSocketColours': 1,
-        'Metadata/Items/Currency/CurrencyRerollSocketLinks': 1,
-        'Metadata/Items/Currency/CurrencyRerollSocketNumbers': 1,
-        'Metadata/Items/Currency/CurrencyMapQuality': 1,
-        'Metadata/Items/Currency/CurrencyCorrupt': 1,
+    "DelveFossilSellPrice7": {
+        "Metadata/Items/Currency/CurrencyWeaponQuality": 1,
+        "Metadata/Items/Currency/CurrencyIdentification": 1,
+        "Metadata/Items/Currency/CurrencyRerollRare": 1,
+        "Metadata/Items/Currency/CurrencyArmourQuality": 1,
+        "Metadata/Items/Currency/CurrencyUpgradeToRare": 1,
+        "Metadata/Items/Currency/CurrencyUpgradeRandomly": 1,
+        "Metadata/Items/Currency/CurrencyPassiveRefund": 1,
+        "Metadata/Items/Currency/CurrencyUpgradeToMagic": 1,
+        "Metadata/Items/Currency/CurrencyRerollMagic": 1,
+        "Metadata/Items/Currency/CurrencyConvertToNormal": 1,
+        "Metadata/Items/Currency/CurrencyAddModToMagic": 1,
+        "Metadata/Items/Currency/CurrencyPortal": 1,
+        "Metadata/Items/Currency/CurrencyFlaskQuality": 1,
+        "Metadata/Items/Currency/CurrencyGemQuality": 1,
+        "Metadata/Items/Currency/CurrencyRerollSocketColours": 1,
+        "Metadata/Items/Currency/CurrencyRerollSocketLinks": 1,
+        "Metadata/Items/Currency/CurrencyRerollSocketNumbers": 1,
+        "Metadata/Items/Currency/CurrencyMapQuality": 1,
+        "Metadata/Items/Currency/CurrencyCorrupt": 1,
     },
-    'DelveFossilSellPrice8': {
-        'Metadata/Items/Currency/CurrencyDuplicateShard': 2,
+    "DelveFossilSellPrice8": {
+        "Metadata/Items/Currency/CurrencyDuplicateShard": 2,
     },
-    'DelveFossilSellPrice9': {
-        'Metadata/Items/Currency/CurrencyCorruptMonolith': 5,
+    "DelveFossilSellPrice9": {
+        "Metadata/Items/Currency/CurrencyCorruptMonolith": 5,
     },
-    'VaalLegionJewel': {
-
-    },
-    'KaruiLegionJewel': {
-
-    },
-    'MarakethLegionJewel': {
-
-    },
-    'TemplarLegionJewel': {
-
-    },
-    'EternalEmpireLegionJewel': {
-
-    },
+    "VaalLegionJewel": {},
+    "KaruiLegionJewel": {},
+    "MarakethLegionJewel": {},
+    "TemplarLegionJewel": {},
+    "EternalEmpireLegionJewel": {},
 }
 
 # =============================================================================
@@ -230,7 +211,7 @@ class IntEnumMetaOverride(EnumMeta):
         if isinstance(item, int):
             return self(item)
         else:
-            return IntEnum.__getitem__(self, item)
+            return super().__getitem__(item)
 
 
 class IntEnumOverride(IntEnum, metaclass=IntEnumMetaOverride):
@@ -307,6 +288,7 @@ class ACTIVE_SKILL_TYPES(IntEnumOverride):
     BUFF
         Buff that applies to the entity itself
     """
+
     ATTACK = 1
     SPELL = 2
     PROJECTILE = 3
@@ -404,6 +386,7 @@ class BETRAYAL_UPGRADE_SLOTS(IntEnumOverride):
     None
         Unused
     """
+
     HELMET = 0
     BOOTS = 1
     GLOVES = 2
@@ -433,6 +416,8 @@ class VERSION(IntEnumOverride):
         for the Awakening Beta.
     ALPHA
         Alpha version of Path of Exile.
+    GENERATED
+        Schema generated from https://github.com/poe-tool-dev/dat-schema
     ALL
         All registered version types.
     DEFAULT
@@ -440,11 +425,15 @@ class VERSION(IntEnumOverride):
         preferred and default selection.
 
     """
+
     STABLE = 1
     BETA = 2
     ALPHA = 4
+    GENERATED = 8
+    POE2 = 16
+    POE2_STABLE = 32
 
-    ALL = STABLE | BETA | ALPHA
+    ALL = STABLE | BETA | ALPHA | GENERATED
 
     DEFAULT = STABLE
 
@@ -474,6 +463,7 @@ class DISTRIBUTOR(IntEnumOverride):
     DEFAULT
         Default selection for clients, i.e. all.
     """
+
     GGG = 1
     STEAM = 2
     GARENA = 4
@@ -498,6 +488,7 @@ class SHOP_PACKAGE_PLATFORM(IntEnumOverride):
     PS
         Sony Playstation
     """
+
     PC = 1
     XBOX = 2
     PS = 3
@@ -532,12 +523,13 @@ class SOCKET_COLOUR(Enum):
         :attr:`SOCKET_COLOUR.BLUE`) the id attribute denotes the integer
         that is sometimes used in the game files to represent the colour
     """
+
     # IDs are from CharacterStarItems.dat->Sockets and game testing
-    R = ('R', 1)
-    G = ('G', 2)
-    B = ('B', 3)
+    R = ("R", 1)
+    G = ("G", 2)
+    B = ("B", 3)
     # I can't actually confirm this id=4, but seems logical
-    W = ('W', 4)
+    W = ("W", 4)
     RED = R
     GREEN = G
     BLUE = B
@@ -589,11 +581,11 @@ class RARITY(Enum, metaclass=IntEnumMetaOverride):
     associated colour
     """
 
-    NORMAL = (0, 'normal', 'white')
-    MAGIC = (1, 'magic', 'blue')
-    RARE = (2, 'rare', 'yellow')
-    UNIQUE = (3, 'unique', 'brown')
-    ANY = (5, 'any', 'any')
+    NORMAL = (0, "normal", "white")
+    MAGIC = (1, "magic", "blue")
+    RARE = (2, "rare", "yellow")
+    UNIQUE = (3, "unique", "brown")
+    ANY = (5, "any", "any")
 
     def __new__(cls, id: int, lower: str, colour: str):
         obj = object.__new__(cls)
@@ -607,8 +599,12 @@ class RARITY(Enum, metaclass=IntEnumMetaOverride):
 class MAP_FRAGMENT_FAMILIES(IntEnumOverride):
     """
     Representation of map fragment families (MapFragmentFamilies.dat)
+
+    As of the 3.24 scarab reword, it appears that each scarab has its own family,
+    so this enum is probably not worth maintaining.
     """
-    BESTIARY_AND_SULPHITE = 0 #Maybe just master-related?
+
+    BESTIARY_AND_SULPHITE = 0  # Maybe just master-related?
     BREACH = 1
     CARTOGRAPHY_SCARAB = 2
     RELIQUARY_SCARAB = 3
@@ -628,7 +624,7 @@ class MAP_FRAGMENT_FAMILIES(IntEnumOverride):
     ETERNAL = 17
     TEMPLAR = 18
     VAAL = 19
-    REGULAR = 20
+    REGULAR = 126
 
     DEFAULT = REGULAR
     STANDARD = REGULAR
@@ -693,13 +689,14 @@ class MOD_DOMAIN(IntEnumOverride):
     UNDEFINED
         TODO
     """
+
     ITEM = 1
     FLASK = 2
     MONSTER = 3
     CHEST = 4
     AREA = 5
     UNKNOWN1 = 6
-    UNKNOWN2 = 7
+    TEMPLAR_RELIC = 7
     UNKNOWN3 = 8
     CRAFTED = 9
     # Corruptions, item limits, jewel mods, other stuff?
@@ -723,7 +720,18 @@ class MOD_DOMAIN(IntEnumOverride):
     EXPEDITION_RELIC = 27
     UNVEILED = 28
     PRIMORDIAL_ALTAR = 29
-    UNCRAFTABLE_OR_SOMETHING = 30 # Used in BaseItemTypes.dat, not Mods.dat.
+    SENTINEL = 30
+    MEMORY_LINES = 31
+    SANCTUM_RELIC = 32
+    CRUCIBLE_REMNANT = 33
+    TINCTURE = 34
+    AFFLICTION_CHARM = 35
+    NECROPOLIS_MONSTER = 36
+    UBER_MAP = 37
+    MAP_RELIC = 38
+
+    # Items that can't have mods (may need to increase the number when new values are added)
+    MODS_DISALLOWED = 39
 
     # legacy names
     MASTER = CRAFTED
@@ -778,6 +786,7 @@ class MOD_GENERATION_TYPE(IntEnumOverride):
     MONSTER_AFFLICTION
         TODO
     """
+
     PREFIX = 1
     SUFFIX = 2
     UNIQUE = 3
@@ -807,6 +816,12 @@ class MOD_GENERATION_TYPE(IntEnumOverride):
     ARCHNEMESIS = 28
     SEARING_EXARCH_IMPLICIT = 29
     EATER_OF_WORLDS_IMPLICIT = 30
+    CRUCIBLE_TREE = 31
+    CRUCIBLE_UNIQUE_TREE = 32
+    AZMERI_EMPOWERED_MONSTER = 33
+    NECROPOLIS_MONSTER = 34
+    NECROPOLIS_DEVOTED_MONSTER = 35
+    MEMORY_ALTAR = 36
 
 
 class WORDLISTS(IntEnumOverride):
@@ -838,6 +853,7 @@ class WORDLISTS(IntEnumOverride):
     ESSENCE
         Name of an essence
     """
+
     ITEM_PREFIX = 1
     ITEM_SUFFIX = 2
     MONSTER_PREFIX = 3
@@ -853,6 +869,7 @@ class DELVE_UPGRADE_TYPE(IntEnumOverride):
     """
     Representation of delve upgrade type ( DelveUpgradeType.dat )
     """
+
     SULPHITE_CAPACITY = 0
     FLARE_CAPACITY = 1
     DYNAMITE_CAPACITY = 2
@@ -897,6 +914,7 @@ class STAT_INTERPOLATION_TYPES(IntEnumOverride):
                 (1+GrantedEffects['IncrementalEffectiveness') ** (MonsterLevel - 1)
 
     """
+
     CONSTANT = 1
     LINEAR = 2
     EXPONENTIAL = 3
@@ -909,6 +927,7 @@ class SCARAB_TYPES(IntEnumOverride):
     Attributes
     ----------
     """
+
     BESTIARY = 0
     BREACH = 1
     CARTOGRAPHY = 2
@@ -937,6 +956,28 @@ class PASSIVE_TYPES(IntEnumOverride):
     REGULAR2 = 2
     NOTABLE = 3
     KEYSTONE = 4
+
+
+class ITEM_CLASS_FLAGS(IntEnumOverride):
+    # doesn't include unarmed
+    MARTIAL_WEAPON = 0
+    # 1h weapons, wand, sceptre, and unarmed
+    ONE_HAND = 1
+    # does include unarmed
+    MELEE = 2
+    # doesn't include sceptres
+    OFF_HAND = 3
+    FLASKS_CHARMS = 4
+    ARMOUR = 5
+    ACCESSORY = 6
+    CURRENCY = 7
+
+
+class GAME_MODES(IntEnumOverride):
+    ALL = 0
+    NORMAL = 1
+    RUTHLESS = 2
+
 
 # =============================================================================
 # Functions

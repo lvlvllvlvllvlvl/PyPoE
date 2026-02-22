@@ -47,7 +47,7 @@ from enum import IntEnum
 # Globals
 # =============================================================================
 
-__all__ = ['SpecificationError', 'SpecificationWarning']
+__all__ = ["SpecificationError", "SpecificationWarning"]
 
 # =============================================================================
 # Exceptions & Warnings
@@ -100,6 +100,7 @@ class SpecificationError(ValueError):
             The row size in the specification doesn't match the real data row
             size
         """
+
         INVALID_FOREIGN_KEY_FILE = 1000
         INVALID_FOREIGN_KEY_ID = 1001
         INVALID_ARGUMENT_COMBINATION = 1002
@@ -118,7 +119,7 @@ class SpecificationError(ValueError):
         self.msg = msg
 
     def __str__(self):
-        return '%s: %s' % (repr(self.code), self.msg)
+        return "%s: %s" % (repr(self.code), self.msg)
 
 
 class SpecificationWarning(UserWarning):

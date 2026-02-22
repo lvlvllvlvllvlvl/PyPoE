@@ -54,14 +54,14 @@ from configobj import ConfigObj
 from validate import Validator
 
 # self
-from PyPoE.cli.core import console, Msg
+from PyPoE.cli.core import Msg, console
 from PyPoE.shared.config.validator import functions
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-__all__ = ['ConfigError', 'SetupError', 'ConfigHelper']
+__all__ = ["ConfigError", "SetupError", "ConfigHelper"]
 
 # =============================================================================
 # Exceptions
@@ -81,7 +81,7 @@ class SetupError(ValueError):
 # =============================================================================
 
 
-#TODO: add link to configobj doc or doc the extra stuff separatly.
+# TODO: add link to configobj doc or doc the extra stuff separatly.
 class ConfigHelper(ConfigObj):
     """
     Extended regular config obj that can perform special tasks and extended
@@ -90,6 +90,7 @@ class ConfigHelper(ConfigObj):
     Generally the new options should be used over the direct usage of inherited
     functions.
     """
+
     def __init__(self, *args, **kwargs):
         """
         Raises
@@ -99,14 +100,14 @@ class ConfigHelper(ConfigObj):
             specified
 
         """
-        if 'infile' not in kwargs:
-            raise ValueError('Must be initialized with infile')
-        kwargs['raise_errors'] = True
-        kwargs['configspec'] = ConfigObj()
+        if "infile" not in kwargs:
+            raise ValueError("Must be initialized with infile")
+        kwargs["raise_errors"] = True
+        kwargs["configspec"] = ConfigObj()
         ConfigObj.__init__(self, *args, **kwargs)
 
         # Fix missing main sections
-        for item in ['Config', 'Setup']:
+        for item in ["Config", "Setup"]:
             if item not in self:
                 self.update({item: {}})
             if item not in self.configspec:
@@ -125,7 +126,7 @@ class ConfigHelper(ConfigObj):
         -------
         configobj.Section
         """
-        return self['Config']
+        return self["Config"]
 
     @property
     def optionspec(self):
@@ -136,7 +137,7 @@ class ConfigHelper(ConfigObj):
         -------
         configobj.Section
         """
-        return self.configspec['Config']
+        return self.configspec["Config"]
 
     @property
     def setup(self):
@@ -147,7 +148,7 @@ class ConfigHelper(ConfigObj):
         -------
         configobj.Section
         """
-        return self['Setup']
+        return self["Setup"]
 
     @property
     def setupspec(self):
@@ -158,7 +159,7 @@ class ConfigHelper(ConfigObj):
         -------
         configobj.Section
         """
-        return self.configspec['Setup']
+        return self.configspec["Setup"]
 
     def add_option(self, key, specification):
         """
@@ -178,7 +179,7 @@ class ConfigHelper(ConfigObj):
             if the key is a duplicate
         """
         if key in self.optionspec:
-            raise KeyError('Duplicate key: %s' % key)
+            raise KeyError("Duplicate key: %s" % key)
         self.optionspec[key] = specification
 
     def get_option(self, key, safe=True):
@@ -212,16 +213,16 @@ class ConfigHelper(ConfigObj):
             if the setup for the key was not performed
         """
         if safe and key in self.setup:
-            if not self.setup[key]['performed']:
-                raise SetupError('Setup not performed.')
+            if not self.setup[key]["performed"]:
+                raise SetupError("Setup not performed.")
         try:
             value = self.option[key]
         except KeyError:
             console(
-                'Config variable "%s" is not configured. Consider running:' %
-                key, msg=Msg.error)
+                'Config variable "%s" is not configured. Consider running:' % key, msg=Msg.error
+            )
             console('config set "%s" "<value>"' % key, msg=Msg.error)
-            console('Exiting...', msg=Msg.error)
+            console("Exiting...", msg=Msg.error)
             sys.exit(-1)
 
         return self.validator.check(self.optionspec[key], value)
@@ -247,7 +248,7 @@ class ConfigHelper(ConfigObj):
             if the validation of the value failed
         """
         if key in self.setup:
-            self.setup[key]['performed'] = False
+            self.setup[key]["performed"] = False
 
         # Raise ValidationError
         value = self.validator.check(self.optionspec[key], value)
@@ -284,26 +285,30 @@ class ConfigHelper(ConfigObj):
 
         """
         if key not in self.setup:
-            self.setup.update({
-                key: {
-                    'performed': False,
-                },
-            })
+            self.setup.update(
+                {
+                    key: {
+                        "performed": False,
+                    },
+                }
+            )
 
-        self.setupspec.update({
-            key: {
-                'performed': 'boolean()',
-            },
-        })
+        self.setupspec.update(
+            {
+                key: {
+                    "performed": "boolean()",
+                },
+            }
+        )
 
         if isinstance(funcs, Iterable):
-           for f in funcs:
-               if not callable(f):
-                   raise TypeError('Callable expected.')
+            for f in funcs:
+                if not callable(f):
+                    raise TypeError("Callable expected.")
         elif not callable(funcs):
-            raise TypeError('Callabe expected.')
+            raise TypeError("Callabe expected.")
         else:
-            funcs = (funcs, )
+            funcs = (funcs,)
 
         self.setup[key].functions = funcs
 
@@ -316,7 +321,7 @@ class ConfigHelper(ConfigObj):
         * key: The key that was changed
         * value: the new value
         * old_value: the old value
-        
+
         Parameters
         ----------
         config_key : str
@@ -330,12 +335,14 @@ class ConfigHelper(ConfigObj):
             if function is not callable
         """
         if not callable(function):
-             raise TypeError('Callabe expected.')
+            raise TypeError("Callabe expected.")
 
         if config_key in self._listeners:
             self._listeners[config_key].append(function)
         else:
-            self._listeners[config_key] = [function, ]
+            self._listeners[config_key] = [
+                function,
+            ]
 
     def add_setup_variable(self, setup_key, variable_key, specification):
         """
@@ -364,7 +371,7 @@ class ConfigHelper(ConfigObj):
         if setup_key not in self.setupspec:
             raise KeyError('Setup key "%s" is invalid' % setup_key)
         if variable_key in self.setupspec[setup_key]:
-            raise KeyError('Duplicate key: %s' % variable_key)
+            raise KeyError("Duplicate key: %s" % variable_key)
         self.setupspec[setup_key][variable_key] = specification
 
     def get_setup_variable(self, setup_key, variable_key):
@@ -444,7 +451,7 @@ class ConfigHelper(ConfigObj):
         bool
             True if setup is performed
         """
-        return self.setup[variable]['performed']
+        return self.setup[variable]["performed"]
 
     def setup_or_raise(self, variable):
         """
@@ -467,5 +474,5 @@ class ConfigHelper(ConfigObj):
             if setup is not performed
         """
         if not self.is_setup(variable):
-            raise SetupError('Setup for %s not performed' % variable)
+            raise SetupError("Setup for %s not performed" % variable)
         return True

@@ -73,25 +73,31 @@ Miscellaneous
 
 # Python
 import io
-import struct
 import os
+import struct
 import warnings
-from typing import Union, Dict
+from typing import Dict, Union
 
-# 3rd Party
+from PyPoE.poe.file.shared import (
+    FILE_SYSTEM_TYPES,
+    AbstractFileReadOnly,
+    AbstractFileSystemNode,
+    ParserError,
+)
 
 # self
 from PyPoE.shared import InheritedDocStringsMeta
 from PyPoE.shared.decorators import doc
 from PyPoE.shared.mixins import ReprMixin
-from PyPoE.poe.file.shared import AbstractFileReadOnly, \
-    AbstractFileSystemNode, FILE_SYSTEM_TYPES, ParserError
+
+# 3rd Party
+
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-__all__ = ['GGPKFile']
+__all__ = ["GGPKFile"]
 
 
 # =============================================================================
@@ -127,9 +133,10 @@ class BaseRecord(ReprMixin):
     offset : int
         Starting offset in ggpk
     """
+
     tag = None
 
-    __slots__ = ['_container', 'length', 'offset']
+    __slots__ = ["_container", "length", "offset"]
 
     def __init__(self, container, length, offset):
         self._container = container
@@ -145,7 +152,6 @@ class BaseRecord(ReprMixin):
         ggpkfile : GGPKFile
             GGPKFile instance
         """
-        pass
 
     def write(self, ggpkfile):
         """
@@ -156,14 +162,14 @@ class BaseRecord(ReprMixin):
         ggpkfile : GGPKFile
             GGPKFile instance
         """
-        ggpkfile.write(struct.pack('<i', self.length))
+        ggpkfile.write(struct.pack("<I", self.length))
         ggpkfile.write(self.tag)
 
 
 class MixinRecord:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._name = ''
+        self._name = ""
         self._name_length = 0
 
     @property
@@ -199,26 +205,26 @@ class GGPKRecord(BaseRecord):
     offsets : list[int]
         List of offsets for records
     """
-    tag = 'GGPK'
 
-    __slots__ = BaseRecord.__slots__.copy() + ['offsets']
+    tag = "GGPK"
+
+    __slots__ = BaseRecord.__slots__.copy() + ["offsets"]
 
     @doc(doc=BaseRecord.read)
     def read(self, ggpkfile):
-        # Should be 2, TODO?
-        records = struct.unpack('<i', ggpkfile.read(4))[0]
+        self._container.version = struct.unpack("<i", ggpkfile.read(4))[0]
         self.offsets = []
-        for i in range(0, records):
-            self.offsets.append(struct.unpack('<q', ggpkfile.read(8))[0])
+        for i in range(2):
+            self.offsets.append(struct.unpack("<q", ggpkfile.read(8))[0])
 
     @doc(doc=BaseRecord.write)
     def write(self, ggpkfile):
         # Write length & tag
         super().write(ggpkfile)
         # Should always be 2
-        ggpkfile.write(struct.pack('<i', 2))
-        for i in range(0, len(offsets)):
-            ggpkfile.write(struct.unpack('<q', offsets[i]))
+        ggpkfile.write(struct.pack("<i", 2))
+        for i in range(0, len(self.offsets)):
+            ggpkfile.write(struct.unpack("<q", self.offsets[i]))
 
 
 class DirectoryRecordEntry(ReprMixin):
@@ -230,6 +236,7 @@ class DirectoryRecordEntry(ReprMixin):
     offset :  int
         offset in :class:`GGPKFile`
     """
+
     def __init__(self, hash, offset):
         """
         Parameters
@@ -260,49 +267,60 @@ class DirectoryRecord(MixinRecord, BaseRecord):
         SHA256 hash of file contents
     """
 
-    tag = 'PDIR'
+    tag = "PDIR"
 
-    __slots__ = BaseRecord.__slots__.copy() + ['_name', '_name_length', 'entries_length', 'hash', 'entries']
+    __slots__ = BaseRecord.__slots__.copy() + [
+        "_name",
+        "_name_length",
+        "entries_length",
+        "hash",
+        "entries",
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     @doc(doc=BaseRecord.read)
     def read(self, ggpkfile):
-        self._name_length = struct.unpack('<i', ggpkfile.read(4))[0]
-        self.entries_length = struct.unpack('<i', ggpkfile.read(4))[0]  
-        self.hash = int.from_bytes(ggpkfile.read(32), 'big')
-        # UTF-16 2-byte width
-        self._name = ggpkfile.read(2 * (self._name_length - 1)).decode('UTF-16_LE')
+        self._name_length = struct.unpack("<i", ggpkfile.read(4))[0]
+        self.entries_length = struct.unpack("<i", ggpkfile.read(4))[0]
+        self.hash = int.from_bytes(ggpkfile.read(32), "big")
+        # UTF-16/32 characters
+        wchar_width = self._container.wchar_width
+        self._name = ggpkfile.read(wchar_width * (self._name_length - 1)).decode(
+            self._container.wchar_encoding
+        )
         # Null Termination
-        ggpkfile.seek(2, os.SEEK_CUR)
+        ggpkfile.seek(wchar_width, os.SEEK_CUR)
         self.entries = []
         for i in range(0, self.entries_length):
-            self.entries.append(DirectoryRecordEntry(
-                hash=struct.unpack('<I', ggpkfile.read(4))[0],
-                offset=struct.unpack('<q', ggpkfile.read(8))[0],
-            ))
+            self.entries.append(
+                DirectoryRecordEntry(
+                    hash=struct.unpack("<I", ggpkfile.read(4))[0],
+                    offset=struct.unpack("<q", ggpkfile.read(8))[0],
+                )
+            )
 
     @doc(doc=BaseRecord.write)
     def write(self, ggpkfile):
         # Error Checking & variable preparation
         if len(self.hash) != 32:
-            raise ValueError('Hash must be 32 bytes, was %s bytes' % len(self.hash))
+            raise ValueError("Hash must be 32 bytes, was %s bytes" % len(self.hash))
         if len(self.entries) != self.entries_length:
-            raise ValueError('Numbers of entries must match with length')
-        name_str = self._name.encode('UTF-16')
+            raise ValueError("Numbers of entries must match with length")
+        name_str = self._name.encode("UTF-16")
         # Write length & tag
         super().write(ggpkfile)
-        ggpkfile.write(struct.pack('<i', self._name_length))
-        ggpkfile.write(struct.pack('<i', self.entries_length))
+        ggpkfile.write(struct.pack("<i", self._name_length))
+        ggpkfile.write(struct.pack("<i", self.entries_length))
         # Fixed 32-bytes
         ggpkfile.write(self.hash)
         ggpkfile.write(name_str)
-        ggpkfile.write(struct.pack('<h', 0))
+        ggpkfile.write(struct.pack("<h", 0))
         # TODO: len(self.entries)
         for entry in self.entries:
-            ggpkfile.write(struct.pack('<i', entry.hash))
-            ggpkfile.write(struct.pack('<q', entry.offset))
+            ggpkfile.write(struct.pack("<i", entry.hash))
+            ggpkfile.write(struct.pack("<q", entry.offset))
 
 
 @doc(append=BaseRecord)
@@ -324,13 +342,19 @@ class FileRecord(MixinRecord, BaseRecord):
         length of data
     """
 
-    tag = 'FILE'
+    tag = "FILE"
 
-    __slots__ = BaseRecord.__slots__.copy() + ['_name', '_name_length', 'hash', 'data_start', 'data_length']
+    __slots__ = BaseRecord.__slots__.copy() + [
+        "_name",
+        "_name_length",
+        "hash",
+        "data_start",
+        "data_length",
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
     def extract(self, buffer=None):
         """
         Extracts this file contents into a memory file object.
@@ -364,7 +388,7 @@ class FileRecord(MixinRecord, BaseRecord):
     def extract_to(self, directory, name=None):
         """
         Extracts the file to the given directory.
-        
+
         Parameters
         ----------
         directory :  str
@@ -372,42 +396,45 @@ class FileRecord(MixinRecord, BaseRecord):
         name : str or None
             the name of the file; if None use the file name as in the record.
         """
-        name = self._name if name is None else name 
+        name = self._name if name is None else name
         path = os.path.join(directory, name)
-        with open(path, 'bw') as exfile:
+        with open(path, "bw") as exfile:
             # TODO Mem leak?
             exfile.write(self.extract().read())
 
     @doc(doc=BaseRecord.read)
     def read(self, ggpkfile):
-        self._name_length = struct.unpack('<i', ggpkfile.read(4))[0]
-        self.hash = int.from_bytes(ggpkfile.read(32), 'big')
-        # UTF-16 2-byte width
-        self._name = ggpkfile.read(2 * (self._name_length - 1)).decode('UTF-16')
+        self._name_length = struct.unpack("<i", ggpkfile.read(4))[0]
+        self.hash = int.from_bytes(ggpkfile.read(32), "big")
+        # UTF-16/32 characters
+        wchar_width = self._container.wchar_width
+        self._name = ggpkfile.read(wchar_width * (self._name_length - 1)).decode(
+            self._container.wchar_encoding
+        )
         # Null Termination
-        ggpkfile.seek(2, os.SEEK_CUR)
+        ggpkfile.seek(wchar_width, os.SEEK_CUR)
         self.data_start = ggpkfile.tell()
-        # Length 4B - Tag 4B - STRLen 4B - Hash 32B + STR ?B  
-        self.data_length = self.length - 44 - self._name_length * 2
-        
+        # Length 4B - Tag 4B - STRLen 4B - Hash 32B + STR ?B
+        self.data_length = self.length - 44 - self._name_length * wchar_width
+
         ggpkfile.seek(self.data_length, os.SEEK_CUR)
 
     @doc(doc=BaseRecord.write)
     def write(self, ggpkfile):
         # Error checking & variable preparation first
         if len(self.hash) != 32:
-            raise ValueError('Hash must be 32 bytes, was %s bytes' % len(self.hash))
-        
-        name_str = self._name.encode('UTF-16')
+            raise ValueError("Hash must be 32 bytes, was %s bytes" % len(self.hash))
+
+        name_str = self._name.encode("UTF-16")
         # Write length & tag
         super().write(ggpkfile)
-        ggpkfile.write(struct.pack('<i', self._name_length))
+        ggpkfile.write(struct.pack("<i", self._name_length))
         # Fixed 32-bytes
         ggpkfile.write(self.hash)
         ggpkfile.write(name_str)
-        ggpkfile.write(struct.pack('<h', 0))
-        
-        #TODO: Write File Contents here?
+        ggpkfile.write(struct.pack("<h", 0))
+
+        # TODO: Write File Contents here?
 
 
 @doc(append=BaseRecord)
@@ -418,20 +445,21 @@ class FreeRecord(BaseRecord):
     next_free : int
         offset of next :class:`FreeRecord`
     """
-    tag = 'FREE'
 
-    __slots__ = BaseRecord.__slots__.copy() + ['next_free']
+    tag = "FREE"
+
+    __slots__ = BaseRecord.__slots__.copy() + ["next_free"]
 
     @doc(doc=BaseRecord.read)
     def read(self, ggpkfile):
-        self.next_free = struct.unpack('<q', ggpkfile.read(8))[0]
-        ggpkfile.seek(self.length -16, os.SEEK_CUR)
+        self.next_free = struct.unpack("<q", ggpkfile.read(8))[0]
+        ggpkfile.seek(self.length - 16, os.SEEK_CUR)
 
     @doc(doc=BaseRecord.write)
     def write(self, ggpkfile):
         # Write length & tag
         super().write(ggpkfile)
-        ggpkfile.write(struct.pack('<q', self.next_free))
+        ggpkfile.write(struct.pack("<q", self.next_free))
 
 
 class DirectoryNode(AbstractFileSystemNode):
@@ -449,23 +477,22 @@ class DirectoryNode(AbstractFileSystemNode):
         some kind of hash the game uses
     """
 
-    __slots__ = ['record', 'hash'] + AbstractFileSystemNode.__slots__
+    __slots__ = ["record", "hash"] + AbstractFileSystemNode.__slots__
 
-    _REPR_ARGUMENTS_IGNORE = {'parent'}
+    _REPR_ARGUMENTS_IGNORE = {"parent"}
 
-    def __init__(self,
-                 *args,
-                 parent: 'DirectoryNode',
-                 is_file: bool,
-                 record: Union[DirectoryRecord, FileRecord],
-                 hash: str,
-                 **kwargs):
+    def __init__(
+        self,
+        *args,
+        parent: "DirectoryNode",
+        is_file: bool,
+        record: Union[DirectoryRecord, FileRecord],
+        hash: str,
+        **kwargs,
+    ):
         super().__init__(
-            *args,
-            parent=parent,
-            is_file=is_file,
-            file_system_type=FILE_SYSTEM_TYPES.GGPK,
-            **kwargs)
+            *args, parent=parent, is_file=is_file, file_system_type=FILE_SYSTEM_TYPES.GGPK, **kwargs
+        )
         self.record: Union[DirectoryRecord, FileRecord] = record
         self.hash: str = hash
 
@@ -478,8 +505,8 @@ class DirectoryNode(AbstractFileSystemNode):
         if self.is_file:
             return self.record.extract()
         else:
-            raise ValueError('Only files can have their data extracted')
-        
+            raise ValueError("Only files can have their data extracted")
+
 
 class GGPKFile(AbstractFileReadOnly, metaclass=InheritedDocStringsMeta):
     """
@@ -493,7 +520,7 @@ class GGPKFile(AbstractFileReadOnly, metaclass=InheritedDocStringsMeta):
         mapping of offset -> record instances
     """
 
-    EXTENSION = '.ggpk'
+    EXTENSION = ".ggpk"
 
     def __init__(self, *args, **kwargs):
         AbstractFileReadOnly.__init__(self, *args, **kwargs)
@@ -525,8 +552,8 @@ class GGPKFile(AbstractFileReadOnly, metaclass=InheritedDocStringsMeta):
         DirectoryNode.__getitem__
         """
         if self.directory is None:
-            raise ValueError('Directory not build')
-        if item == 'ROOT':
+            raise ValueError("Directory not build")
+        if item == "ROOT":
             return self.directory
 
         return self.directory[item]
@@ -543,27 +570,39 @@ class GGPKFile(AbstractFileReadOnly, metaclass=InheritedDocStringsMeta):
 
     is_parsed = property(fget=_is_parsed)
 
+    @property
+    def wchar_encoding(self):
+        if self.version == 4:
+            return "UTF-32_LE"
+        return "UTF-16_LE"
+
+    @property
+    def wchar_width(self):
+        if self.version == 4:
+            return 4
+        return 2
+
     #
     # Private
     #
 
     def _read_record(self, records, ggpkfile, offset: int):
-        length = struct.unpack('<i', ggpkfile.read(4))[0]
+        length = struct.unpack("<I", ggpkfile.read(4))[0]
         tag = ggpkfile.read(4)
-        
-        '''for recordcls in recordsc:
+
+        """for recordcls in recordsc:
             if recordcls.tag == tag:
                 break
 
-        record = recordcls(self, length, offset)'''
+        record = recordcls(self, length, offset)"""
 
-        if tag == b'FILE':
+        if tag == b"FILE":
             record = FileRecord(self, length, offset)
-        elif tag == b'FREE':
+        elif tag == b"FREE":
             record = FreeRecord(self, length, offset)
-        elif tag == b'PDIR':
+        elif tag == b"PDIR":
             record = DirectoryRecord(self, length, offset)
-        elif tag == b'GGPK':
+        elif tag == b"GGPK":
             record = GGPKRecord(self, length, offset)
         else:
             raise InvalidTagException(tag)
@@ -605,54 +644,53 @@ class GGPKFile(AbstractFileReadOnly, metaclass=InheritedDocStringsMeta):
             if any of the GGPKFile instances do not have their directory build
         """
         if not isinstance(other_ggpk, GGPKFile):
-            raise TypeError('other_ggpk must a parsed GGPK file instance')
+            raise TypeError("other_ggpk must a parsed GGPK file instance")
 
-        if not self.is_parsed or  not other_ggpk.is_parsed:
-            raise ValueError('Both ggpk files must be parsed and have their '
-                             'directory build.')
+        if not self.is_parsed or not other_ggpk.is_parsed:
+            raise ValueError("Both ggpk files must be parsed and have their directory build.")
 
-        data = [{'ggpk': self}, {'ggpk': other_ggpk}]
+        data = [{"ggpk": self}, {"ggpk": other_ggpk}]
 
         for gdict in data:
-            gdict['files'] = {}
+            gdict["files"] = {}
 
             def add_file(node, depth):
                 if not isinstance(node.record, FileRecord):
                     return
-                gdict['files'][node.get_path()] = node.record.hash
+                gdict["files"][node.get_path()] = node.record.hash
 
-            gdict['ggpk'].directory.walk(add_file)
+            gdict["ggpk"].directory.walk(add_file)
 
-            gdict['set'] = set(gdict['files'].keys())
+            gdict["set"] = set(gdict["files"].keys())
 
-        new_files = sorted(list(data[0]['set'].difference(data[1]['set'])))
-        deleted_files = sorted(list(data[1]['set'].difference(data[0]['set'])))
+        new_files = sorted(list(data[0]["set"].difference(data[1]["set"])))
+        deleted_files = sorted(list(data[1]["set"].difference(data[0]["set"])))
         changed_files = []
-        for fn in sorted(list(data[0]['set'].union(data[1]['set']))):
-                try:
-                    if data[0]['files'][fn] != data[1]['files'][fn]:
-                        changed_files.append(fn)
-                except KeyError:
-                    pass
+        for fn in sorted(list(data[0]["set"].union(data[1]["set"]))):
+            try:
+                if data[0]["files"][fn] != data[1]["files"][fn]:
+                    changed_files.append(fn)
+            except KeyError:
+                pass
 
         if out_file:
-            with open(out_file, 'w') as f:
-                f.write('Diff between two ggpk files\n')
-                f.write('\n')
+            with open(out_file, "w") as f:
+                f.write("Diff between two ggpk files\n")
+                f.write("\n")
 
                 for header, k in (
-                    ('New files', new_files),
-                    ('Removed files', deleted_files),
-                    ('Changed files', changed_files),
+                    ("New files", new_files),
+                    ("Removed files", deleted_files),
+                    ("Changed files", changed_files),
                 ):
-                    f.write('\n')
-                    f.write('='*80)
-                    f.write('\n')
+                    f.write("\n")
+                    f.write("=" * 80)
+                    f.write("\n")
                     f.write(header)
-                    f.write('\n\n')
+                    f.write("\n\n")
                     for fn in k:
                         f.write(fn)
-                        f.write('\n')
+                        f.write("\n")
 
         return new_files, deleted_files, changed_files
 
@@ -661,7 +699,7 @@ class GGPKFile(AbstractFileReadOnly, metaclass=InheritedDocStringsMeta):
         Rebuilds the directory or the specified :class:`DirectoryNode`
         If the root directory is rebuild it will be stored in the directory
         object variable.
-        
+
         Parameters
         ----------
         parent : :class:`DirectoryNode` or None
@@ -682,7 +720,7 @@ class GGPKFile(AbstractFileReadOnly, metaclass=InheritedDocStringsMeta):
             :class:`FileRecord` or :class:`DirectoryRecord`
         """
         if not self.records:
-            raise ParserError('No records - perform .read() first')
+            raise ParserError("No records - perform .read() first")
 
         # Build Root directory
         if parent is None:
@@ -692,8 +730,10 @@ class GGPKFile(AbstractFileReadOnly, metaclass=InheritedDocStringsMeta):
                 if isinstance(record, DirectoryRecord):
                     break
             if not isinstance(record, DirectoryRecord):
-                raise ParserError('GGPKRecord does not contain a DirectoryRecord,\
-                    got %s' % type(record))
+                raise ParserError(
+                    "GGPKRecord does not contain a DirectoryRecord,                    got %s"
+                    % type(record)
+                )
 
             root = DirectoryNode(
                 parent=None,
@@ -706,13 +746,13 @@ class GGPKFile(AbstractFileReadOnly, metaclass=InheritedDocStringsMeta):
         else:
             root = parent
 
-        l = []
+        entries = []
         for entry in root.record.entries:
-            l.append((entry.offset, entry.hash, root))
+            entries.append((entry.offset, entry.hash, root))
 
         try:
             while True:
-                offset, hash, parent = l.pop()
+                offset, hash, parent = entries.pop()
                 try:
                     record = self.records[offset]
                 except KeyError:
@@ -728,14 +768,14 @@ class GGPKFile(AbstractFileReadOnly, metaclass=InheritedDocStringsMeta):
 
                     if node.is_directory:
                         for entry in record.entries:
-                            l.append((entry.offset, entry.hash, node))
+                            entries.append((entry.offset, entry.hash, node))
         except IndexError:
             pass
 
         return root
 
     directory_build = build_directory
-        
+
     def _read(self, buffer, *args, **kwargs):
         """
         Reads the records from the file into object.records.
@@ -755,7 +795,7 @@ class GGPKFile(AbstractFileReadOnly, metaclass=InheritedDocStringsMeta):
                     offset=offset,
                 )
             except InvalidTagException as e:
-                warnings.warn('Invalid tag %s - seeking next valid tag' % e.args)
+                warnings.warn("Invalid tag %s - seeking next valid tag" % e.args)
                 buffer.seek(offset)
 
                 not_found = True
@@ -764,7 +804,7 @@ class GGPKFile(AbstractFileReadOnly, metaclass=InheritedDocStringsMeta):
                 while not_found:
                     chunk = buffer.read(4096)
                     # TODO: Maybe remove free and GGPK here for speedups
-                    for bytestr in (b'FILE', b'PDIR', b'FREE', b'GGPK'):
+                    for bytestr in (b"FILE", b"PDIR", b"FREE", b"GGPK"):
                         index = chunk.find(bytestr)
                         if index == -1:
                             continue
@@ -788,25 +828,3 @@ class GGPKFile(AbstractFileReadOnly, metaclass=InheritedDocStringsMeta):
     def read(self, file_path_or_raw, *args, **kwargs):
         super().read(file_path_or_raw, *args, **kwargs)
         self._file_path_or_raw = file_path_or_raw
-
-
-if __name__ == '__main__':
-    import cProfile
-    from line_profiler import LineProfiler
-    profiler = LineProfiler()
-    '''profiler.add_function(GGPKFile.read)
-    profiler.add_function(GGPKFile._read_record)
-    for record in recordsc:
-        profiler.add_function(record.read)'''
-
-    ggpk = GGPKFile()
-    ggpk.read(r'M:\Path of Exile\Content.ggpk')
-    ggpk.directory_build()
-    print(ggpk[r'Bundles2\_.index.bin'].get_path())
-    #profiler.run("ggpk.read()")
-
-    #profiler.add_function(GGPKFile.directory_build)
-    #profiler.add_function(DirectoryNode.__init__)
-    #profiler.run("ggpk.directory_build()")
-    #ggpk.directory.directories[2].extract_to('N:/')
-    profiler.print_stats()

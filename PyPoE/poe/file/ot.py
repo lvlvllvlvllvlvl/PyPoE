@@ -45,7 +45,7 @@ Documentation
 
 .. autoclass:: OTFileCache
 
-"""
+"""  # noqa
 
 # =============================================================================
 # Imports
@@ -55,15 +55,20 @@ Documentation
 
 # 3rd-party
 
+from PyPoE.poe.file.shared.keyvalues import (
+    AbstractKeyValueFile,
+    AbstractKeyValueFileCache,
+    AbstractKeyValueSection,
+)
+
 # self
 from PyPoE.shared.decorators import doc
-from PyPoE.poe.file.shared.keyvalues import *
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-__all__ = ['OTFile', 'OTFileCache']
+__all__ = ["OTFile", "OTFileCache"]
 
 # =============================================================================
 # Classes
@@ -71,37 +76,37 @@ __all__ = ['OTFile', 'OTFileCache']
 
 
 class ActionKeyValueSection(AbstractKeyValueSection):
-    NAME = 'Actor'
+    NAME = "Actor"
 
 
 class AnimatedKeyValueSection(AbstractKeyValueSection):
-    NAME = 'Animated'
+    NAME = "Animated"
 
 
 class BaseKeyValueSection(AbstractKeyValueSection):
-    NAME = 'Base'
-    ORDERED_HASH_KEYS = {'tag'}
+    NAME = "Base"
+    ORDERED_HASH_KEYS = {"tag"}
 
 
 class ModsKeyValueSection(AbstractKeyValueSection):
-    NAME = 'Mods'
-    ORDERED_HASH_KEYS = {'enable_rarity'}
+    NAME = "Mods"
+    ORDERED_HASH_KEYS = {"enable_rarity"}
 
 
 class PathfindingKeyValueSection(AbstractKeyValueSection):
-    NAME = 'Pathfinding'
+    NAME = "Pathfinding"
 
 
 class PositionedKeyValueSection(AbstractKeyValueSection):
-    NAME = 'Positioned'
+    NAME = "Positioned"
 
 
 class SocketsKeyValueSection(AbstractKeyValueSection):
-    NAME = 'Sockets'
+    NAME = "Sockets"
 
 
 class StatsKeyValueSection(AbstractKeyValueSection):
-    NAME = 'Stats'
+    NAME = "Stats"
 
 
 @doc(append=AbstractKeyValueFile)
@@ -110,26 +115,30 @@ class OTFile(AbstractKeyValueFile):
     Representation of a .ot file.
     """
 
-    SECTIONS = dict((s.NAME, s) for s in [
-        ActionKeyValueSection,
-        AnimatedKeyValueSection,
-        BaseKeyValueSection,
-        ModsKeyValueSection,
-        PathfindingKeyValueSection,
-        PositionedKeyValueSection,
-        SocketsKeyValueSection,
-        StatsKeyValueSection,
-    ])
+    SECTIONS = dict(
+        (s.NAME, s)
+        for s in [
+            ActionKeyValueSection,
+            AnimatedKeyValueSection,
+            BaseKeyValueSection,
+            ModsKeyValueSection,
+            PathfindingKeyValueSection,
+            PositionedKeyValueSection,
+            SocketsKeyValueSection,
+            StatsKeyValueSection,
+        ]
+    )
 
-    EXTENSION = '.ot'
+    EXTENSION = ".ot"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
 
 @doc(append=AbstractKeyValueFileCache)
-class OTFileCache(AbstractKeyValueFileCache):
+class OTFileCache(AbstractKeyValueFileCache[OTFile]):
     """
     Cache for OTFile instances.
     """
+
     FILE_TYPE = OTFile

@@ -37,18 +37,19 @@ Documentation
 # Python
 import re
 from functools import partial
-from typing import Callable, Dict, Union, List
-
-# 3rd-party
+from typing import Callable, Dict, List, Union
 
 # self
 from PyPoE.shared.mixins import ReprMixin
+
+# 3rd-party
+
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-__all__ = ['Tag', 'parse_description_tags']
+__all__ = ["Tag", "parse_description_tags"]
 
 # =============================================================================
 # Classes
@@ -79,15 +80,18 @@ class Tag(ReprMixin):
         parameter specified in the text to this tag if any
 
     """
-    __slots__ = ['id', 'parent', 'parameter', 'children']
 
-    _REPR_ARGUMENTS_IGNORE = {'parent'}
+    __slots__ = ["id", "parent", "parameter", "children"]
 
-    def __init__(self,
-                 id: Union[str, None] = None,
-                 parent: Union['Tag', None] = None,
-                 children: Union[List[Union[str, 'Tag']], None] = None,
-                 parameter: Union[str, None] = None):
+    _REPR_ARGUMENTS_IGNORE = {"parent"}
+
+    def __init__(
+        self,
+        id: Union[str, None] = None,
+        parent: Union["Tag", None] = None,
+        children: Union[List[Union[str, "Tag"]], None] = None,
+        parameter: Union[str, None] = None,
+    ):
         """
         Parameters
         ----------
@@ -101,10 +105,10 @@ class Tag(ReprMixin):
             parameter specified in the text to this tag if any
         """
         self.id: Union[str, None] = id
-        self.parent: Union['Tag', None] = parent
+        self.parent: Union["Tag", None] = parent
         self.parameter: Union[str, None] = parameter
         if children is None:
-            self.children: List[Union[str, 'Tag']] = []
+            self.children: List[Union[str, "Tag"]] = []
 
     def append_to_children(self, text: str):
         """
@@ -123,7 +127,7 @@ class Tag(ReprMixin):
         else:
             self.children.append(text)
 
-    def root(self) -> 'Tag':
+    def root(self) -> "Tag":
         """
         Returns the root Tag node
 
@@ -161,14 +165,17 @@ class Tag(ReprMixin):
         KeyError
             if a id is not present in the handlers parameter
         """
-        out_str = ''.join([
-            item.handle_tags(handlers=handlers) if isinstance(item, Tag)
-            else item for item in self.children
-        ])
+        out_str = "".join(
+            [
+                item.handle_tags(handlers=handlers) if isinstance(item, Tag) else item
+                for item in self.children
+            ]
+        )
         if self.id is None:
             return out_str
         else:
             return handlers[self.id](hstr=out_str, parameter=self.parameter)
+
 
 # =============================================================================
 # Functions
@@ -189,20 +196,23 @@ def parse_description_tags(text: str) -> Tag:
     -------
         the parsed text as Tag class (with no id)
     """
+
     def f(scanner, result, tid):
         return tid, scanner.match, result
 
-    scanner = re.Scanner([
-        (r'(?<!<)<(?!<)', partial(f, tid='lt')),
-        (r'(?<!>)>(?!>)', partial(f, tid='gt')),
-        (r'\{', partial(f, tid='lbrace')),
-        (r'\}', partial(f, tid='rbrace')),
-        (r':', partial(f, tid='colon')),
-        (r'[^<>\{\}:]+', partial(f, tid='text')),
-        # Harbinger stuff
-        (r'<<[^<>\{\}:]+>>', partial(f, tid='text')),
-
-    ], re.UNICODE | re.MULTILINE)
+    scanner = re.Scanner(
+        [
+            (r"(?<!<)<(?!<)", partial(f, tid="lt")),
+            (r"(?<!>)>(?!>)", partial(f, tid="gt")),
+            (r"\{", partial(f, tid="lbrace")),
+            (r"\}", partial(f, tid="rbrace")),
+            (r":", partial(f, tid="colon")),
+            (r"[^<>\{\}:]+", partial(f, tid="text")),
+            # Harbinger stuff
+            (r"<<[^<>\{\}:]+>>", partial(f, tid="text")),
+        ],
+        re.UNICODE | re.MULTILINE,
+    )
 
     in_tag = [False]
     in_text = [True]
@@ -213,20 +223,20 @@ def parse_description_tags(text: str) -> Tag:
     last = out
 
     for tid, match, text in scanner.scan(text)[0]:
-        if tid == 'lt':
+        if tid == "lt":
             depth += 1
             in_tag.append(True)
             has_tag.append(True)
             parameter.append(False)
-        elif tid == 'gt':
+        elif tid == "gt":
             in_tag[depth] = False
             parameter[depth] = False
-        elif tid == 'lbrace':
+        elif tid == "lbrace":
             if has_tag[depth]:
                 in_text.append(True)
             else:
                 last.append_to_children(text)
-        elif tid == 'rbrace':
+        elif tid == "rbrace":
             if has_tag[depth]:
                 del in_tag[depth]
                 del in_text[depth]
@@ -236,12 +246,12 @@ def parse_description_tags(text: str) -> Tag:
                 depth -= 1
             else:
                 last.append_to_children(text)
-        elif tid == 'colon':
+        elif tid == "colon":
             if in_tag[depth]:
                 parameter[depth] = True
             else:
                 last.children[-1] += text
-        elif tid == 'text':
+        elif tid == "text":
             if in_tag[depth]:
                 if parameter[depth]:
                     last.parameter = text

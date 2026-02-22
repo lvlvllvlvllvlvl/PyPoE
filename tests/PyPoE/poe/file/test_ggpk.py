@@ -34,11 +34,8 @@ See PyPoE/LICENSE
 # =============================================================================
 
 # Python
-import os
-from tempfile import TemporaryDirectory
 
 # 3rd Party
-import pytest
 
 # self
 
@@ -46,9 +43,8 @@ import pytest
 # Setup
 # =============================================================================
 
-DDS_UNCOMPRESSED = 'Art/Textures/Characters/Adventurer/' \
-                   'adventurerPalid_colour.dds'
-DDS_COMPRESSED = 'Art/2DArt/BuffIcons/AssassinsMark.dds'
+DDS_UNCOMPRESSED = "Art/Textures/Characters/Adventurer/adventurerPalid_colour.dds"
+DDS_COMPRESSED = "Art/2DArt/BuffIcons/AssassinsMark.dds"
 
 # =============================================================================
 # Tests
@@ -65,5 +61,5 @@ class TestDDSExtract:
         file_system.extract_dds(file_system.get_file(DDS_COMPRESSED))
 
     def test_reference(self, file_system):
-        data = b'*' + DDS_COMPRESSED.encode('ascii')
+        data = b"*" + DDS_COMPRESSED.encode("ascii")
         file_system.extract_dds(data)

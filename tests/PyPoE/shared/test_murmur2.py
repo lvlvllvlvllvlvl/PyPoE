@@ -42,8 +42,8 @@ from PyPoE.shared import murmur2
 # =============================================================================
 
 data = [
-    ('This is a test'.encode('ascii'), 895688205, 0),
-    ('This is a test'.encode('ascii'), 1204582478, 42),
+    ("This is a test".encode("ascii"), 895688205, 0),
+    ("This is a test".encode("ascii"), 1204582478, 42),
 ]
 
 # =============================================================================
@@ -54,6 +54,7 @@ data = [
 # Tests
 # =============================================================================
 
-@pytest.mark.parametrize('data,result,seed', data)
+
+@pytest.mark.parametrize("data,result,seed", data)
 def test_murmur2_32(data, result, seed):
     assert murmur2.murmur2_32(data, seed) == result

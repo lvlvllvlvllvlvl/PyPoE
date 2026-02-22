@@ -31,20 +31,22 @@ See PyPoE/LICENSE
 # 3rd-party
 
 # self
-from PyPoE.poe.file.specification.fields import *
+from PyPoE.poe.file.specification.fields import Field, File, Specification
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-specification = Specification({
-    'Main.dat': File(
-        fields=(
-            Field(
-                name='Invalid',
-                type='int',
-                enum='THIS_DOES_NOT_EXIST',
+specification = Specification(
+    {
+        "Main.dat": File(
+            fields=(
+                Field(
+                    name="Invalid",
+                    type="int",
+                    enum="THIS_DOES_NOT_EXIST",
+                ),
             ),
         ),
-    ),
-})
+    }
+)

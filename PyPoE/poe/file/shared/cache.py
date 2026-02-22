@@ -43,45 +43,51 @@ Documentation
 # =============================================================================
 
 # Python
-from typing import Union, List, Dict, Any
+from typing import Any, Dict, Generic, List, TypeVar, Union
 
-# 3rd-party
+from PyPoE.poe.file.file_system import FileSystem
+from PyPoE.poe.file.shared import AbstractFileReadOnly
 
 # self
 from PyPoE.shared.mixins import ReprMixin
-from PyPoE.poe.file.shared import AbstractFileReadOnly
-from PyPoE.poe.file.file_system import FileSystem
+
+# 3rd-party
+
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-__all__ = ['AbstractFileCache']
+__all__ = ["AbstractFileCache"]
 
 # =============================================================================
 # Classes
 # =============================================================================
 
+FileType = TypeVar("FileType", bound=AbstractFileReadOnly)
 
-class AbstractFileCache(ReprMixin):
+
+class AbstractFileCache(ReprMixin, Generic[FileType]):
     """
     Attributes
     ----------
 
     'is_unpacked' : bool
 
-    'files' : dict[str, AbstractFileReadOnly]
+    'files' : dict[str, FileType]
         Dictionary of loaded file instances and their related path
     """
 
-    FILE_TYPE = None
+    FILE_TYPE: FileType = None
 
-    def __init__(self,
-                 path_or_file_system: Union[str, FileSystem] = None,
-                 files: List[str] = None,
-                 files_shortcut: bool = True,
-                 instance_options: Dict[str, Any] = None,
-                 read_options: Dict[str, Any] = None):
+    def __init__(
+        self,
+        path_or_file_system: Union[str, FileSystem] = None,
+        files: List[str] = None,
+        files_shortcut: bool = True,
+        instance_options: Dict[str, Any] = None,
+        read_options: Dict[str, Any] = None,
+    ):
         """
         Parameters
         ----------
@@ -112,18 +118,20 @@ class AbstractFileCache(ReprMixin):
         else:
             self.file_system: FileSystem = FileSystem(root_path=path_or_file_system)
 
-        self.instance_options: Dict[str, Any] = {} if \
-            instance_options is None else instance_options
-        self.read_options: Dict[str, Any] = {} if \
-            read_options is None else read_options
+        self.instance_options: Dict[str, Any] = {} if instance_options is None else instance_options
+        self.read_options: Dict[str, Any] = {} if read_options is None else read_options
 
-        self.files: Dict[str, AbstractFileReadOnly] = {}
+        self.files: Dict[str, FileType] = {}
 
         read_func = self.__getitem__ if files_shortcut else self.get_file
 
         if files is not None:
             for file in files:
-                read_func(file)
+                try:
+                    read_func(file)
+                except Exception:
+                    print("Error reading", file)
+                    raise
 
     def __getitem__(self, item: str) -> Any:
         """
@@ -140,15 +148,12 @@ class AbstractFileCache(ReprMixin):
 
         Returns
         -------
-        AbstractFileReadOnly
+        FileType
             instance
         """
         return self.get_file(item)
 
-    def _get_file_instance_args(self,
-                                file_name: str,
-                                *args,
-                                **kwargs) -> Dict[str, Any]:
+    def _get_file_instance_args(self, file_name: str, *args, **kwargs) -> Dict[str, Any]:
         """
         Returns a dictionary of keyword arguments to pass to the file's
         __init__ method upon initial reading.
@@ -167,10 +172,7 @@ class AbstractFileCache(ReprMixin):
         options = dict(self.instance_options)
         return options
 
-    def _get_read_args(self,
-                       file_name: str,
-                       *args,
-                       **kwargs) -> Dict[str, Any]:
+    def _get_read_args(self, file_name: str, *args, **kwargs) -> Dict[str, Any]:
         """
         Returns a dictionary of keyword arguments to pass to the file's
         read method upon initial reading.
@@ -190,14 +192,11 @@ class AbstractFileCache(ReprMixin):
             Dictionary of keyword arguments
         """
         options = dict(self.read_options)
-        options['file_path_or_raw'] = self.file_system.get_file(file_name)
+        options["file_path_or_raw"] = self.file_system.get_file(file_name)
 
         return options
 
-    def _create_instance(self,
-                         file_name: str,
-                         *args,
-                         **kwargs) -> Any:
+    def _create_instance(self, file_name: str, *args, **kwargs) -> FileType:
         """
         Creates a new instance for the given file name
 
@@ -212,16 +211,11 @@ class AbstractFileCache(ReprMixin):
 
             File instance
         """
-        f = self.FILE_TYPE(
-            **self._get_file_instance_args(file_name=file_name, *args, **kwargs)
-        )
+        f = self.FILE_TYPE(**self._get_file_instance_args(file_name=file_name, *args, **kwargs))
         f.read(**self._get_read_args(file_name=file_name, *args, **kwargs))
         return f
 
-    def get_file(self,
-                 file_name: str,
-                 *args,
-                 **kwargs) -> AbstractFileReadOnly:
+    def get_file(self, file_name: str, *args, **kwargs) -> FileType:
         """
         Returns the the specified file from the cache.
 
@@ -236,7 +230,7 @@ class AbstractFileCache(ReprMixin):
 
         Returns
         -------
-        AbstractFileReadOnly
+        FileType
             read file instance
         """
         if file_name not in self.files:

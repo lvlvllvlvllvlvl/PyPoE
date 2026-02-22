@@ -1,5 +1,5 @@
 """
-Additional validators 
+Additional validators
 
 Overview
 ===============================================================================
@@ -54,7 +54,7 @@ from validate import ValidateError, is_boolean
 # Globals
 # =============================================================================
 
-__all__ = ['IntEnumValidator', 'is_directory', 'is_file', 'functions']
+__all__ = ["IntEnumValidator", "is_directory", "is_file", "functions"]
 
 
 # =============================================================================
@@ -66,6 +66,7 @@ class IntEnumValidator:
     """
     Class to create a dynamic validator for IntEnum classes
     """
+
     def __init__(self, enum, default=None):
         """
 
@@ -84,7 +85,7 @@ class IntEnumValidator:
 
         """
         if not issubclass(enum, IntEnum):
-            raise TypeError('enum must be an IntEnum subclass')
+            raise TypeError("enum must be an IntEnum subclass")
         self._enum = enum
 
         if default is None:
@@ -94,7 +95,7 @@ class IntEnumValidator:
         elif isinstance(default, int):
             self._default = enum(int)
         else:
-            raise TypeError('default must be a subtype of default')
+            raise TypeError("default must be a subtype of default")
         self._default = None
 
     def _get_enum_from_val(self, value):
@@ -117,10 +118,7 @@ class IntEnumValidator:
         try:
             return self._enum(value)
         except ValueError:
-            raise ValidateError(
-                '%s The value is not accepted by the enum.' %
-                self._enum.__name__
-            )
+            raise ValidateError("%s The value is not accepted by the enum." % self._enum.__name__)
 
     def __call__(self, value):
         """
@@ -147,14 +145,14 @@ class IntEnumValidator:
                 # MyEnum.attribute
                 #
                 # This will get rid of the class portion for casting if present
-                if value.startswith(self._enum.__name__ + '.'):
-                    value = value[len(self._enum.__name__) + 1:]
+                if value.startswith(self._enum.__name__ + "."):
+                    value = value[len(self._enum.__name__) + 1 :]
                 try:
                     value = getattr(self._enum, value)
                 except AttributeError:
                     raise ValidateError(
-                        'The value is neither an integer or a valid %s ' \
-                        'attribute' % self._enum.__name__
+                        "The value is neither an integer or a valid %s attribute"
+                        % self._enum.__name__
                     )
             else:
                 value = self._get_enum_from_val(value)
@@ -163,7 +161,7 @@ class IntEnumValidator:
         elif value is None:
             return self._default
         else:
-            raise ValidateError('Invalid type')
+            raise ValidateError("Invalid type")
 
         return value
 
@@ -205,8 +203,8 @@ def is_file(value, *args, exists=True, allow_empty=False, **kwargs):
     ValidateError
         if the the value can't be validated
     """
-    if allow_empty and value == '':
-        return ''
+    if allow_empty and value == "":
+        return ""
     else:
         _exists(value, exists)
         if not os.path.isfile(value):
@@ -214,7 +212,9 @@ def is_file(value, *args, exists=True, allow_empty=False, **kwargs):
         return value
 
 
-def is_directory(value, *args, exists=True, allow_empty=False, make_absolute=False, **kwargs):
+def is_directory(
+    value, *args, exists=True, allow_empty=False, make_absolute=False, allow_http=False, **kwargs
+):
     """
     Checks whether the value is a valid directory path (and optionally whether
     it exists).
@@ -240,8 +240,10 @@ def is_directory(value, *args, exists=True, allow_empty=False, make_absolute=Fal
     ValidateError
         if the the value can't be validated
     """
-    if allow_empty and value == '':
-        return ''
+    if allow_empty and value == "":
+        return ""
+    elif allow_http and value.startswith("http"):
+        return value
     else:
         _exists(value, exists)
         if not os.path.isdir(value):
@@ -250,11 +252,12 @@ def is_directory(value, *args, exists=True, allow_empty=False, make_absolute=Fal
             value = os.path.abspath(value)
         return value
 
+
 # =============================================================================
 # Globals
 # =============================================================================
 
 functions = {
-    'is_file': is_file,
-    'is_directory': is_directory,
+    "is_file": is_file,
+    "is_directory": is_directory,
 }

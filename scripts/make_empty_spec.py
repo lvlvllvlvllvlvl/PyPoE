@@ -40,14 +40,15 @@ Internal API
 import os
 import struct
 
+# self
+from PyPoE.poe import constants
+from PyPoE.poe.file import dat, specification
+from PyPoE.poe.file.bundle import Index
+from PyPoE.poe.file.ggpk import GGPKFile
+from PyPoE.poe.path import PoEPath
+
 # 3rd-party
 
-# self
-from PyPoE.poe.constants import VERSION, DISTRIBUTOR
-from PyPoE.poe.path import PoEPath
-from PyPoE.poe.file import dat
-from PyPoE.poe.file.ggpk import GGPKFile
-from PyPoE.poe.file.bundle import Index, Bundle
 
 # =============================================================================
 # Globals
@@ -66,7 +67,7 @@ __all__ = []
 
 def spec_unknown(size, i=0):
     if size == 0:
-        return ''
+        return ""
     spec = "Field("
     out = []
     while size >= 4:
@@ -75,7 +76,7 @@ def spec_unknown(size, i=0):
         out.append("    type='int',")
         out.append("),")
         size -= 4
-        i+=1
+        i += 1
 
     mod = size % 4
     for j in range(0, mod):
@@ -83,21 +84,21 @@ def spec_unknown(size, i=0):
         out.append("    name='Unknown%s'," % i)
         out.append("    type='byte',")
         out.append("),")
-        i+=1
+        i += 1
 
-    return ' '*12 + ('\n' + ' '*12).join(out)
+    return " " * 12 + ("\n" + " " * 12).join(out)
 
 
 def run():
     out = []
 
-    path = PoEPath(version=VERSION.STABLE, distributor=DISTRIBUTOR.GGG
-                   ).get_installation_paths()[0]
-    dat.set_default_spec(VERSION.STABLE)
-    existing_set = set(dat._default_spec.keys())
+    path = PoEPath(
+        version=constants.VERSION.STABLE, distributor=constants.DISTRIBUTOR.GGG
+    ).get_installation_paths()[0]
+    existing_set = set(specification.load(constants.VERSION.STABLE).keys())
 
     ggpk = GGPKFile()
-    ggpk.read(os.path.join(path, 'content.ggpk'))
+    ggpk.read(os.path.join(path, "content.ggpk"))
     ggpk.directory_build()
 
     index = Index()
@@ -105,12 +106,12 @@ def run():
 
     file_set = set()
 
-    for name in index.get_dir_record('Data').files:
-        if not name.endswith('.dat'):
+    for name in index.get_dir_record("Data").files:
+        if not name.endswith(".dat"):
             continue
 
         # Not a regular dat file, ignore
-        if name in ['Languages.dat']:
+        if name in ["Languages.dat"]:
             continue
 
         file_set.add(name)
@@ -118,23 +119,26 @@ def run():
     new = sorted(file_set.difference(set(existing_set)))
 
     for fn in new:
-        fr = index.get_file_record('Data/' + fn)
+        fr = index.get_file_record("Data/" + fn)
         fr.bundle.read(ggpk[fr.bundle.ggpk_path].record.extract())
         binary = fr.get_file()
         data_offset = binary.find(dat.DAT_FILE_MAGIC_NUMBER)
-        n_rows = struct.unpack('<I', binary[0:4])[0]
+        n_rows = struct.unpack("<I", binary[0:4])[0]
         length = data_offset - 4
         if n_rows > 0:
-            record_length = length//n_rows
+            record_length = length // n_rows
 
-        out.append("""    '%s': File(
+        out.append(
+            """    '%s': File(
         fields=(
 %s
         ),
-    ),""" % (fn, spec_unknown(record_length)))
+    ),"""
+            % (fn, spec_unknown(record_length))
+        )
 
-    print('\n'.join(out))
+    print("\n".join(out))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()

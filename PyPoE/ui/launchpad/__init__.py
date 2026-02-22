@@ -43,14 +43,14 @@ from PyPoE.ui.shared import main
 # Globals
 # =============================================================================
 
-__all__ = ['LaunchpadMainWindow', 'launchpad_main']
+__all__ = ["LaunchpadMainWindow", "launchpad_main"]
 
 # =============================================================================
 # Classes
 # =============================================================================
 
-class LaunchpadMainWindow(QMainWindow):
 
+class LaunchpadMainWindow(QMainWindow):
     child_closed = Signal(QWidget)
 
     def __init__(self, apps, *args, **kwargs):
@@ -59,13 +59,13 @@ class LaunchpadMainWindow(QMainWindow):
 
         self.child_closed.connect(self._handle_closed_child)
 
-        self.setWindowTitle(self.tr('PyPoE UI Launchpad'))
+        self.setWindowTitle(self.tr("PyPoE UI Launchpad"))
 
         frame = QFrame(parent=self)
         layout = QVBoxLayout()
         frame.setLayout(layout)
 
-        layout.addWidget(QLabel(self.tr('Choose an application to start')))
+        layout.addWidget(QLabel(self.tr("Choose an application to start")))
 
         self.buttons = []
         self.instances = []
@@ -81,6 +81,7 @@ class LaunchpadMainWindow(QMainWindow):
     def _wrap_clicked(self, i):
         def wrapped():
             return self.run_application(i)
+
         return wrapped
 
     def _handle_closed_child(self, qwidget):
@@ -93,12 +94,13 @@ class LaunchpadMainWindow(QMainWindow):
 
     def run_application(self, i):
         self.buttons[i].setEnabled(False)
-        self.buttons[i].setText(self.buttons[i].text() + self.tr(' (Running)'))
+        self.buttons[i].setText(self.buttons[i].text() + self.tr(" (Running)"))
         qmainwindow = self.apps[i](parent=self)
         qmainwindow.show()
         qmainwindow.activateWindow()
 
         self.instances[i] = qmainwindow
+
 
 # =============================================================================
 # Functions

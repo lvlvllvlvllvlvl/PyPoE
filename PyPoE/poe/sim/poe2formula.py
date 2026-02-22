@@ -1,11 +1,9 @@
 """
-
-
 Overview
 ===============================================================================
 
 +----------+------------------------------------------------------------------+
-| Path     | scripts/profile/PyPoE/ui/dat_handler.py                          |
+| Path     | PyPoE/poe/sim/poe2formula.py                                     |
 +----------+------------------------------------------------------------------+
 | Version  | 1.0.0a0                                                          |
 +----------+------------------------------------------------------------------+
@@ -17,12 +15,24 @@ Overview
 Description
 ===============================================================================
 
-
+Formulas for calculating certain things.
 
 Agreement
 ===============================================================================
 
 See PyPoE/LICENSE
+
+
+.. todo::
+
+  Find out the real function for calculating the stat requirement.
+
+Documentation
+===============================================================================
+
+.. autoclass:: GemTypes
+
+.. autofunction:: gem_stat_requirement
 """
 
 # =============================================================================
@@ -30,59 +40,74 @@ See PyPoE/LICENSE
 # =============================================================================
 
 # Python
-import sys
-
-# 3rd-party
-import cProfile
-#from line_profiler import LineProfiler
-
-from PySide2.QtCore import *
-from PySide2.QtWidgets import *
+import math
+from decimal import ROUND_HALF_UP, Decimal
+from enum import Enum
 
 # self
-from PyPoE.poe.file.file_system import FileSystem
-from PyPoE.ui.shared.file.handler import DatStyle
-from PyPoE.ui.shared.file.manager import FileDataManager
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-__all__ = []
+__all__ = ["GemTypes", "gem_stat_requirement"]
 
 # =============================================================================
 # Classes
 # =============================================================================
 
+
+class GemTypes(Enum):
+    """
+    Attributes
+    ----------
+    support
+        Support Skill Gem
+    active
+        Active Skill Gem
+    meta
+        Meta Skill Gem
+    """
+
+    support = 1
+    active = 2
+    meta = 3
+
+
 # =============================================================================
 # Functions
 # =============================================================================
-if __name__ == '__main__':
-    '''profiler = LineProfiler(
-        DatStyle.sizeHint,
-        DatStyle._get_text,
-        DatStyle._show_value,
-    )'''
-    translator = QTranslator()
-    translator.load('i18n/en_US')
-    app = QApplication(sys.argv)
-    app.installTranslator(translator)
-    frame = QMainWindow()
-    frame.setMinimumSize(2000, 1000)
 
-    fs = FileSystem(r'M:\Steam\steamapps\common\Path of Exile')
 
-    f = 'HeistEquipment.dat'
+def gem_stat_requirement(level=0, multi=100):
+    """
+    Calculates and returns the stat requirement for the specified level
+    requirement.
 
-    data = fs.get_file('Data/' + f)
-    #for item in dir(o):
-     #   print(item, getattr(o, item))
-    fm = FileDataManager(None)
-    h = fm.get_handler(f)
-    #profiler.run('w = h.get_widget(data, f, parent=frame)')
-    #profiler.print_stats()
-    w = h.get_widget(data, f, parent=frame)
-    frame.setCentralWidget(w)
+    .. warning::
+        These functions are primarily reverse engineered and may break with
+        updates.
 
-    frame.show()
-    app.exec_()
+    Parameters
+    ----------
+    level : int
+        Level requirement for the current gem level
+    multi : int
+        Stat multiplier, i.e. from SkillGems.dat
+
+
+    Returns
+    -------
+    int
+        calculated stat requirement
+    """
+
+    _level = 5 + (level - 3) * 1.7
+    _multi = math.pow(multi / 100, 0.9)
+    result = Decimal(_level * _multi)
+
+    result = int(result.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+    result = result + 4
+
+    # Gems seem to have no requirements lower then 8
+    return 0 if result < 8 else result

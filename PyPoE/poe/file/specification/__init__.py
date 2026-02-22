@@ -23,23 +23,24 @@ Overview
 import importlib
 from importlib.machinery import SourceFileLoader
 
+# self
+from PyPoE.poe import constants
+
 # 3rd-party
 
-# self
-from PyPoE.poe.constants import VERSION
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-__all__ = ['load']
+__all__ = ["load"]
 
 # =============================================================================
 # Globals
 # =============================================================================
 
 
-def load(path=None, version=VERSION.DEFAULT, reload=False, validate=None):
+def load(path=None, version=constants.VERSION.DEFAULT, reload=False, validate=None):
     """
     Loads a specification from a python module that can be used for the dat
     files.
@@ -86,21 +87,23 @@ def load(path=None, version=VERSION.DEFAULT, reload=False, validate=None):
         if validate is None:
             validate = False
 
-        if version in (VERSION.STABLE, VERSION.BETA, VERSION.ALPHA):
+        if version in (
+            constants.VERSION.STABLE,
+            constants.VERSION.BETA,
+            constants.VERSION.ALPHA,
+            constants.VERSION.GENERATED,
+            constants.VERSION.POE2,
+        ):
             module = importlib.import_module(
-                'PyPoE.poe.file.specification.data.%s' %
-                str(version).split('.')[1].lower()
+                "PyPoE.poe.file.specification.data.%s" % version.name.lower()
             )
         else:
-            raise ValueError(
-                'Unknown version or version currently not supported: %s' %
-                version
-            )
+            raise ValueError("Unknown version or version currently not supported: %s" % version)
     else:
         if validate is None:
             validate = True
 
-        module = SourceFileLoader('', path).load_module()
+        module = SourceFileLoader("", path).load_module()
 
     if reload:
         importlib.reload(module)

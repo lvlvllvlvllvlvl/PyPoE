@@ -51,24 +51,27 @@ Internal API
 # Imports
 # =============================================================================
 
-# Python
-import socket
-import select
-import struct
 import io
 import os
-from urllib import request
-from urllib.error import URLError
+import select
+
+# Python
+import socket
+import struct
 from collections import OrderedDict
 from hashlib import sha256
 from hmac import compare_digest
+from urllib import request
+from urllib.error import URLError
 
-# 3rd-party
+from PyPoE.poe.file.ggpk import DirectoryNode, DirectoryRecord, FileRecord
 
 # self
 from PyPoE.shared.mixins import ReprMixin
-from PyPoE.poe.file.ggpk import DirectoryNode, DirectoryRecord, FileRecord
 from PyPoE.shared.murmur2 import murmur2_32
+
+# 3rd-party
+
 
 # =============================================================================
 # Globals
@@ -79,6 +82,7 @@ __all__ = []
 # =============================================================================
 # Functions
 # =============================================================================
+
 
 def socket_fd_open(socket_fd):
     """
@@ -97,11 +101,11 @@ def socket_fd_open(socket_fd):
     """
 
     # open new socket from fd
-    sock = socket.fromfd(fd=socket_fd,
-                         family=socket.AF_INET,
-                         type=socket.SOCK_STREAM,
-                         proto=socket.IPPROTO_TCP)
+    sock = socket.fromfd(
+        fd=socket_fd, family=socket.AF_INET, type=socket.SOCK_STREAM, proto=socket.IPPROTO_TCP
+    )
     return sock
+
 
 def socket_fd_close(socket_fd):
     """
@@ -120,8 +124,8 @@ def socket_fd_close(socket_fd):
     # close the socket
     sock.close()
 
-def node_check_hash(directory_node, folder_path=None, ggpk=None,
-                    recurse=True, bufsize=2**20):
+
+def node_check_hash(directory_node, folder_path=None, ggpk=None, recurse=True, bufsize=2**20):
     """
     Compare expected hash against files on disk.
 
@@ -234,7 +238,7 @@ def node_check_hash(directory_node, folder_path=None, ggpk=None,
     """
 
     if bool(folder_path) == bool(ggpk):
-        raise ValueError('Must specify either folder_path or ggpk')
+        raise ValueError("Must specify either folder_path or ggpk")
 
     node_hash = None
     hash_test = False
@@ -244,7 +248,7 @@ def node_check_hash(directory_node, folder_path=None, ggpk=None,
         if folder_path:
             file = os.path.join(folder_path, self.record.name)
             try:
-                file_handle = open(file, 'rb')
+                file_handle = open(file, "rb")
             except FileNotFoundError:
                 return [(self, node_hash, hash_test)]
         elif ggpk:
@@ -262,18 +266,16 @@ def node_check_hash(directory_node, folder_path=None, ggpk=None,
             node_hash = file_hash
             del file_hash
 
-            hash_test = compare_digest(node_hash.hexdigest(),
-                                       format(self.record.hash, '064x'))
+            hash_test = compare_digest(node_hash.hexdigest(), format(self.record.hash, "064x"))
 
             file_handle.close()
             del file_handle
 
         return [(self, node_hash, hash_test)]
 
-    elif (isinstance(self.record, DirectoryRecord)
-          or self.record is None):
+    elif isinstance(self.record, DirectoryRecord) or self.record is None:
         if folder_path:
-            folder = ''
+            folder = ""
             if self.record is not None:
                 folder = self.record.name
             folder_path = os.path.join(folder_path, folder)
@@ -288,13 +290,10 @@ def node_check_hash(directory_node, folder_path=None, ggpk=None,
         # need the order of items in folder to generate hash
         for node in children:
             # if node is directory and do not want to recurse
-            if not (isinstance(node.record, DirectoryRecord)
-                    and not recurse):
-                child_node_hash = node_check_hash(node,
-                                                  folder_path=folder_path,
-                                                  ggpk=ggpk,
-                                                  recurse=recurse,
-                                                  bufsize=bufsize)
+            if not (isinstance(node.record, DirectoryRecord) and not recurse):
+                child_node_hash = node_check_hash(
+                    node, folder_path=folder_path, ggpk=ggpk, recurse=recurse, bufsize=bufsize
+                )
                 if child_node_hash[-1][1] is None:
                     missing_files = True
                 # only calculate the folder hash from immediate
@@ -303,19 +302,19 @@ def node_check_hash(directory_node, folder_path=None, ggpk=None,
                 # store all hash results to return
                 hash_list += child_node_hash
         if missing_files is False and recurse:
-            folder_hash_concat = b''.join(
-                item[1].digest() for item in child_hash_list)
+            folder_hash_concat = b"".join(item[1].digest() for item in child_hash_list)
             node_hash = sha256(folder_hash_concat)
-            hash_test = compare_digest(node_hash.hexdigest(),
-                                       format(self.record.hash, '064x'))
+            hash_test = compare_digest(node_hash.hexdigest(), format(self.record.hash, "064x"))
         # put folder hash at end of list if recurse and not root
         if self.record is not None and recurse:
             return hash_list + [(self, node_hash, hash_test)]
 
         return hash_list
 
-def node_outdated_files(patch_file_list, directory_node_path,
-                        folder_path, recurse=False, bufsize=2**10):
+
+def node_outdated_files(
+    patch_file_list, directory_node_path, folder_path, recurse=False, bufsize=2**10
+):
     """
     Get expected hash based list of outdated files on disk
     for given directory node.
@@ -362,22 +361,22 @@ def node_outdated_files(patch_file_list, directory_node_path,
     try:
         directory_node = patch_file_list.directory[directory_node_path]
         # if directory and no child metadata
-        if (isinstance(directory_node.record, DirectoryRecord)
-                and not directory_node.children):
-            raise FileNotFoundError('Just here to trigger the except')
+        if isinstance(directory_node.record, DirectoryRecord) and not directory_node.children:
+            raise FileNotFoundError("Just here to trigger the except")
     except FileNotFoundError:
-        directory_paths = directory_node_path.split('/')
-        cdir = ''
+        directory_paths = directory_node_path.split("/")
+        cdir = ""
         for index, dir_name in enumerate(directory_paths):
             if cdir:
-                cdir += '/'
+                cdir += "/"
             cdir += dir_name
             # do not know if node is file or folder
             # if file, second last node is final
             if (len(directory_paths) - index) < 1:
                 directory_node = patch_file_list.directory[directory_node_path]
-                if (directory_node.record is not None
-                        and isinstance(directory_node.record, FileRecord)):
+                if directory_node.record is not None and isinstance(
+                    directory_node.record, FileRecord
+                ):
                     break
             patch_file_list.update_filelist([cdir])
     directory_node = patch_file_list.directory[directory_node_path]
@@ -397,10 +396,9 @@ def node_outdated_files(patch_file_list, directory_node_path,
                 if not child.directories:
                     end_directories.append(child)
 
-    node_hash_list = node_check_hash(directory_node,
-                                     folder_path=folder_path,
-                                     recurse=recurse,
-                                     bufsize=bufsize)
+    node_hash_list = node_check_hash(
+        directory_node, folder_path=folder_path, recurse=recurse, bufsize=bufsize
+    )
 
     download_list = {}
     for node, checksum, match in node_hash_list:
@@ -415,8 +413,10 @@ def node_outdated_files(patch_file_list, directory_node_path,
 
     return download_list
 
-def node_update_files(patch_file_list, directory_node_path,
-                      folder_path, recurse=False, bufsize=2**10):
+
+def node_update_files(
+    patch_file_list, directory_node_path, folder_path, recurse=False, bufsize=2**10
+):
     """
     Update files and folders on disk for given node path.
 
@@ -452,48 +452,41 @@ def node_update_files(patch_file_list, directory_node_path,
     bufsize : int
         The size of the buffer to use for computing each hash
     """
-    node_parent_split = directory_node_path.rsplit('/', 1)
-    node_parent = directory_node_path.rsplit('/', 1)[0]
+    node_parent_split = directory_node_path.rsplit("/", 1)
+    node_parent = directory_node_path.rsplit("/", 1)[0]
     if len(node_parent_split) == 1:
-        node_parent = ''
-    hash_path = os.path.join(folder_path,
-                             node_parent)
-    download_list = node_outdated_files(patch_file_list,
-                                        directory_node_path,
-                                        hash_path,
-                                        recurse=recurse,
-                                        bufsize=bufsize)
+        node_parent = ""
+    hash_path = os.path.join(folder_path, node_parent)
+    download_list = node_outdated_files(
+        patch_file_list, directory_node_path, hash_path, recurse=recurse, bufsize=bufsize
+    )
 
     from json import dump
+
     dump_dict = patch_file_list.directory.get_dict()
-    dump_dict['version'] = patch_file_list.patch.version
-    file_handle = open(os.path.join(folder_path,
-                                    'poe_file_details.json'),
-                       'w', encoding='utf-8')
+    dump_dict["version"] = patch_file_list.patch.version
+    file_handle = open(os.path.join(folder_path, "poe_file_details.json"), "w", encoding="utf-8")
     dump(dump_dict, file_handle)
     file_handle.close()
 
     dir_fd = os.open(folder_path, os.O_DIRECTORY)
 
-    files_subdir = 'files'
+    files_subdir = "files"
     files_count = len(download_list.keys())
     download_index = 0
     for hash, nodes in download_list.items():
-        pretty_hash = format(hash, '064x')
+        pretty_hash = format(hash, "064x")
         dst_file = os.path.join(folder_path, files_subdir, pretty_hash)
         node_file_name = nodes[0].get_path()
-        print("{} file downloads remaining".format(
-            files_count - download_index))
-        patch_file_list.patch.download(node_file_name,
-                                       dst_file=dst_file)
+        print("{} file downloads remaining".format(files_count - download_index))
+        patch_file_list.patch.download(node_file_name, dst_file=dst_file)
         print("downloaded: {}".format(node_file_name))
         download_index += 1
 
         for node in nodes:
             link_src = dst_file
             node_path = node.get_path()
-            link_dst = os.path.join(folder_path,
-                                    node_path)
+            link_dst = os.path.join(folder_path, node_path)
             link_parent = os.path.dirname(link_dst)
             os.makedirs(link_parent, exist_ok=True)
             link_source_rel = os.path.relpath(link_src, link_parent)
@@ -512,6 +505,7 @@ def node_update_files(patch_file_list, directory_node_path,
             os.symlink(link_source_rel, node_path, dir_fd=dir_fd)
 
     os.close(dir_fd)
+
 
 # =============================================================================
 # Classes
@@ -534,11 +528,11 @@ class Patch:
         Socket file descriptor for connection to patch server
     """
 
-    _SERVER_IPV4 = '172.65.204.172'
-    _SERVER_IPV6 = '2606:4700:90:0:7976:9369:8e00:f737'
+    _SERVER_IPV4 = "172.65.204.172"
+    _SERVER_IPV6 = "2606:4700:90:0:7976:9369:8e00:f737"
     _PORT = 12995
     # use patch proto 4
-    _PROTO = b'\x01\x04'
+    _PROTO = b"\x01\x04"
 
     def __init__(self, master_server=_SERVER_IPV4, master_port=_PORT):
         """
@@ -593,16 +587,16 @@ class Patch:
             sock.send(Patch._PROTO)
             data = io.BytesIO(sock.recv(1024))
 
-            unknown = struct.unpack('B', data.read(1))[0]
-            blank = struct.unpack('33s', data.read(33))[0]
+            struct.unpack("B", data.read(1))[0]
+            struct.unpack("33s", data.read(33))[0]
 
-            url_length = struct.unpack('B', data.read(1))[0]
-            self.patch_url = data.read(url_length*2).decode('utf-16')
+            url_length = struct.unpack("B", data.read(1))[0]
+            self.patch_url = data.read(url_length * 2).decode("utf-16")
 
-            blank = struct.unpack('B', data.read(1))[0]
+            struct.unpack("B", data.read(1))[0]
 
-            url2_length = struct.unpack('B', data.read(1))[0]
-            self.patch_cdn_url = data.read(url2_length*2).decode('utf-16')
+            url2_length = struct.unpack("B", data.read(1))[0]
+            self.patch_cdn_url = data.read(url2_length * 2).decode("utf-16")
 
             # Close this later!
             self.sock_fd = sock.detach()
@@ -646,13 +640,13 @@ class Patch:
         elif dst_file:
             write_path = dst_file
         else:
-            raise ValueError('Either dst_dir or dst_file must be set')
+            raise ValueError("Either dst_dir or dst_file must be set")
 
         # Make any intermediate dirs to avoid errors
         os.makedirs(os.path.split(write_path)[0], exist_ok=True)
 
         # As per manual, writing should automatically find the optimal buffer
-        with open(write_path, mode='wb') as f:
+        with open(write_path, mode="wb") as f:
             f.write(self.download_raw(file_path))
 
     def download_raw(self, file_path):
@@ -681,12 +675,13 @@ class Patch:
                     url="%s%s" % (host, file_path),
                 ) as robj:
                     if robj.getcode() != 200:
-                        raise ValueError('HTTP response code: %s' % robj.getcode())
+                        raise ValueError("HTTP response code: %s" % robj.getcode())
                     return robj.read()
             except URLError as url_error:
                 # try alternate patch url if connection refused
-                if (not isinstance(url_error.reason, ConnectionRefusedError)
-                    or not index < len(hosts)):
+                if not isinstance(url_error.reason, ConnectionRefusedError) or not index < len(
+                    hosts
+                ):
                     raise url_error
 
     @property
@@ -702,7 +697,8 @@ class Patch:
             The first 3 digits match the public known versions, the last is
             internal scheme for the a/b/c patches and hotfixes.
         """
-        return self.patch_url.strip('/').rsplit('/', maxsplit=1)[-1]
+        return self.patch_url.strip("/").rsplit("/", maxsplit=1)[-1]
+
 
 class PatchFileList:
     """
@@ -813,8 +809,9 @@ class PatchFileList:
     directory : :class:`.DirectoryNodeExtended`
         Store patch file list data as :class:`PyPoE.poe.file.ggpk.DirectoryNode`
     """
-    _PROTO_PRE = b'\x03\x00'
-    _PROTO_HEADER2 = b'\x04\x00'
+
+    _PROTO_PRE = b"\x03\x00"
+    _PROTO_HEADER2 = b"\x04\x00"
 
     def __init__(self, patch, socket_timeout=1.0):
         """
@@ -838,7 +835,7 @@ class PatchFileList:
         self.directory = DirectoryNodeExtended(None, None, None)
 
         # Get the root filelist
-        self.update_filelist([''])
+        self.update_filelist([""])
 
     def __del__(self):
         """
@@ -880,8 +877,7 @@ class PatchFileList:
             # no single value should be long enough to be broken
             # over more than 1 TCP packet
             if recv_attempts > 1:
-                raise EOFError('Too many attempts to pull data'
-                               + ' when expecting more data')
+                raise EOFError("Too many attempts to pull data" + " when expecting more data")
             # Attempt to read length asked for
             data_read = data_stream.read(read_length)
             recv_attempts += 1
@@ -890,11 +886,9 @@ class PatchFileList:
                 # Check if there is more data waiting in the socket
                 # And that data waiting is not an empty TCP packet
                 sockets_ready = select.select([sock], [], [], 0)
-                if (len(sockets_ready) < 1
-                    or len(sock.recv(1, socket.MSG_PEEK)) < 1):
+                if len(sockets_ready) < 1 or len(sock.recv(1, socket.MSG_PEEK)) < 1:
                     # If there is no more data, something is wrong
-                    raise EOFError('Reached end of TCP stream'
-                                   + ' when expecting more data')
+                    raise EOFError("Reached end of TCP stream" + " when expecting more data")
                 # Otherwise, create a new data stream with
                 # all existing data + data pulled from socket
                 data_stream.seek(0)
@@ -918,14 +912,13 @@ class PatchFileList:
             extracted variable length string
         """
         # First bytes tells length of string
-        varchar_length = struct.unpack('B', self.read(1))[0]
+        varchar_length = struct.unpack("B", self.read(1))[0]
         # String encoded utf-16 is 2*string length bytes
         varchar_length_blob = varchar_length * 2
         # Sometimes (root), length is 0, string is empty
-        varchar_name = ''
+        varchar_name = ""
         if varchar_length > 0:
-            varchar_name = self.read(
-                varchar_length_blob).decode('utf-16')
+            varchar_name = self.read(varchar_length_blob).decode("utf-16")
         return varchar_name
 
     def update_filelist(self, folders):
@@ -962,33 +955,31 @@ class PatchFileList:
             If the patch server sends data not understood
         """
         if len(set(folders)) != len(folders):
-            raise ValueError('folder list contains non unique folder')
+            raise ValueError("folder list contains non unique folder")
 
-        folder_query = b''
+        folder_query = b""
         for folder in folders:
-            if folder == '':
+            if folder == "":
                 if len(folders) > 1:
-                    raise ValueError('if querying root,'
-                                     + 'only root allowed')
+                    raise ValueError("if querying root," + "only root allowed")
                 # query root folder (0 length folder name)
-                folder_query = (PatchFileList._PROTO_PRE
-                                + b'\x00')
+                folder_query = PatchFileList._PROTO_PRE + b"\x00"
             else:
                 # test if folder is known
                 try:
                     test_directory = self.directory[folder].record
                     if not isinstance(test_directory, DirectoryRecord):
-                        raise ValueError('Must only query folders.')
+                        raise ValueError("Must only query folders.")
                 except FileNotFoundError:
-                    raise ValueError('Queried folder unknown.'
-                                     + ' Must traverse patchserver'
-                                     + ' top (root) to bottom')
+                    raise ValueError(
+                        "Queried folder unknown."
+                        + " Must traverse patchserver"
+                        + " top (root) to bottom"
+                    )
 
-                query_folder_length = struct.pack('B', len(folder))
-                query_folder_name = folder.encode('utf-16le')
-                query_folder = (PatchFileList._PROTO_PRE
-                                + query_folder_length
-                                + query_folder_name)
+                query_folder_length = struct.pack("B", len(folder))
+                query_folder_name = folder.encode("utf-16le")
+                query_folder = PatchFileList._PROTO_PRE + query_folder_length + query_folder_name
                 folder_query += query_folder
 
         sock = self.sock
@@ -1001,63 +992,62 @@ class PatchFileList:
 
         for folder in folders:
             # patch proto 4 decode
-            query_header = struct.unpack('2s', self.read(2))[0]
-            query_folder_name = ''
-            folder_name = ''
+            query_header = struct.unpack("2s", self.read(2))[0]
+            query_folder_name = ""
+            folder_name = ""
             if query_header != PatchFileList._PROTO_HEADER2:
-                raise KeyError('Unknown patch server header:'
-                               + ' {} from query: {}'
-                               .format(query_header, folder_query))
+                raise KeyError(
+                    "Unknown patch server header:"
+                    + " {} from query: {}".format(query_header, folder_query)
+                )
 
             folder_name = self.extract_varchar()
 
-            item_count = struct.unpack('>I', self.read(4))[0]
+            item_count = struct.unpack(">I", self.read(4))[0]
 
-            print('{} items in directory {}'
-                  .format(item_count, folder_name))
+            print("{} items in directory {}".format(item_count, folder_name))
 
             parent = self.directory[folder]
 
             folder_directory_nodes = []
 
             for item in range(0, item_count):
-                header = struct.unpack('2s', self.read(2))[0]
-                if header == b'\x00\x00':
-                    tag = 'FILE'
-                elif header == b'\x01\x00':
-                    tag = 'PDIR'
+                header = struct.unpack("2s", self.read(2))[0]
+                if header == b"\x00\x00":
+                    tag = "FILE"
+                elif header == b"\x01\x00":
+                    tag = "PDIR"
                 else:
-                    raise KeyError('Unknown patch server'
-                                   + ' item type:'
-                                   + ' {} from query: {}'
-                                   .format(header, folder_query))
+                    raise KeyError(
+                        "Unknown patch server"
+                        + " item type:"
+                        + " {} from query: {}".format(header, folder_query)
+                    )
 
                 name = self.extract_varchar()
 
                 # 4 byte unsigned int item size in bytes
                 # 32 byte sha256 item checksum
-                size, sha256sum = struct.unpack(
-                    '>I32s', self.read(36))
+                size, sha256sum = struct.unpack(">I32s", self.read(36))
 
                 # store sha256sum as int
-                sha256sum = int.from_bytes(sha256sum, byteorder='big')
+                sha256sum = int.from_bytes(sha256sum, byteorder="big")
 
                 if tag == DirectoryRecord.tag:
-                    temp_record = VirtualDirectoryRecord(
-                        name=name,
-                        hash=sha256sum)
+                    temp_record = VirtualDirectoryRecord(name=name, hash=sha256sum)
                 elif tag == FileRecord.tag:
-                    temp_record = VirtualFileRecord(
-                        name=name,
-                        hash=sha256sum,
-                        size=size)
+                    temp_record = VirtualFileRecord(name=name, hash=sha256sum, size=size)
 
-                folder_directory_nodes.append(DirectoryNodeExtended(
-                    record=temp_record,
-                    hash=murmur2_32(name.lower().encode('utf-16le')),
-                    parent=parent))
+                folder_directory_nodes.append(
+                    DirectoryNodeExtended(
+                        record=temp_record,
+                        hash=murmur2_32(name.lower().encode("utf-16le")),
+                        parent=parent,
+                    )
+                )
 
             parent.children = folder_directory_nodes
+
 
 class BaseRecordData(ReprMixin):
     """
@@ -1076,20 +1066,22 @@ class BaseRecordData(ReprMixin):
     hash :  int
         SHA256 hash of file contents
     """
+
     def __init__(self, name, hash):
         self._name = name
         self.hash = hash
 
-class VirtualDirectoryRecord(BaseRecordData,
-                             DirectoryRecord):
+
+class VirtualDirectoryRecord(BaseRecordData, DirectoryRecord):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-class VirtualFileRecord(BaseRecordData,
-                        FileRecord):
+
+class VirtualFileRecord(BaseRecordData, FileRecord):
     def __init__(self, name, hash, size):
         self.data_length = size
         super().__init__(name, hash)
+
 
 class DirectoryNodeExtended(DirectoryNode):
     """
@@ -1100,6 +1092,7 @@ class DirectoryNodeExtended(DirectoryNode):
 
         :meth:`.gen_walk`
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -1139,24 +1132,23 @@ class DirectoryNodeExtended(DirectoryNode):
         record_dict = OrderedDict()
 
         if isinstance(self.record, BaseRecordData):
-            record_dict['name'] = self.record._name
+            record_dict["name"] = self.record._name
 
-            pretty_hash = format(self.record.hash, '064x')
-            record_dict['hash'] = pretty_hash
+            pretty_hash = format(self.record.hash, "064x")
+            record_dict["hash"] = pretty_hash
 
             if isinstance(self.record, VirtualDirectoryRecord):
-                record_dict['type'] = 'folder'
+                record_dict["type"] = "folder"
             elif isinstance(self.record, VirtualFileRecord):
-                record_dict['type'] = 'file'
-                record_dict['size'] = self.record.data_length
+                record_dict["type"] = "file"
+                record_dict["size"] = self.record.data_length
         else:
-            record_dict['name'] = 'ROOT'
-
+            record_dict["name"] = "ROOT"
 
         if recurse is True:
             if len(self.children) > 1:
                 children = []
-                record_dict['children'] = children
+                record_dict["children"] = children
 
                 for child in self.children:
                     children.append(child.get_dict())
@@ -1182,38 +1174,32 @@ class DirectoryNodeExtended(DirectoryNode):
 
         """
         if not isinstance(node_dict, OrderedDict):
-            raise TypeError('OrderedDict required')
+            raise TypeError("OrderedDict required")
 
         node_children = []
 
-        node_name = node_dict['name']
-        if node_name == 'ROOT':
+        node_name = node_dict["name"]
+        if node_name == "ROOT":
             temp_record = None
             node_hash = None
         else:
-            node_type = node_dict['type']
+            node_type = node_dict["type"]
 
             # unpretty hash. str hex bytes -> bytes
-            pretty_hash = node_dict['hash']
+            pretty_hash = node_dict["hash"]
             # store sha256sum as int
             node_hash = int(pretty_hash, 16)
 
-            if node_type == 'file':
-                node_file_size = node_dict['size']
+            if node_type == "file":
+                node_file_size = node_dict["size"]
 
-                temp_record = VirtualFileRecord(
-                    name=node_name,
-                    hash=node_hash,
-                    size=node_file_size)
+                temp_record = VirtualFileRecord(name=node_name, hash=node_hash, size=node_file_size)
 
-            elif node_type == 'folder':
-                temp_record = VirtualDirectoryRecord(
-                    name=node_name,
-                    hash=node_hash)
+            elif node_type == "folder":
+                temp_record = VirtualDirectoryRecord(name=node_name, hash=node_hash)
 
             else:
-                raise KeyError('Unknown type: {}'.format(
-                    node_type))
+                raise KeyError("Unknown type: {}".format(node_type))
 
         if parent is None:
             self.record = temp_record
@@ -1221,14 +1207,11 @@ class DirectoryNodeExtended(DirectoryNode):
             self.parent = None
             child_node = self
         else:
-            child_node = DirectoryNodeExtended(
-                record=temp_record,
-                hash=node_name,
-                parent=parent)
+            child_node = DirectoryNodeExtended(record=temp_record, hash=node_name, parent=parent)
             parent.children.append(child_node)
 
         try:
-            node_children = node_dict['children']
+            node_children = node_dict["children"]
             if node_children:
                 for child in node_children:
                     child_node.load_dict(child, child_node)
@@ -1260,11 +1243,11 @@ class DirectoryNodeExtended(DirectoryNode):
             (:class:`.DirectoryNodeExtended`, depth)
         """
         # only continue if not past maximum depth
-        if (max_depth == -1 or _depth <= max_depth):
+        if max_depth == -1 or _depth <= max_depth:
             yield (self, _depth)
             _depth += 1
             # don't recurse it that goes over max_depth
-            if (max_depth == -1 or _depth <= max_depth):
+            if max_depth == -1 or _depth <= max_depth:
                 # depth first
                 for child in self.children:
                     yield from child.gen_walk(max_depth, _depth)

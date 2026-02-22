@@ -29,9 +29,10 @@ See PyPoE/LICENSE
 # Imports
 # =============================================================================
 
+import os
+
 # Python
 import sys
-import os
 import time
 
 # 3rd-party
@@ -45,7 +46,7 @@ from PyPoE.ui.shared.settings import SettingsWindow
 # Globals
 # =============================================================================
 
-__all__ = ['SharedMainWindow', 'main']
+__all__ = ["SharedMainWindow", "main"]
 
 # =============================================================================
 # Classes
@@ -113,10 +114,10 @@ def main(maincls, *args, **kwargs):
         Class to instantiate with the given arguments and keywords
     """
     translator = QTranslator()
-    translator.load('i18n/en_US')
+    translator.load("i18n/en_US")
 
     app = QApplication(sys.argv)
-    app.setOrganizationName('PyPoE')
+    app.setOrganizationName("PyPoE")
     app.installTranslator(translator)
 
     maininst = maincls(*args, **kwargs)

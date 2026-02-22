@@ -28,13 +28,15 @@ Documentation
 .. autoclass:: PoEPath
     :special-members: __init__
 """
+
 # =============================================================================
 # Imports
 # =============================================================================
 
+import os
+
 # Python
 import sys
-import os
 
 try:
     import winreg
@@ -42,13 +44,13 @@ except ImportError:
     winreg = None
 
 # self
-from PyPoE.poe.constants import VERSION, DISTRIBUTOR
+from PyPoE.poe import constants
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-__all__ = ['PoEPath']
+__all__ = ["PoEPath"]
 
 # =============================================================================
 # Classes
@@ -63,6 +65,7 @@ class PoEPathList(list):
     used just like a regular list.
     It addition it performs existence checks on the items added by default.
     """
+
     def __init__(self, only_existing=True):
         self._only_existing = True
 
@@ -108,7 +111,9 @@ class PoEPath:
         official Path of Exile client on Linux.
     """
 
-    def __init__(self, version=VERSION.DEFAULT, distributor=DISTRIBUTOR.DEFAULT):
+    def __init__(
+        self, version=constants.VERSION.DEFAULT, distributor=constants.DISTRIBUTOR.DEFAULT
+    ):
         """
         Change the version or distributor if you only watch to search for
         specific installations.
@@ -156,42 +161,37 @@ class PoEPath:
         paths = PoEPathList(only_existing)
 
         # Currently PoE only runs on windows
-        if sys.platform != 'win32':
+        if sys.platform != "win32":
             return paths
 
         # TODO: Possibly find a way to reduce this spaghetti like code
-        if self.distributor & DISTRIBUTOR.GGG:
+        if self.distributor & constants.DISTRIBUTOR.GGG:
             for item in (
-                (r'Software\GrindingGearGames\Path of Exile', VERSION.STABLE),
-                (r'Software\GrindingGearGames\Path of Exile - beta', VERSION.BETA),
-                (r'Software\GrindingGearGames\Path of Exile - Alpha',
-                 VERSION.ALPHA)
+                (r"Software\GrindingGearGames\Path of Exile", constants.VERSION.STABLE),
+                (r"Software\GrindingGearGames\Path of Exile - beta", constants.VERSION.BETA),
+                (r"Software\GrindingGearGames\Path of Exile - Alpha", constants.VERSION.ALPHA),
             ):
                 if self.version & item[1]:
-                    basepath =  self._get_winreg_path(item[0], 'InstallLocation')
-                    paths.append(basepath, item[1], DISTRIBUTOR.GGG)
+                    basepath = self._get_winreg_path(item[0], "InstallLocation")
+                    paths.append(basepath, item[1], constants.DISTRIBUTOR.GGG)
 
-        if self.distributor & DISTRIBUTOR.STEAM:
-            basepath = self._get_winreg_path(r'Software\Valve\Steam',
-                                             'SteamPath')
+        if self.distributor & constants.DISTRIBUTOR.STEAM:
+            basepath = self._get_winreg_path(r"Software\Valve\Steam", "SteamPath")
             # Steam does have a beta, but it is installed into the same directory
             # AFAIK, there is no safe way to determine which is installed
             # unless we hook into steam
-            if basepath and self.version ^ VERSION.ALL:
+            if basepath and self.version ^ constants.VERSION.ALL:
                 # Steam Common folder
-                basepath = os.path.join(basepath, 'SteamApps', 'common')
+                basepath = os.path.join(basepath, "SteamApps", "common")
                 # Seems to be both beta, and live folder
-                basepath = os.path.join(basepath, 'Path of Exile')
-                paths.append(basepath, VERSION.ALL, DISTRIBUTOR.STEAM)
+                basepath = os.path.join(basepath, "Path of Exile")
+                paths.append(basepath, constants.VERSION.ALL, constants.DISTRIBUTOR.STEAM)
 
-        if self.distributor & DISTRIBUTOR.GARENA:
-            if self.version & VERSION.STABLE:
+        if self.distributor & constants.DISTRIBUTOR.GARENA:
+            if self.version & constants.VERSION.STABLE:
                 basepath = self._get_winreg_path(
-                    r'SOFTWARE\Wow6432Node\Garena\PoE',
-                    'Path',
-                    user=False
+                    r"SOFTWARE\Wow6432Node\Garena\PoE", "Path", user=False
                 )
-                paths.append(basepath, VERSION.STABLE, DISTRIBUTOR.GARENA)
-
+                paths.append(basepath, constants.VERSION.STABLE, constants.DISTRIBUTOR.GARENA)
 
         return paths

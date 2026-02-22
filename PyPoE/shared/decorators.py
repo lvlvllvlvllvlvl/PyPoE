@@ -41,7 +41,7 @@ import warnings
 # Globals
 # =============================================================================
 
-__all__ = ['deprecated', 'doc']
+__all__ = ["deprecated", "doc"]
 
 
 # =============================================================================
@@ -57,9 +57,9 @@ class DeprecationDecorator:
     function call and also adds the DEPRECATED
 
     """
-    _default_message = 'Use of {func} is deprecated and will be removed in' \
-                       ' PyPoE {version}'
-    _default_doc_message = 'DEPRECATED. Will be removed in PyPoE {version}'
+
+    _default_message = "Use of {func} is deprecated and will be removed in PyPoE {version}"
+    _default_doc_message = "DEPRECATED. Will be removed in PyPoE {version}"
 
     def __init__(self, message=None, doc_message=None, version=None):
         """
@@ -82,29 +82,27 @@ class DeprecationDecorator:
         """
         self.message = message or self._default_message
         self.doc_message = doc_message or self._default_doc_message
-        self.version = version or 'unknown version'
+        self.version = version or "unknown version"
 
     def __call__(self, function):
         message_kwargs = {
-            'version': self.version,
+            "version": self.version,
         }
 
-        if hasattr(function, '__func__'):
+        if hasattr(function, "__func__"):
             function = function.__func__
 
         if function.__doc__ is None:
             function.__doc__ = self.doc_message.format(**message_kwargs)
         else:
-            function.__doc__ = self.doc_message.format(**message_kwargs) + \
-                               '\n' + function.__doc__
+            function.__doc__ = self.doc_message.format(**message_kwargs) + "\n" + function.__doc__
 
         @functools.wraps(function)
         def deprecated_function(*args, **kwargs):
             warnings.warn(
-                self.message.format(
-                    func=function.__name__,
-                    **message_kwargs
-                ), DeprecationWarning, stacklevel=2,
+                self.message.format(func=function.__name__, **message_kwargs),
+                DeprecationWarning,
+                stacklevel=2,
             )
 
             return function(*args, **kwargs)
@@ -140,13 +138,13 @@ class DocStringDecorator:
 
     def _get_str(self, obj):
         if obj is None:
-            return ''
+            return ""
         elif isinstance(obj, str):
             return obj
         elif obj.__doc__:
             return obj.__doc__
         else:
-            return ''
+            return ""
 
     def __call__(self, object):
         if self.doc is None:
@@ -156,8 +154,8 @@ class DocStringDecorator:
 
         docs = self.prepend + docs + self.append
 
-        if docs != '':
-            if hasattr(object, '__func__'):
+        if docs != "":
+            if hasattr(object, "__func__"):
                 object.__func__.__doc__ = docs
             else:
                 object.__doc__ = docs

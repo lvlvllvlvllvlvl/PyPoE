@@ -31,10 +31,10 @@ See PyPoE/LICENSE
 
 # Python
 import os
+from tempfile import TemporaryDirectory
 
 # 3rd-party
 import pytest
-from tempfile import TemporaryDirectory
 
 # self
 from PyPoE.poe.file import idt
@@ -44,34 +44,35 @@ from PyPoE.poe.file import idt
 # =============================================================================
 
 cur_dir = os.path.split(os.path.realpath(__file__))[0]
-idl_path = os.path.join(cur_dir, '_data', 'test.idt')
+idl_path = os.path.join(cur_dir, "_data", "test.idt")
 
 # =============================================================================
 # Fixtures
 # =============================================================================
 
 data = {
-    'version': 1,
-    'image': 'Art/2DItems/Test.dds',
-    'records': [
+    "version": 1,
+    "image": "Art/2DItems/Test.dds",
+    "records": [
         {
-            'name': 'Blade',
-            'records': [
-                {'x': 1, 'y': 1},
-                {'x': 2, 'y': 2},
+            "name": "Blade",
+            "records": [
+                {"x": 1, "y": 1},
+                {"x": 2, "y": 2},
             ],
         },
         {
-            'name': 'Handle',
-            'records': [
-                {'x': 1, 'y': 1},
-                {'x': 2, 'y': 2},
-                {'x': 3, 'y': 3},
-                {'x': 4, 'y': 4},
+            "name": "Handle",
+            "records": [
+                {"x": 1, "y": 1},
+                {"x": 2, "y": 2},
+                {"x": 3, "y": 3},
+                {"x": 4, "y": 4},
             ],
         },
     ],
 }
+
 
 @pytest.fixture
 def idt_file():
@@ -82,16 +83,16 @@ def idt_file():
 # Tests
 # =============================================================================
 
-class TestIDLFile:
 
+class TestIDLFile:
     def eq(self, idt_file):
-        assert idt_file.version == data['version']
-        assert idt_file.image == data['image']
-        for i, tex in enumerate(data['records']):
-            assert idt_file.records[i].name == tex['name']
-            for j, coord in enumerate(tex['records']):
-                assert idt_file.records[i].records[j].x == coord['x']
-                assert idt_file.records[i].records[j].y == coord['y']
+        assert idt_file.version == data["version"]
+        assert idt_file.image == data["image"]
+        for i, tex in enumerate(data["records"]):
+            assert idt_file.records[i].name == tex["name"]
+            for j, coord in enumerate(tex["records"]):
+                assert idt_file.records[i].records[j].x == coord["x"]
+                assert idt_file.records[i].records[j].y == coord["y"]
 
     def test_init(self, idt_file):
         self.eq(idt_file)
@@ -106,11 +107,8 @@ class TestIDLFile:
         idt_file2 = idt.IDTFile()
 
         with TemporaryDirectory() as d:
-            tmp_path = os.path.join(d, 'test_write.idt')
+            tmp_path = os.path.join(d, "test_write.idt")
             idt_file.write(tmp_path)
             idt_file2.read(tmp_path)
 
             self.eq(idt_file2)
-
-
-

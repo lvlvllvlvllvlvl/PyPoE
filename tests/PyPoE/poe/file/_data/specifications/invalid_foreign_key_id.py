@@ -31,25 +31,26 @@ See PyPoE/LICENSE
 # 3rd-party
 
 # self
-from PyPoE.poe.file.specification.fields import *
+from PyPoE.poe.file.specification.fields import Field, File, Specification
 
 # =============================================================================
 # Globals
 # =============================================================================
 
-specification = Specification({
-    'Main.dat': File(
-        fields=(
-            Field(
-                name='ForeignKey',
-                type='int',
-                key='Other.dat',
-                key_id='Missing',
+specification = Specification(
+    {
+        "Main.dat": File(
+            fields=(
+                Field(
+                    name="ForeignKey",
+                    type="int",
+                    key="Other.dat",
+                    key_id="Missing",
+                ),
             ),
         ),
-    ),
-    'Other.dat': File(
-        fields=(
+        "Other.dat": File(
+            fields=(),
         ),
-    ),
-})
+    }
+)

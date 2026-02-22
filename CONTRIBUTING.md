@@ -5,23 +5,19 @@ If you have any questions - please message on the [#tools-dev](https://discord.g
 
 ## How does the branching model work?
 
-We have two main branches - `dev` and `patches`. Below is a non-exhaustive explanation on how they work.
+!!!IMPORTANT!!! -- DO NOT forget to perform a `git pull` before branching to ensure you have the latest code!
 
-This is the branching model:
+Simply put, you branch off from `dev` by using branch names like:
 
-<img src="branching_diag.jpg"/>
+- `feature/my-branch-name`
+- `bugfix/my-bugfix-name`
+- `patch/my-patch-name`
 
-### DEV
+And then raise a PR ensuring that your target branch for the merge is our fork's `dev` branch.
 
-This branch is here for generic improvements/enhancements/bugfixes that are not related to anything that touches the schema or mappers for `dat` files. So if you are looking to add general fixups or some new code that helps PyPoE run better, more efficiently or solves some annoying bug, any pull requests should be raised with `dev` as the target branch.
+## Merges, Reviews, Etc..
 
-Please avoid mixing schema work into dev as dev later gets merged into patches at key milestones, and any such changes could conflict with other people's schema changes.
-
-### PATCHES
-
-The `patches` branch is there so you could commit any schema/mapper work related to PyPoE, these are blocks of code that help PyPoE infer the `dat` file data and structure, and have nothing to do with the I/O or general processing section of this repo (those live in `dev`).
-
-When committing to `patches` please make sure you do not cross-contaminate it with generic fixes or bugfixes that don't relate to schema work as those should go into dev.
+Once your PR is up, assign a reviewer (ask us on discord and post your PR link). Once it is approved, we will merge the work into the `dev` branch. Once work has completed for a given PoE game version, it will be tagged as a release.
 
 ## Releases
 

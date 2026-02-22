@@ -40,7 +40,7 @@ from PyPoE.cli.exporter.dat.parsers.json import JSONExportHandler
 # Globals
 # =============================================================================
 
-__all__ = ['DatHandler']
+__all__ = ["DatHandler"]
 
 # =============================================================================
 # Classes
@@ -52,19 +52,21 @@ class DatHandler:
 
     :type sql: argparse.ArgumentParser
     """
+
     def __init__(self, sub_parser):
         """
 
         :type sub_parser: argparse._SubParsersAction
         """
         parser = sub_parser.add_parser(
-            'dat',
-            help='.dat export',
+            "dat",
+            help=".dat export",
         )
         parser.set_defaults(func=lambda args: parser.print_help())
 
-        sub = parser.add_subparsers(help='Export type')
+        sub = parser.add_subparsers(help="Export type")
         JSONExportHandler(sub)
+
 
 # =============================================================================
 # Functions

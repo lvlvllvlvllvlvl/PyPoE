@@ -41,7 +41,7 @@ from PySide2.QtWidgets import *
 # Globals
 # =============================================================================
 
-__all__ = ['TableContextReadOnlyMenu']
+__all__ = ["TableContextReadOnlyMenu"]
 
 # =============================================================================
 # Classes
@@ -78,17 +78,19 @@ class TableContextReadOnlyMenu(QMenu):
             cmax = max(cmax, cid)
 
         # +1 to offset for the minimum size
-        matrix = [[None for j in range(0, cmax-cmin+1)] for i in range(0, rmax-rmin+1)]
+        matrix = [[None for j in range(0, cmax - cmin + 1)] for i in range(0, rmax - rmin + 1)]
 
         for qmodelindex in qmodelindexlist:
-            matrix[qmodelindex.row()-rmin][qmodelindex.column()-cmin] = self._handle_data(qmodelindex.data())
+            matrix[qmodelindex.row() - rmin][qmodelindex.column() - cmin] = self._handle_data(
+                qmodelindex.data()
+            )
 
         # Transform the matrix into a string
         out = []
         for row in matrix:
-            out.append('\t'.join(['' if cell is None else cell for cell in row]))
+            out.append("\t".join(["" if cell is None else cell for cell in row]))
 
-        QApplication.clipboard().setText('\n'.join(out))
+        QApplication.clipboard().setText("\n".join(out))
 
     def popup(self, point, *args, **kwargs):
         self.point = point

@@ -52,8 +52,8 @@ __all__ = []
 # =============================================================================
 
 classes = {
-    'fields': 'Field',
-    'virtual_fields': 'VirtualField',
+    "fields": "Field",
+    "virtual_fields": "VirtualField",
 }
 
 
@@ -65,7 +65,7 @@ def convert_spec(inpath, outpath):
     def add_comments(comments, indent):
         if comments:
             for comment in comments:
-                out.append(" "*indent + comment.strip())
+                out.append(" " * indent + comment.strip())
 
     for file_key in spec:
         file = spec[file_key]
@@ -75,30 +75,49 @@ def convert_spec(inpath, outpath):
         for subsection_key in file:
             subsection = file[subsection_key]
             add_comments(file.comments[subsection_key], 8)
-            out.append(" "*8 + "%s=OrderedDict((" % subsection_key)
+            out.append(" " * 8 + "%s=OrderedDict((" % subsection_key)
             for field_key in subsection:
                 field = subsection[field_key]
                 add_comments(subsection.comments[field_key], 12)
 
                 class_name = classes[subsection_key]
-                out.append(" "*12 + "('%s', %s(" % (field_key, class_name))
+                out.append(" " * 12 + "('%s', %s(" % (field_key, class_name))
                 for key, value in field.items():
                     add_comments(field.comments[key], 16)
-                    if key in ('type', 'key', 'key_id', 'enum', 'file_ext', 'display', 'display_type', 'description'):
+                    if key in (
+                        "type",
+                        "key",
+                        "key_id",
+                        "enum",
+                        "file_ext",
+                        "display",
+                        "display_type",
+                        "description",
+                    ):
                         if isinstance(value, list):
-                            value = ', '.join(value)
-                        value = value.replace('\n', '').replace("'", '"')
+                            value = ", ".join(value)
+                        value = value.replace("\n", "").replace("'", '"')
                         value = "'%s'" % value
-                    elif key == 'fields':
+                    elif key == "fields":
                         value = "('" + "', '".join(value) + "')"
-                    out.append(" "*16 + "%s=%s,%s" % (key, value, field.inline_comments[key] if field.inline_comments[key] else ''))
-                out.append(" "*12 + ")),")
-            out.append(" "*8 + ")),")
-        out.append(" "*4 + "),")
+                    out.append(
+                        " " * 16
+                        + "%s=%s,%s"
+                        % (
+                            key,
+                            value,
+                            field.inline_comments[key] if field.inline_comments[key] else "",
+                        )
+                    )
+                out.append(" " * 12 + ")),")
+            out.append(" " * 8 + ")),")
+        out.append(" " * 4 + "),")
 
     out.append("})")
-    out.append('')
-    out.insert(0, '''"""Overview
+    out.append("")
+    out.insert(
+        0,
+        '''"""Overview
 ===============================================================================
 
 +----------+------------------------------------------------------------------+
@@ -133,19 +152,21 @@ from collections import OrderedDict
 # 3rd-party
 
 # self
-from PyPoE.poe.file.specification.fields import *
+from PyPoE.poe.file.specification.fields import Field, File, Specification, VirtualField
 
 # =============================================================================
 # Globals
 # =============================================================================
-''')
+''',
+    )
 
-    with open(outpath, 'w') as f:
-        f.write('\n'.join(out))
+    with open(outpath, "w") as f:
+        f.write("\n".join(out))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import os
-    path = r'C:\Code\Scripts\PoE\PyPoE\tests\PyPoE\poe\file\_data\specifications'
+
+    path = r"C:\Code\Scripts\PoE\PyPoE\tests\PyPoE\poe\file\_data\specifications"
     for fn in os.listdir(path):
-        convert_spec(os.path.join(path, fn), os.path.join('C:/', fn.replace('.ini', '.py')))
+        convert_spec(os.path.join(path, fn), os.path.join("C:/", fn.replace(".ini", ".py")))

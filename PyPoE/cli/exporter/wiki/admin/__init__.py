@@ -36,4 +36,4 @@ from PyPoE.cli.exporter.wiki.admin.unique import UniqueCommandHandler
 
 ADMIN_HANDLERS = [UniqueCommandHandler]
 
-__all__ = ['ADMIN_HANDLERS']
+__all__ = ["ADMIN_HANDLERS"]

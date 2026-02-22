@@ -26,7 +26,6 @@ Agreement
 See PyPoE/LICENSE
 """
 
-
 # =============================================================================
 # Imports
 # =============================================================================
@@ -39,7 +38,6 @@ from importlib import import_module
 # self
 from PyPoE.cli.exporter.wiki.handler import ExporterHandler
 
-
 # =============================================================================
 # Globals
 # =============================================================================
@@ -47,7 +45,7 @@ from PyPoE.cli.exporter.wiki.handler import ExporterHandler
 
 WIKI_HANDLERS = []
 
-__all__ = ['WIKI_HANDLERS']
+__all__ = ["WIKI_HANDLERS"]
 
 
 # =============================================================================
@@ -58,15 +56,15 @@ __all__ = ['WIKI_HANDLERS']
 def _load():
     cur_dir = os.path.split(os.path.realpath(__file__))[0]
     for file_name in os.listdir(cur_dir):
-        if file_name.startswith('_'):
+        if file_name.startswith("_"):
             continue
-        file_name = file_name.replace('.py', '')
-        imp = import_module('.' + file_name, __package__)
+        file_name = file_name.replace(".py", "")
+        imp = import_module("." + file_name, __package__)
         for obj_name in dir(imp):
-            if obj_name.startswith('_'):
+            if obj_name.startswith("_"):
                 continue
 
-            if not obj_name.endswith('Handler'):
+            if not obj_name.endswith("Handler"):
                 continue
 
             obj = getattr(imp, obj_name)

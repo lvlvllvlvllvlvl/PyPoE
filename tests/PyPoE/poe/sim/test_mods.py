@@ -51,18 +51,17 @@ from PyPoE.poe.sim import mods
 
 class DatRecordOverride(DatRecord):
     keys = {
-        'Id': '',
-        'Level': 1,
-        'Domain': 0,
-        'GenerationType': 0,
-        'CorrectGroup': '',
-        'TagsKeys': [],
-        'SpawnWeight_TagsKeys': [{'Id': 'default'}],
-        'SpawnWeight_Values': [1000],
+        "Id": "",
+        "Level": 1,
+        "Domain": 0,
+        "GenerationType": 0,
+        "CorrectGroup": "",
+        "TagsKeys": [],
+        "SpawnWeight_TagsKeys": [{"Id": "default"}],
+        "SpawnWeight_Values": [1000],
     }
 
     def __init__(self, **kwargs):
-
         self.data = {}
 
         self.data.update(self.keys)
@@ -70,6 +69,7 @@ class DatRecordOverride(DatRecord):
 
     def __getitem__(self, item):
         return self.data[item]
+
 
 # =============================================================================
 # Fixtures
@@ -83,89 +83,90 @@ class DatRecordOverride(DatRecord):
 class TestGetModFromId:
     mod_list = [
         DatRecordOverride(
-            Id='0',
+            Id="0",
         ),
     ]
+
     def test(self):
-        assert self.mod_list[0] == mods.get_mod_from_id('0', self.mod_list)
-        assert None == mods.get_mod_from_id('does_not_exist', self.mod_list)
+        assert self.mod_list[0] == mods.get_mod_from_id("0", self.mod_list)
+        assert mods.get_mod_from_id("does_not_exist", self.mod_list) is None
 
 
 class TestGetSpawnChanceCalculator:
     mod_list = [
         DatRecordOverride(
-            Id='0',
-            CorrectGroup='A',
+            Id="0",
+            CorrectGroup="A",
             Domain=MOD_DOMAIN.ITEM.value,
             GenerationTYpe=MOD_GENERATION_TYPE.PREFIX.value,
         ),
         DatRecordOverride(
-            Id='1',
-            CorrectGroup='A',
+            Id="1",
+            CorrectGroup="A",
             Domain=MOD_DOMAIN.ITEM.value,
             GenerationTYpe=MOD_GENERATION_TYPE.PREFIX.value,
         ),
         DatRecordOverride(
-            Id='2',
-            CorrectGroup='A',
+            Id="2",
+            CorrectGroup="A",
             Domain=MOD_DOMAIN.ITEM.value,
             GenerationTYpe=MOD_GENERATION_TYPE.PREFIX.value,
         ),
         DatRecordOverride(
-            Id='3',
-            CorrectGroup='B',
+            Id="3",
+            CorrectGroup="B",
             Domain=MOD_DOMAIN.ITEM.value,
             GenerationTYpe=MOD_GENERATION_TYPE.PREFIX.value,
         ),
         DatRecordOverride(
-            Id='4',
-            CorrectGroup='B',
+            Id="4",
+            CorrectGroup="B",
             Domain=MOD_DOMAIN.ITEM.value,
             GenerationTYpe=MOD_GENERATION_TYPE.PREFIX.value,
             SpawnWeight_TagsKeys=[
-                {'Id': 'nope'},
-                {'Id': 'half'},
-                {'Id': 'default'},
+                {"Id": "nope"},
+                {"Id": "half"},
+                {"Id": "default"},
             ],
             SpawnWeight_Values=[
                 0,
                 500,
                 1000,
-            ]
+            ],
         ),
     ]
 
     @pytest.fixture
     def scc(self):
         return {
-            'nope': mods.SpawnChanceCalculator(self.mod_list, tags=['default', 'nope']),
-            'half': mods.SpawnChanceCalculator(self.mod_list, tags=['default', 'half']),
-            'default': mods.SpawnChanceCalculator(self.mod_list, tags=['default']),
+            "nope": mods.SpawnChanceCalculator(self.mod_list, tags=["default", "nope"]),
+            "half": mods.SpawnChanceCalculator(self.mod_list, tags=["default", "half"]),
+            "default": mods.SpawnChanceCalculator(self.mod_list, tags=["default"]),
         }
 
     def test_total_weight(self, scc):
-        assert 5000 == scc['default'].get_total_spawn_weight()
-        assert 4500 == scc['half'].get_total_spawn_weight()
-        assert 4000 == scc['nope'].get_total_spawn_weight()
+        assert 5000 == scc["default"].get_total_spawn_weight()
+        assert 4500 == scc["half"].get_total_spawn_weight()
+        assert 4000 == scc["nope"].get_total_spawn_weight()
 
     def test_spawn_chance_no_remove(self, scc):
-        assert 1000/5000 == scc['default'].spawn_chance('0', remove=False)
-        assert 1000/4500 == scc['half'].spawn_chance('0', remove=False)
-        assert 500/4500 == scc['half'].spawn_chance('4', remove=False)
+        assert 1000 / 5000 == scc["default"].spawn_chance("0", remove=False)
+        assert 1000 / 4500 == scc["half"].spawn_chance("0", remove=False)
+        assert 500 / 4500 == scc["half"].spawn_chance("4", remove=False)
 
     def test_spawn_chance_remove(self, scc):
-        assert 1000/5000 == scc['default'].spawn_chance('0', remove=True)
-        assert 1000/2000 == scc['default'].spawn_chance('3', remove=True)
-        assert 0 == scc['default'].spawn_chance('0', remove=False)
+        assert 1000 / 5000 == scc["default"].spawn_chance("0", remove=True)
+        assert 1000 / 2000 == scc["default"].spawn_chance("3", remove=True)
+        assert 0 == scc["default"].spawn_chance("0", remove=False)
 
 
 class TestGetSpawnWeight:
     data = DatRecordOverride(
         SpawnWeight_TagsKeys=[
-            {'Id': 'a'},
-            {'Id': 'b'},
-            {'Id': 'c'},
-            {'Id': 'default'},
+            {"Id": "a"},
+            {"Id": "b"},
+            {"Id": "c"},
+            {"Id": "default"},
         ],
         SpawnWeight_Values=[
             1,
@@ -174,67 +175,77 @@ class TestGetSpawnWeight:
             1000,
         ],
     )
-    
+
     def test_basic(self):
-        assert 1000 == mods.get_spawn_weight(self.data, ['default', ])
-        assert 1 == mods.get_spawn_weight(self.data, ['a', ])
+        assert 1000 == mods.get_spawn_weight(
+            self.data,
+            [
+                "default",
+            ],
+        )
+        assert 1 == mods.get_spawn_weight(
+            self.data,
+            [
+                "a",
+            ],
+        )
 
     def test_order(self):
-        assert 1 == mods.get_spawn_weight(self.data, ['a', 'default'])
-        assert 1 == mods.get_spawn_weight(self.data, ['default', 'a'])
-        assert 2 == mods.get_spawn_weight(self.data, ['b', 'c', 'default'])
+        assert 1 == mods.get_spawn_weight(self.data, ["a", "default"])
+        assert 1 == mods.get_spawn_weight(self.data, ["default", "a"])
+        assert 2 == mods.get_spawn_weight(self.data, ["b", "c", "default"])
 
 
 class TestGenerateSpawnableModList:
     mod_list = [
         DatRecordOverride(
-            Id='0',
-            CorrectGroup='0',
+            Id="0",
+            CorrectGroup="0",
             Domain=MOD_DOMAIN.ITEM.value,
             GenerationTYpe=MOD_GENERATION_TYPE.PREFIX.value,
         ),
         DatRecordOverride(
-            Id='1',
-            CorrectGroup='1',
+            Id="1",
+            CorrectGroup="1",
             Domain=MOD_DOMAIN.ITEM.value,
             GenerationTYpe=MOD_GENERATION_TYPE.SUFFIX.value,
         ),
         DatRecordOverride(
-            Id='2',
-            CorrectGroup='2',
+            Id="2",
+            CorrectGroup="2",
             Level=50,
             Domain=MOD_DOMAIN.ITEM.value,
             GenerationTYpe=MOD_GENERATION_TYPE.PREFIX.value,
         ),
         # should never appear in any of the lists
         DatRecordOverride(
-            Id='3',
-            CorrectGroup='3',
+            Id="3",
+            CorrectGroup="3",
             Domain=MOD_DOMAIN.ITEM.value,
             GenerationTYpe=MOD_GENERATION_TYPE.SUFFIX.value,
             SpawnWeight_Values=[0],
         ),
         # Should not appear unless specifically asked for
         DatRecordOverride(
-            Id='4',
-            CorrectGroup='4',
+            Id="4",
+            CorrectGroup="4",
             Domain=MOD_DOMAIN.ITEM.value,
             GenerationTYpe=MOD_GENERATION_TYPE.SUFFIX.value,
-            SpawnWeight_TagsKeys=[{'Id': 'different'}],
+            SpawnWeight_TagsKeys=[{"Id": "different"}],
         ),
     ]
-    
+
     def test_domain_and_generation_type(self):
         assert [] == mods.generate_spawnable_mod_list(
             self.mod_list,
             domain=MOD_DOMAIN.AREA,
             generation_type=MOD_GENERATION_TYPE.PREFIX,
-        ), 'Got a list for something should not match anything'
+        ), "Got a list for something should not match anything"
         assert self.mod_list[1] == mods.generate_spawnable_mod_list(
             self.mod_list,
             domain=MOD_DOMAIN.ITEM,
             generation_type=MOD_GENERATION_TYPE.SUFFIX,
-        ), 'Should have found only one match'
+        ), "Should have found only one match"
 
     def test_level(self):
         assert self.mod_list[2] == mods.generate_spawnable_mod_list(
@@ -242,12 +253,12 @@ class TestGenerateSpawnableModList:
             domain=MOD_DOMAIN.ITEM,
             generation_type=MOD_GENERATION_TYPE.PREFIX,
             level=30,
-        ), 'Should have found only one match'
+        ), "Should have found only one match"
 
     def test_tags(self):
         assert [] == mods.generate_spawnable_mod_list(
             self.mod_list,
             domain=MOD_DOMAIN.AREA,
             generation_type=MOD_GENERATION_TYPE.PREFIX,
-            tags=['different'],
-        ), 'Should have found only one match'
+            tags=["different"],
+        ), "Should have found only one match"
