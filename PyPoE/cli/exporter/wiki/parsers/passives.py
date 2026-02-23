@@ -138,13 +138,6 @@ class PassiveSkillParser(parser.BaseParser):
             },
         ),
         (
-            "PassiveSkillGraphId",
-            {
-                "template": "int_id",
-                "format": normalize,
-            },
-        ),
-        (
             "Name",
             {
                 "template": "name",
@@ -601,8 +594,6 @@ class AlternatePassiveSkillParser(parser.BaseParser):
                     data["is_keystone"] = True
                 elif passive["PassiveType"][i] == 3:
                     data["is_notable"] = True
-
-            data["int_id"] = 0
 
             # Handle icon paths
             if passive["DDSIcon"]:
