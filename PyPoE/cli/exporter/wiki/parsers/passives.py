@@ -114,9 +114,6 @@ class PassiveSkillCommandHandler(ExporterHandler):
         )
 
 
-CLASS_PASSIVES = [f"AscendancySpecialEldritch{i}" for i in range(1, 6)] + ["AscendancyTrickster14"]
-
-
 class PassiveSkillParser(parser.BaseParser):
     _files = [
         "PassiveSkills.datc64",
@@ -180,15 +177,6 @@ class PassiveSkillParser(parser.BaseParser):
             {
                 "template": "ascendancy_class",
                 "format": lambda value: value["Name"],
-            },
-        ),
-        (
-            # Overwrite ascendancy class with character class for forbidden-jewel-only passives
-            "AscendancyKey",
-            {
-                "template": "ascendancy_class",
-                "format": lambda value: value["CharactersKey"]["Name"],
-                "condition": lambda passive: passive["Id"] in CLASS_PASSIVES,
             },
         ),
         (
