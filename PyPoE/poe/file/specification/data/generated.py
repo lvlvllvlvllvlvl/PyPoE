@@ -1088,6 +1088,7 @@ specification = Specification(
                 Field(
                     name="PassiveType",
                     type="ref|list|int",
+                    enum="PASSIVE_SKILL_SIZES",
                 ),
                 Field(
                     name="StatsKeys",
@@ -1358,11 +1359,13 @@ specification = Specification(
         "AncestralTrialChieftains.dat": File(
             fields=(
                 Field(
-                    name="Key0",
+                    name="Tribe",
                     type="ref|out",
+                    key="AncestralTrialTribes.dat",
+                    unique=True,
                 ),
                 Field(
-                    name="Key1",
+                    name="Key0",
                     type="ref|out",
                 ),
             ),
@@ -1662,8 +1665,9 @@ specification = Specification(
                     unique=True,
                 ),
                 Field(
-                    name="Key0",
+                    name="NPC",
                     type="ref|out",
+                    key="NPCs.dat",
                 ),
                 Field(
                     name="Portrait",
@@ -1691,6 +1695,10 @@ specification = Specification(
                     type="ref|string",
                 ),
                 Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
                     name="Key1",
                     type="ref|out",
                 ),
@@ -1703,15 +1711,11 @@ specification = Specification(
                     type="ref|out",
                 ),
                 Field(
-                    name="Key4",
-                    type="ref|out",
-                ),
-                Field(
                     name="Keys1",
                     type="ref|list|ref|out",
                 ),
                 Field(
-                    name="Key5",
+                    name="Key4",
                     type="ref|out",
                 ),
                 Field(
@@ -1735,7 +1739,7 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Key6",
+                    name="Key5",
                     type="ref|out",
                 ),
             ),
@@ -26089,6 +26093,8 @@ specification = Specification(
                 Field(
                     name="SkillType",
                     type="int",
+                    enum="PASSIVE_SKILL_TYPES",
+                    description="0: Character, 1: Atlas, 2: Genesis",
                 ),
                 Field(
                     name="MasteryGroup",
@@ -26096,7 +26102,7 @@ specification = Specification(
                     key="PassiveSkillMasteryGroups.dat",
                 ),
                 Field(
-                    name="Group",
+                    name="AtlasGroup",
                     type="ref|out",
                     key="AtlasPassiveSkillTreeGroupType.dat",
                 ),
@@ -26106,47 +26112,49 @@ specification = Specification(
                     key="SoundEffects.dat",
                 ),
                 Field(
-                    name="Unknown1",
+                    name="NameHardmode",
                     type="ref|string",
                 ),
                 Field(
-                    name="Unknown2",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown3",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown4",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown5",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown6",
-                    type="int",
-                ),
-                Field(
-                    name="Flag0",
+                    name="HasHardmodeAlternate",
                     type="bool",
                 ),
                 Field(
-                    name="Keys0",
-                    type="ref|list|ref|out",
-                ),
-                Field(
-                    name="Unknown7",
+                    name="Stat1ValueHardmode",
                     type="int",
                 ),
                 Field(
-                    name="Keys1",
-                    type="ref|list|ref|out",
+                    name="Stat2ValueHardmode",
+                    type="int",
                 ),
                 Field(
-                    name="Flag1",
+                    name="Stat3ValueHardmode",
+                    type="int",
+                ),
+                Field(
+                    name="Stat4ValueHardmode",
+                    type="int",
+                ),
+                Field(
+                    name="Stat5ValueHardmode",
+                    type="int",
+                ),
+                Field(
+                    name="StatsHardmode",
+                    type="ref|list|ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="SkillPointsGrantedHardmode",
+                    type="int",
+                ),
+                Field(
+                    name="BuffsHardmode",
+                    type="ref|list|ref|out",
+                    key="BuffTemplates.dat",
+                ),
+                Field(
+                    name="IsAtlasWormhole",
                     type="bool",
                 ),
                 Field(
@@ -26155,8 +26163,9 @@ specification = Specification(
                     key="Descendancy.dat",
                 ),
                 Field(
-                    name="Key0",
+                    name="GrantedEffectsPerLevelHardmode",
                     type="ref|out",
+                    key="GrantedEffectsPerLevel.dat",
                 ),
                 Field(
                     name="BrequelSubTree",
@@ -26164,15 +26173,15 @@ specification = Specification(
                     key="BrequelPassiveSubTrees.dat",
                 ),
                 Field(
-                    name="Flag2",
+                    name="IsBrequelStartingNode",
                     type="bool",
                 ),
                 Field(
-                    name="Flag3",
+                    name="Flag0",
                     type="bool",
                 ),
                 Field(
-                    name="Flag4",
+                    name="IsBrequelWomb",
                     type="bool",
                 ),
             ),
@@ -32742,6 +32751,7 @@ specification = Specification(
                 Field(
                     name="Wordlist",
                     type="int",
+                    enum="WORDLISTS",
                 ),
                 Field(
                     name="Text",
