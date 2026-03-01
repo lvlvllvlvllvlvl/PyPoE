@@ -39,9 +39,10 @@ TODO
 # 3rd-party
 import pytest
 
-# self
-from PyPoE.poe.constants import MOD_DOMAIN, MOD_GENERATION_TYPE
 from PyPoE.poe.file.dat import DatRecord
+
+# self
+from PyPoE.poe.poe1constants import MOD_DOMAIN, MOD_GENERATION_TYPE
 from PyPoE.poe.sim import mods
 
 # =============================================================================

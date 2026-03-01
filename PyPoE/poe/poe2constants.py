@@ -31,7 +31,7 @@ Documentation
 
 .. autoclass:: DELVE_UPGRADE_TYPE
 
-.. autoclass:: MAP_FRAGMENT_FAMILIES
+.. autoclass:: GAME_MODES
 
 .. autoclass:: MOD_DOMAIN
 
@@ -39,11 +39,7 @@ Documentation
 
 .. autoclass:: RARITY
 
-.. autoclass:: SHOP_PACKAGE_PLATFORM
-
 .. autoclass:: SOCKET_COLOUR
-
-.. autoclass:: STAT_INTERPOLATION_TYPES
 
 .. autoclass:: WORDLISTS
 """
@@ -67,18 +63,16 @@ from enum import Enum, EnumMeta, IntEnum
 __all__ = [
     "BETRAYAL_UPGRADE_SLOTS",
     "DELVE_UPGRADE_TYPE",
-    "MAP_FRAGMENT_FAMILIES",
     "MOD_DOMAIN",
     "MOD_GENERATION_TYPE",
     "RARITY",
-    "SHOP_PACKAGE_PLATFORM",
     "SOCKET_COLOUR",
-    "STAT_INTERPOLATION_TYPES",
     "WORDLISTS",
     "MOD_MAX_STATS",
     "MOD_STATS_RANGE",
     "MOD_SELL_PRICES",
-    "PASSIVE_TYPES",
+    "PASSIVE_SKILL_SIZES",
+    "PASSIVE_SKILL_TYPES",
     "GAME_MODES",
 ]
 
@@ -397,27 +391,6 @@ class BETRAYAL_UPGRADE_SLOTS(IntEnumOverride):
     NONE = 5
 
 
-class SHOP_PACKAGE_PLATFORM(IntEnumOverride):
-    """
-    ShopPackagePlatform.dat
-
-    Attributes
-    ----------
-    PC
-        PC
-    XBOX
-        Microsoft XBox
-    PS
-        Sony Playstation
-    """
-
-    PC = 1
-    XBOX = 2
-    PS = 3
-
-    PLAYSTATION = PS
-
-
 class SOCKET_COLOUR(Enum):
     """
     Representation of item socket colours.
@@ -516,40 +489,6 @@ class RARITY(Enum, metaclass=IntEnumMetaOverride):
         obj.name_lower = lower
         obj.colour = colour
         return obj
-
-
-class MAP_FRAGMENT_FAMILIES(IntEnumOverride):
-    """
-    Representation of map fragment families (MapFragmentFamilies.dat)
-
-    As of the 3.24 scarab reword, it appears that each scarab has its own family,
-    so this enum is probably not worth maintaining.
-    """
-
-    BESTIARY_AND_SULPHITE = 0  # Maybe just master-related?
-    BREACH = 1
-    CARTOGRAPHY_SCARAB = 2
-    RELIQUARY_SCARAB = 3
-    SHAPER_SCARAB = 4
-    ELDER_SCARAB = 5
-    DIVINATION_SCARAB = 6
-    TORMENT_SCARAB = 7
-    AMBUSH_SCARAB = 8
-    HARBINGER_SCARAB = 9
-    EXPEDITION_SCARAB = 10
-    LEGION_SCARAB = 11
-    METAMORPH_SCARAB = 12
-    BLIGHT_SCARAB = 13
-    ABYSS_SCARAB = 14
-    KARUI = 15
-    MARAKETH = 16
-    ETERNAL = 17
-    TEMPLAR = 18
-    VAAL = 19
-    REGULAR = 126
-
-    DEFAULT = REGULAR
-    STANDARD = REGULAR
 
 
 class MOD_DOMAIN(IntEnumOverride):
@@ -815,6 +754,11 @@ class WORDLISTS(IntEnumOverride):
     STRONGBOX_PREFIX = 7
     STRONGBOX_SUFFIX = 8
     ESSENCE = 9
+    TEST = 10
+    VILLAGER_PREFIX = 11
+    VILLAGER_SUFFIX = 12
+    MERCENARY_PREFIX = 13
+    MERCENARY_SUFFIX = 14
 
 
 class DELVE_UPGRADE_TYPE(IntEnumOverride):
@@ -838,91 +782,17 @@ class DELVE_UPGRADE_TYPE(IntEnumOverride):
     SULFITE_CAPACITY = SULPHITE_CAPACITY
 
 
-class STAT_INTERPOLATION_TYPES(IntEnumOverride):
-    """
-    Representation of stat interpolation types (StatInterpolationTypes.dat)
-
-    Primarily used by GrantedEffects.dat
-
-    Attributes
-    ----------
-    CONSTANT
-        Constant scaling
-    LINEAR
-        Linear scaling
-    EXPONENTIAL
-        Exponential scaling
-
-        .. code-block:: none
-
-            skill_base =
-                (
-                    GameConstants -> SkillDamageBaseEffectiveness +
-                    (GameConstants -> SkillDamageIncrementalEffectiveness * (
-                        MonsterLevel - 1
-                    ))
-                ) *
-                GrantedEffects['BaseEffectiveness'] *
-                (1+GrantedEffects['IncrementalEffectiveness') ** (MonsterLevel - 1)
-
-    """
-
-    CONSTANT = 1
-    LINEAR = 2
-    EXPONENTIAL = 3
-
-
-class SCARAB_TYPES(IntEnumOverride):
-    """
-    Representation of scarab types (ScarabTypes.dat)
-
-    Attributes
-    ----------
-    """
-
-    BESTIARY = 0
-    BREACH = 1
-    CARTOGRAPHY = 2
-    RELIQUARY = 3
-    SHAPER = 4
-    ELDER = 5
-    DIVINATION = 6
-    TORMENT = 7
-    AMBUSH = 8
-    HARBINGER = 9
-    PERANDUS = 10
-    LEGION = 11
-    METAMORPH = 12
-    SULFITE = 13
-
-
-class HARVEST_OBJECT_TYPES(IntEnumOverride):
-    NONE = 0
-    WILD = 1
-    VIVID = 2
-    PRIMAL = 3
-
-
-class PASSIVE_TYPES(IntEnumOverride):
-    REGULAR1 = 1
-    REGULAR2 = 2
+class PASSIVE_SKILL_SIZES(IntEnumOverride):
+    ATTRIBUTE = 1
+    SMALL = 2
     NOTABLE = 3
     KEYSTONE = 4
 
 
-class ITEM_CLASS_FLAGS(IntEnumOverride):
-    # doesn't include unarmed
-    MARTIAL_WEAPON = 0
-    # 1h weapons, wand, sceptre, and unarmed
-    ONE_HAND = 1
-    # does include unarmed
-    MELEE = 2
-    # doesn't include sceptres
-    OFF_HAND = 3
-    FLASKS_CHARMS = 4
-    ARMOUR = 5
-    ACCESSORY = 6
-    CURRENCY = 7
+class PASSIVE_SKILL_TYPES(IntEnumOverride):
+    CHARACTER = 0
+    ATLAS = 1
+    GENESIS = 2
 
 
 class GAME_MODES(IntEnumOverride):
