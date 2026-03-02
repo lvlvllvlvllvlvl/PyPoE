@@ -39,9 +39,9 @@ Internal API
 import os.path
 
 # Python
+import posixpath
 import re
 import warnings
-from collections import OrderedDict
 from functools import partialmethod
 
 # self
@@ -115,25 +115,13 @@ class MasteryParser(parser.BaseParser):
         error_msg="Several masteries have not been found:\n%s",
     )
 
-    _COPY_KEYS = OrderedDict(
+    _COPY_KEYS = (
         (
-            (
-                "Id",
-                {
-                    "template": "id",
-                },
-            ),
-            (
-                "InactiveIcon",
-                {
-                    "template": "icon",
-                    "format": lambda value: value.replace(
-                        "Art/2DArt/SkillIcons/passives/MasteryPassiveIcons/", ""
-                    ).replace(".dds", ""),
-                    "default": "",
-                },
-            ),
-        )
+            "Id",
+            {
+                "template": "id",
+            },
+        ),
     )
 
     def _apply_filter(self, parsed_args, masteries):
@@ -151,6 +139,23 @@ class MasteryParser(parser.BaseParser):
             new.append(mastery)
 
         return new
+
+    def _handle_icon(self, infobox, mastery):
+        file_path = mastery["InactiveIcon"]
+        if not file_path:
+            warnings.warn(f"Icon path file not found for {mastery['Id']}: {infobox['Name']}")
+            return
+
+        infobox["icon"] = posixpath.basename(file_path).replace(".dds", "")
+
+        # Extract icons if specified
+        if self.parsed_args.store_images:
+            icon = self.file_system.get_file(file_path)
+            self._write_dds(
+                data=icon,
+                out_path=os.path.join(self._img_path, "%s mastery icon.dds" % infobox["icon"]),
+                parsed_args=self.parsed_args,
+            )
 
     def by_id(self, parsed_args):
         return self.export(
@@ -184,7 +189,7 @@ class MasteryParser(parser.BaseParser):
         )
 
     def _masteries_from_named_passives(self, passives):
-        masteries = OrderedDict()
+        masteries = {}
         for passive in passives:
             mastery = passive["MasteryGroup"]
             if mastery:
@@ -194,55 +199,49 @@ class MasteryParser(parser.BaseParser):
     def export(self, parsed_args, masteries):
         r = ExporterResult()
 
-        if masteries:
-            console(f"Found {len(masteries)} masteries, parsing...")
-        else:
-            console("No masteries found for the specified parameters. Quitting.", msg=Msg.warning)
+        if not masteries:
+            console(
+                "No masteries found for the specified parameters. Quitting.",
+                msg=Msg.warning,
+            )
             return r
 
+        console("Accessing additional data...")
         self.rr[self._PASSIVES_FILE_NAME].build_index("MasteryGroup")
+        console("Found %s masteries, processing..." % len(masteries))
 
         self._image_init(parsed_args)
 
         for mastery in masteries:
-            data = dict()
+            infobox = {}
 
+            # Copy over simple fields from the .dat64
+            parser.apply_simple_column_map(infobox, self._COPY_KEYS, mastery)
+
+            # Name
             passives = self.rr[self._PASSIVES_FILE_NAME].index["MasteryGroup"][mastery]
-            data["name"] = passives[0]["Name"]
+            infobox["name"] = passives[0]["Name"]
 
-            for row_key, copy_data in self._COPY_KEYS.items():
-                value = mastery[row_key]
-
-                condition = copy_data.get("condition")
-                if condition is not None and not condition(mastery):
-                    continue
-
-                # Skip default values to reduce size of template
-                if value == copy_data.get("default"):
-                    continue
-
-                fmt = copy_data.get("format")
-                if fmt:
-                    value = fmt(value)
-                data[copy_data["template"]] = value
+            # Handle icon
+            self._handle_icon(infobox, mastery)
 
             # Parse effects
             effects = [effect for effect in mastery["MasteryEffects"]]
             effect_index = 1
             for effect in effects:
-                data[f"effect{effect_index}_id"] = effect["Id"]
+                infobox[f"effect{effect_index}_id"] = effect["Id"]
 
                 stat_ids = []
                 values = []
                 stat_index = 1
                 for stat, value in effect["StatsZip"]:
                     stat_ids.append(stat["Id"])
-                    data[f"effect{effect_index}_stat{stat_index}_id"] = stat["Id"]
+                    infobox[f"effect{effect_index}_stat{stat_index}_id"] = stat["Id"]
                     values.append(value)
-                    data[f"effect{effect_index}_stat{stat_index}_value"] = value
+                    infobox[f"effect{effect_index}_stat{stat_index}_value"] = value
                     stat_index = stat_index + 1
 
-                data[f"effect{effect_index}_stat_text"] = "<br>".join(
+                infobox[f"effect{effect_index}_stat_text"] = "<br>".join(
                     self._get_stats(
                         stat_ids, values, translation_file="passive_skill_stat_descriptions.txt"
                     )
@@ -250,32 +249,17 @@ class MasteryParser(parser.BaseParser):
 
                 effect_index = effect_index + 1
 
-            if data["icon"] == "":
-                warnings.warn(f"Icon path file not found for {mastery['Id']}: {data['name']}")
-
-            # extract icons if specified
-            if parsed_args.store_images:
-                file_name = data["icon"] + " mastery icon"
-                dds = os.path.join(self._img_path, file_name + ".dds")
-                png = os.path.join(self._img_path, file_name + ".png")
-                if not (os.path.exists(dds) or os.path.exists(png)):
-                    self._write_dds(
-                        data=self.file_system.get_file(mastery["InactiveIcon"]),
-                        out_path=dds,
-                        parsed_args=parsed_args,
-                    )
-
             cond = WikiCondition(
-                data=data,
+                data=infobox,
                 cmdargs=parsed_args,
             )
 
             r.add_result(
                 text=cond,
-                out_file=f"mastery_{data['id']}.txt",
+                out_file=f"mastery_{infobox['id']}.txt",
                 wiki_page=[
                     {
-                        "page": "Mastery:" + self._format_wiki_title(data["id"]),
+                        "page": "Mastery:" + self._format_wiki_title(infobox["id"]),
                         "condition": cond,
                     },
                 ],
