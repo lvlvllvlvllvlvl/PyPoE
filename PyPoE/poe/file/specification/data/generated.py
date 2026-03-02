@@ -1183,6 +1183,13 @@ specification = Specification(
                     type="int",
                 ),
             ),
+            virtual_fields=(
+                VirtualField(
+                    name="Icon_DDSFile",
+                    fields=("DDSIcon",),
+                    alias=True,
+                ),
+            ),
         ),
         "AlternateQualityTypes.dat": File(
             fields=(
@@ -26201,6 +26208,24 @@ specification = Specification(
                     fields=(
                         "Stats",
                         "StatValues",
+                    ),
+                    zip=True,
+                ),
+                VirtualField(
+                    name="StatValuesHardmode",
+                    fields=(
+                        "Stat1ValueHardmode",
+                        "Stat2ValueHardmode",
+                        "Stat3ValueHardmode",
+                        "Stat4ValueHardmode",
+                        "Stat5ValueHardmode",
+                    ),
+                ),
+                VirtualField(
+                    name="StatsHardmodeZip",
+                    fields=(
+                        "StatsHardmode",
+                        "StatValuesHardmode",
                     ),
                     zip=True,
                 ),
