@@ -137,6 +137,25 @@ class BasePassiveSkillParser(parser.BaseParser):
 
         return new
 
+    def _build_psg(self, psg_filename):
+        psg = PSGFile()
+        psg.read(
+            file_path_or_raw=self.file_system.get_file(psg_filename),
+        )
+        node_index = {}
+        for group in psg.groups:
+            for node in group.nodes:
+                node_index[normalize(node.passive_skill)] = node
+        # Connections are one-way, make them two way
+        for psg_id, node in node_index.items():
+            for other_psg in node.connections:
+                if other_psg in node_index:
+                    if psg_id not in node_index[other_psg].connections:
+                        node_index[normalize(other_psg)].connections.append(psg_id)
+                else:
+                    console(f"Missing connection {other_psg} for {psg_id}")
+        return node_index
+
     def _handle_icon(self, infobox, passive):
         file_path = passive["Icon_DDSFile"]
         if not file_path:
@@ -375,25 +394,6 @@ class PassiveSkillParser(BasePassiveSkillParser):
             },
         ),
     )
-
-    def _build_psg(self, psg_filename):
-        psg = PSGFile()
-        psg.read(
-            file_path_or_raw=self.file_system.get_file(psg_filename),
-        )
-        node_index = {}
-        for group in psg.groups:
-            for node in group.nodes:
-                node_index[normalize(node.passive_skill)] = node
-        # Connections are one-way, make them two way
-        for psg_id, node in node_index.items():
-            for other_psg in node.connections:
-                if other_psg in node_index:
-                    if psg_id not in node_index[other_psg].connections:
-                        node_index[normalize(other_psg)].connections.append(psg_id)
-                else:
-                    console(f"Missing connection {other_psg} for {psg_id}")
-        return node_index
 
     def export(self, parsed_args, passives):
         r = ExporterResult()
