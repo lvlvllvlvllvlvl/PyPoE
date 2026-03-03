@@ -7,6 +7,9 @@ virtual_fields_mappings = {
     constants.VERSION.STABLE: defaultdict(
         list[VirtualField],
         {
+            "AlternatePassiveSkills": [
+                Alias("Icon_DDSFile", "DDSIcon"),
+            ],
             "BlightCraftingItems": [
                 Alias("BaseItemTypesKey", "Oil"),
             ],
@@ -136,6 +139,17 @@ virtual_fields_mappings = {
                     fields=("Stat1Value", "Stat2Value", "Stat3Value", "Stat4Value", "Stat5Value"),
                 ),
                 Zip("StatsZip", ("Stats", "StatValues")),
+                VirtualField(
+                    name="StatValuesHardmode",
+                    fields=(
+                        "Stat1ValueHardmode",
+                        "Stat2ValueHardmode",
+                        "Stat3ValueHardmode",
+                        "Stat4ValueHardmode",
+                        "Stat5ValueHardmode",
+                    ),
+                ),
+                Zip("StatsHardmodeZip", ("StatsHardmode", "StatValuesHardmode")),
                 Alias("ReminderTextKeys", "ReminderStrings"),
             ],
             "PassiveSkillMasteryEffects": [

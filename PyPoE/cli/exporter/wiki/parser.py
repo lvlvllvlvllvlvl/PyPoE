@@ -73,7 +73,7 @@ from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.util import fix_path, get_content_path
 from PyPoE.poe import poe1constants as constants
-from PyPoE.poe.file.dat import RelationalReader
+from PyPoE.poe.file.dat import DatRecord, RelationalReader
 from PyPoE.poe.file.file_system import FileSystem
 from PyPoE.poe.file.it import ITFileCache
 from PyPoE.poe.file.ot import OTFileCache
@@ -2877,3 +2877,30 @@ def parse_and_handle_description_tags(rr, text):
         .replace("\n", "<br>")
         .replace("\r", "")
     )
+
+
+def apply_simple_column_map(
+    infobox, column_map: tuple[tuple[str, dict], ...], list_object: DatRecord | list[DatRecord]
+):
+    """
+    Copy over simple fields from the .dat64
+
+    Parameters
+    ----------
+    infobox: Dictionary in which values should be added
+    column_map: Map to apply
+    list_object: File to search for keys
+    """
+    if not isinstance(list_object, DatRecord):
+        list_object = list_object[0]
+
+    for k, data in column_map:
+        value = list_object[k]
+
+        if data.get("condition") and not data["condition"](value):
+            continue
+
+        if data.get("format"):
+            value = data["format"](value)
+
+        infobox[data["template"]] = value
