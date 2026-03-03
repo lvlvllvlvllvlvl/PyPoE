@@ -42,7 +42,7 @@ Internal API
 from collections.abc import Iterable
 
 # self
-from PyPoE.poe import constants
+from PyPoE.poe import poe1constants as constants
 from PyPoE.poe.file.dat import RelationalReader
 from PyPoE.poe.file.ot import OTFileCache
 
