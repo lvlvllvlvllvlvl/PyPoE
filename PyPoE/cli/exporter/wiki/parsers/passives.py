@@ -452,23 +452,24 @@ class PassiveSkillParser(BasePassiveSkillParser):
             # Handle stats
             stat_modes = (
                 {
-                    "id": "stat%s_id",
-                    "value": "stat%s_value",
-                    "text": "stat_text",
                     "stats_key": "Stats",
                     "stat_value_key": "Stat%sValue",
                     "stat_buffs_key": "PassiveSkillBuffs",
                 },
                 {
-                    "id": "stat%s_id_ruthless",
-                    "value": "stat%s_value_ruthless",
-                    "text": "stat_text_ruthless",
+                    "pre": "ruthless_",
                     "stats_key": "StatsHardmode",
                     "stat_value_key": "Stat%sValueHardmode",
                     "stat_buffs_key": "BuffsHardmode",
                 },
             )
             for mode in stat_modes:
+                prefix = mode.get("pre") or ""
+                keys = {
+                    "id": f"{prefix}stat%s_id",
+                    "value": f"{prefix}stat%s_value",
+                    "text": f"{prefix}stat_text",
+                }
                 stat_ids = []
                 values = []
                 j = 0
@@ -479,11 +480,11 @@ class PassiveSkillParser(BasePassiveSkillParser):
                         break
                     j = i + 1
                     stat_ids.append(stat["Id"])
-                    infobox[mode["id"] % j] = stat["Id"]
+                    infobox[keys["id"] % j] = stat["Id"]
                     values.append(passive[mode["stat_value_key"] % j])
-                    infobox[mode["value"] % j] = passive[mode["stat_value_key"] % j]
+                    infobox[keys["value"] % j] = passive[mode["stat_value_key"] % j]
 
-                infobox[mode["text"]] = "<br>".join(
+                infobox[keys["text"]] = "<br>".join(
                     self._get_stats(
                         stat_ids, values, translation_file=get_translation_file(passive["Id"])
                     )
@@ -501,8 +502,8 @@ class PassiveSkillParser(BasePassiveSkillParser):
 
                     for i, (sid, val) in enumerate(zip(stat_ids, values)):
                         j += 1
-                        infobox[mode["id"] % j] = sid
-                        infobox[mode["value"] % j] = val
+                        infobox[keys["id"] % j] = sid
+                        infobox[keys["value"] % j] = val
 
                     text = "<br>".join(
                         self._get_stats(
@@ -520,13 +521,13 @@ class PassiveSkillParser(BasePassiveSkillParser):
                             text,
                         )
 
-                    if infobox[mode["text"]]:
-                        infobox[mode["text"]] += "<br>" + text
+                    if infobox[keys["text"]]:
+                        infobox[keys["text"]] += "<br>" + text
                     else:
-                        infobox[mode["text"]] = text
+                        infobox[keys["text"]] = text
 
-                if infobox[mode["text"]] == "":
-                    infobox.pop(mode["text"])
+                if infobox[keys["text"]] == "":
+                    infobox.pop(keys["text"])
 
             # Handle connections
             tree_count = 0
