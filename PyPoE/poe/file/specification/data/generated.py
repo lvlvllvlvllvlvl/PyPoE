@@ -2716,54 +2716,27 @@ specification = Specification(
         "AtlasNode.dat": File(
             fields=(
                 Field(
-                    name="WorldAreasKey",
-                    type="ref|out",
-                    key="WorldAreas.dat",
-                    unique=True,
+                    name="Id",
+                    type="ref|string",
                 ),
                 Field(
-                    name="ItemVisualIdentityKey",
+                    name="Area1",
                     type="ref|out",
-                    key="ItemVisualIdentity.dat",
+                    key="WorldAreas.dat",
                 ),
                 Field(
                     name="Flag0",
                     type="bool",
                 ),
                 Field(
-                    name="MapsKey",
-                    type="ref|out",
-                    key="Maps.dat",
-                ),
-                Field(
-                    name="FlavourTextKey",
+                    name="FlavourText",
                     type="ref|out",
                     key="FlavourText.dat",
                 ),
                 Field(
-                    name="AtlasNodeKeys",
+                    name="Connections",
                     type="ref|list|ref|generic",
                     key="AtlasNode.dat",
-                ),
-                Field(
-                    name="Tier0",
-                    type="int",
-                ),
-                Field(
-                    name="Tier1",
-                    type="int",
-                ),
-                Field(
-                    name="Tier2",
-                    type="int",
-                ),
-                Field(
-                    name="Tier3",
-                    type="int",
-                ),
-                Field(
-                    name="Tier4",
-                    type="int",
                 ),
                 Field(
                     name="Unknown0",
@@ -2786,7 +2759,7 @@ specification = Specification(
                     type="float",
                 ),
                 Field(
-                    name="DDSFile",
+                    name="UniqueArt",
                     type="ref|string",
                     file_path=True,
                     file_ext=".dds",
@@ -2800,8 +2773,26 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
+                    name="DivCards",
+                    type="ref|list|ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="DivCardsHardmode",
+                    type="ref|list|ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
                     name="Unknown5",
                     type="int",
+                ),
+                Field(
+                    name="HASH16",
+                    type="short",
+                ),
+                Field(
+                    name="Flag1",
+                    type="bool",
                 ),
                 Field(
                     name="Unknown6",
@@ -2812,40 +2803,97 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
+                    name="Data0",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="Flag2",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag3",
+                    type="bool",
+                ),
+                Field(
+                    name="WatchstoneSlot",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="QuestStates",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="Flag4",
+                    type="bool",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Area2",
+                    type="ref|out",
+                    key="WorldAreas.dat",
+                ),
+                Field(
+                    name="Flag5",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag6",
+                    type="bool",
+                ),
+                Field(
                     name="Unknown8",
+                    type="float",
+                ),
+                Field(
+                    name="Flag7",
+                    type="bool",
+                ),
+                Field(
+                    name="Unknown9",
                     type="int",
                 ),
                 Field(
-                    name="DivCards",
-                    type="ref|list|ref|out",
-                    key="BaseItemTypes.dat",
+                    name="Unknown10",
+                    type="int",
                 ),
                 Field(
-                    name="Keys0",
-                    type="ref|list|ref|out",
-                    key="BaseItemTypes.dat",
+                    name="Unknown11",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown12",
+                    type="int",
+                ),
+                Field(
+                    name="Flag8",
+                    type="bool",
+                ),
+            ),
+            virtual_fields=(
+                VirtualField(
+                    name="FlavourTextKey",
+                    fields=("FlavourText",),
+                    alias=True,
                 ),
             ),
         ),
         "AtlasNodeDefinition.dat": File(
             fields=(
                 Field(
-                    name="WorldAreasKey",
+                    name="Id",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Area1",
                     type="ref|out",
                     key="WorldAreas.dat",
-                ),
-                Field(
-                    name="ItemVisualIdentityKey",
-                    type="ref|out",
-                    key="ItemVisualIdentity.dat",
-                ),
-                Field(
-                    name="Flag0",
-                    type="bool",
-                ),
-                Field(
-                    name="Tier",
-                    type="int",
                 ),
                 Field(
                     name="Unknown0",
@@ -2856,8 +2904,59 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
                     name="Flag1",
                     type="bool",
+                ),
+                Field(
+                    name="Image",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".dds",
+                ),
+                Field(
+                    name="Flag2",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag3",
+                    type="bool",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                ),
+                Field(
+                    name="QuestStates",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="Flag4",
+                    type="bool",
+                ),
+                Field(
+                    name="Key2",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Area2",
+                    type="ref|out",
+                    key="WorldAreas.dat",
+                ),
+                Field(
+                    name="Flag5",
+                    type="bool",
+                ),
+                Field(
+                    name="Key3",
+                    type="ref|out",
                 ),
             ),
         ),
@@ -11007,6 +11106,86 @@ specification = Specification(
                 ),
             ),
         ),
+        "FaridunLifeScalingPerLevel.dat": File(
+            fields=(
+                Field(
+                    name="Level",
+                    type="int",
+                ),
+                Field(
+                    name="Life",
+                    type="int",
+                ),
+            ),
+        ),
+        "FaridunWishFamilies.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                ),
+            ),
+        ),
+        "FaridunWishes.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Data0",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="Icon",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Data1",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown2",
+                    type="int",
+                ),
+                Field(
+                    name="Name",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Key2",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown3",
+                    type="int",
+                ),
+                Field(
+                    name="Data2",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="Unknown4",
+                    type="int",
+                ),
+            ),
+        ),
         "FixedHideoutDoodadTypes.dat": File(
             fields=(
                 Field(
@@ -15161,10 +15340,6 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Name",
-                    type="ref|string",
-                ),
-                Field(
                     name="Data0",
                     type="ref|list|int",
                 ),
@@ -15181,8 +15356,9 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Key0",
+                    name="UnlockMtx",
                     type="ref|out",
+                    key="MtxTypes.dat",
                 ),
                 Field(
                     name="ErrorMessage",
@@ -18689,6 +18865,10 @@ specification = Specification(
                     name="Flag6",
                     type="bool",
                 ),
+                Field(
+                    name="Keys0",
+                    type="ref|list|ref|out",
+                ),
             ),
         ),
         "MapInhabitants.dat": File(
@@ -19228,14 +19408,6 @@ specification = Specification(
                     name="AchievementItem",
                     type="ref|out",
                     key="AchievementItems.dat",
-                ),
-                Field(
-                    name="Regular_GuildCharacter",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Unique_GuildCharacter",
-                    type="ref|string",
                 ),
                 Field(
                     name="Tier",
@@ -21651,6 +21823,10 @@ specification = Specification(
                     name="Keys2",
                     type="ref|list|ref|out",
                     key="GrantedEffectsPerLevel.dat",
+                ),
+                Field(
+                    name="Flag2",
+                    type="bool",
                 ),
             ),
             virtual_fields=(
@@ -24112,21 +24288,9 @@ specification = Specification(
                     type="ref|string",
                 ),
                 Field(
-                    name="Flag0",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag1",
-                    type="bool",
-                ),
-                Field(
                     name="Signature_ModsKey",
                     type="ref|out",
                     key="Mods.dat",
-                ),
-                Field(
-                    name="Flag2",
-                    type="bool",
                 ),
                 Field(
                     name="SpawnWeight_TagsKeys",
@@ -24142,31 +24306,6 @@ specification = Specification(
                     type="ref|out",
                 ),
                 Field(
-                    name="Unknown0",
-                    type="int",
-                ),
-                Field(
-                    name="AreaDescription",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Key1",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Unknown1",
-                    type="int",
-                ),
-                Field(
-                    name="Key2",
-                    type="ref|out",
-                    key="Stats.dat",
-                ),
-                Field(
-                    name="HasAreaMissions",
-                    type="bool",
-                ),
-                Field(
                     name="Keys0",
                     type="ref|list|ref|out",
                 ),
@@ -24175,15 +24314,7 @@ specification = Specification(
                     type="ref|list|ref|out",
                 ),
                 Field(
-                    name="Key3",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Keys2",
-                    type="ref|list|ref|out",
-                ),
-                Field(
-                    name="Key4",
+                    name="Key1",
                     type="ref|out",
                 ),
             ),
@@ -27176,8 +27307,8 @@ specification = Specification(
                     key="ClientStrings.dat",
                 ),
                 Field(
-                    name="Key0",
-                    type="ref|out",
+                    name="Flag0",
+                    type="bool",
                 ),
             ),
         ),
@@ -31889,12 +32020,8 @@ specification = Specification(
                     key="FlavourText.dat",
                 ),
                 Field(
-                    name="HasGuildCharacter",
+                    name="Flag0",
                     type="bool",
-                ),
-                Field(
-                    name="GuildCharacter",
-                    type="ref|string",
                 ),
                 Field(
                     name="Name",

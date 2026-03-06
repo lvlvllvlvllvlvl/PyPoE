@@ -101,22 +101,6 @@ def _linear_to_srgb(img):
     )
 
 
-def _apply_column_map(
-    infobox, column_map: tuple[tuple[str, dict], ...], list_object: DatRecord | list[DatRecord]
-):
-    if not isinstance(list_object, DatRecord):
-        list_object = list_object[0]
-
-    for k, data in column_map:
-        value = list_object[k]
-        if data.get("condition") and not data["condition"](value):
-            continue
-
-        if data.get("format"):
-            value = data["format"](value)
-        infobox[data["template"]] = value
-
-
 def _skip(*_):
     return False
 
@@ -156,7 +140,7 @@ def _type_factory(
                 else:
                     raise Exception(f"Multiple matches found for {base_item_type['Id']}")
 
-        _apply_column_map(infobox, data_mapping, data)
+        parser.apply_simple_column_map(infobox, data_mapping, data)
 
         if function:
             function(self, infobox, base_item_type, data)
