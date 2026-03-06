@@ -93,17 +93,6 @@ def _linear_to_srgb(img):
     )
 
 
-def _apply_column_map(infobox, column_map: tuple[tuple[str, dict], ...], list_object):
-    for k, data in column_map:
-        value = list_object[k]
-        if data.get("condition") and not data["condition"](value):
-            continue
-
-        if data.get("format"):
-            value = data["format"](value)
-        infobox[data["template"]] = value
-
-
 def _type_factory(
     data_file: str,
     data_mapping: tuple[tuple[str, dict], ...],
@@ -130,7 +119,7 @@ def _type_factory(
                     warnings.warn(f'Missing {data_file} info for "{base_item_type["Name"]}"')
                 return fail_condition
 
-        _apply_column_map(infobox, data_mapping, data)
+        parser.apply_simple_column_map(infobox, data_mapping, data)
 
         if function:
             function(self, infobox, base_item_type, data)
@@ -2825,7 +2814,7 @@ class ItemsParser(SkillParserShared):
             harvest_object.rowid
         ]
 
-        _apply_column_map(
+        parser.apply_simple_column_map(
             infobox,
             (
                 (
@@ -2919,7 +2908,7 @@ class ItemsParser(SkillParserShared):
             harvest_object.rowid
         ]
 
-        _apply_column_map(
+        parser.apply_simple_column_map(
             infobox,
             (
                 (
