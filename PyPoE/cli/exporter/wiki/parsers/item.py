@@ -23,9 +23,6 @@ Agreement
 ===============================================================================
 
 See PyPoE/LICENSE
-
-# TODO
-Kishara's Star (item)
 """
 
 # =============================================================================
@@ -235,40 +232,13 @@ class WikiCondition(parser.WikiCondition):
         # prophecies
         "prophecy_objective",
         "prophecy_reward",
-        # Quest Rewards
-        "quest_reward1_type",
-        "quest_reward1_quest",
-        "quest_reward1_quest_id",
-        "quest_reward1_act",
-        "quest_reward1_class_ids",
-        "quest_reward1_npc",
-        "quest_reward2_type",
-        "quest_reward2_quest",
-        "quest_reward2_quest_id",
-        "quest_reward2_act",
-        "quest_reward2_class_ids",
-        "quest_reward2_npc",
-        "quest_reward3_type",
-        "quest_reward3_quest",
-        "quest_reward3_quest_id",
-        "quest_reward3_act",
-        "quest_reward3_class_ids",
-        "quest_reward3_npc",
-        "quest_reward4_type",
-        "quest_reward4_quest",
-        "quest_reward4_quest_id",
-        "quest_reward4_act",
-        "quest_reward4_class_ids",
-        "quest_reward4_npc",
         # Sentinels
         "sentinel_monster",
         "sentinel_monster_level",
     )
+
     COPY_MATCH = re.compile(
-        r"^(recipe|sell_price|implicit[0-9]+_(?:text|random_list)).*", re.UNICODE
-    )
-    COPY_MATCH = re.compile(
-        r"^(recipe|sell_price|implicit[0-9]+_(?:text|random_list)).*", re.UNICODE
+        r"^(quest_reward|recipe|sell_price|implicit[0-9]+_(?:text|random_list)).*", re.UNICODE
     )
 
     NAME = "Item"
@@ -391,7 +361,7 @@ class ItemsParser(SkillParserShared):
         "InstanceLocalItem",
     )
 
-    _DROP_DISABLED_ITEMS_BY_ID = {}
+    _DROP_DISABLED_ITEMS_BY_ID = set()
 
     _EXCLUDE_CLASSES = {
         "Map",
@@ -668,6 +638,7 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/QuestItems/GoldenPages/Page2": " (2 of 4)",
             "Metadata/Items/QuestItems/GoldenPages/Page3": " (3 of 4)",
             "Metadata/Items/QuestItems/GoldenPages/Page4": " (4 of 4)",
+            "Metadata/Items/QuestItems/Act7/KisharaStar": " (quest item)",
             # =================================================================
             # Heist equipment
             # =================================================================
@@ -3130,7 +3101,6 @@ class ItemsParser(SkillParserShared):
                 break
         return True
 
-    _cls_map = dict()
     """
     This defines the expected data elements for an item class.
     """
