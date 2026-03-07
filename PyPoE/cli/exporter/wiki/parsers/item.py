@@ -352,10 +352,12 @@ class ItemsParser(SkillParserShared):
 
     _DROP_DISABLED_ITEMS_BY_ID = set()
 
+    # Skip items by class ID
     _EXCLUDE_CLASSES = {
         "Map",
         "NecropolisPack",
         "HiddenItem",
+        "RemovedItem",
     }
 
     _NAME_OVERRIDE_BY_ID = {
@@ -526,6 +528,7 @@ class ItemsParser(SkillParserShared):
             # =================================================================
             # Currency items
             # =================================================================
+            "Metadata/Items/Currency/CurrencySilverCoin": " (Prophecy)",
             "Metadata/Items/Currency/CurrencyAncestralSilverCoin": "",
             # =================================================================
             # Hideout decorations
@@ -1445,7 +1448,6 @@ class ItemsParser(SkillParserShared):
         # =================================================================
         # Currency items
         # =================================================================
-        "Metadata/Items/Currency/CurrencySilverCoin",
         "Metadata/Items/Currency/CurrencyLabyrinthEnchant",
         # =================================================================
         # Non-stackable resonators from before 3.8.0
