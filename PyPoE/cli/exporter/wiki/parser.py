@@ -2578,6 +2578,7 @@ class TagHandler:
         "divination": partial(_default_handler, tid="divination"),
         "corrupted": partial(_link_handler, tid="corrupted"),
         "fractured": partial(_link_handler, tid="fractured"),
+        "brequelmutated": partial(_link_handler, tid="foulborn"),
     }
 
 
