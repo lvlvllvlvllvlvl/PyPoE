@@ -49,7 +49,7 @@ ItemParser
 import pytest
 
 # self
-from PyPoE.poe.constants import RARITY, SOCKET_COLOUR
+from PyPoE.poe.poe1constants import RARITY, SOCKET_COLOUR
 from PyPoE.poe.sim import item
 
 # =============================================================================

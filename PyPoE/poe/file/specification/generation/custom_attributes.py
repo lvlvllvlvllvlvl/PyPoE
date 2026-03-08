@@ -4,6 +4,11 @@ class CustomizedField:
 
 
 custom_attributes = {
+    "AlternatePassiveSkills.dat": {
+        "PassiveType": CustomizedField(
+            enum="PASSIVE_SKILL_SIZES",
+        ),
+    },
     "BaseItemTypes.dat": {
         "ModDomainsKey": CustomizedField(
             enum="MOD_DOMAIN",
@@ -29,16 +34,6 @@ custom_attributes = {
             enum="DELVE_UPGRADE_TYPE",
         ),
     },
-    "GrantedEffectsPerLevel.dat": {
-        "StatInterpolationTypesKeys": CustomizedField(
-            enum="STAT_INTERPOLATION_TYPES",
-        ),
-    },
-    "HarvestObjects.dat": {
-        "ObjectType": CustomizedField(
-            enum="HARVEST_OBJECT_TYPES",
-        ),
-    },
     "Maps.dat": {
         "MapGeneration": CustomizedField(
             enum="MAP_GENERATION",
@@ -55,23 +50,13 @@ custom_attributes = {
             enum="GAME_MODES",
         ),
     },
-    "Scarabs.dat": {
-        "ScarabType": CustomizedField(
-            enum="SCARAB_TYPES",
-        ),
-    },
-    "ShopPaymentPackage.dat": {
-        "ShopPackagePlatformKeys": CustomizedField(
-            enum="SHOP_PACKAGE_PLATFORM",
-        ),
-    },
-    "SupporterPackSets.dat": {
-        "ShopPackagePlatformKey": CustomizedField(
-            enum="SHOP_PACKAGE_PLATFORM",
+    "PassiveSkills.dat": {
+        "SkillType": CustomizedField(
+            enum="PASSIVE_SKILL_TYPES",
         ),
     },
     "Words.dat": {
-        "WordlistsKey": CustomizedField(
+        "Wordlist": CustomizedField(
             enum="WORDLISTS",
         ),
     },

@@ -162,8 +162,12 @@ exporting gem-skills &&
 pypoe_exporter $QUIET $WIKI skill by_gem "${IMG[@]}" "${ARGS[@]}" "$@"
 exporting items &&
 pypoe_exporter $QUIET $WIKI items item rowid "${IMG[@]}" "${ARGS[@]}" "$@"
-exporting passives &&
-pypoe_exporter $QUIET $WIKI passive rowid "${IMG[@]}" "${ARGS[@]}" "$@"
+exporting passives && {
+  pypoe_exporter $QUIET $WIKI passive passive rowid "${IMG[@]}" "${ARGS[@]}" "$@"
+  if [ "$WIKI" = "wiki" ]; then
+    pypoe_exporter $QUIET $WIKI passive alternate rowid "${IMG[@]}" "${ARGS[@]}" "$@"
+  fi
+}
 exporting skills &&
 pypoe_exporter $QUIET $WIKI skill by_name "${IMG[@]}" "${ARGS[@]}" "$@"
 exporting masteries &&

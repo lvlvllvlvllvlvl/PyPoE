@@ -44,7 +44,7 @@ import struct
 import pytest
 
 # self
-from PyPoE.poe import constants
+from PyPoE.poe import poe1constants as constants
 from PyPoE.poe.file import dat
 from PyPoE.poe.file.specification import load
 

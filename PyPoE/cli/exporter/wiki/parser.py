@@ -73,7 +73,7 @@ from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.util import fix_path, get_content_path
 from PyPoE.poe import poe1constants as constants
-from PyPoE.poe.file.dat import RelationalReader
+from PyPoE.poe.file.dat import DatRecord, RelationalReader
 from PyPoE.poe.file.file_system import FileSystem
 from PyPoE.poe.file.it import ITFileCache
 from PyPoE.poe.file.ot import OTFileCache
@@ -235,13 +235,14 @@ _inter_wiki_map = {
         ("(?<=[0-9] )Iron Will", {"link": "Iron Will Support"}),
         ("(?<=[0-9] )Item Quantity", {"link": "Item Quantity Support"}),
         ("(?<=[0-9] )Item Rarity", {"link": "Item Rarity Support"}),
+        ("(?<=[0-9] )Kinetic Instability", {"link": "Kinetic Instability Support"}),
         ("(?<=[0-9] )Knockback", {"link": "Knockback Support"}),
         ("(?<=[0-9] )Less Duration", {"link": "Less Duration Support"}),
-        ("(?<=[0-9] )Lesser Multiple Projectiles", {"link": "Lesser Multiple Projectiles Support"}),
         ("(?<=[0-9] )Life Gain on Hit", {"link": "Life Gain on Hit Support"}),
         ("(?<=[0-9] )Life Leech", {"link": "Life Leech Support"}),
         ("(?<=[0-9] )Lifetap", {"link": "Lifetap Support"}),
         ("(?<=[0-9] )Lightning Penetration", {"link": "Lightning Penetration Support"}),
+        ("(?<=[0-9] )Living Lightning", {"link": "Living Lightning Support"}),
         ("(?<=[0-9] )Locus Mine", {"link": "Locus Mine Support"}),
         ("(?<=[0-9] )Maim", {"link": "Maim Support"}),
         ("(?<=[0-9] )Mana Leech", {"link": "Mana Leech Support"}),
@@ -257,6 +258,7 @@ _inter_wiki_map = {
         ("(?<=[0-9] )Mirage Archer", {"link": "Mirage Archer Support"}),
         ("(?<=[0-9] )Momentum", {"link": "Momentum Support"}),
         ("(?<=[0-9] )More Duration", {"link": "More Duration Support"}),
+        ("(?<=[0-9] )Multiple Projectiles", {"link": "Multiple Projectiles Support"}),
         ("(?<=[0-9] )Multiple Totems", {"link": "Multiple Totems Support"}),
         ("(?<=[0-9] )Multiple Traps", {"link": "Multiple Traps Support"}),
         ("(?<=[0-9] )Multistrike", {"link": "Multistrike Support"}),
@@ -302,6 +304,7 @@ _inter_wiki_map = {
         ("(?<=[0-9] )Void Manipulation", {"link": "Void Manipulation Support"}),
         ("(?<=[0-9] )Volatility", {"link": "Volatility Support"}),
         ("(?<=[0-9] )Volley", {"link": "Volley Support"}),
+        ("(?<=[0-9] )Windburst", {"link": "Windburst Support"}),
         ("(?<=[0-9] )Withering Touch", {"link": "Withering Touch Support"}),
         #
         # Other supports
@@ -487,6 +490,7 @@ _inter_wiki_map = {
         ("Cobra Lash", {"link": "Cobra Lash"}),
         ("Cold Snap", {"link": "Cold Snap"}),
         ("Conductivity", {"link": "Conductivity"}),
+        ("Conflagration", {"link": "Conflagration"}),
         ("Consecrated Path", {"link": "Consecrated Path"}),
         ("Contagion", {"link": "Contagion"}),
         ("Conversion Trap", {"link": "Conversion Trap"}),
@@ -572,6 +576,8 @@ _inter_wiki_map = {
         ("Herald of Thunder", {"link": "Herald of Thunder"}),
         ("Hexblast", {"link": "Hexblast"}),
         ("Holy Flame Totem", {"link": "Holy Flame Totem"}),
+        ("Holy Hammers", {"link": "Holy Hammers"}),
+        ("Holy Sweep", {"link": "Holy Sweep"}),
         ("Hydrosphere", {"link": "Hydrosphere"}),
         ("Ice Crash", {"link": "Ice Crash"}),
         ("Ice Nova", {"link": "Ice Nova"}),
@@ -587,6 +593,8 @@ _inter_wiki_map = {
         ("Intuitive Link", {"link": "Intuitive Link"}),
         ("Kinetic Blast", {"link": "Kinetic Blast"}),
         ("Kinetic Bolt", {"link": "Kinetic Bolt"}),
+        ("Kinetic Fusillade", {"link": "Kinetic Fusillade"}),
+        ("Kinetic Rain", {"link": "Kinetic Rain"}),
         ("Lacerate", {"link": "Lacerate"}),
         ("Lancing Steel", {"link": "Lancing Steel"}),
         ("Leap Slam", {"link": "Leap Slam"}),
@@ -652,6 +660,7 @@ _inter_wiki_map = {
         ("Smoke Mine", {"link": "Smoke Mine"}),
         ("Snipe", {"link": "Snipe"}),
         ("Sniper's Mark", {"link": "Sniper's Mark"}),
+        ("Somatic Shell", {"link": "Somatic Shell"}),
         ("Soul Link", {"link": "Soul Link"}),
         ("Soulrend", {"link": "Soulrend"}),
         ("Spark", {"link": "Spark"}),
@@ -682,12 +691,12 @@ _inter_wiki_map = {
         ("Summon(?:|ed) Skitterbot(?:|s)", {"link": "Summon Skitterbots"}),
         ("Summon(?:|ed) Stone Golem(?:|s)", {"link": "Summon Stone Golem"}),
         ("Sunder", {"link": "Sunder"}),
-        ("Sweep", {"link": "Sweep"}),
         ("Swordstorm", {"link": "Swordstorm"}),
         ("Tectonic Slam", {"link": "Tectonic Slam"}),
         ("Tempest Shield", {"link": "Tempest Shield"}),
         ("Temporal Chains", {"link": "Temporal Chains"}),
         ("Temporal Rift", {"link": "Temporal Rift"}),
+        ("Thunderstorm", {"link": "Thunderstorm"}),
         ("Tornado Shot", {"link": "Tornado Shot"}),
         ("Tornado", {"link": "Tornado"}),
         ("Toxic Rain", {"link": "Toxic Rain"}),
@@ -715,6 +724,7 @@ _inter_wiki_map = {
         ("Withering Step", {"link": "Withering Step"}),
         ("Wrath", {"link": "Wrath"}),
         ("Zealotry", {"link": "Zealotry"}),
+        ("Wall of Force", {"link": "Wall of Force"}),
         #
         # Other skills
         #
@@ -2568,6 +2578,7 @@ class TagHandler:
         "divination": partial(_default_handler, tid="divination"),
         "corrupted": partial(_link_handler, tid="corrupted"),
         "fractured": partial(_link_handler, tid="fractured"),
+        "brequelmutated": partial(_link_handler, tid="foulborn"),
     }
 
 
@@ -2877,3 +2888,30 @@ def parse_and_handle_description_tags(rr, text):
         .replace("\n", "<br>")
         .replace("\r", "")
     )
+
+
+def apply_simple_column_map(
+    infobox, column_map: tuple[tuple[str, dict], ...], list_object: DatRecord | list[DatRecord]
+):
+    """
+    Copy over simple fields from the .dat64
+
+    Parameters
+    ----------
+    infobox: Dictionary in which values should be added
+    column_map: Map to apply
+    list_object: File to search for keys
+    """
+    if not isinstance(list_object, DatRecord):
+        list_object = list_object[0]
+
+    for k, data in column_map:
+        value = list_object[k]
+
+        if data.get("condition") and not data["condition"](value):
+            continue
+
+        if data.get("format"):
+            value = data["format"](value)
+
+        infobox[data["template"]] = value
