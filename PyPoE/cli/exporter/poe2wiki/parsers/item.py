@@ -1433,10 +1433,10 @@ class ItemsParser(SkillParserShared):
 
     def _skill_gem_type(self, infobox: OrderedDict, base_item_type, skill_gem, gem_type):
         name = gem_type["Name"]
-        if "[DNT]" in name or "[DNT-UNUSED]" in name:
+        if "[DNT" in name:
             return False
         if skill_gem["IsVaalVariant"]:
-            infobox["is_vaal_skill_gem"] = "true"
+            infobox["is_vaal_skill_gem"] = True
             if gem_type["ItemColor"] != 3:
                 return False
         if skill_gem["VaalVariant_BaseItemType"]:

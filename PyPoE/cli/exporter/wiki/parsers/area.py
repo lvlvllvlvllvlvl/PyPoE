@@ -354,13 +354,13 @@ class AreaParser(parser.BaseParser):
     def by_id(self, parsed_args):
         return self.export(
             parsed_args,
-            self._area_column_index_filter(column_id="Id", arg_list=parsed_args.area_id),
+            self._area_column_index_filter(column_id="Id", arg_list=parsed_args.id),
         )
 
     def by_name(self, parsed_args):
         return self.export(
             parsed_args,
-            self._area_column_index_filter(column_id="Name", arg_list=parsed_args.area_name),
+            self._area_column_index_filter(column_id="Name", arg_list=parsed_args.name),
         )
 
     def by_filter(self, parsed_args):
@@ -414,13 +414,16 @@ class AreaParser(parser.BaseParser):
                 infobox["spawn_weight%s_tag" % i] = tag["Id"]
                 infobox["spawn_weight%s_value" % i] = value
 
-            map_pin = self.rr[self._MAPPINS_FILE_NAME].index["WorldAreasKeys"].get(area)
-            if map_pin:
-                infobox["flavour_text"] = map_pin[0]["FlavourText"]
-
-            atlas_node = self.rr[self._ATLASNODE_FILE_NAME].index["Area2"].get(area)
-            if atlas_node and "FlavourText" in atlas_node:
-                infobox["flavour_text"] = atlas_node["FlavourText"]["Text"]
+            # Flavour text
+            flavour_text = None
+            map_pins = self.rr[self._MAPPINS_FILE_NAME].index["WorldAreasKeys"].get(area)
+            if map_pins:
+                flavour_text = map_pins[0]["FlavourText"]
+            atlas_nodes = self.rr[self._ATLASNODE_FILE_NAME].index["Area2"].get(area)
+            if atlas_nodes:
+                flavour_text = atlas_nodes[0]["FlavourText"]["Text"]
+            if flavour_text:
+                infobox["flavour_text"] = flavour_text.replace("\n", "<br>").replace("\r", "")
 
             cond = WikiCondition(
                 data=infobox,
