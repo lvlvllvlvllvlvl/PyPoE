@@ -106,13 +106,6 @@ class AreaCommandHandler(ExporterHandler):
     def add_default_parsers(self, *args, **kwargs):
         super().add_default_parsers(*args, **kwargs)
         self.add_format_argument(kwargs["parser"])
-        # kwargs["parser"].add_argument(
-        #     "--skip-main-page",
-        #     help="Skip adding main_page argument to the template",
-        #     action="store_true",
-        #     default=False,
-        #     dest="skip_main_page",
-        # )
 
 
 class AreaParser(parser.BaseParser):
@@ -407,9 +400,6 @@ class AreaParser(parser.BaseParser):
         self.rr[self._MAPPINS_FILE_NAME].build_index("WorldAreasKeys")
         self.rr[self._ATLASNODE_FILE_NAME].build_index("Area2")
         self.rr["MapSeries.dat64"].build_index("Id")
-        if not parsed_args.skip_main_page:
-            self.rr["Maps.dat64"].build_index("Regular_WorldAreasKey")
-            self.rr["UniqueMaps.dat64"].build_index("WorldAreasKey")
         console("Found %s areas, processing..." % len(areas))
 
         for area in areas:
