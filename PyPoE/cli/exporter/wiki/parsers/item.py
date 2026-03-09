@@ -1590,6 +1590,12 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/MapFragments/Maven/MavenMapInsideBottomLeft5",
         "Metadata/Items/MapFragments/Maven/MavenMapInsideTopLeft5",
         "Metadata/Items/MapFragments/Maven/MavenMapInsideTopRight5",
+        "Metadata/Items/MapFragments/Maven/MavenMapVoid1",
+        "Metadata/Items/MapFragments/Maven/MavenMapVoid2",
+        "Metadata/Items/MapFragments/Maven/MavenMapVoid3",
+        "Metadata/Items/MapFragments/Maven/MavenMapVoid4",
+        "Metadata/Items/MapFragments/Maven/MavenMapVoid5",
+        "Metadata/Items/MapFragments/Maven/MavenMapVoid6",
         # =================================================================
         # Invocations (only present for sanctum league)
         # =================================================================
@@ -1725,6 +1731,12 @@ class ItemsParser(SkillParserShared):
         },
         "Support Skill Gem": {
             r"Royale",
+        },
+        "StackableCurrency": {
+            r"Tencent",
+        },
+        "VaultKey": {
+            r"Tencent",
         },
         "Microtransaction": {
             r"Garena",
