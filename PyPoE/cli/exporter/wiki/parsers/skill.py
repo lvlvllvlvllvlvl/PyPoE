@@ -973,7 +973,7 @@ class SkillParserShared(parser.BaseParser):
         # Body
         for i, row in enumerate(level_data):
             prefix = "level%s" % (i + 1)
-            infobox[prefix] = "True"
+            infobox[prefix] = row["Level"]
 
             # In 3.21 the level requirement is a float so we need to cast it to int
             if "PlayerLevelReq" in row and row["PlayerLevelReq"] == int(row["PlayerLevelReq"]):
