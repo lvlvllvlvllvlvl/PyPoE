@@ -1891,10 +1891,21 @@ class ItemsParser(SkillParserShared):
             infobox["base_item_id"] = infobox.pop("metadata_id")
 
         # SkillGems.dat
-        for attr_short, attr_long in self._attribute_map.items():
-            if not skill_gem[attr_short]:
-                continue
-            infobox[attr_long + "_percent"] = skill_gem[attr_short]
+        attr_map = {
+            "strength": skill_gem["StrengthRequirementPercent"],
+            "dexterity": skill_gem["DexterityRequirementPercent"],
+            "intelligence": skill_gem["IntelligenceRequirementPercent"],
+        }
+        try:
+            attr_weight = 100 / (
+                attr_map["strength"] + attr_map["dexterity"] + attr_map["intelligence"]
+            )
+        except ZeroDivisionError:
+            attr_weight = 1
+        for k, v in attr_map.items():
+            percent = math.floor(v * attr_weight)
+            if percent > 0:
+                infobox[k + "_percent"] = percent
 
         infobox["gem_tags"] = ", ".join([gt["Tag"] for gt in gem_type["GemTags"] if gt["Tag"]])
         infobox["gem_shader"] = gem_type["ItemColor"]
