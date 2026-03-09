@@ -317,13 +317,13 @@ class AreaParser(parser.BaseParser):
     def by_id(self, parsed_args):
         return self.export(
             parsed_args,
-            self._area_column_index_filter(column_id="Id", arg_list=parsed_args.area_id),
+            self._area_column_index_filter(column_id="Id", arg_list=parsed_args.id),
         )
 
     def by_name(self, parsed_args):
         return self.export(
             parsed_args,
-            self._area_column_index_filter(column_id="Name", arg_list=parsed_args.area_name),
+            self._area_column_index_filter(column_id="Name", arg_list=parsed_args.name),
         )
 
     def by_filter(self, parsed_args):
@@ -376,20 +376,17 @@ class AreaParser(parser.BaseParser):
             #    infobox["spawn_weight%s_tag" % i] = tag["Id"]
             #    infobox["spawn_weight%s_value" % i] = value
 
-            map_pin = self.rr[self._MAPPINS_FILE_NAME].index["WorldAreasKeys"].get(area)
-            if map_pin:
-                infobox["flavour_text"] = map_pin[0]["FlavourText"]
-
+            # Flavour text
+            flavour_text = None
+            map_pins = self.rr[self._MAPPINS_FILE_NAME].index["WorldAreasKeys"].get(area)
+            if map_pins:
+                flavour_text = map_pins[0]["FlavourText"]
             endgame_map = self.rr[self._ENDGAMEMAPS_FILE_NAME].index["WorldArea"].get(area)
             if endgame_map:
-                infobox["flavour_text"] = endgame_map["FlavourText"]
+                flavour_text = endgame_map["FlavourText"]
                 get_endgame_map_biomes(infobox, endgame_map)
-
-            if infobox.get("flavour_text"):
-                infobox["flavour_text"] = parser.parse_and_handle_description_tags(
-                    rr=self.rr,
-                    text=infobox["flavour_text"],
-                )
+            if flavour_text:
+                infobox["flavour_text"] = flavour_text.replace("\n", "<br>").replace("\r", "")
 
             cond = WikiCondition(
                 data=infobox,

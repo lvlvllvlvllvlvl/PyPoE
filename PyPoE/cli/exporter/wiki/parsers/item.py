@@ -1886,16 +1886,16 @@ class ItemsParser(SkillParserShared):
 
     def _skill_gem_type(self, infobox: OrderedDict, base_item_type, skill_gem, gem_type):
         name = gem_type["Name"]
-        if "[DNT]" in name:
+        if "[DNT" in name:
             return False
         if skill_gem["IsVaalVariant"]:
-            infobox["is_vaal_skill_gem"] = "true"
+            infobox["is_vaal_skill_gem"] = True
             if gem_type["ItemColor"] != 3:
                 return False
         if skill_gem["VaalVariant_BaseItemTypesKey"]:
             infobox["vaal_variant_id"] = skill_gem["VaalVariant_BaseItemTypesKey"]["Id"]
         if skill_gem["RegularVariant"]:
-            infobox["is_awakened_support_gem"] = "true"
+            infobox["is_awakened_support_gem"] = True
         if skill_gem["AwakenedVariant"]:
             infobox["awakened_variant_id"] = skill_gem["AwakenedVariant"]["BaseItemTypesKey"]["Id"]
         if name:
