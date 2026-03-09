@@ -756,7 +756,8 @@ class SkillParserShared(parser.BaseParser):
         if gra_eff["SupportGemLetter"]:
             infobox["support_gem_letter"] = gra_eff["SupportGemLetter"]
 
-        infobox["is_support"] = gra_eff["IsSupport"]
+        if gra_eff["IsSupport"]:
+            infobox["is_support"] = True
         if not gra_eff["IsSupport"]:
             infobox["cast_time"] = gra_eff["CastTime"] / 1000
 

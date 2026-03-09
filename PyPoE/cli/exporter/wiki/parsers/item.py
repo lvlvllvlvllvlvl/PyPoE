@@ -2087,7 +2087,9 @@ class ItemsParser(SkillParserShared):
 
         # some descriptions come from active skills which are parsed in above function
         if ge["IsSupport"] and gem_type["SupportText"]:
-            infobox["gem_description"] = gem_type["SupportText"].replace("\n", "<br>")
+            infobox["gem_description"] = (
+                gem_type["SupportText"].replace("\n", "<br>").replace("\r", "")
+            )
 
         #
         # Output handling for progression
