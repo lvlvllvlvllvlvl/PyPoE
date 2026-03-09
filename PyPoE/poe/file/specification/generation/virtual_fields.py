@@ -166,10 +166,6 @@ virtual_fields_mappings = {
                 Alias("BaseItemTypesKey", "Tattoo"),
                 Alias("PassiveSkillOverrideTypesKey", "OverrideType"),
             ],
-            "WorldAreas": [
-                Alias("AreaType_TagsKeys", "AreaTypeTags"),
-                Alias("VaalArea_WorldAreasKeys", "VaalArea"),
-            ],
             "SkillGems": [
                 Alias("ExperienceProgression", "ItemExperienceType"),
                 Alias("Str", "StrengthRequirementPercent"),
