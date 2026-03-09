@@ -33384,16 +33384,6 @@ specification = Specification(
             ),
             virtual_fields=(
                 VirtualField(
-                    name="AreaType_TagsKeys",
-                    fields=("AreaTypeTags",),
-                    alias=True,
-                ),
-                VirtualField(
-                    name="VaalArea_WorldAreasKeys",
-                    fields=("VaalArea",),
-                    alias=True,
-                ),
-                VirtualField(
                     name="TagsKeys",
                     fields=("Tags",),
                     alias=True,
