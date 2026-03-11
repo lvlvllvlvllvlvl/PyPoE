@@ -1391,14 +1391,6 @@ class ItemsParser(SkillParserShared):
         },
     }
 
-    _attribute_map = OrderedDict(
-        (
-            ("Str", "strength"),
-            ("Dex", "dexterity"),
-            ("Int", "intelligence"),
-        )
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._parsed_args = None
@@ -1437,7 +1429,7 @@ class ItemsParser(SkillParserShared):
             return False
         if skill_gem["IsVaalVariant"]:
             infobox["is_vaal_skill_gem"] = True
-            if gem_type["ItemColor"] != 3:
+            if gem_type["ItemColor"] != constants.GEM_STYLES.DEFAULT:
                 return False
         if skill_gem["VaalVariant_BaseItemType"]:
             infobox["vaal_variant_id"] = skill_gem["VaalVariant_BaseItemType"]["Id"]
@@ -2587,7 +2579,7 @@ class ItemsParser(SkillParserShared):
                         process=self._get_icon_process(infobox, base_item_type),
                     )
 
-                infobox.pop("gem_shader", None)
+                infobox.pop("gem_style", None)
 
         return r
 
@@ -2602,7 +2594,7 @@ class ItemsParser(SkillParserShared):
 
     def _get_icon_process(self, infobox: dict[str, str], base_item_type):
         comp = base_item_type["ItemVisualIdentityKey"]["Composition"]
-        if comp == 1:  # Flask
+        if comp == constants.ITEM_VISUAL_COMPOSITIONS.FLASK:
 
             def flask_icon_process(img: Image):
                 layer1 = img.crop((105, 0, 210, 212))
@@ -2613,36 +2605,33 @@ class ItemsParser(SkillParserShared):
                 return ico
 
             return flask_icon_process
-        if comp == 3:  # Gem
-            return self._get_gem_icon_process(infobox)
+        # if comp == constants.ITEM_VISUAL_COMPOSITIONS.GEM:
+        #     return self._get_gem_icon_process(infobox)
         return self._resize_icon
 
     def _get_gem_icon_process(self, infobox: dict[str, str]):
-        if "gem_shader" not in infobox:
+        if "gem_style" not in infobox:
             return None
+        style = infobox.pop("gem_style")
 
-        attrs = {
-            k.lower(): int(infobox.get(f"{v}_percent", 0)) for k, v in self._attribute_map.items()
-        }
-        attr = max(attrs, key=attrs.get)
-        var = infobox.pop("gem_shader")
-
-        def process(img: Image):
-            adorn = img.crop((0, 0, 78, 78))
-            base = img.crop((2 * 78, 0, 3 * 78, 78))
-            if var == 3:
-                return Image.alpha_composite(base, adorn)
-            const = SHADE_LUT[(attr, var)]
-
+        def shade(base, style):
+            attr_map = {
+                "str": "strength",
+                "dex": "dexterity",
+                "int": "intelligence",
+            }
+            attrs = {k.lower(): int(infobox.get(f"{v}_percent", 0)) for k, v in attr_map.items()}
+            attr = max(attrs, key=attrs.get)
+            const = SHADE_LUT[(attr, style)]
             base_rgba = _srgb_to_linear(np.float32(np.asarray(base)) / 255.0)
 
             # Shade algorithm:
             # * compute luminance influence
             #   float Luminance(float3 color)
             #   {
-            #   	return dot(float3(0.299, 0.587, 0.114), color);
+            #       return dot(float3(0.299, 0.587, 0.114), color);
             #   }
-            # 	const float luminance_influence = pow(Luminance(original_rgb), 0.02);
+            #   const float luminance_influence = pow(Luminance(original_rgb), 0.02);
             base_rgb = base_rgba[:, :, :3]
             base_a = base_rgba[:, :, 3]
             lum_f = (
@@ -2658,9 +2647,9 @@ class ItemsParser(SkillParserShared):
             hsv = matplotlib.colors.rgb_to_hsv(base_rgb)
 
             # * shift HSV by XYZ, clamp H
-            # 	max(modf( hsv_sample.x + effect_params.x, ignore ), 0.024),
-            # 	saturate( hsv_sample.y + effect_params.y ),
-            # 	saturate( hsv_sample.z + effect_params.z )
+            #   max(modf( hsv_sample.x + effect_params.x, ignore ), 0.024),
+            #   saturate( hsv_sample.y + effect_params.y ),
+            #   saturate( hsv_sample.z + effect_params.z )
             h2 = np.maximum(np.modf(hsv[:, :, 0] + const.hue_factor)[0], 0.024)
             s2 = np.clip(hsv[:, :, 1] + const.sat_factor, 0.0, 1.0)
             v2 = np.clip(hsv[:, :, 2] + const.val_factor, 0.0, 1.0)
@@ -2670,11 +2659,11 @@ class ItemsParser(SkillParserShared):
             modified_rgb = matplotlib.colors.hsv_to_rgb(np.stack([h2, s2, v2], axis=2))
 
             # * mix original RGB and modified RGB by luminance influence weighted by W
-            # 	const float3 final_rgb = lerp(
-            # 		modified_rgb,
-            # 		original_rgb,
-            # 		lerp(luminance_influence, 0.f, effect_params.w)
-            # 	);
+            #   const float3 final_rgb = lerp(
+            #       modified_rgb,
+            #       original_rgb,
+            #       lerp(luminance_influence, 0.f, effect_params.w)
+            #   );
             def lerp(a, b, f):
                 return a * (1.0 - f) + b * f
 
@@ -2685,9 +2674,16 @@ class ItemsParser(SkillParserShared):
             shifted_base = Image.fromarray(np.uint8(_linear_to_srgb(shifted_rgba) * 255.0), "RGBA")
 
             # * desaturate, but the parameter for that seems to be 1 so won't bother
-            # 	return Desaturate(float4(final_rgb, 1.f) * original_a, saturation) * input.colour;
+            #   return Desaturate(float4(final_rgb, 1.f) * original_a, saturation) * input.colour;
 
-            ico = Image.alpha_composite(shifted_base, adorn)
+            return shifted_base
+
+        def process(img: Image):
+            adorn = img.crop((0, 0, 78, 78))
+            base = img.crop((2 * 78, 0, 3 * 78, 78))
+            if style in (constants.GEM_STYLES.UNUSED_1, constants.GEM_STYLES.UNUSED_2):
+                base = shade(base, style)
+            ico = Image.alpha_composite(base, adorn)
             ico = self._resize_icon(ico)
             return ico
 

@@ -5358,20 +5358,15 @@ specification = Specification(
                 ),
             ),
         ),
-        "BrequelGraftTypes.dat": File(
+        "BrequelGrafts.dat": File(
             fields=(
                 Field(
-                    name="BaseItemType",
-                    type="ref|out",
-                    key="BaseItemTypes.dat",
+                    name="Id",
+                    type="ref|string",
                     unique=True,
                 ),
                 Field(
-                    name="LeftArm",
-                    type="ref|string",
-                ),
-                Field(
-                    name="RightArm",
+                    name="Arm",
                     type="ref|string",
                 ),
                 Field(
@@ -5386,11 +5381,6 @@ specification = Specification(
                 Field(
                     name="SkillAnimation",
                     type="ref|string",
-                ),
-                Field(
-                    name="Achievement",
-                    type="ref|out",
-                    key="AchievementItems.dat",
                 ),
             ),
         ),
@@ -5412,7 +5402,7 @@ specification = Specification(
                     key="ClientStrings.dat",
                 ),
                 Field(
-                    name="Key2",
+                    name="Wombgift",
                     type="ref|out",
                     key="BaseItemTypes.dat",
                 ),
@@ -11683,6 +11673,7 @@ specification = Specification(
                 Field(
                     name="ItemColor",
                     type="int",
+                    enum="GEM_STYLES",
                     description="Used by gem icon shader https://gist.github.com/zao/08878df57aba605e5fa1e6373f2dce02",
                 ),
             ),
@@ -16894,7 +16885,7 @@ specification = Specification(
                 Field(
                     name="Composition",
                     type="int",
-                    description="0: Standard, 1: Flask, 2: Divination Card, 3: Gem",
+                    enum="ITEM_VISUAL_COMPOSITIONS",
                 ),
                 Field(
                     name="Key0",
@@ -19202,6 +19193,10 @@ specification = Specification(
                 ),
                 Field(
                     name="KeepersTier",
+                    type="int",
+                ),
+                Field(
+                    name="MirageTier",
                     type="int",
                 ),
             ),
