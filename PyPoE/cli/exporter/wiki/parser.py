@@ -849,6 +849,7 @@ _inter_wiki_map = {
         ("Unseen Strike", {"link": "Unseen Strike"}),
         ("Void Gaze", {"link": "Void Gaze"}),
         ("Void Shot", {"link": "Void Shot"}),
+        ("Ward Shatter", {"link": "Ward Shatter"}),
         #
         # Minions
         #
@@ -2482,7 +2483,6 @@ class TagHandler:
     UNIQ_FORMATS = {
         "Grand Spectrum": "[[%s]]",
         "Precursor's Emblem": "[[%s]]",
-        "The Beachhead": "{{iil|The Beachhead (High Tier)|%s}}",
     }
 
     CUSTOM_LINKS = {

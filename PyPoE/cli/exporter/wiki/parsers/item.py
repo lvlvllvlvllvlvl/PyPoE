@@ -1450,6 +1450,10 @@ class ItemsParser(SkillParserShared):
         # Currency items
         # =================================================================
         "Metadata/Items/Currency/CurrencyLabyrinthEnchant",
+        "Metadata/Items/Currency/RunegraftMinionCannotAttack",
+        "Metadata/Items/Currency/RunegraftMatchedSpeed",
+        "Metadata/Items/Currency/RunegraftMinionCannotCast",
+        "Metadata/Items/Currency/RunegraftTest",
         # =================================================================
         # Non-stackable resonators from before 3.8.0
         # =================================================================
@@ -1642,11 +1646,21 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Currency/SanctumCurrencyWindDancer",
         "Metadata/Items/Currency/SanctumCurrencyZealotsOath",
         # =================================================================
-        # Scarabs
+        # Old Sanctum relics, maybe?
+        # =================================================================
+        "Metadata/Items/Relics/Relic1x2",
+        "Metadata/Items/Relics/Relic1x3",
+        "Metadata/Items/Relics/Relic1x4",
+        "Metadata/Items/Relics/Relic2x1",
+        "Metadata/Items/Relics/Relic2x2",
+        "Metadata/Items/Relics/Relic3x1",
+        "Metadata/Items/Relics/Relic4x1",
+        # =================================================================
+        # Map fragments
         # =================================================================
         "Metadata/Items/Scarabs/ScarabMisc6",
         "Metadata/Items/Scarabs/ScarabMisc7",
-        "Metadata/Items/Scarabs/ScarabMisc10",
+        "Metadata/Items/MapFragments/RatsAllflamePack",
         # =================================================================
         # Corpse items
         # =================================================================
@@ -1718,12 +1732,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Armours/BodyArmours/BodyStrTemp",
         "Metadata/Items/Armours/Boots/BootsStrTemp",
         "Metadata/Items/Classic/MysteryLeaguestone",
-        "Metadata/Items/Relics/Relic1x3",
-        "Metadata/Items/Relics/Relic1x4",
-        "Metadata/Items/Relics/Relic2x1",
-        "Metadata/Items/Relics/Relic2x2",
-        "Metadata/Items/Relics/Relic3x1",
-        "Metadata/Items/Relics/Relic4x1",
     }
 
     _ITEM_SKIP_PATTERNS = {

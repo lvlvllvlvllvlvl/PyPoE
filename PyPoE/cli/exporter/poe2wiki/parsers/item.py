@@ -2483,7 +2483,7 @@ class ItemsParser(SkillParserShared):
         self.num_processed = 0
 
         for base_item_type in items:
-            if "[DNT]" in base_item_type["Name"] or "[DNT-UNUSED]" in base_item_type["Name"]:
+            if "[DNT" in base_item_type["Name"] or "[UNUSED" in base_item_type["Name"]:
                 continue
 
             name = base_item_type["Name"]
