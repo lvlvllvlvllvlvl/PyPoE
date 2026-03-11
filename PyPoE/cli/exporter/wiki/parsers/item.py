@@ -34,6 +34,7 @@ import math
 import os
 
 # Python
+import posixpath
 import re
 import struct
 import warnings
@@ -1449,6 +1450,10 @@ class ItemsParser(SkillParserShared):
         # Currency items
         # =================================================================
         "Metadata/Items/Currency/CurrencyLabyrinthEnchant",
+        "Metadata/Items/Currency/RunegraftMinionCannotAttack",
+        "Metadata/Items/Currency/RunegraftMatchedSpeed",
+        "Metadata/Items/Currency/RunegraftMinionCannotCast",
+        "Metadata/Items/Currency/RunegraftTest",
         # =================================================================
         # Non-stackable resonators from before 3.8.0
         # =================================================================
@@ -1641,11 +1646,21 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Currency/SanctumCurrencyWindDancer",
         "Metadata/Items/Currency/SanctumCurrencyZealotsOath",
         # =================================================================
-        # Scarabs
+        # Old Sanctum relics, maybe?
+        # =================================================================
+        "Metadata/Items/Relics/Relic1x2",
+        "Metadata/Items/Relics/Relic1x3",
+        "Metadata/Items/Relics/Relic1x4",
+        "Metadata/Items/Relics/Relic2x1",
+        "Metadata/Items/Relics/Relic2x2",
+        "Metadata/Items/Relics/Relic3x1",
+        "Metadata/Items/Relics/Relic4x1",
+        # =================================================================
+        # Map fragments
         # =================================================================
         "Metadata/Items/Scarabs/ScarabMisc6",
         "Metadata/Items/Scarabs/ScarabMisc7",
-        "Metadata/Items/Scarabs/ScarabMisc10",
+        "Metadata/Items/MapFragments/RatsAllflamePack",
         # =================================================================
         # Corpse items
         # =================================================================
@@ -1717,12 +1732,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Armours/BodyArmours/BodyStrTemp",
         "Metadata/Items/Armours/Boots/BootsStrTemp",
         "Metadata/Items/Classic/MysteryLeaguestone",
-        "Metadata/Items/Relics/Relic1x3",
-        "Metadata/Items/Relics/Relic1x4",
-        "Metadata/Items/Relics/Relic2x1",
-        "Metadata/Items/Relics/Relic2x2",
-        "Metadata/Items/Relics/Relic3x1",
-        "Metadata/Items/Relics/Relic4x1",
     }
 
     _ITEM_SKIP_PATTERNS = {
@@ -1760,14 +1769,6 @@ class ItemsParser(SkillParserShared):
     }
 
     _PLACEHOLDER_IMAGES = {"Art/2DItems/Hideout/HideoutPlaceholder.dds"}
-
-    _attribute_map = OrderedDict(
-        (
-            ("Str", "strength"),
-            ("Dex", "dexterity"),
-            ("Int", "intelligence"),
-        )
-    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1870,6 +1871,11 @@ class ItemsParser(SkillParserShared):
             return False
         return True
 
+    _GEM_OVERLAY_MAP = {
+        constants.GEM_STYLES.TRARTHAN: "Art/2DItems/Gems/Overlays/Sparklebackground.dds",
+        constants.GEM_STYLES.EXCEPTIONAL: "Art/2DItems/Gems/Overlays/ExceptionalSupportGemOverlay.dds",
+    }
+
     def _skill_gem(self, infobox: OrderedDict, base_item_type):
         try:
             skill_gem = self.rr["SkillGems.dat64"].index["BaseItemTypesKey"][base_item_type.rowid]
@@ -1890,7 +1896,7 @@ class ItemsParser(SkillParserShared):
             return False
         if skill_gem["IsVaalVariant"]:
             infobox["is_vaal_skill_gem"] = True
-            if gem_type["ItemColor"] != 3:
+            if gem_type["ItemColor"] != constants.GEM_STYLES.DEFAULT:
                 return False
         if skill_gem["VaalVariant_BaseItemTypesKey"]:
             infobox["vaal_variant_id"] = skill_gem["VaalVariant_BaseItemTypesKey"]["Id"]
@@ -1920,7 +1926,7 @@ class ItemsParser(SkillParserShared):
                 infobox[k + "_percent"] = percent
 
         infobox["gem_tags"] = ", ".join([gt["Tag"] for gt in gem_type["GemTags"] if gt["Tag"]])
-        infobox["gem_shader"] = gem_type["ItemColor"]
+        infobox["gem_style"] = gem_type["ItemColor"]
 
         # No longer used
         #
@@ -2696,7 +2702,7 @@ class ItemsParser(SkillParserShared):
                 .index["Id"]["EssenceModLevelRestriction"]["Text"]
                 .replace("{0}", str(essence["ItemLevelRestriction"]))
             )
-            out[-1] += "<br />"
+            out[-1] += "<br>"
 
         def add_line(text, mod):
             nonlocal out
@@ -2732,7 +2738,7 @@ class ItemsParser(SkillParserShared):
             # TODO: Can't find items in clientstrings
             add_line(get_str("Other").replace("{0}", "Items"), item_mod)
 
-        infobox["description"] += "<br />" + "<br />".join(out)
+        infobox["description"] += "<br>" + "<br>".join(out)
 
         return True
 
@@ -3606,6 +3612,8 @@ class ItemsParser(SkillParserShared):
 
         console("Loading additional files - this may take a while...")
         self._image_init(parsed_args)
+        # Some gems require overlay images to be added to their inventory icons
+        self._make_gem_overlays(parsed_args)
 
         r = ExporterResult()
         self.rr["BaseItemTypes.dat64"].build_index("Name")
@@ -3724,9 +3732,27 @@ class ItemsParser(SkillParserShared):
                         process=self._get_icon_process(infobox, base_item_type),
                     )
 
-                infobox.pop("gem_shader", None)
+                infobox.pop("gem_style", None)
 
         return r
+
+    def _make_gem_overlays(self, parsed_args):
+        if not parsed_args.store_images:
+            return
+
+        def process(img: Image):
+            img = img.crop((0, 0, 78, 78))
+            return img
+
+        for k, file_path in self._GEM_OVERLAY_MAP.items():
+            file_name = posixpath.basename(file_path)
+            ico = os.path.join(self._img_path, file_name)
+            self._write_dds(
+                data=self.file_system.get_file(file_path),
+                out_path=ico,
+                parsed_args=parsed_args,
+                process=process,
+            )
 
     def _resize_icon(self, img: Image):
         max_dimension = max(img.size)
@@ -3739,7 +3765,7 @@ class ItemsParser(SkillParserShared):
 
     def _get_icon_process(self, infobox: dict[str, str], base_item_type):
         comp = base_item_type["ItemVisualIdentityKey"]["Composition"]
-        if comp == 1:  # Flask
+        if comp == constants.ITEM_VISUAL_COMPOSITIONS.FLASK:
 
             def flask_icon_process(img: Image):
                 layer1 = img.crop((78, 0, 156, 156))
@@ -3750,39 +3776,33 @@ class ItemsParser(SkillParserShared):
                 return ico
 
             return flask_icon_process
-        if comp == 3:  # Gem
-            return self._get_gem_icon_process(infobox)
+        if base_item_type["ItemClassesKey"]["Id"] in ("Active Skill Gem", "Support Skill Gem"):
+            return self._get_gem_icon_process(infobox, comp)
         return self._resize_icon
 
-    def _get_gem_icon_process(self, infobox: dict[str, str]):
-        if "gem_shader" not in infobox:
+    def _get_gem_icon_process(self, infobox: dict[str, str], comp):
+        if "gem_style" not in infobox:
             return None
+        style = infobox.pop("gem_style")
 
-        attrs = {
-            k.lower(): int(infobox.get(f"{v}_percent", 0)) for k, v in self._attribute_map.items()
-        }
-        attr = max(attrs, key=attrs.get)
-        var = infobox.pop("gem_shader")
-
-        def process(img: Image):
-            adorn = img.crop((0, 0, 78, 78))
-            base = img.crop((2 * 78, 0, 3 * 78, 78))
-            if var == 3:
-                # Trarthian constants not known
-                return None
-            elif var == 4:
-                return Image.alpha_composite(base, adorn)
-            const = SHADE_LUT[(attr, var)]
-
+        def shade(base, style):
+            attr_map = {
+                "str": "strength",
+                "dex": "dexterity",
+                "int": "intelligence",
+            }
+            attrs = {k.lower(): int(infobox.get(f"{v}_percent", 0)) for k, v in attr_map.items()}
+            attr = max(attrs, key=attrs.get)
+            const = SHADE_LUT[(attr, style)]
             base_rgba = _srgb_to_linear(np.float32(np.asarray(base)) / 255.0)
 
             # Shade algorithm:
             # * compute luminance influence
             #   float Luminance(float3 color)
             #   {
-            #   	return dot(float3(0.299, 0.587, 0.114), color);
+            #       return dot(float3(0.299, 0.587, 0.114), color);
             #   }
-            # 	const float luminance_influence = pow(Luminance(original_rgb), 0.02);
+            #   const float luminance_influence = pow(Luminance(original_rgb), 0.02);
             base_rgb = base_rgba[:, :, :3]
             base_a = base_rgba[:, :, 3]
             lum_f = (
@@ -3798,9 +3818,9 @@ class ItemsParser(SkillParserShared):
             hsv = matplotlib.colors.rgb_to_hsv(base_rgb)
 
             # * shift HSV by XYZ, clamp H
-            # 	max(modf( hsv_sample.x + effect_params.x, ignore ), 0.024),
-            # 	saturate( hsv_sample.y + effect_params.y ),
-            # 	saturate( hsv_sample.z + effect_params.z )
+            #   max(modf( hsv_sample.x + effect_params.x, ignore ), 0.024),
+            #   saturate( hsv_sample.y + effect_params.y ),
+            #   saturate( hsv_sample.z + effect_params.z )
             h2 = np.maximum(np.modf(hsv[:, :, 0] + const.hue_factor)[0], 0.024)
             s2 = np.clip(hsv[:, :, 1] + const.sat_factor, 0.0, 1.0)
             v2 = np.clip(hsv[:, :, 2] + const.val_factor, 0.0, 1.0)
@@ -3810,11 +3830,11 @@ class ItemsParser(SkillParserShared):
             modified_rgb = matplotlib.colors.hsv_to_rgb(np.stack([h2, s2, v2], axis=2))
 
             # * mix original RGB and modified RGB by luminance influence weighted by W
-            # 	const float3 final_rgb = lerp(
-            # 		modified_rgb,
-            # 		original_rgb,
-            # 		lerp(luminance_influence, 0.f, effect_params.w)
-            # 	);
+            #   const float3 final_rgb = lerp(
+            #       modified_rgb,
+            #       original_rgb,
+            #       lerp(luminance_influence, 0.f, effect_params.w)
+            #   );
             def lerp(a, b, f):
                 return a * (1.0 - f) + b * f
 
@@ -3825,9 +3845,31 @@ class ItemsParser(SkillParserShared):
             shifted_base = Image.fromarray(np.uint8(_linear_to_srgb(shifted_rgba) * 255.0), "RGBA")
 
             # * desaturate, but the parameter for that seems to be 1 so won't bother
-            # 	return Desaturate(float4(final_rgb, 1.f) * original_a, saturation) * input.colour;
+            #   return Desaturate(float4(final_rgb, 1.f) * original_a, saturation) * input.colour;
 
-            ico = Image.alpha_composite(shifted_base, adorn)
+            return shifted_base
+
+        def overlay(base, style):
+            file_name = posixpath.basename(self._GEM_OVERLAY_MAP[style]).replace(".dds", ".png")
+            ico = os.path.join(self._img_path, file_name)
+            overlay_img = Image.open(ico)
+            base = Image.alpha_composite(overlay_img, base)
+            return base
+
+        def process(img: Image):
+            if comp == constants.ITEM_VISUAL_COMPOSITIONS.GEM:
+                base = img.crop((2 * 78, 0, 3 * 78, 78))
+                if style in (
+                    constants.GEM_STYLES.TRANSFIGURED_X,
+                    constants.GEM_STYLES.TRANSFIGURED_Y,
+                ):
+                    base = shade(base, style)
+                adorn = img.crop((0, 0, 78, 78))
+                ico = Image.alpha_composite(base, adorn)
+            else:
+                ico = img.crop((0, 0, 78, 78))
+            if style in (constants.GEM_STYLES.TRARTHAN, constants.GEM_STYLES.EXCEPTIONAL):
+                ico = overlay(ico, style)
             ico = self._resize_icon(ico)
             return ico
 

@@ -34,6 +34,16 @@ custom_attributes = {
             enum="DELVE_UPGRADE_TYPE",
         ),
     },
+    "GemEffects.dat": {
+        "ItemColor": CustomizedField(
+            enum="GEM_STYLES",
+        ),
+    },
+    "ItemVisualIdentity.dat": {
+        "Composition": CustomizedField(
+            enum="ITEM_VISUAL_COMPOSITIONS",
+        ),
+    },
     "Maps.dat": {
         "MapGeneration": CustomizedField(
             enum="MAP_GENERATION",
