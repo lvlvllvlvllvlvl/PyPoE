@@ -1900,10 +1900,10 @@ class ItemsParser(SkillParserShared):
                 return False
         if skill_gem["VaalVariant_BaseItemTypesKey"]:
             infobox["vaal_variant_id"] = skill_gem["VaalVariant_BaseItemTypesKey"]["Id"]
-        if skill_gem["RegularVariant"]:
-            infobox["is_awakened_support_gem"] = True
         if skill_gem["AwakenedVariant"]:
             infobox["awakened_variant_id"] = skill_gem["AwakenedVariant"]["BaseItemTypesKey"]["Id"]
+        if skill_gem["RegularVariant"]:
+            infobox["regular_variant_id"] = skill_gem["RegularVariant"]["BaseItemTypesKey"]["Id"]
         if name:
             infobox["name"] = name
             infobox["base_item_id"] = infobox.pop("metadata_id")
