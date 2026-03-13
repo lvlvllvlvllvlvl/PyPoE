@@ -738,12 +738,16 @@ _inter_wiki_map = {
         ("Aspect of the Spider", {"link": "Aspect of the Spider"}),
         ("Avenging Flame", {"link": "Avenging Flame"}),
         ("Barkskin", {"link": "Barkskin"}),
+        ("Blazing Glare", {"link": "Blazing Glare"}),
         ("Blood Offering", {"link": "Blood Offering"}),
         ("Blood Sacrament", {"link": "Blood Sacrament"}),
         ("Bone Corpses", {"link": "Bone Corpses"}),
         ("Bone Nova", {"link": "Bone Nova"}),
         ("Brandsurge", {"link": "Brandsurge"}),
         ("Call of Steel", {"link": "Call of Steel"}),
+        ("Caustic Retribution", {"link": "Caustic Retribution"}),
+        ("Ceaseless Flesh", {"link": "Ceaseless Flesh"}),
+        ("Cinders", {"link": "Cinders"}),
         ("Cold Aegis", {"link": "Cold Aegis"}),
         ("Consecrate", {"link": "Consecrate"}),
         ("Contaminate", {"link": "Contaminate"}),
@@ -840,7 +844,9 @@ _inter_wiki_map = {
         ("Summon Triggerbots", {"link": "Summon Triggerbots"}),
         ("Summon Void Spawn", {"link": "Summon Void Spawn"}),
         ("(?:Summon )?Volatile Anomaly", {"link": "Volatile Anomaly"}),
+        ("Suspend in Time", {"link": "Suspend in Time"}),
         ("Tawhoa's Chosen", {"link": "Tawhoa's Chosen"}),
+        ("Tears of Rot", {"link": "Tears of Rot"}),
         ("Tentacle Whip", {"link": "Tentacle Whip"}),
         ("Thirst for Blood", {"link": "Thirst for Blood"}),
         ("Twister", {"link": "Twister"}),
@@ -960,9 +966,9 @@ _inter_wiki_map = {
         ("Blood Charge(?:|s)", {"link": "Blood Charge"}),
         ("Fanatic Charge(?:|s)", {"link": "Fanatic Charge"}),
         #
-        # Buffs
+        # Status effects
         #
-        # Friendly
+        # Buffs
         ("Adrenaline", {"link": "Adrenaline"}),
         ("Arcane Surge", {"link": "Arcane Surge"}),
         ("Fortify|Fortified", {"link": "Fortify"}),
@@ -994,7 +1000,7 @@ _inter_wiki_map = {
         ("Phantasmal Might", {"link": "Phantasmal Might"}),
         ("Blood Stance", {"link": "Blood Stance"}),
         ("Sand Stance", {"link": "Sand Stance"}),
-        # Hostile
+        # Debuffs
         ("Blind(?:|ed)", {"link": "Blind"}),
         ("Maim(?:|ed)", {"link": "Maim"}),
         ("Hinder(?:|ed)", {"link": "Hinder"}),
@@ -1019,6 +1025,7 @@ _inter_wiki_map = {
         ("Mana Burn", {"link": "Mana Burn"}),
         ("Marked for Death", {"link": "Marked for Death"}),
         ("Malignant Madness", {"link": "Malignant Madness"}),
+        ("Cinderflame", {"link": "Cinderflame"}),
         # Ground effects
         ("Burning Ground", {"link": "Burning Ground"}),
         ("Desecrated Ground", {"link": "Desecrated Ground"}),
@@ -1047,10 +1054,8 @@ _inter_wiki_map = {
         ("Leech(?:|ed|ing)", {"link": "Leech"}),
         ("Low Life", {"link": "Low Life"}),
         ("Full Life", {"link": "Full Life"}),
-        ("Life", {"link": "Life"}),
         ("Low Mana", {"link": "Low Mana"}),
         ("Full Mana", {"link": "Full Mana"}),
-        ("Mana", {"link": "Mana"}),
         ("Reservation|Reserve(?:|d)", {"link": "Reservation"}),
         ("Regeneration|Regenerate(?:|d)", {"link": "Regeneration"}),
         ("Chaos Resistance(?:|s)", {"link": "Chaos Resistance"}),
@@ -1202,6 +1207,11 @@ _inter_wiki_map = {
         ("Belt(?:|s)", {"link": "Belt"}),
         ("(?<!small |edium |large |ssive )Ring(?:|s)", {"link": "Ring"}),
         ("Jewellery", {"link": "Jewellery"}),
+        # Flasks
+        ("Life Flask(?:|s)", {"link": "Life Flask"}),
+        ("Mana Flask(?:|s)", {"link": "Mana Flask"}),
+        ("Utility Flask(?:|s)", {"link": "Utility Flask"}),
+        ("Flask(?:|s)", {"link": "Flask"}),
         # Jewels
         ("Murderous Eye Jewel(?:|s)", {"link": "Murderous Eye Jewel"}),
         ("Ghastly Eye Jewel(?:|s)", {"link": "Ghastly Eye Jewel"}),
@@ -1275,7 +1285,6 @@ _inter_wiki_map = {
         ("Currency(?: Item(?:|s))?", {"link": "Currency"}),
         # Other
         ("Quiver(?:|s)", {"link": "Quiver"}),
-        ("Flask(?:|s)", {"link": "Flask"}),
         ("Tincture(?:|s)", {"link": "Tincture"}),
         ("Blight(?:|ed) Map(?:|s)", {"link": "Blighted Map"}),
         ("Blight-Ravaged Map(?:|s)", {"link": "Blight-Ravaged Map"}),
@@ -1431,6 +1440,8 @@ _inter_wiki_map = {
         ("Armour", {"link": "Armour"}),
         ("(?<! to )Charge(?:|s)", {"link": "Charge"}),
         ("Crush(?:|ed)", {"link": "Crushed"}),
+        ("Life", {"link": "Life"}),
+        ("Mana", {"link": "Mana"}),
     ),
     "Russian": (
         #
