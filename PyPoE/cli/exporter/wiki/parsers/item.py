@@ -1972,7 +1972,7 @@ class ItemsParser(SkillParserShared):
             gra_eff=ge,
             infobox=primary,
             parsed_args=self._parsed_args,
-            msg_name=gem_type["Name"],
+            msg_name=ge["ActiveSkill"] and ge["ActiveSkill"]["DisplayedName"],
             max_level=max_level,
         )
 
@@ -2013,7 +2013,7 @@ class ItemsParser(SkillParserShared):
                 gra_eff=second,
                 infobox=secondary,
                 parsed_args=self._parsed_args,
-                msg_name=base_item_type["Name"],
+                msg_name=second["ActiveSkill"] and second["ActiveSkill"]["DisplayedName"],
                 max_level=max_level,
             )
 
