@@ -1727,7 +1727,7 @@ class ItemsParser(SkillParserShared):
         "Map",
         "NecropolisPack",
         "HiddenItem",
-        # "MapKey",
+        "MapKey",
         "RemovedItem",
     }
 
