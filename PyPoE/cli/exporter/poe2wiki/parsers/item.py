@@ -298,7 +298,6 @@ class ItemsHandler(ExporterHandler):
             "by_filter",
             help="Extracts all items matching various filters",
         )
-
         self.add_default_parsers(
             parser=item_filter_parser,
             cls=ItemsParser,
@@ -311,13 +310,26 @@ class ItemsHandler(ExporterHandler):
             help="Filter by item name using regular expression.",
             dest="re_name",
         )
-
         item_filter_parser.add_argument(
             "-ft-id",
             "--filter-id",
             "--filter-metadata-id",
-            help="Filter by item metadata id using regular expression",
+            help="Filter by item metadata ID using regular expression",
             dest="re_id",
+        )
+        item_filter_parser.add_argument(
+            "-ft-c",
+            "--filter-class",
+            help="Filter by item class(es). Case sensitive.",
+            nargs="*",
+            dest="item_class",
+        )
+        item_filter_parser.add_argument(
+            "-ft-cid",
+            "--filter-class-id",
+            help="Filter by item class ID(s). Case sensitive.",
+            nargs="*",
+            dest="item_class_id",
         )
 
     def add_default_parsers(self, *args, type=None, **kwargs):
@@ -339,31 +351,7 @@ class ItemsHandler(ExporterHandler):
         )
 
         if type == "item":
-            parser.add_argument(
-                "-ft-c",
-                "--filter-class",
-                help="Filter by item class(es). Case sensitive.",
-                nargs="*",
-                dest="item_class",
-            )
-
-            parser.add_argument(
-                "-ft-cid",
-                "--filter-class-id",
-                help="Filter by item class id(s). Case sensitive.",
-                nargs="*",
-                dest="item_class_id",
-            )
-
             self.add_image_arguments(parser)
-        elif type == "prophecy":
-            parser.add_argument(
-                "--allow-disabled",
-                help="Allows disabled prophecies to be exported",
-                action="store_true",
-                dest="allow_disabled",
-                default=False,
-            )
 
 
 class ItemsParser(SkillParserShared):
@@ -397,7 +385,7 @@ class ItemsParser(SkillParserShared):
         "InstanceLocalItem",
     )
 
-    _DROP_DISABLED_ITEMS_BY_ID = set()
+    _DROP_DISABLED_ITEMS_BY_ID = set()  # Leave empty
 
     # For some reason these items have different drop level in game and in BaseItemTypes.dat
     _DROP_LEVEL_BY_ID = {
@@ -1408,6 +1396,23 @@ class ItemsParser(SkillParserShared):
             )
         else:
             self.rr2 = None
+        self._skipped_items = self._build_skip_list()
+
+    def _build_skip_list(self):
+        skip_list = set()
+        for item in self.rr["BaseItemTypes.dat64"]:
+            if item["ItemClass"]["Id"] in self._EXCLUDE_CLASSES:
+                skip_list.add(item["Id"])
+            elif item["Id"] in self._SKIP_ITEMS_BY_ID:
+                skip_list.add(item["Id"])
+            elif item["ItemClass"]["Id"] in self._ITEM_SKIP_PATTERNS:
+                for pattern in self._ITEM_SKIP_PATTERNS[item["ItemClass"]["Id"]]:
+                    if re.search(pattern, item["Id"], flags=re.IGNORECASE):
+                        skip_list.add(item["Id"])
+        return skip_list
+
+    def _in_skip_list(self, item):
+        return item and item["Id"] in self._skipped_items
 
     def _skill_gem(self, infobox: OrderedDict, base_item_type):
         try:
@@ -2258,34 +2263,6 @@ class ItemsParser(SkillParserShared):
         "MiscMapItem": _conflict_misc_map_item,
     }
 
-    def _parse_class_filter(self, parsed_args):
-        if parsed_args.item_class_id:
-            return [
-                self.rr["ItemClasses.dat64"].index["Id"][cls]["Name"]
-                for cls in parsed_args.item_class_id
-            ]
-        elif parsed_args.item_class:
-            self.rr["ItemClasses.dat64"].build_index("Name")
-            return [
-                self.rr["ItemClasses.dat64"].index["Name"][cls][0]["Name"]
-                for cls in parsed_args.item_class
-            ]
-        else:
-            return []
-
-    _skipped_items = set()
-
-    def _maybe_skip(self, base_item_type):
-        if base_item_type["Id"] in self._SKIP_ITEMS_BY_ID:
-            self._skipped_items.add(base_item_type["Id"])
-            return True
-        if base_item_type["ItemClass"]["Id"] in self._ITEM_SKIP_PATTERNS:
-            for pattern in self._ITEM_SKIP_PATTERNS[base_item_type["ItemClass"]["Id"]]:
-                if re.search(pattern, base_item_type["Id"], flags=re.IGNORECASE):
-                    self._skipped_items.add(base_item_type["Id"])
-                    return True
-        return False
-
     def _process_purchase_costs(self, source, infobox):
         for rarity in constants.RARITY:
             if rarity.id >= 5:
@@ -2320,17 +2297,33 @@ class ItemsParser(SkillParserShared):
             parsed_args.re_id = re.compile(parsed_args.re_id, flags=re.UNICODE)
 
         items = []
-
         for item in self.rr["BaseItemTypes.dat64"]:
             if parsed_args.re_name and not parsed_args.re_name.match(item["Name"]):
                 continue
-
             if parsed_args.re_id and not parsed_args.re_id.match(item["Id"]):
                 continue
-
             items.append(item)
 
+        class_ids = self._parse_class_filter(parsed_args)
+        if class_ids:
+            items = [item for item in items if item["ItemClassesKey"]["Id"] in class_ids]
+
         return self._export(parsed_args, items)
+
+    def _parse_class_filter(self, parsed_args):
+        if parsed_args.item_class_id:
+            return [
+                self.rr["ItemClasses.dat64"].index["Id"][cls]["Id"]
+                for cls in parsed_args.item_class_id
+            ]
+        elif parsed_args.item_class:
+            self.rr["ItemClasses.dat64"].build_index("Name")
+            return [
+                self.rr["ItemClasses.dat64"].index["Name"][cls][0]["Id"]
+                for cls in parsed_args.item_class
+            ]
+        else:
+            return []
 
     def _process_base_item_type(self, base_item_type, infobox):
         m_id = base_item_type["Id"]
@@ -2424,7 +2417,7 @@ class ItemsParser(SkillParserShared):
             items = [
                 item
                 for item in rr["BaseItemTypes.dat64"].index["Name"][name]
-                if item["Id"] not in self._skipped_items
+                if not self._in_skip_list(item)
             ]
             if len(items) > 1:
                 resolver = self._conflict_resolver_map.get(cls_id)
@@ -2455,15 +2448,11 @@ class ItemsParser(SkillParserShared):
         return name
 
     def _export(self, parsed_args, items):
-        classes = self._parse_class_filter(parsed_args)
-        if classes:
-            items = [item for item in items if item["ItemClass"]["Name"] in classes]
-        else:
-            items = [item for item in items if item["ItemClass"]["Id"] not in self._EXCLUDE_CLASSES]
-
         self._parsed_args = parsed_args
         console("Found %s items. Removing disabled items..." % len(items))
-        items = [base_item_type for base_item_type in items if not self._maybe_skip(base_item_type)]
+        items = [
+            base_item_type for base_item_type in items if not self._in_skip_list(base_item_type)
+        ]
         console("%s items left for processing." % len(items))
 
         console("Loading additional files - this may take a while...")
@@ -2471,10 +2460,6 @@ class ItemsParser(SkillParserShared):
 
         r = ExporterResult()
         self.rr["BaseItemTypes.dat64"].build_index("Name")
-
-        for item in self.rr["BaseItemTypes.dat64"]:
-            if item["ItemClass"]["Id"] in self._EXCLUDE_CLASSES:
-                self._skipped_items.add(item["Id"])
 
         if self._language != "English" and parsed_args.english_file_link:
             self.rr2["BaseItemTypes.dat64"].build_index("Name")
