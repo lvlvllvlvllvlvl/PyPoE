@@ -3256,7 +3256,6 @@ class ItemsParser(SkillParserShared):
         "ManaFlask": (_type_level, _type_flask, _type_flask_charges),
         "HybridFlask": (_type_level, _type_flask, _type_flask_charges),
         "UtilityFlask": (_type_level, _type_flask, _type_flask_charges),
-        "UtilityFlaskCritical": (_type_level, _type_flask, _type_flask_charges),
         # Gems
         "Active Skill Gem": (_skill_gem,),
         "Support Skill Gem": (_skill_gem,),
@@ -3640,7 +3639,7 @@ class ItemsParser(SkillParserShared):
                         result = f(self, item, base_item_type)
                         if result is False:
                             console(
-                                f'Required extra info for item "{name}" with class id '
+                                f'Required extra info for item "{name}" with class ID '
                                 f'"{cls_id}" not found. Skipping.',
                                 msg=Msg.warning,
                             )
