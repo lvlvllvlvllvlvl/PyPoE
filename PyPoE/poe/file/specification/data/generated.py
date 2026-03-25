@@ -548,6 +548,10 @@ specification = Specification(
                     type="ref|generic",
                     key="ActiveSkills.dat",
                 ),
+                Field(
+                    name="Unknown2",
+                    type="ref|string",
+                ),
             ),
         ),
         "Acts.dat": File(
@@ -2520,22 +2524,6 @@ specification = Specification(
                 ),
             ),
         ),
-        "AtlasFavouredMapSlots.dat": File(
-            fields=(
-                Field(
-                    name="Unknown0",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown1",
-                    type="int",
-                ),
-                Field(
-                    name="Requirement",
-                    type="ref|string",
-                ),
-            ),
-        ),
         "AtlasFog.dat": File(
             fields=(
                 Field(
@@ -2700,6 +2688,40 @@ specification = Specification(
                 ),
             ),
         ),
+        "AtlasMissionTypes.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Stats",
+                    type="ref|list|ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="StatValues",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="Astrolabe",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+            ),
+        ),
         "AtlasMods.dat": File(
             fields=(
                 Field(
@@ -2718,6 +2740,7 @@ specification = Specification(
                 Field(
                     name="Id",
                     type="ref|string",
+                    unique=True,
                 ),
                 Field(
                     name="Area1",
@@ -2783,7 +2806,7 @@ specification = Specification(
                     key="BaseItemTypes.dat",
                 ),
                 Field(
-                    name="Unknown5",
+                    name="Tier",
                     type="int",
                 ),
                 Field(
@@ -2791,7 +2814,69 @@ specification = Specification(
                     type="short",
                 ),
                 Field(
+                    name="IsUniqueMap",
+                    type="bool",
+                ),
+                Field(
+                    name="Region",
+                    type="ref|out",
+                    key="AtlasRegions.dat",
+                ),
+                Field(
+                    name="Node_DDSFile",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".dds",
+                ),
+                Field(
+                    name="IsNormalMap",
+                    type="bool",
+                ),
+                Field(
+                    name="RequiresSpecificItem",
+                    type="bool",
+                ),
+                Field(
+                    name="VoidstoneSlot",
+                    type="ref|out",
+                    key="AtlasVoidstoneSlots.dat",
+                ),
+                Field(
+                    name="MapDeviceLayout",
+                    type="ref|out",
+                    key="MapDeviceLayouts.dat",
+                ),
+                Field(
+                    name="QuestStates",
+                    type="ref|list|int",
+                ),
+                Field(
                     name="Flag1",
+                    type="bool",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Area2",
+                    type="ref|out",
+                    key="WorldAreas.dat",
+                ),
+                Field(
+                    name="Flag2",
+                    type="bool",
+                ),
+                Field(
+                    name="Flag3",
+                    type="bool",
+                ),
+                Field(
+                    name="Unknown5",
+                    type="float",
+                ),
+                Field(
+                    name="Flag4",
                     type="bool",
                 ),
                 Field(
@@ -2803,76 +2888,15 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Data0",
-                    type="ref|list|byte",
-                ),
-                Field(
-                    name="Flag2",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag3",
-                    type="bool",
-                ),
-                Field(
-                    name="WatchstoneSlot",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Key0",
-                    type="ref|out",
-                ),
-                Field(
-                    name="QuestStates",
-                    type="ref|list|int",
-                ),
-                Field(
-                    name="Flag4",
-                    type="bool",
-                ),
-                Field(
-                    name="Key1",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Area2",
-                    type="ref|out",
-                    key="WorldAreas.dat",
-                ),
-                Field(
-                    name="Flag5",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag6",
-                    type="bool",
-                ),
-                Field(
                     name="Unknown8",
-                    type="float",
-                ),
-                Field(
-                    name="Flag7",
-                    type="bool",
+                    type="int",
                 ),
                 Field(
                     name="Unknown9",
                     type="int",
                 ),
                 Field(
-                    name="Unknown10",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown11",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown12",
-                    type="int",
-                ),
-                Field(
-                    name="Flag8",
+                    name="Flag5",
                     type="bool",
                 ),
             ),
@@ -2904,45 +2928,47 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Flag0",
+                    name="NotOnAtlas",
                     type="bool",
                 ),
                 Field(
-                    name="Flag1",
+                    name="IsUniqueMap",
                     type="bool",
                 ),
                 Field(
-                    name="Image",
+                    name="Node_DDSFile",
                     type="ref|string",
                     file_path=True,
                     file_ext=".dds",
                 ),
                 Field(
-                    name="Flag2",
+                    name="IsNormalMap",
                     type="bool",
                 ),
                 Field(
-                    name="Flag3",
+                    name="RequiresSpecificItem",
                     type="bool",
                 ),
                 Field(
-                    name="Key0",
+                    name="VoidstoneSlot",
                     type="ref|out",
+                    key="AtlasVoidstoneSlots.dat",
                 ),
                 Field(
-                    name="Key1",
+                    name="MapDeviceLayout",
                     type="ref|out",
+                    key="MapDeviceLayouts.dat",
                 ),
                 Field(
                     name="QuestStates",
                     type="ref|list|int",
                 ),
                 Field(
-                    name="Flag4",
+                    name="Flag0",
                     type="bool",
                 ),
                 Field(
-                    name="Key2",
+                    name="Key0",
                     type="ref|out",
                 ),
                 Field(
@@ -2951,12 +2977,13 @@ specification = Specification(
                     key="WorldAreas.dat",
                 ),
                 Field(
-                    name="Flag5",
+                    name="Flag1",
                     type="bool",
                 ),
                 Field(
-                    name="Key3",
+                    name="Header",
                     type="ref|out",
+                    key="MapNodeHeader.dat",
                 ),
             ),
         ),
@@ -3194,6 +3221,28 @@ specification = Specification(
                 ),
             ),
         ),
+        "AtlasRegions.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="MemoryVault",
+                    type="ref|out",
+                    key="WorldAreas.dat",
+                ),
+                Field(
+                    name="Data0",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="Data1",
+                    type="ref|list|byte",
+                ),
+            ),
+        ),
         "AtlasTrees.dat": File(
             fields=(
                 Field(
@@ -3248,6 +3297,61 @@ specification = Specification(
                 ),
                 Field(
                     name="Key0",
+                    type="ref|out",
+                ),
+            ),
+        ),
+        "AtlasVoidstoneSlots.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="SlotNumber",
+                    type="int",
+                ),
+                Field(
+                    name="Voidstone",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="ref|string",
+                ),
+                Field(
+                    name="QuestFlag",
+                    type="ref|out",
+                    key="QuestFlags.dat",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown2",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown3",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown4",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key2",
                     type="ref|out",
                 ),
             ),
@@ -5358,6 +5462,80 @@ specification = Specification(
                 ),
             ),
         ),
+        "BrequelFruitRewardTypes.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="Name",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Description",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Data0",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="Data1",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="AchievementItem",
+                    type="ref|out",
+                    key="AchievementItems.dat",
+                ),
+                Field(
+                    name="AchievementItemHardmode",
+                    type="ref|out",
+                    key="AchievementItems.dat",
+                ),
+            ),
+        ),
+        "BrequelFruitTypes.dat": File(
+            fields=(
+                Field(
+                    name="BaseItemType",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                    unique=True,
+                ),
+                Field(
+                    name="Reward",
+                    type="ref|out",
+                    key="BrequelFruitRewardTypes.dat",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                ),
+            ),
+        ),
         "BrequelGrafts.dat": File(
             fields=(
                 Field(
@@ -5405,6 +5583,21 @@ specification = Specification(
                     name="Wombgift",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                ),
+            ),
+        ),
+        "BrequelTreeSlots.dat": File(
+            fields=(
+                Field(
+                    name="PassiveSkill",
+                    type="ref|out",
+                    key="PassiveSkills.dat",
+                    unique=True,
+                ),
+                Field(
+                    name="BrequelSubTree",
+                    type="ref|out",
+                    key="BrequelPassiveSubTrees.dat",
                 ),
             ),
         ),
@@ -6559,6 +6752,10 @@ specification = Specification(
                 ),
                 Field(
                     name="Key8",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key9",
                     type="ref|out",
                 ),
             ),
@@ -7878,8 +8075,9 @@ specification = Specification(
         "CurrencyUseEffects.dat": File(
             fields=(
                 Field(
-                    name="Key0",
+                    name="CurrencyItem",
                     type="ref|out",
+                    key="BaseItemTypes.dat",
                     unique=True,
                 ),
                 Field(
@@ -7891,12 +8089,6 @@ specification = Specification(
                     type="ref|string",
                     file_path=True,
                     file_ext=".bk2",
-                ),
-                Field(
-                    name="SoundFile",
-                    type="ref|string",
-                    file_path=True,
-                    file_ext=".ogg",
                 ),
                 Field(
                     name="Flag0",
@@ -7913,12 +8105,18 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Key1",
+                    name="Stat",
                     type="ref|out",
+                    key="Stats.dat",
                 ),
                 Field(
                     name="Unknown1",
                     type="float",
+                ),
+                Field(
+                    name="SoundEffect",
+                    type="ref|out",
+                    key="SoundEffects.dat",
                 ),
             ),
         ),
@@ -12521,12 +12719,12 @@ specification = Specification(
                     type="float",
                 ),
                 Field(
-                    name="IncrementalEffectiveness",
+                    name="Unknown0",
                     type="float",
                 ),
                 Field(
-                    name="Unknown0",
-                    type="int",
+                    name="IncrementalEffectiveness",
+                    type="float",
                 ),
             ),
         ),
@@ -16927,6 +17125,10 @@ specification = Specification(
                     name="Unknown17",
                     type="ref|string",
                 ),
+                Field(
+                    name="Keys3",
+                    type="ref|list|ref|out",
+                ),
             ),
         ),
         "ItemVisualReplacement.dat": File(
@@ -18637,6 +18839,66 @@ specification = Specification(
                 ),
             ),
         ),
+        "MapDeviceLayouts.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="Slots",
+                    type="int",
+                ),
+                Field(
+                    name="Data0",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="Receptacle_DDSFile",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".dds",
+                ),
+                Field(
+                    name="Data1",
+                    type="ref|list|float",
+                ),
+                Field(
+                    name="Data2",
+                    type="ref|list|float",
+                ),
+                Field(
+                    name="MapKey",
+                    type="ref|out",
+                    key="MapKeys.dat",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="Unknown2",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown3",
+                    type="int",
+                ),
+                Field(
+                    name="Data3",
+                    type="ref|list|int",
+                ),
+            ),
+        ),
         "MapDeviceRecipes.dat": File(
             fields=(
                 Field(
@@ -18876,6 +19138,45 @@ specification = Specification(
                 ),
             ),
         ),
+        "MapKeys.dat": File(
+            fields=(
+                Field(
+                    name="BaseItemType",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
+                    unique=True,
+                ),
+                Field(
+                    name="MapTier",
+                    type="int",
+                ),
+                Field(
+                    name="KeyTier",
+                    type="int",
+                ),
+                Field(
+                    name="IsSpecial",
+                    type="bool",
+                ),
+            ),
+        ),
+        "MapNodeHeader.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                    unique=True,
+                ),
+                Field(
+                    name="Unknown0",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Data0",
+                    type="ref|list|int",
+                ),
+            ),
+        ),
         "MapPins.dat": File(
             fields=(
                 Field(
@@ -19093,6 +19394,12 @@ specification = Specification(
                     file_path=True,
                     file_ext=".dds",
                 ),
+                Field(
+                    name="Mirage_DDSFile",
+                    type="ref|string",
+                    file_path=True,
+                    file_ext=".dds",
+                ),
             ),
         ),
         "MapSeriesTiers.dat": File(
@@ -19219,6 +19526,11 @@ specification = Specification(
                 VirtualField(
                     name="MercenariesTier",
                     fields=("SecretsTier",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="FaridunTier",
+                    fields=("MirageTier",),
                     alias=True,
                 ),
             ),
@@ -19704,11 +20016,42 @@ specification = Specification(
                 ),
             ),
         ),
+        "MemoryLineModifiers.dat": File(
+            fields=(
+                Field(
+                    name="MemoryLineType",
+                    type="ref|out",
+                    key="MemoryLineType.dat",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Stats",
+                    type="ref|list|ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="StatValues",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="Data0",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="Data1",
+                    type="ref|list|byte",
+                ),
+            ),
+        ),
         "MemoryLineType.dat": File(
             fields=(
                 Field(
                     name="Id",
                     type="ref|string",
+                    unique=True,
                 ),
                 Field(
                     name="MemoryLine",
@@ -19720,20 +20063,12 @@ specification = Specification(
                     type="short",
                 ),
                 Field(
-                    name="Flag0",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag1",
-                    type="bool",
-                ),
-                Field(
                     name="Stats",
                     type="ref|list|ref|out",
                     key="Stats.dat",
                 ),
                 Field(
-                    name="StatsValues",
+                    name="StatValues",
                     type="ref|list|int",
                 ),
                 Field(
@@ -19753,8 +20088,22 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Key0",
+                    name="FinalAtlasNode",
                     type="ref|out",
+                    key="AtlasNode.dat",
+                ),
+                Field(
+                    name="Unknown3",
+                    type="int",
+                ),
+                Field(
+                    name="Tier",
+                    type="int",
+                ),
+                Field(
+                    name="CurrencyItem",
+                    type="ref|out",
+                    key="BaseItemTypes.dat",
                 ),
             ),
         ),

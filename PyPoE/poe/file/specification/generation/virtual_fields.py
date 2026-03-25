@@ -83,6 +83,7 @@ virtual_fields_mappings = {
                 Alias("LakeTier", "KalandraTier"),
                 Alias("AncestralTier", "AncestorTier"),
                 Alias("MercenariesTier", "SecretsTier"),
+                Alias("FaridunTier", "MirageTier"),
             ],
             "Mods": [
                 Zip("SpawnWeight", ("SpawnWeight_TagsKeys", "SpawnWeight_Values")),
