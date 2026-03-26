@@ -779,6 +779,7 @@ _inter_wiki_map = {
         ("Lightning Aegis", {"link": "Lightning Aegis"}),
         ("Lightning Bolt", {"link": "Lightning Bolt"}),
         ("Manifest Dancing Dervishes", {"link": "Manifest Dancing Dervishes"}),
+        ("Misty Reflection", {"link": "Misty Reflection"}),
         ("Molten Burst", {"link": "Molten Burst"}),
         ("Pacify", {"link": "Pacify"}),
         ("Penance Mark", {"link": "Penance Mark"}),
