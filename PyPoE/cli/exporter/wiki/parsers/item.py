@@ -540,6 +540,7 @@ class ItemsParser(SkillParserShared):
             # =================================================================
             # Invitations
             # =================================================================
+            "Metadata/Items/MapFragments/Maven/MavenMapAtlas1": " (quest item)",
             "Metadata/Items/MapFragments/Primordial/QuestTangleKey": " (quest item)",
             "Metadata/Items/MapFragments/Primordial/QuestTangleBossKey": " (quest item)",
             "Metadata/Items/MapFragments/Primordial/QuestCleansingFireKey": " (quest item)",
@@ -620,6 +621,7 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/QuestItems/GoldenPages/Page3": " (3 of 4)",
             "Metadata/Items/QuestItems/GoldenPages/Page4": " (4 of 4)",
             "Metadata/Items/QuestItems/Act7/KisharaStar": " (quest item)",
+            "Metadata/Items/QuestItems/Act11/DominusKey": " (quest item)",
             # =================================================================
             # Heist equipment
             # =================================================================
@@ -1388,6 +1390,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMistFootprintsEffect",
         "Metadata/Items/MicrotransactionItemEffects/MicrotransactionReaperFootprints",
         "Metadata/Items/MicrotransactionItemEffects/MicrotransactionFieryHands",
+        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemonHandGloves",
         # =================================================================
         # Hideout decorations
         # =================================================================
@@ -1442,6 +1445,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Currency/RunegraftMatchedSpeed",
         "Metadata/Items/Currency/RunegraftMinionCannotCast",
         "Metadata/Items/Currency/RunegraftTest",
+        "Metadata/Items/Currency/AstrolabeSettlers",
         # =================================================================
         # Non-stackable resonators from before 3.8.0
         # =================================================================
@@ -1649,6 +1653,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Scarabs/ScarabMisc6",
         "Metadata/Items/Scarabs/ScarabMisc7",
         "Metadata/Items/MapFragments/RatsAllflamePack",
+        "Metadata/Items/MapFragments/Maven/MavenMapAtlas5",
         # =================================================================
         # Corpse items
         # =================================================================
@@ -1707,7 +1712,11 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestWhakano3",
         "Metadata/Items/Heist/QuestContracts/HeistContractQuestNenet1",
         "Metadata/Items/Heist/QuestContracts/HeistContractQuestNenetRepeatable",
+        "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestIsla3",
         "Metadata/Items/Masters/PirateTreasureKey",
+        "Metadata/Items/MapFragments/Maven/MavenMapAtlas2",
+        "Metadata/Items/MapFragments/Maven/MavenMapAtlas3",
+        "Metadata/Items/MapFragments/Maven/MavenMapAtlas4",
         # =================================================================
         # Misc
         # =================================================================
@@ -1720,6 +1729,13 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Armours/BodyArmours/BodyStrTemp",
         "Metadata/Items/Armours/Boots/BootsStrTemp",
         "Metadata/Items/Classic/MysteryLeaguestone",
+        "Metadata/Items/MapFragments/CurrencyVaalFragments1Complete",
+        "Metadata/Items/MapFragments/CurrencyVaalFragments2Complete",
+        "Metadata/Items/MapFragments/CurrencyProphecyFragmentsComplete",
+        "Metadata/Items/MapFragments/CurrencyShaperFragmentsComplete",
+        "Metadata/Items/MapFragments/CurrencyElderFragmentsComplete",
+        "Metadata/Items/MapFragments/CurrencyUberElderFragmentsComplete",
+        "Metadata/Items/MapFragments/CurrencySirusFragmentsComplete",
     }
 
     # Skip items by class ID
@@ -1762,6 +1778,9 @@ class ItemsParser(SkillParserShared):
             r"Convert.*Scroll",
             r"Premium.*Pet",
             r"UnifiedAuraEffect",
+        },
+        "InstanceLocalItem": {
+            r"TradeProxy",
         },
     }
 
