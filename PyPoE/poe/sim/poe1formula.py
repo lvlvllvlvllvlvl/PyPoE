@@ -150,7 +150,7 @@ def gem_stat_requirement(level, gtype=GemTypes.support, multi=100):
     The calculations vary depending on the gem type (i.e. active or support gem)
     and on the multiplier.
 
-    Currently only multipliers of 100, 60 and 40 are supported.
+    Currently only specific multipliers (100, 60, 40, etc.) are supported.
 
 
     .. warning::
@@ -197,7 +197,7 @@ def gem_stat_requirement(level, gtype=GemTypes.support, multi=100):
             # can't find a good a for 8
             b = 7.75
         elif multi == 75:
-            a = 1.6
+            a = 1.62
         elif multi == 60:
             a = 1.325
         elif multi == 40:
@@ -206,7 +206,9 @@ def gem_stat_requirement(level, gtype=GemTypes.support, multi=100):
             raise ValueError("Unsupported multi '%s'" % multi)
     elif gtype == GemTypes.support:
         b = 6 * multi / 100
-        if multi == 100:
+        if multi == 250:
+            a = 3.39
+        elif multi == 100:
             a = 1.495
         elif multi == 60:
             a = 0.945  # 1.575*0.6
