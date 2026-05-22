@@ -7,8 +7,23 @@ virtual_fields_mappings = {
     constants.VERSION.STABLE: defaultdict(
         list[VirtualField],
         {
+            "AfflictionStartDialogue": [
+                Alias("Achievements", "NecropolisAchievements"),
+            ],
             "AlternatePassiveSkills": [
                 Alias("Icon_DDSFile", "DDSIcon"),
+            ],
+            "AncestralTrialTribes": [
+                Alias("NPC", "NPCHub"),
+            ],
+            "BetrayalDialogue": [
+                Alias("Art", "IconArt"),
+                Alias(
+                    "MissionCompletion_AcheivementItemsKey", "MissionCompletion_AchievementItemsKey"
+                ),
+            ],
+            "BetrayalRanks": [
+                Alias("SafehouseLeader_AcheivementItemsKey", "SafehouseLeader_AchievementItemsKey"),
             ],
             "BlightCraftingItems": [
                 Alias("BaseItemTypesKey", "Oil"),
@@ -26,9 +41,21 @@ virtual_fields_mappings = {
                     fields=("AddMod", "AddEnchantment"),
                 ),
             ],
+            "CrucibleLifeScalingPerLevel": [
+                Alias("Life", "MoreLife"),
+            ],
             "CurrencyItems": [Alias("Stacks", "StackSize")],
+            "Descendancy": [
+                Alias("UIArt", "PassiveTreeUIArt"),
+            ],
             "DelveUpgrades": [
                 Zip("Stats", ("StatsKeys", "StatValues")),
+            ],
+            "FaridunLifeScalingPerLevel": [
+                Alias("Life", "MoreLife"),
+            ],
+            "GlobalAudioConfig": [
+                Alias("StatSet", "StatSet1"),
             ],
             "GrantedEffectsPerLevel": [
                 VirtualField(
@@ -54,23 +81,39 @@ virtual_fields_mappings = {
                         "Stat4Float",
                         "Stat5Float",
                         "Stat6Float",
-                        "Stat7Float",
+                        "Stat7FlNZSToat",
                         "Stat8Float",
                     ),
                 ),
                 Zip("Stats", ("StatsKeys", "StatValues")),
                 Zip("Costs", ("CostTypesKeys", "CostAmounts")),
             ],
+            "HarvestLifeScalingPerLevel": [
+                Alias("Life", "MoreLife"),
+            ],
             "HarvestCraftOptions": [
                 Alias("HarvestCraftTiersKey", "Tier"),
                 Alias("LifeforceCostType", "LifeforceType"),
                 Alias("SacredBlossomCost", "SacredCost"),
+            ],
+            "HellscapeLifeScalingPerLevel": [
+                Alias("AreaLevel", "Level"),
+                Alias("Scale", "MoreLife"),
             ],
             "HeistAreas": [
                 Alias("ClientStringsKey", "Reward"),
             ],
             "IndexableSkillGems": [
                 Alias("Name", "Name1"),
+            ],
+            "KiracLevels": [
+                Alias("AreaLevel", "MapAreaLevelOffered"),
+            ],
+            "LakeBossLifeScalingPerLevel": [
+                Alias("Scaling", "MoreLife"),
+            ],
+            "LakeMetaOptions": [
+                Alias("TextAudio", "TextAudioIntro"),
             ],
             "MapPurchaseCosts": [
                 Zip("NormalPurchase", ("NormalPurchase_BaseItemTypesKeys", "NormalPurchase_Costs")),
@@ -84,7 +127,11 @@ virtual_fields_mappings = {
                 Alias("AncestralTier", "AncestorTier"),
                 Alias("MercenariesTier", "SecretsTier"),
             ],
+            "MicrotransactionObjectEffects": [
+                Alias("Script", "Script1"),
+            ],
             "Mods": [
+                Alias("BuffTemplate", "BuffTemplate1"),
                 Zip("SpawnWeight", ("SpawnWeight_TagsKeys", "SpawnWeight_Values")),
                 VirtualField(
                     name="Stat1Zip",
@@ -127,6 +174,9 @@ virtual_fields_mappings = {
                 ),
                 Zip("GenerationWeight", ("GenerationWeight_TagsKeys", "GenerationWeight_Values")),
             ],
+            "NPCShopSets": [
+                Alias("QuestFlag", "QuestFlag5"),
+            ],
             "PantheonSouls": [
                 Alias("BaseItemTypesKey", "CapturedVessel"),
                 Alias("MonsterVarietiesKey", "CapturedMonster"),
@@ -165,6 +215,16 @@ virtual_fields_mappings = {
             "PassiveSkillTattoos": [
                 Alias("BaseItemTypesKey", "Tattoo"),
                 Alias("PassiveSkillOverrideTypesKey", "OverrideType"),
+            ],
+            "PrimordialBossLifeScalingPerLevel": [
+                Alias("AreaLevel", "Level"),
+                Alias("Scale", "MoreLife"),
+            ],
+            "ProjectilesArtVariations": [
+                Alias("Projectile", "Id"),
+            ],
+            "RogueExileLifeScalingPerLevel": [
+                Alias("AdditionalLife", "MoreLife"),
             ],
             "WorldAreas": [
                 Alias("AreaType_TagsKeys", "AreaTypeTags"),
