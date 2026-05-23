@@ -6345,7 +6345,12 @@ specification = Specification(
             virtual_fields=(
                 VirtualField(
                     name="Binary_StatsKeys",
-                    fields=("BinaryStats",),
+                    fields=("GrantedFlags",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="BinaryStats",
+                    fields=("GrantedFlags",),
                     alias=True,
                 ),
             ),
@@ -13632,13 +13637,6 @@ specification = Specification(
                     type="bool",
                 ),
             ),
-            virtual_fields=(
-                VirtualField(
-                    name="StatSet",
-                    fields=("StatSet1",),
-                    alias=True,
-                ),
-            ),
         ),
         "GoldActScaling.dat": File(
             fields=(
@@ -14035,6 +14033,13 @@ specification = Specification(
                     name="StatSet2",
                     type="ref|list|ref|out",
                     key="GrantedEffectStatSets.dat",
+                ),
+            ),
+            virtual_fields=(
+                VirtualField(
+                    name="StatSet",
+                    fields=("StatSet1",),
+                    alias=True,
                 ),
             ),
         ),
@@ -31985,6 +31990,11 @@ specification = Specification(
                 VirtualField(
                     name="Dex",
                     fields=("DexterityRequirementPercent",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="GemEffects",
+                    fields=("GemVariants",),
                     alias=True,
                 ),
             ),

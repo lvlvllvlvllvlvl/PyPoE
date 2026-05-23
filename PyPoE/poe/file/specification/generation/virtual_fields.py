@@ -29,7 +29,8 @@ virtual_fields_mappings = {
                 Alias("BaseItemTypesKey", "Oil"),
             ],
             "BuffDefinitions": [
-                Alias("Binary_StatsKeys", "BinaryStats"),
+                Alias("Binary_StatsKeys", "GrantedFlags"),
+                Alias("BinaryStats", "GrantedFlags"),
             ],
             "CraftingBenchOptions": [
                 Zip(
@@ -54,7 +55,7 @@ virtual_fields_mappings = {
             "FaridunLifeScalingPerLevel": [
                 Alias("Life", "MoreLife"),
             ],
-            "GlobalAudioConfig": [
+            "GrantedEffects": [
                 Alias("StatSet", "StatSet1"),
             ],
             "GrantedEffectsPerLevel": [
@@ -235,6 +236,7 @@ virtual_fields_mappings = {
                 Alias("Str", "StrengthRequirementPercent"),
                 Alias("Int", "IntelligenceRequirementPercent"),
                 Alias("Dex", "DexterityRequirementPercent"),
+                Alias("GemEffects", "GemVariants"),
             ],
         },
     )

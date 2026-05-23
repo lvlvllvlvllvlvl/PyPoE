@@ -51,7 +51,7 @@ Documentation
 
 # self
 from PyPoE.poe import poe1constants
-from PyPoE.poe.file.dat import DatRecord
+from PyPoE.poe.file.dat import DatRecord, IndexResult
 
 # =============================================================================
 # Globals
@@ -185,6 +185,8 @@ class SpawnChanceCalculator:
             mod = self.get_mod(mod_or_id)
             if mod is None:
                 return 0
+        elif isinstance(mod_or_id, IndexResult):
+            mod = mod_or_id.only()
         elif isinstance(mod_or_id, DatRecord):
             mod = mod_or_id
         else:
