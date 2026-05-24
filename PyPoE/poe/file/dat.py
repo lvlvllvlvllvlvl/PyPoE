@@ -1200,6 +1200,19 @@ class RelationalReader(AbstractFileCache[DatFile]):
                 else:
                     warnings.warn(msg, SpecificationWarning)
                     obj = None
+            except ValueError:
+                # probably need to add a value to the enum in <game>constants.py
+                msg = "Did not find proper value for %s in %s" % (
+                    obj - offset,
+                    other,
+                )
+                if self.raise_error_on_missing_relation:
+                    raise SpecificationError(
+                        SpecificationError.ERRORS.RUNTIME_MISSING_FOREIGN_KEY, msg
+                    )
+                else:
+                    warnings.warn(msg, SpecificationWarning)
+                    obj = None
         return obj
 
     def _dv_set_value(self, value, other, key, offset):
