@@ -307,13 +307,6 @@ class MapsParser(ItemsParser):
                 },
             ),
             (
-                "Regular_GuildCharacter",
-                {
-                    "template": "map_guild_character",
-                    "condition": lambda v: v,
-                },
-            ),
-            (
                 "Unique_WorldAreasKey",
                 {
                     "template": "unique_map_area_id",
@@ -327,13 +320,6 @@ class MapsParser(ItemsParser):
                     "template": "unique_map_area_level",
                     "format": lambda v: v["AreaLevel"],
                     "condition": lambda v: v is not None,
-                },
-            ),
-            (
-                "Unique_GuildCharacter",
-                {
-                    "template": "unique_map_guild_character",
-                    "condition": lambda v: v != "",
                 },
             ),
         ),
@@ -642,7 +628,7 @@ class MapsParser(ItemsParser):
 
             # Export map icon
             if parsed_args.store_images:
-                dds_file_path = base_item["ItemVisualIdentityKey"]["DDSFile"]
+                dds_file_path = base_item["Node_DDSFile"]
 
                 # Warn about map with no icon
                 if not dds_file_path:
@@ -734,13 +720,8 @@ class MapsParser(ItemsParser):
 
                 # AtlasNode.dat only contains data for latest series
                 if latest:
-                    try:
-                        atlas_node = self.rr["AtlasNode.dat64"].index["WorldAreasKey"][
-                            world_area.rowid
-                        ]
-                    except KeyError:
-                        continue
-                    finally:
+                    atlas_node = self.rr["AtlasNode.dat64"].index["WorldAreasKey"][world_area.rowid]
+                    if atlas_node:
                         for n in range(5):
                             node_data[f"tier_{n}"] = atlas_node[f"Tier{n}"]
                         node_data["connections"] = [
@@ -804,23 +785,34 @@ class MapsParser(ItemsParser):
 
         # === Maps from Atlas ===
         for atlas_node in self.rr["AtlasNode.dat64"]:
-            if not atlas_node["ItemVisualIdentityKey"]["DDSFile"]:
+            if not atlas_node["Node_DDSFile"]:
                 warnings.warn(
                     "Missing 2d art inventory icon at index %s" % atlas_node.index,
                 )
                 continue
 
-            name = atlas_node["WorldAreasKey"]["Name"]
+            name = (
+                atlas_node["NodeDisplayName"]["Text"]
+                if atlas_node["NodeDisplayName"]
+                else (
+                    atlas_node["Area1"]["Name"]
+                    if atlas_node["Area1"]
+                    else atlas_node["Area2"]["Name"] if atlas_node["Area2"] else None
+                )
+            )
+            if not name:
+                warnings.warn(f"Name not known for atlas node {atlas_node['Id']}")
+                continue
 
             ico = os.path.join(self._img_path, name + ".dds")
 
             self._write_dds(
-                data=self.file_system.get_file(atlas_node["ItemVisualIdentityKey"]["DDSFile"]),
+                data=self.file_system.get_file(atlas_node["Node_DDSFile"]),
                 out_path=ico,
                 parsed_args=parsed_args,
             )
 
-            if "Unique" not in atlas_node["WorldAreasKey"]["Id"]:
+            if not atlas_node["IsUniqueMap"]:
                 ico = ico.replace(".dds", ".png")
                 for name, color in self._MAP_COLORS.items():
                     ico_path = Path(ico)

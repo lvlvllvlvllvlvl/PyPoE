@@ -286,7 +286,7 @@ class AreaParser(parser.BaseParser):
                 "FirstEntry_NPCsKey",
                 {
                     "template": "entry_npc",
-                    "condition": lambda area: area["FirstEntry_NPCTextAudioKey"] is not None,
+                    "condition": lambda area: area["FirstEntry_NPCsKey"],
                     "format": lambda value: value["Name"],
                 },
             ),

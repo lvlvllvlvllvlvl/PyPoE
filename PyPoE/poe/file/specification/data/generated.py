@@ -3065,6 +3065,11 @@ specification = Specification(
             ),
             virtual_fields=(
                 VirtualField(
+                    name="WorldAreasKey",
+                    fields=("Area1",),
+                    alias=True,
+                ),
+                VirtualField(
                     name="FlavourTextKey",
                     fields=("FlavourText",),
                     alias=True,
@@ -9258,6 +9263,18 @@ specification = Specification(
                 Field(
                     name="MonsterPhysConversionMulti",
                     type="int",
+                ),
+            ),
+            virtual_fields=(
+                VirtualField(
+                    name="Life",
+                    fields=("MonsterLife",),
+                    alias=True,
+                ),
+                VirtualField(
+                    name="AllyLife",
+                    fields=("MinionLife",),
+                    alias=True,
                 ),
             ),
         ),
@@ -21065,6 +21082,11 @@ specification = Specification(
                     fields=("SecretsTier",),
                     alias=True,
                 ),
+                VirtualField(
+                    name="FaridunTier",
+                    fields=("MirageTier",),
+                    alias=True,
+                ),
             ),
         ),
         "MapStashSpecialSubStashGroup.dat": File(
@@ -25435,6 +25457,13 @@ specification = Specification(
                 Field(
                     name="BaseDamageIgnoresAttackSpeed",
                     type="bool",
+                ),
+            ),
+            virtual_fields=(
+                VirtualField(
+                    name="MonsterResistancesKey",
+                    fields=("Resistances",),
+                    alias=True,
                 ),
             ),
         ),

@@ -16,6 +16,9 @@ virtual_fields_mappings = {
             "AncestralTrialTribes": [
                 Alias("NPC", "NPCHub"),
             ],
+            "AtlasNode": [
+                Alias("WorldAreasKey", "Area1"),
+            ],
             "BetrayalDialogue": [
                 Alias("Art", "IconArt"),
                 Alias(
@@ -46,11 +49,15 @@ virtual_fields_mappings = {
                 Alias("Life", "MoreLife"),
             ],
             "CurrencyItems": [Alias("Stacks", "StackSize")],
-            "Descendancy": [
-                Alias("UIArt", "PassiveTreeUIArt"),
+            "DefaultMonsterStats": [
+                Alias("Life", "MonsterLife"),
+                Alias("AllyLife", "MinionLife"),
             ],
             "DelveUpgrades": [
                 Zip("Stats", ("StatsKeys", "StatValues")),
+            ],
+            "Descendancy": [
+                Alias("UIArt", "PassiveTreeUIArt"),
             ],
             "FaridunLifeScalingPerLevel": [
                 Alias("Life", "MoreLife"),
@@ -127,6 +134,7 @@ virtual_fields_mappings = {
                 Alias("LakeTier", "KalandraTier"),
                 Alias("AncestralTier", "AncestorTier"),
                 Alias("MercenariesTier", "SecretsTier"),
+                Alias("FaridunTier", "MirageTier"),
             ],
             "MicrotransactionObjectEffects": [
                 Alias("Script", "Script1"),
@@ -174,6 +182,9 @@ virtual_fields_mappings = {
                     fields=("Stat1Zip", "Stat2Zip", "Stat3Zip", "Stat4Zip", "Stat5Zip", "Stat6Zip"),
                 ),
                 Zip("GenerationWeight", ("GenerationWeight_TagsKeys", "GenerationWeight_Values")),
+            ],
+            "MonsterTypes": [
+                Alias("MonsterResistancesKey", "Resistances"),
             ],
             "NPCShopSets": [
                 Alias("QuestFlag", "QuestFlag5"),
