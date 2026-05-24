@@ -15,7 +15,7 @@ from PyPoE.poe.file import specification
 from PyPoE.poe.file.specification.fields import VirtualField
 from PyPoE.poe.file.specification.generation.column_naming import (
     UnknownColumnNameGenerator,
-    name_mappings,
+    common_aliases,
 )
 from PyPoE.poe.file.specification.generation.custom_attributes import (
     CustomizedField,
@@ -48,7 +48,7 @@ def main():
         "--adapt-version",
         "-a",
         nargs="*",
-        choices=["stable"],
+        choices=[k.name.lower() for k in virtual_fields_mappings.keys()],
         default=[],
         help="Adapt the input schema to be compatible with another spec",
     )
@@ -208,14 +208,13 @@ def _adapt_to_spec(
         for field in fields:
             virtual_fields[table][field.name] = field
 
-    mapping = name_mappings[version]
     for table, file in spec.items():
         table = table.removesuffix(".dat")
         if table not in source:
             continue
         for name, field in file.fields.items():
             if name not in virtual_fields[table] and name not in source[table]:
-                for mapped in mapping(name):
+                for mapped in common_aliases(name):
                     if mapped not in virtual_fields[table] and mapped in source[table]:
                         virtual_fields[table][name] = VirtualField(name, (mapped,), alias=True)
 

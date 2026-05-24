@@ -89,7 +89,7 @@ virtual_fields_mappings = {
                         "Stat4Float",
                         "Stat5Float",
                         "Stat6Float",
-                        "Stat7FlNZSToat",
+                        "Stat7Float",
                         "Stat8Float",
                     ),
                 ),
@@ -250,5 +250,56 @@ virtual_fields_mappings = {
                 Alias("GemEffects", "GemVariants"),
             ],
         },
-    )
+    ),
+    constants.VERSION.POE2: defaultdict(
+        list[VirtualField],
+        {
+            "AddBuffToTargetVarieties": [
+                Alias("StatsKeys", "Stats1Keys"),
+            ],
+            "BuffDefinitions": [
+                Alias("BinaryStats", "GrantedFlags"),
+            ],
+            "GamblePrices": [
+                Alias("Cost", "BaseCost"),
+            ],
+            "MiniQuestStates": [
+                Alias("QuestFlags1", "QuestFlagsStart"),
+                Alias("QuestFlags2", "QuestFlagsEnd"),
+            ],
+            "MinionStats": [
+                Alias("Stat", "MinionStat"),
+            ],
+            "MonsterPacks": [
+                Alias("Formation", "PackFormation"),
+                Alias("TagsKeys", "Tags"),
+            ],
+            "NPCTextAudio": [
+                Alias("NPCs", "NPCPortrait"),
+            ],
+            "PantheonPanelLayout": [
+                Alias("QuestFlag", "QuestFlag1"),
+            ],
+            "PassiveSkills": [
+                Alias("AtlasnodeGroup", "AtlasNodeGroup"),
+                Alias("KeystoneId", "AudioEvent"),
+            ],
+            "ShapeShiftFormClones": [
+                Alias("Metadata", "AfterImageEffect"),
+                Alias("Metadata2", "PlayerEffect"),
+            ],
+            "ShapeShiftTransformData": [
+                Alias("ShapeShiftForm", "BaseForm"),
+            ],
+            "Tutorial": [
+                Alias("QuestFlag", "QuestFlagComplete"),
+            ],
+            "WeaponTypes": [
+                Alias("Critical", "CritChance"),
+            ],
+            "WorldAreas": [
+                Alias("Bosses", "Bosses_MonsterVarietiesKeys"),
+            ],
+        },
+    ),
 }
