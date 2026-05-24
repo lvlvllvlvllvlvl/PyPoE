@@ -1279,7 +1279,17 @@ class RelationalReader(AbstractFileCache[DatFile]):
                 else:
                     spec_row_key = spec_row.key
 
-                df_other_reader = self[spec_row_key]
+                try:
+                    df_other_reader = self[spec_row_key]
+                except FileNotFoundError:
+                    msg = f'Did not find table {spec_row_key} for foreign ref column "{key}" in {file_name}'
+                    if self.raise_error_on_missing_relation:
+                        raise SpecificationError(
+                            SpecificationError.ERRORS.RUNTIME_MISSING_FOREIGN_KEY, msg
+                        )
+                    else:
+                        warnings.warn(msg, SpecificationWarning)
+                        continue
 
                 key_id = spec_row.key_id
                 key_offset = spec_row.key_offset
