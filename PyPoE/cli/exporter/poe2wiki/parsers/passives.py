@@ -66,11 +66,7 @@ __all__ = []
 
 
 class WikiCondition(parser.WikiCondition):
-    COPY_KEYS = (
-        "is_in_game",
-        "release_version",
-        "removal_version",
-    )
+    COPY_KEYS = ("is_in_game",)
 
     NAME = "Passive skill"
     ADD_INCLUDE = False
@@ -84,7 +80,8 @@ def normalize(id):
 
 
 class PassiveSkillCommandHandler(ExporterHandler):
-    def __init__(self, sub_parser):
+    def __init__(self, sub_parser, *args, **kwargs):
+        super().__init__(self, sub_parser, *args, **kwargs)
         self.parser = sub_parser.add_parser(
             "passive",
             help="Passive skill exporter",
@@ -97,6 +94,12 @@ class PassiveSkillCommandHandler(ExporterHandler):
         parser.set_defaults(func=lambda args: parser.print_help())
         sub = parser.add_subparsers()
         self.add_default_subparser_filters(sub, cls=PassiveSkillParser)
+
+        # Alternate Passives
+        parser = passive_sub.add_parser("alternate", help="Export alternate passive skills")
+        parser.set_defaults(func=lambda args: parser.print_help())
+        sub = parser.add_subparsers()
+        self.add_default_subparser_filters(sub, cls=AlternatePassiveSkillParser)
 
     def add_default_parsers(self, *args, **kwargs):
         super().add_default_parsers(*args, **kwargs)
@@ -182,6 +185,85 @@ class BasePassiveSkillParser(parser.BaseParser):
                 parsed_args=self.parsed_args,
             )
 
+    def _get_stat_text(self, infobox, j, passive):
+        """
+        Handle regular stats, adds stat ids and values to infobox
+        """
+        stats = []
+        values = []
+
+        for i in range(0, self._MAX_STAT_ID):
+            try:
+                stat = passive["Stats"][i]
+            except IndexError:
+                break
+            j = i + 1
+            value = passive["Stat%sValue" % j]
+            if value == 0:
+                j = j - 1
+                continue
+            stats.append(stat["Id"])
+            infobox["stat%s_id" % j] = stat["Id"]
+            values.append(passive["Stat%sValue" % j])
+            infobox["stat%s_value" % j] = passive["Stat%sValue" % j]
+
+        stat_text = parser.process_keywords(
+            "<br>".join(
+                self._get_stats(
+                    stats=stats,
+                    values=values,
+                    translation_file=get_translation_file(passive["Id"]),
+                )
+            )
+        )
+
+        return stat_text, j
+
+    def _get_buff_stat_text(self, infobox, j, passive):
+        """
+        Handle buff stats, adds stat ids and values to infobox
+        For now this is being added to the stat text
+        """
+        stat_text = None
+        for ps_buff in passive["PassiveSkillBuffs"]:
+            buff_defs = ps_buff["BuffDefinition"]
+            # if buff_defs["Binary_StatsKeys"]:
+            #    stat_ids = [stat["Id"] for stat in buff_defs["Binary_StatsKeys"]]
+            #    values = [1 for _ in stat_ids]
+            # else:
+            stat_ids = [stat["Id"] for stat in buff_defs["Stats"]]
+            values = ps_buff["Buff_StatValues"]
+
+            for i, (sid, val) in enumerate(zip(stat_ids, values)):
+                j += 1
+                infobox["stat%s_id" % j] = sid
+                infobox["stat%s_value" % j] = val
+
+            buff_stat_text = parser.process_keywords(
+                "<br>".join(
+                    self._get_stats(
+                        stats=stat_ids,
+                        values=values,
+                        translation_file="passive_skill_aura_stat_descriptions.txt",
+                    )
+                )
+            )
+
+            if ps_buff["AuraRadius"]:
+                radius = ps_buff["AuraRadius"] / 10
+                buff_stat_text = re.sub(
+                    r"\[\[Nearby\|?([^]]*)]]",
+                    lambda match: f"{{{{Radius|{match.group(1)}|{radius}m}}}}",
+                    buff_stat_text,
+                )
+
+            if stat_text:
+                stat_text += "<br>" + buff_stat_text
+            else:
+                stat_text = buff_stat_text
+
+        return stat_text, j
+
     def by_rowid(self, parsed_args):
         return self.export(
             parsed_args,
@@ -244,7 +326,6 @@ class PassiveSkillParser(BasePassiveSkillParser):
                 "format": lambda v: "<br>".join([x["Text"] for x in v]),
             },
         ),
-        # Atlas related
         (
             "AtlasSubTree",
             {
@@ -253,7 +334,6 @@ class PassiveSkillParser(BasePassiveSkillParser):
                 "format": lambda v: v["Id"],
             },
         ),
-        # Ascendancy related
         (
             "Ascendancy",
             {
@@ -262,7 +342,6 @@ class PassiveSkillParser(BasePassiveSkillParser):
                 "format": lambda v: v["Name"],
             },
         ),
-        # Stat related
         (
             "PassiveSkillBuffs",
             {
@@ -293,7 +372,6 @@ class PassiveSkillParser(BasePassiveSkillParser):
                 "format": lambda v: v["GemEffects"][0]["GrantedEffect"]["Id"],
             },
         ),
-        # Booleans
         (
             "IsRootOfAtlasTree",
             {
@@ -416,9 +494,9 @@ class PassiveSkillParser(BasePassiveSkillParser):
 
             # Handle stats
             j = 0
-            stat_text, j = self.get_stat_text(infobox, j, passive)
+            stat_text, j = self._get_stat_text(infobox, j, passive)
             # For now this is being added to the stat text
-            buff_stat_text, j = self.get_buff_stat_text(infobox, j, passive)
+            buff_stat_text, j = self._get_buff_stat_text(infobox, j, passive)
 
             # Temporary for granted skills
             granted_skill_stat_text = None
@@ -504,80 +582,149 @@ class PassiveSkillParser(BasePassiveSkillParser):
 
         return r
 
-    def get_stat_text(self, infobox, j, passive):
-        """
-        Handle regular stats, adds stat ids and values to infobox
-        """
-        stat_ids = []
-        values = []
 
-        for i in range(0, self._MAX_STAT_ID):
-            try:
-                stat = passive["Stats"][i]
-            except IndexError:
-                break
-            j = i + 1
-            stat_ids.append(stat["Id"])
-            infobox["stat%s_id" % j] = stat["Id"]
-            values.append(passive["Stat%sValue" % j])
-            infobox["stat%s_value" % j] = passive["Stat%sValue" % j]
+class AlternatePassiveSkillParser(BasePassiveSkillParser):
+    _PASSIVES_FILE_NAME = "AlternatePassiveSkills.datc64"
+    _files = [
+        _PASSIVES_FILE_NAME,
+    ]
 
-        stat_text = parser.process_keywords(
-            "<br>".join(
-                self._get_stats(
-                    stats=stat_ids,
-                    values=values,
-                    translation_file=get_translation_file(passive["Id"]),
-                )
+    _MAX_STAT_ID = 4
+
+    _COPY_KEYS = (
+        (
+            "Id",
+            {
+                "template": "id",
+            },
+        ),
+        (
+            "Name",
+            {
+                "template": "name",
+                "condition": lambda v: v,
+            },
+        ),
+        (
+            "FlavourText",
+            {
+                "template": "flavour_text",
+                "condition": lambda v: v,
+                "format": lambda v: v.replace("\n", "<br>").replace("\r", ""),
+            },
+        ),
+        (
+            "AlternateTreeVersion",
+            {
+                "template": "alternate_tree",
+                "condition": lambda v: v,
+                "format": lambda v: v["ConquerorType"],
+            },
+        ),
+        (
+            "RandomMin",
+            {
+                "template": "random_stats_min",
+                "condition": lambda v: v > 0,
+            },
+        ),
+        (
+            "RandomMax",
+            {
+                "template": "random_stats_max",
+                "condition": lambda v: v > 0,
+            },
+        ),
+    )
+
+    def export(self, parsed_args, passives):
+        r = ExporterResult()
+
+        passives = self._apply_filter(parsed_args, passives)
+
+        if not passives:
+            console(
+                "No passives found for the specified parameters. Quitting.",
+                msg=Msg.warning,
             )
-        )
+            return r
 
-        return stat_text, j
+        console("Removing disabled passives...")
+        passives = [
+            p for p in passives if p["Name"] and not p["Name"].startswith(("[DNT", "[UNUSED"))
+        ]
+        passives = [
+            p
+            for p in passives
+            if p["Id"]
+            and not p["Id"].startswith(("vaal_", "karui_", "maraketh_", "templar_", "eternal_"))
+        ]
 
-    def get_buff_stat_text(self, infobox, j, passive):
-        """
-        Handle buff stats, adds stat ids and values to infobox
-        For now this is being added to the stat text
-        """
-        stat_text = None
-        for ps_buff in passive["PassiveSkillBuffs"]:
-            buff_defs = ps_buff["BuffDefinition"]
-            # if buff_defs["Binary_StatsKeys"]:
-            #    stat_ids = [stat["Id"] for stat in buff_defs["Binary_StatsKeys"]]
-            #    values = [1 for _ in stat_ids]
-            # else:
-            stat_ids = [stat["Id"] for stat in buff_defs["Stats"]]
-            values = ps_buff["Buff_StatValues"]
+        console("Found %s passives, processing..." % len(passives))
 
-            for i, (sid, val) in enumerate(zip(stat_ids, values)):
-                j += 1
-                infobox["stat%s_id" % j] = sid
-                infobox["stat%s_value" % j] = val
+        self._image_init(parsed_args)
 
-            buff_stat_text = parser.process_keywords(
+        for passive in passives:
+            infobox = {}
+
+            # Copy over simple fields from the .dat64
+            parser.apply_simple_column_map(infobox, self._COPY_KEYS, passive)
+
+            # Set passive type flags
+            for i in range(len(passive["PassiveType"])):
+                if passive["PassiveType"][i] == constants.PASSIVE_SKILL_SIZES.KEYSTONE:
+                    infobox["is_keystone"] = True
+                elif passive["PassiveType"][i] == constants.PASSIVE_SKILL_SIZES.NOTABLE:
+                    infobox["is_notable"] = True
+
+            # Handle icon
+            self._handle_icon(infobox, passive)
+
+            # Handle stats
+            stat_ids = []
+            values = []
+            j = 0
+            for i in range(0, self._MAX_STAT_ID):
+                try:
+                    stat = passive["StatsKeys"][i]
+                except IndexError:
+                    break
+                j = i + 1
+                stat_ids.append(stat["Id"])
+                infobox["stat%s_id" % j] = stat["Id"]
+                value = passive["Stat%sMin" % j], passive["Stat%sMax" % j]
+                values.append(value)
+                infobox["stat%s_min" % j] = passive["Stat%sMin" % j]
+                infobox["stat%s_max" % j] = passive["Stat%sMax" % j]
+
+            infobox["stat_text"] = parser.process_keywords(
                 "<br>".join(
                     self._get_stats(
-                        stats=stat_ids,
-                        values=values,
-                        translation_file="passive_skill_aura_stat_descriptions.txt",
+                        stat_ids, values, translation_file=get_translation_file(passive["Id"])
                     )
                 )
             )
+            if infobox["stat_text"] == "":
+                infobox.pop("stat_text")
 
-            if ps_buff["AuraRadius"]:
-                radius = ps_buff["AuraRadius"] / 10
-                buff_stat_text = re.sub(
-                    r"\[\[Nearby\|?([^]]*)]]",
-                    lambda match: f"{{{{Radius|{match.group(1)}|{radius}m}}}}",
-                    buff_stat_text,
-                )
+            cond = WikiCondition(
+                data=infobox,
+                cmdargs=parsed_args,
+            )
 
-            if stat_text:
-                stat_text += "<br>" + buff_stat_text
-            else:
-                stat_text = buff_stat_text
+            r.add_result(
+                text=cond,
+                out_file="passive_skill_%s.txt" % infobox["id"],
+                wiki_page=[
+                    {
+                        "page": "Passive Skill:" + self._format_wiki_title(infobox["id"]),
+                        "condition": cond,
+                    },
+                ],
+                wiki_message="Alternate passive skill updater",
+            )
 
-        return stat_text, j
+        return r
 
 
 # =============================================================================
