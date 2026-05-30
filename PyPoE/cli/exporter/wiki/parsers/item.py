@@ -56,7 +56,7 @@ from PyPoE.cli.exporter.wiki.parsers.skill import SkillParserShared
 
 # Self
 from PyPoE.poe import poe1constants as constants
-from PyPoE.poe.file.dat import DatReader, RelationalReader
+from PyPoE.poe.file.dat import DatReader, DatRecord, RelationalReader
 from PyPoE.poe.file.it import ITFile
 from PyPoE.poe.sim.poe1formula import GemTypes, gem_stat_requirement
 
@@ -113,9 +113,12 @@ def _type_factory(
             if index_column not in file.index:
                 file.build_index(index_column)
 
+            data: DatRecord | list[DatRecord] = []
             try:
                 data = file.index[index_column][idx]
             except KeyError:
+                pass
+            if not data:
                 if not skip_warning:
                     warnings.warn(f'Missing {data_file} info for "{base_item_type["Name"]}"')
                 return fail_condition

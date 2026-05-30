@@ -70,6 +70,7 @@ from collections import OrderedDict, defaultdict
 from collections.abc import Iterable
 from enum import IntEnum
 from io import BytesIO
+from typing import Any, Dict
 
 from PyPoE.poe.file.shared import AbstractFileReadOnly
 from PyPoE.poe.file.shared.cache import AbstractFileCache
@@ -92,9 +93,11 @@ __all__ = [
     "DAT_FILE_MAGIC_NUMBER",
     "DatFile",
     "RelationalReader",
+    "DatRecord",
+    "IndexResult",
 ]
 
-DAT_FILE_MAGIC_NUMBER = b"\xBB\xbb\xBB\xbb\xBB\xbb\xBB\xbb"
+DAT_FILE_MAGIC_NUMBER = b"\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb"
 
 # =============================================================================
 # Classes
@@ -458,6 +461,62 @@ class DatRecord(list):
         return self.parent.table_columns.keys()
 
 
+class IndexResult(list[DatRecord]):
+    """
+    Wrapper class for results of looking up values via DatReader.index
+
+    The wrapper behaves as a single record when accessed by column name (string
+    key) or via record-like attributes (.rowid, .parent, .iter(), .keys()).
+    If the wrapper holds more than one record, this access will raise a
+    KeyError.
+
+    The wrapper behaves as a list of records when iterated or accessed by
+    integer index.
+
+    The intent of this class is to make adding @unique to a
+    column a non-breaking change. Previously, DatReader.index[column][key] returned a single row if
+    the column was marked as unique, and a list otherwise. This meant that marking a column as
+    unique in the schema broke any code indexing on that column, as it would have expected to
+    receive a list but instead received a single row.
+    """
+
+    __slots__ = ["_reader", "_column"]
+
+    def __init__(self, reader, column):
+        super().__init__()
+        self._reader = reader
+        self._column = column
+
+    def only(self) -> DatRecord:
+        """
+        Returns the sole DatRecord or raises KeyError if there is not
+        exactly one record.
+
+        Returns
+        -------
+        DatRecord
+            the sole record
+        """
+        if len(self) != 1:
+            raise KeyError(
+                f"Code accessing `{self._reader.file_name}.index['{self._column}']` assumed unique results, "
+                f"but there were {len(self)} matches for the requested key. "
+                f"Please update calling code to handle multiple results appropriately."
+            )
+
+        return self[0]
+
+    def __getitem__(self, item):
+        if isinstance(item, str):
+            return self.only()[item]
+        return super().__getitem__(item)
+
+    def __getattr__(self, name):
+        if name in ("rowid", "parent", "iter", "keys"):
+            return getattr(self.only(), name)
+        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
+
+
 class DatReader(ReprMixin):
     """
     Attributes
@@ -554,7 +613,7 @@ class DatReader(ReprMixin):
         """
         self.auto_build_index = auto_build_index
         self.x64 = x64
-        self.index = {}
+        self.index: Dict[str, Dict[Any, IndexResult]] = {}
         self.data_parsed = []
         self.data_offset = 0
         self.file_length = 0
@@ -622,8 +681,8 @@ class DatReader(ReprMixin):
         Builds or rebuilds the index for the specified column.
 
         Indexed columns can be accessed though the instance variable index and
-        will return a single value for unique columns and a list for non-unique
-        columns.
+        will return a :class:`DatRecordIndex` instance which behaves as a single
+        value for unique columns and a list for non-unique columns.
 
         For example:
         self.index[column_name][indexed_value]
@@ -659,36 +718,19 @@ class DatReader(ReprMixin):
             for c in column:
                 columns.add(aliases.get(c, c))
 
-        columns_1to1 = set()
-        columns_1toN = set()
-        columns_NtoN = set()
         for column in columns:
-            if column in self.columns_unique:
-                self.index[column] = {}
-                columns_1to1.add(column)
-            elif self.specification.fields[column].type.startswith("ref|list"):
-                columns_NtoN.add(column)
-                self.index[column] = defaultdict(list)
-            else:
-                columns_1toN.add(column)
-                self.index[column] = defaultdict(list)
+            self.index[column] = defaultdict(lambda: IndexResult(self, column))
             for alias in inv_alias[column]:
                 self.index[alias] = self.index[column]
 
-        # Second loop
         for row in self:
-
-            def get_idx(column):
-                idx = row[column]
-                return idx
-
-            for column in columns_1to1:
-                self.index[column][get_idx(column)] = row
-            for column in columns_1toN:
-                self.index[column][get_idx(column)].append(row)
-            for column in columns_NtoN:
-                for value in row[column]:
-                    self.index[column][value].append(row)
+            for column in columns:
+                if self.specification.fields[column].type.startswith("ref|list"):
+                    for key in row[column]:
+                        self.index[column][key].append(row)
+                else:
+                    key = row[column]
+                    self.index[column][key].append(row)
 
     def row_iter(self):
         """
@@ -988,7 +1030,7 @@ class DatReader(ReprMixin):
                     outstr.append("<td>")
                     if self.use_dat_value:
                         outstr.append(str(dv.get_value()))
-                    elif isinstance(dv, DatRecord):
+                    elif isinstance(dv, (DatRecord, IndexResult)):
                         outstr.append(str(dv.rowid))
                     else:
                         outstr.append(str(dv))
@@ -1158,6 +1200,19 @@ class RelationalReader(AbstractFileCache[DatFile]):
                 else:
                     warnings.warn(msg, SpecificationWarning)
                     obj = None
+            except ValueError:
+                # probably need to add a value to the enum in <game>constants.py
+                msg = "Did not find proper value for %s in %s" % (
+                    obj - offset,
+                    other,
+                )
+                if self.raise_error_on_missing_relation:
+                    raise SpecificationError(
+                        SpecificationError.ERRORS.RUNTIME_MISSING_FOREIGN_KEY, msg
+                    )
+                else:
+                    warnings.warn(msg, SpecificationWarning)
+                    obj = None
         return obj
 
     def _dv_set_value(self, value, other, key, offset):
@@ -1224,7 +1279,17 @@ class RelationalReader(AbstractFileCache[DatFile]):
                 else:
                     spec_row_key = spec_row.key
 
-                df_other_reader = self[spec_row_key]
+                try:
+                    df_other_reader = self[spec_row_key]
+                except FileNotFoundError:
+                    msg = f'Did not find table {spec_row_key} for foreign ref column "{key}" in {file_name}'
+                    if self.raise_error_on_missing_relation:
+                        raise SpecificationError(
+                            SpecificationError.ERRORS.RUNTIME_MISSING_FOREIGN_KEY, msg
+                        )
+                    else:
+                        warnings.warn(msg, SpecificationWarning)
+                        continue
 
                 key_id = spec_row.key_id
                 key_offset = spec_row.key_offset
@@ -1238,7 +1303,7 @@ class RelationalReader(AbstractFileCache[DatFile]):
                 for i, row in enumerate(df.reader.table_data):
                     try:
                         df.reader.table_data[i][index] = vf(
-                            row[index],
+                            row[key],
                             df_other_reader,
                             key_id,
                             key_offset,

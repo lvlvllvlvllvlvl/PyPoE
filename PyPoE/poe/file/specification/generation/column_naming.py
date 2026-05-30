@@ -1,7 +1,5 @@
 import re
 
-from PyPoE.poe import constants
-
 
 class UnknownColumnNameGenerator:
     _flag_count = 0
@@ -30,13 +28,10 @@ class UnknownColumnNameGenerator:
         return name
 
 
-def StableToGeneratedNameMapping(name: str):
+def common_aliases(name: str):
     for suffix in ["Key", "Keys", "sKey", "sKeys", "esKey", "esKeys", "s"]:
         if name.endswith(suffix):
             yield name.removesuffix(suffix)
         m = re.match(r"^(.*\D)(\d+)$", name)
         if m and m.group(1).endswith(suffix):
             yield m.group(1).removesuffix(suffix) + m.group(2)
-
-
-name_mappings = {constants.VERSION.STABLE: StableToGeneratedNameMapping}

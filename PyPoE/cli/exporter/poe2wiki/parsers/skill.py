@@ -849,7 +849,7 @@ class SkillParserShared(parser.BaseParser):
             elif key in dynamic["stats"]:
                 try:
                     stat_dict_max = level_data[max_level]["stats"][key]
-                except KeyError:
+                except (KeyError, IndexError):
                     maxerr = True
                 else:
                     maxerr = False
@@ -857,7 +857,7 @@ class SkillParserShared(parser.BaseParser):
                 # Stat was 0
                 try:
                     stat_dict = level_data[0]["stats"][key]
-                except KeyError:
+                except (KeyError, IndexError):
                     minerr = True
                 else:
                     minerr = False

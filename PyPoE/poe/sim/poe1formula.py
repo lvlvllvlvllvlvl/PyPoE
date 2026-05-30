@@ -214,6 +214,9 @@ def gem_stat_requirement(level, gtype=GemTypes.support, multi=100):
             a = 0.945  # 1.575*0.6
         elif multi == 40:
             a = 0.6575  # 1.64375 * 0.6
+        elif multi == 250:
+            # linear interpolation won't work, but this multi only appears on an exceptional gem
+            return 259 if level <= 72 else 266
         else:
             raise ValueError("Unsupported multi '%s'" % multi)
     else:

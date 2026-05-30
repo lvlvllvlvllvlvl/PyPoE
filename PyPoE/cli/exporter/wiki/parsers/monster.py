@@ -269,13 +269,6 @@ class MonsterParser(parser.BaseParser):
                 },
             ),
             (
-                "CriticalStrikeChance",
-                {
-                    "template": "critical_strike_chance",
-                    "format": lambda v: v / 100,
-                },
-            ),
-            (
                 "AttackSpeed",
                 {
                     "template": "attack_speed",

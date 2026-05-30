@@ -794,6 +794,7 @@ class PASSIVE_SKILL_SIZES(IntEnumOverride):
 class PASSIVE_SKILL_TYPES(IntEnumOverride):
     CHARACTER = 0
     ATLAS = 1
+    GENESIS = 2
 
 
 class GAME_MODES(IntEnumOverride):

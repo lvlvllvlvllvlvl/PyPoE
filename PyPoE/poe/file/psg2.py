@@ -244,8 +244,10 @@ class PSGFile(AbstractFileReadOnly):
     def __init__(self, passive_skills_dat_file=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.skills_per_orbit = []
         self.root_passives = []
         self.groups = []
+        self.unk = []
 
         if isinstance(passive_skills_dat_file, DatFile):
             # TODO: check whether is read and raise exception
@@ -269,18 +271,12 @@ class PSGFile(AbstractFileReadOnly):
         offset = 0
 
         # version?
-        struct.unpack_from("<B", data, offset=offset)[0]
-        offset += 1
+        self.unk = struct.unpack_from("<BB", data, offset=offset)
+        offset += 2
 
-        unknown_length = 11
-        # We used to be able to fetch the count of throwaway unknown data from the start of the
-        # .psg, but it doesn't work as of 3.16. Manually, I looked for where there's a 32 bit
-        # unsigned int equal to the number of root nodes, and ignored everything before it.
-        # unknown_length = struct.unpack_from('<B', data, offset=offset)[0]
-        offset += 1
-
-        struct.unpack_from("<" + "B" * unknown_length, data, offset=offset)
-        offset += 1 * unknown_length
+        orbits = struct.unpack_from("<B", data, offset=offset)[0]
+        self.skills_per_orbit = struct.unpack_from("<" + "B" * orbits, data, offset=offset + 1)
+        offset += 1 + orbits
 
         root_length = struct.unpack_from("<I", data, offset=offset)[0]
         if root_length > 1000:
