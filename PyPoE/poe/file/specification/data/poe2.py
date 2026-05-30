@@ -608,10 +608,6 @@ specification = Specification(
                     name="Unknown0",
                     type="int",
                 ),
-                Field(
-                    name="Key0",
-                    type="ref|out",
-                ),
             ),
         ),
         "ActiveSkills.dat": File(
@@ -793,10 +789,6 @@ specification = Specification(
                     name="Unknown0",
                     type="int",
                 ),
-                Field(
-                    name="Unknown1",
-                    type="ref|string",
-                ),
             ),
             virtual_fields=(
                 VirtualField(
@@ -927,13 +919,6 @@ specification = Specification(
                 Field(
                     name="Flag0",
                     type="bool",
-                ),
-            ),
-            virtual_fields=(
-                VirtualField(
-                    name="StatsKeys",
-                    fields=("Stats1Keys",),
-                    alias=True,
                 ),
             ),
         ),
@@ -1371,13 +1356,6 @@ specification = Specification(
                     key="MonsterVarieties.dat",
                 ),
             ),
-            virtual_fields=(
-                VirtualField(
-                    name="Achievements",
-                    fields=("NecropolisAchievements",),
-                    alias=True,
-                ),
-            ),
         ),
         "AlternateCharacterSkin.dat": File(
             fields=(
@@ -1679,10 +1657,6 @@ specification = Specification(
                 Field(
                     name="HASH16",
                     type="ushort",
-                ),
-                Field(
-                    name="Keys0",
-                    type="ref|list|ref|out",
                 ),
             ),
         ),
@@ -2272,13 +2246,6 @@ specification = Specification(
                     name="NPCArena",
                     type="ref|out",
                     key="NPCs.dat",
-                ),
-            ),
-            virtual_fields=(
-                VirtualField(
-                    name="NPC",
-                    fields=("NPCHub",),
-                    alias=True,
                 ),
             ),
         ),
@@ -3542,11 +3509,6 @@ specification = Specification(
             ),
             virtual_fields=(
                 VirtualField(
-                    name="WorldAreasKey",
-                    fields=("Area1",),
-                    alias=True,
-                ),
-                VirtualField(
                     name="FlavourTextKey",
                     fields=("FlavourText",),
                     alias=True,
@@ -3700,22 +3662,6 @@ specification = Specification(
                     name="Key2",
                     type="ref|out",
                     key="ClientStrings.dat",
-                ),
-                Field(
-                    name="Unknown0",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Unknown1",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Unknown2",
-                    type="float",
-                ),
-                Field(
-                    name="Unknown3",
-                    type="ref|string",
                 ),
             ),
         ),
@@ -4622,22 +4568,6 @@ specification = Specification(
                     name="Key1",
                     type="ref|out",
                 ),
-                Field(
-                    name="Unknown0",
-                    type="int",
-                ),
-                Field(
-                    name="Keys0",
-                    type="ref|list|ref|out",
-                ),
-                Field(
-                    name="Keys1",
-                    type="ref|list|ref|out",
-                ),
-                Field(
-                    name="Keys2",
-                    type="ref|list|ref|out",
-                ),
             ),
             virtual_fields=(
                 VirtualField(
@@ -5318,18 +5248,6 @@ specification = Specification(
                     type="ref|list|int",
                 ),
             ),
-            virtual_fields=(
-                VirtualField(
-                    name="Art",
-                    fields=("IconArt",),
-                    alias=True,
-                ),
-                VirtualField(
-                    name="MissionCompletion_AcheivementItemsKey",
-                    fields=("MissionCompletion_AchievementItemsKey",),
-                    alias=True,
-                ),
-            ),
         ),
         "BetrayalForts.dat": File(
             fields=(
@@ -5423,13 +5341,6 @@ specification = Specification(
                 Field(
                     name="RankImage",
                     type="ref|string",
-                ),
-            ),
-            virtual_fields=(
-                VirtualField(
-                    name="SafehouseLeader_AcheivementItemsKey",
-                    fields=("SafehouseLeader_AchievementItemsKey",),
-                    alias=True,
                 ),
             ),
         ),
@@ -7093,13 +7004,8 @@ specification = Specification(
             ),
             virtual_fields=(
                 VirtualField(
-                    name="BinaryStats",
-                    fields=("GrantedFlags",),
-                    alias=True,
-                ),
-                VirtualField(
                     name="Binary_StatsKeys",
-                    fields=("GrantedFlags",),
+                    fields=("BinaryStats",),
                     alias=True,
                 ),
                 VirtualField(
@@ -8379,6 +8285,10 @@ specification = Specification(
                     key="MiscEffectPacks.dat",
                 ),
                 Field(
+                    name="Key3",
+                    type="ref|out",
+                ),
+                Field(
                     name="Unknown5",
                     type="int",
                 ),
@@ -8540,7 +8450,7 @@ specification = Specification(
                     key="NPCPortraits.dat",
                 ),
                 Field(
-                    name="Key3",
+                    name="Key4",
                     type="ref|out",
                     key="ItemVisualIdentity.dat",
                 ),
@@ -9678,28 +9588,107 @@ specification = Specification(
         "CraftingBenchOptions.dat": File(
             fields=(
                 Field(
-                    name="Id",
-                    type="ref|string",
-                    unique=True,
+                    name="HideoutNPC",
+                    type="ref|out",
+                    key="HideoutNPCs.dat",
                 ),
                 Field(
-                    name="Key0",
+                    name="Order",
+                    type="int",
+                ),
+                Field(
+                    name="AddMod",
                     type="ref|out",
+                    key="Mods.dat",
+                ),
+                Field(
+                    name="Cost_BaseItemTypes",
+                    type="ref|list|ref|out",
+                    key="BaseItemTypes.dat",
+                ),
+                Field(
+                    name="Cost_Values",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="RequiredLevel",
+                    type="int",
+                ),
+                Field(
+                    name="Name",
+                    type="ref|string",
+                ),
+                Field(
+                    name="CraftingBenchCustomAction",
+                    type="int",
+                ),
+                Field(
+                    name="ItemClasses",
+                    type="ref|list|ref|out",
+                    key="ItemClasses.dat",
+                ),
+                Field(
+                    name="Links",
+                    type="int",
+                ),
+                Field(
+                    name="SocketColours",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Sockets",
+                    type="int",
+                ),
+                Field(
+                    name="ItemQuantity",
+                    type="int",
+                ),
+                Field(
+                    name="Data0",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="Description",
+                    type="ref|string",
+                ),
+                Field(
+                    name="IsDisabled",
+                    type="bool",
+                ),
+                Field(
+                    name="IsAreaOption",
+                    type="bool",
+                ),
+                Field(
+                    name="RecipeIds",
+                    type="ref|list|int",
+                    key="RecipeUnlockDisplay.dat",
+                    key_id="RecipeId",
+                ),
+                Field(
+                    name="Tier",
+                    type="int",
+                ),
+                Field(
+                    name="CraftingItemClassCategories",
+                    type="ref|list|ref|out",
+                    key="CraftingItemClassCategories.dat",
                 ),
                 Field(
                     name="Unknown0",
-                    type="ref|string",
+                    type="int",
                 ),
                 Field(
-                    name="Unknown1",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Key1",
+                    name="UnlockCategory",
                     type="ref|out",
+                    key="CraftingBenchUnlockCategories.dat",
                 ),
                 Field(
-                    name="Unknown2",
+                    name="UnveilsRequired",
+                    type="int",
+                ),
+                Field(
+                    name="UnveilsRequired2",
                     type="int",
                 ),
                 Field(
@@ -9707,44 +9696,60 @@ specification = Specification(
                     type="ref|list|ref|out",
                 ),
                 Field(
-                    name="Data0",
-                    type="ref|list|int",
+                    name="KalandraAchievement",
+                    type="ref|list|ref|out",
+                    key="AchievementItems.dat",
                 ),
                 Field(
-                    name="Keys1",
-                    type="ref|list|ref|out",
+                    name="Unknown1",
+                    type="int",
                 ),
                 Field(
-                    name="Keys2",
-                    type="ref|list|ref|out",
+                    name="Unknown2",
+                    type="int",
                 ),
                 Field(
-                    name="Keys3",
-                    type="ref|list|ref|out",
+                    name="VeiledMod",
+                    type="ref|out",
+                    key="Mods.dat",
+                ),
+                Field(
+                    name="AddEnchantment",
+                    type="ref|out",
+                    key="Mods.dat",
+                ),
+                Field(
+                    name="SortCategory",
+                    type="ref|out",
+                    key="CraftingBenchSortCategories.dat",
+                ),
+                Field(
+                    name="ModType",
+                    type="ref|out",
+                    key="ModType.dat",
                 ),
                 Field(
                     name="Flag0",
                     type="bool",
                 ),
                 Field(
-                    name="Keys4",
-                    type="ref|list|ref|out",
+                    name="Unknown3",
+                    type="int",
                 ),
                 Field(
-                    name="Keys5",
-                    type="ref|list|ref|out",
-                ),
-                Field(
-                    name="Key2",
+                    name="Stat1",
                     type="ref|out",
+                    key="Stats.dat",
                 ),
                 Field(
-                    name="Key3",
+                    name="Stat2",
                     type="ref|out",
+                    key="Stats.dat",
                 ),
                 Field(
-                    name="Flag1",
-                    type="bool",
+                    name="Stat3",
+                    type="ref|out",
+                    key="Stats.dat",
                 ),
             ),
             virtual_fields=(
@@ -10006,13 +10011,6 @@ specification = Specification(
                     type="int",
                 ),
             ),
-            virtual_fields=(
-                VirtualField(
-                    name="Life",
-                    fields=("MoreLife",),
-                    alias=True,
-                ),
-            ),
         ),
         "CruciblePlayerClassOffsets.dat": File(
             fields=(
@@ -10222,6 +10220,10 @@ specification = Specification(
                 Field(
                     name="IsGold",
                     type="bool",
+                ),
+                Field(
+                    name="UsageHint",
+                    type="ref|string",
                 ),
                 Field(
                     name="Flag0",
@@ -13802,18 +13804,6 @@ specification = Specification(
                     type="ref|out",
                     key="Stats.dat",
                 ),
-                Field(
-                    name="Key0",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Keys1",
-                    type="ref|list|ref|out",
-                ),
-                Field(
-                    name="Keys2",
-                    type="ref|list|ref|out",
-                ),
             ),
             virtual_fields=(
                 VirtualField(
@@ -14763,13 +14753,6 @@ specification = Specification(
                     type="int",
                 ),
             ),
-            virtual_fields=(
-                VirtualField(
-                    name="Life",
-                    fields=("MoreLife",),
-                    alias=True,
-                ),
-            ),
         ),
         "FaridunWishFamilies.dat": File(
             fields=(
@@ -15302,13 +15285,6 @@ specification = Specification(
                     key="ClientStrings.dat",
                 ),
             ),
-            virtual_fields=(
-                VirtualField(
-                    name="Cost",
-                    fields=("BaseCost",),
-                    alias=True,
-                ),
-            ),
         ),
         "GameConstants.dat": File(
             fields=(
@@ -15574,6 +15550,7 @@ specification = Specification(
                 Field(
                     name="ItemColor",
                     type="int",
+                    enum="GEM_STYLES",
                     description="Used by gem icon shader https://gist.github.com/zao/08878df57aba605e5fa1e6373f2dce02",
                 ),
                 Field(
@@ -16701,18 +16678,6 @@ specification = Specification(
                     type="ref|list|int",
                     description="Apply to these stat sets, if not specified apply to all sets",
                 ),
-                Field(
-                    name="Keys0",
-                    type="ref|list|ref|out",
-                ),
-                Field(
-                    name="Data0",
-                    type="ref|list|int",
-                ),
-                Field(
-                    name="Data1",
-                    type="ref|list|int",
-                ),
             ),
             virtual_fields=(
                 VirtualField(
@@ -17145,7 +17110,7 @@ specification = Specification(
                         "Stat4Float",
                         "Stat5Float",
                         "Stat6Float",
-                        "Stat7FlNZSToat",
+                        "Stat7Float",
                         "Stat8Float",
                     ),
                 ),
@@ -17743,13 +17708,6 @@ specification = Specification(
                 Field(
                     name="MoreLife",
                     type="int",
-                ),
-            ),
-            virtual_fields=(
-                VirtualField(
-                    name="Life",
-                    fields=("MoreLife",),
-                    alias=True,
                 ),
             ),
         ),
@@ -19320,18 +19278,6 @@ specification = Specification(
                 Field(
                     name="MoreLife",
                     type="int",
-                ),
-            ),
-            virtual_fields=(
-                VirtualField(
-                    name="AreaLevel",
-                    fields=("Level",),
-                    alias=True,
-                ),
-                VirtualField(
-                    name="Scale",
-                    fields=("MoreLife",),
-                    alias=True,
                 ),
             ),
         ),
@@ -21271,10 +21217,6 @@ specification = Specification(
                     name="Flag1",
                     type="bool",
                 ),
-                Field(
-                    name="Flag2",
-                    type="bool",
-                ),
             ),
             virtual_fields=(
                 VirtualField(
@@ -22279,6 +22221,7 @@ specification = Specification(
                 Field(
                     name="Composition",
                     type="int",
+                    enum="ITEM_VISUAL_COMPOSITIONS",
                 ),
                 Field(
                     name="UniqueStat1",
@@ -22379,10 +22322,6 @@ specification = Specification(
                 ),
                 Field(
                     name="Unknown29",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Unknown30",
                     type="ref|string",
                 ),
             ),
@@ -22710,14 +22649,6 @@ specification = Specification(
                     name="Unknown1",
                     type="ref|string",
                 ),
-                Field(
-                    name="Key0",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Key1",
-                    type="ref|out",
-                ),
             ),
         ),
         "KillstreakThresholds.dat": File(
@@ -22773,13 +22704,6 @@ specification = Specification(
                 Field(
                     name="MapCompletion",
                     type="int",
-                ),
-            ),
-            virtual_fields=(
-                VirtualField(
-                    name="AreaLevel",
-                    fields=("MapAreaLevelOffered",),
-                    alias=True,
                 ),
             ),
         ),
@@ -23328,13 +23252,6 @@ specification = Specification(
                     type="int",
                 ),
             ),
-            virtual_fields=(
-                VirtualField(
-                    name="Scaling",
-                    fields=("MoreLife",),
-                    alias=True,
-                ),
-            ),
         ),
         "LakeMetaOptions.dat": File(
             fields=(
@@ -23345,13 +23262,6 @@ specification = Specification(
                 Field(
                     name="Data0",
                     type="ref|list|int",
-                ),
-            ),
-            virtual_fields=(
-                VirtualField(
-                    name="TextAudio",
-                    fields=("TextAudioIntro",),
-                    alias=True,
                 ),
             ),
         ),
@@ -26780,13 +26690,6 @@ specification = Specification(
                     type="bool",
                 ),
             ),
-            virtual_fields=(
-                VirtualField(
-                    name="Script",
-                    fields=("Script1",),
-                    alias=True,
-                ),
-            ),
         ),
         "MicrotransactionOnKillBeams.dat": File(
             fields=(
@@ -27349,18 +27252,6 @@ specification = Specification(
                     type="int",
                 ),
             ),
-            virtual_fields=(
-                VirtualField(
-                    name="QuestFlags1",
-                    fields=("QuestFlagsStart",),
-                    alias=True,
-                ),
-                VirtualField(
-                    name="QuestFlags2",
-                    fields=("QuestFlagsEnd",),
-                    alias=True,
-                ),
-            ),
         ),
         "MinimapIcons.dat": File(
             fields=(
@@ -27487,13 +27378,6 @@ specification = Specification(
                 Field(
                     name="CompanionStat",
                     type="bool",
-                ),
-            ),
-            virtual_fields=(
-                VirtualField(
-                    name="Stat",
-                    fields=("MinionStat",),
-                    alias=True,
                 ),
             ),
         ),
@@ -29737,18 +29621,13 @@ specification = Specification(
             ),
             virtual_fields=(
                 VirtualField(
-                    name="Formation",
-                    fields=("PackFormation",),
+                    name="WorldAreasKeys",
+                    fields=("WorldAreas",),
                     alias=True,
                 ),
                 VirtualField(
                     name="TagsKeys",
                     fields=("Tags",),
-                    alias=True,
-                ),
-                VirtualField(
-                    name="WorldAreasKeys",
-                    fields=("WorldAreas",),
                     alias=True,
                 ),
             ),
@@ -30167,7 +30046,7 @@ specification = Specification(
             virtual_fields=(
                 VirtualField(
                     name="MonsterResistancesKey",
-                    fields=("Resistances",),
+                    fields=("MonsterResistances",),
                     alias=True,
                 ),
             ),
@@ -31363,24 +31242,6 @@ specification = Specification(
                     name="VolumePercentage",
                     type="int",
                 ),
-                Field(
-                    name="QuestFlag1",
-                    type="ref|out",
-                    key="QuestFlags.dat",
-                ),
-                Field(
-                    name="QuestFlag2",
-                    type="ref|out",
-                    key="QuestFlags.dat",
-                ),
-                Field(
-                    name="Data1",
-                    type="ref|list|int",
-                ),
-                Field(
-                    name="Data2",
-                    type="ref|list|int",
-                ),
             ),
         ),
         "NPCConversations.dat": File(
@@ -31942,13 +31803,6 @@ specification = Specification(
                     type="int",
                 ),
             ),
-            virtual_fields=(
-                VirtualField(
-                    name="QuestFlag",
-                    fields=("QuestFlag5",),
-                    alias=True,
-                ),
-            ),
         ),
         "NPCShops.dat": File(
             fields=(
@@ -32430,11 +32284,6 @@ specification = Specification(
                 ),
             ),
             virtual_fields=(
-                VirtualField(
-                    name="NPCs",
-                    fields=("NPCPortrait",),
-                    alias=True,
-                ),
                 VirtualField(
                     name="CharactersKey",
                     fields=("Characters",),
@@ -33383,11 +33232,6 @@ specification = Specification(
             ),
             virtual_fields=(
                 VirtualField(
-                    name="QuestFlag",
-                    fields=("QuestFlag1",),
-                    alias=True,
-                ),
-                VirtualField(
                     name="Effect1_StatsKeys",
                     fields=("Effect1_Stats",),
                     alias=True,
@@ -33664,12 +33508,8 @@ specification = Specification(
                     type="ref|list|int",
                 ),
                 Field(
-                    name="Unknown0",
-                    type="int",
-                ),
-                Field(
-                    name="Flag0",
-                    type="bool",
+                    name="Key0",
+                    type="ref|out",
                 ),
             ),
         ),
@@ -34261,11 +34101,6 @@ specification = Specification(
                     type="ref|out",
                     key="PassiveSkillTreeNodeFrameArt.dat",
                 ),
-                Field(
-                    name="MultipleChoiceFrame",
-                    type="ref|out",
-                    key="PassiveSkillTreeNodeFrameArt.dat",
-                ),
             ),
         ),
         "PassiveSkillTreeUIArtAscendancy.dat": File(
@@ -34677,74 +34512,8 @@ specification = Specification(
                     type="ref|out",
                     key="PassiveSkillTreeNodeFrameArt.dat",
                 ),
-                Field(
-                    name="Flag5",
-                    type="bool",
-                ),
-                Field(
-                    name="Unknown7",
-                    type="int",
-                ),
-                Field(
-                    name="Flag6",
-                    type="bool",
-                ),
-                Field(
-                    name="Key0",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Unknown8",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown9",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown10",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown11",
-                    type="int",
-                ),
-                Field(
-                    name="Unknown12",
-                    type="int",
-                ),
-                Field(
-                    name="Flag7",
-                    type="bool",
-                ),
-                Field(
-                    name="Key1",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Unknown13",
-                    type="int",
-                ),
-                Field(
-                    name="Key2",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Key3",
-                    type="ref|out",
-                ),
             ),
             virtual_fields=(
-                VirtualField(
-                    name="AtlasnodeGroup",
-                    fields=("AtlasNodeGroup",),
-                    alias=True,
-                ),
-                VirtualField(
-                    name="KeystoneId",
-                    fields=("AudioEvent",),
-                    alias=True,
-                ),
                 VirtualField(
                     name="StatValues",
                     fields=(
@@ -35212,18 +34981,6 @@ specification = Specification(
                     type="int",
                 ),
             ),
-            virtual_fields=(
-                VirtualField(
-                    name="AreaLevel",
-                    fields=("Level",),
-                    alias=True,
-                ),
-                VirtualField(
-                    name="Scale",
-                    fields=("MoreLife",),
-                    alias=True,
-                ),
-            ),
         ),
         "ProjectileOverrides.dat": File(
             fields=(
@@ -35480,13 +35237,6 @@ specification = Specification(
                     name="Stat",
                     type="ref|out",
                     key="Stats.dat",
-                ),
-            ),
-            virtual_fields=(
-                VirtualField(
-                    name="Projectile",
-                    fields=("Id",),
-                    alias=True,
                 ),
             ),
         ),
@@ -36772,13 +36522,6 @@ specification = Specification(
                     type="int",
                 ),
             ),
-            virtual_fields=(
-                VirtualField(
-                    name="AdditionalLife",
-                    fields=("MoreLife",),
-                    alias=True,
-                ),
-            ),
         ),
         "RogueExileModBonuses.dat": File(
             fields=(
@@ -37904,18 +37647,6 @@ specification = Specification(
                     type="ref|string",
                 ),
             ),
-            virtual_fields=(
-                VirtualField(
-                    name="Metadata",
-                    fields=("AfterImageEffect",),
-                    alias=True,
-                ),
-                VirtualField(
-                    name="Metadata2",
-                    fields=("PlayerEffect",),
-                    alias=True,
-                ),
-            ),
         ),
         "ShapeShiftForms.dat": File(
             fields=(
@@ -38068,13 +37799,6 @@ specification = Specification(
                 Field(
                     name="Flag2",
                     type="bool",
-                ),
-            ),
-            virtual_fields=(
-                VirtualField(
-                    name="ShapeShiftForm",
-                    fields=("BaseForm",),
-                    alias=True,
                 ),
             ),
         ),
@@ -38928,23 +38652,6 @@ specification = Specification(
                     name="Data0",
                     type="ref|list|byte",
                 ),
-                Field(
-                    name="Unknown2",
-                    type="ref|generic",
-                    key="SkillGems.dat",
-                ),
-                Field(
-                    name="Flag6",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag7",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag8",
-                    type="bool",
-                ),
             ),
             virtual_fields=(
                 VirtualField(
@@ -39439,35 +39146,6 @@ specification = Specification(
                     name="Type",
                     type="ref|out",
                     key="SoulCoreTypes.dat",
-                ),
-                Field(
-                    name="Unknown0",
-                    type="ref|generic",
-                    key="SoulCores.dat",
-                ),
-                Field(
-                    name="Flag0",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag1",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag2",
-                    type="bool",
-                ),
-                Field(
-                    name="Flag3",
-                    type="bool",
-                ),
-                Field(
-                    name="Key0",
-                    type="ref|out",
-                ),
-                Field(
-                    name="Flag4",
-                    type="bool",
                 ),
             ),
         ),
@@ -40704,10 +40382,6 @@ specification = Specification(
                     name="VisualIdentity",
                     type="ref|out",
                     key="SupportGemSocketedVisualIdentity.dat",
-                ),
-                Field(
-                    name="Flag0",
-                    type="bool",
                 ),
             ),
         ),
@@ -42528,13 +42202,6 @@ specification = Specification(
                     type="bool",
                 ),
             ),
-            virtual_fields=(
-                VirtualField(
-                    name="QuestFlag",
-                    fields=("QuestFlagComplete",),
-                    alias=True,
-                ),
-            ),
         ),
         "TutorialLeagueQuestFlags.dat": File(
             fields=(
@@ -43187,27 +42854,6 @@ specification = Specification(
                 Field(
                     name="Limit",
                     type="int",
-                ),
-            ),
-        ),
-        "UniqueMagesLegacy.dat": File(
-            fields=(
-                Field(
-                    name="Name",
-                    type="ref|string",
-                ),
-                Field(
-                    name="DisplayText",
-                    type="ref|string",
-                ),
-                Field(
-                    name="Stats",
-                    type="ref|list|ref|out",
-                    key="Stats.dat",
-                ),
-                Field(
-                    name="StatValues",
-                    type="ref|list|int",
                 ),
             ),
         ),
@@ -44572,11 +44218,6 @@ specification = Specification(
             ),
             virtual_fields=(
                 VirtualField(
-                    name="Critical",
-                    fields=("CritChance",),
-                    alias=True,
-                ),
-                VirtualField(
                     name="BaseItemTypesKey",
                     fields=("BaseItemType",),
                     alias=True,
@@ -45263,21 +44904,6 @@ specification = Specification(
                 ),
             ),
             virtual_fields=(
-                VirtualField(
-                    name="Bosses",
-                    fields=("Bosses_MonsterVarietiesKeys",),
-                    alias=True,
-                ),
-                VirtualField(
-                    name="AreaType_TagsKeys",
-                    fields=("AreaTypeTags",),
-                    alias=True,
-                ),
-                VirtualField(
-                    name="VaalArea_WorldAreasKeys",
-                    fields=("VaalArea",),
-                    alias=True,
-                ),
                 VirtualField(
                     name="TopologiesKeys",
                     fields=("Topologies",),

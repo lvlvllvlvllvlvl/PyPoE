@@ -34,6 +34,7 @@ import math
 import os
 
 # Python
+import posixpath
 import re
 import struct
 import warnings
@@ -262,7 +263,6 @@ class ItemsHandler(ExporterHandler):
             "by_filter",
             help="Extracts all items matching various filters",
         )
-
         self.add_default_parsers(
             parser=item_filter_parser,
             cls=ItemsParser,
@@ -275,13 +275,26 @@ class ItemsHandler(ExporterHandler):
             help="Filter by item name using regular expression.",
             dest="re_name",
         )
-
         item_filter_parser.add_argument(
             "-ft-id",
             "--filter-id",
             "--filter-metadata-id",
-            help="Filter by item metadata id using regular expression",
+            help="Filter by item metadata ID using regular expression",
             dest="re_id",
+        )
+        item_filter_parser.add_argument(
+            "-ft-c",
+            "--filter-class",
+            help="Filter by item class(es). Case sensitive.",
+            nargs="*",
+            dest="item_class",
+        )
+        item_filter_parser.add_argument(
+            "-ft-cid",
+            "--filter-class-id",
+            help="Filter by item class ID(s). Case sensitive.",
+            nargs="*",
+            dest="item_class_id",
         )
 
     def add_default_parsers(self, *args, type=None, **kwargs):
@@ -303,22 +316,6 @@ class ItemsHandler(ExporterHandler):
         )
 
         if type == "item":
-            parser.add_argument(
-                "-ft-c",
-                "--filter-class",
-                help="Filter by item class(es). Case sensitive.",
-                nargs="*",
-                dest="item_class",
-            )
-
-            parser.add_argument(
-                "-ft-cid",
-                "--filter-class-id",
-                help="Filter by item class id(s). Case sensitive.",
-                nargs="*",
-                dest="item_class_id",
-            )
-
             self.add_image_arguments(parser)
 
 
@@ -353,15 +350,7 @@ class ItemsParser(SkillParserShared):
         "InstanceLocalItem",
     )
 
-    _DROP_DISABLED_ITEMS_BY_ID = set()
-
-    # Skip items by class ID
-    _EXCLUDE_CLASSES = {
-        "Map",
-        "NecropolisPack",
-        "HiddenItem",
-        "RemovedItem",
-    }
+    _DROP_DISABLED_ITEMS_BY_ID = set()  # Leave empty
 
     _NAME_OVERRIDE_BY_ID = {
         "English": {
@@ -554,6 +543,7 @@ class ItemsParser(SkillParserShared):
             # =================================================================
             # Invitations
             # =================================================================
+            "Metadata/Items/MapFragments/Maven/MavenMapAtlas1": " (quest item)",
             "Metadata/Items/MapFragments/Primordial/QuestTangleKey": " (quest item)",
             "Metadata/Items/MapFragments/Primordial/QuestTangleBossKey": " (quest item)",
             "Metadata/Items/MapFragments/Primordial/QuestCleansingFireKey": " (quest item)",
@@ -634,6 +624,7 @@ class ItemsParser(SkillParserShared):
             "Metadata/Items/QuestItems/GoldenPages/Page3": " (3 of 4)",
             "Metadata/Items/QuestItems/GoldenPages/Page4": " (4 of 4)",
             "Metadata/Items/QuestItems/Act7/KisharaStar": " (quest item)",
+            "Metadata/Items/QuestItems/Act11/DominusKey": " (quest item)",
             # =================================================================
             # Heist equipment
             # =================================================================
@@ -1402,6 +1393,7 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/MicrotransactionItemEffects/MicrotransactionMistFootprintsEffect",
         "Metadata/Items/MicrotransactionItemEffects/MicrotransactionReaperFootprints",
         "Metadata/Items/MicrotransactionItemEffects/MicrotransactionFieryHands",
+        "Metadata/Items/MicrotransactionItemEffects/MicrotransactionDemonHandGloves",
         # =================================================================
         # Hideout decorations
         # =================================================================
@@ -1452,6 +1444,11 @@ class ItemsParser(SkillParserShared):
         # Currency items
         # =================================================================
         "Metadata/Items/Currency/CurrencyLabyrinthEnchant",
+        "Metadata/Items/Currency/RunegraftMinionCannotAttack",
+        "Metadata/Items/Currency/RunegraftMatchedSpeed",
+        "Metadata/Items/Currency/RunegraftMinionCannotCast",
+        "Metadata/Items/Currency/RunegraftTest",
+        "Metadata/Items/Currency/AstrolabeSettlers",
         # =================================================================
         # Non-stackable resonators from before 3.8.0
         # =================================================================
@@ -1593,6 +1590,12 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/MapFragments/Maven/MavenMapInsideBottomLeft5",
         "Metadata/Items/MapFragments/Maven/MavenMapInsideTopLeft5",
         "Metadata/Items/MapFragments/Maven/MavenMapInsideTopRight5",
+        "Metadata/Items/MapFragments/Maven/MavenMapVoid1",
+        "Metadata/Items/MapFragments/Maven/MavenMapVoid2",
+        "Metadata/Items/MapFragments/Maven/MavenMapVoid3",
+        "Metadata/Items/MapFragments/Maven/MavenMapVoid4",
+        "Metadata/Items/MapFragments/Maven/MavenMapVoid5",
+        "Metadata/Items/MapFragments/Maven/MavenMapVoid6",
         # =================================================================
         # Invocations (only present for sanctum league)
         # =================================================================
@@ -1638,11 +1641,22 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Currency/SanctumCurrencyWindDancer",
         "Metadata/Items/Currency/SanctumCurrencyZealotsOath",
         # =================================================================
-        # Scarabs
+        # Old Sanctum relics, maybe?
+        # =================================================================
+        "Metadata/Items/Relics/Relic1x2",
+        "Metadata/Items/Relics/Relic1x3",
+        "Metadata/Items/Relics/Relic1x4",
+        "Metadata/Items/Relics/Relic2x1",
+        "Metadata/Items/Relics/Relic2x2",
+        "Metadata/Items/Relics/Relic3x1",
+        "Metadata/Items/Relics/Relic4x1",
+        # =================================================================
+        # Map fragments
         # =================================================================
         "Metadata/Items/Scarabs/ScarabMisc6",
         "Metadata/Items/Scarabs/ScarabMisc7",
-        "Metadata/Items/Scarabs/ScarabMisc10",
+        "Metadata/Items/MapFragments/RatsAllflamePack",
+        "Metadata/Items/MapFragments/Maven/MavenMapAtlas5",
         # =================================================================
         # Corpse items
         # =================================================================
@@ -1701,7 +1715,11 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestWhakano3",
         "Metadata/Items/Heist/QuestContracts/HeistContractQuestNenet1",
         "Metadata/Items/Heist/QuestContracts/HeistContractQuestNenetRepeatable",
+        "Metadata/Items/Heist/QuestItems/HeistFinalObjectiveQuestIsla3",
         "Metadata/Items/Masters/PirateTreasureKey",
+        "Metadata/Items/MapFragments/Maven/MavenMapAtlas2",
+        "Metadata/Items/MapFragments/Maven/MavenMapAtlas3",
+        "Metadata/Items/MapFragments/Maven/MavenMapAtlas4",
         # =================================================================
         # Misc
         # =================================================================
@@ -1714,12 +1732,22 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Armours/BodyArmours/BodyStrTemp",
         "Metadata/Items/Armours/Boots/BootsStrTemp",
         "Metadata/Items/Classic/MysteryLeaguestone",
-        "Metadata/Items/Relics/Relic1x3",
-        "Metadata/Items/Relics/Relic1x4",
-        "Metadata/Items/Relics/Relic2x1",
-        "Metadata/Items/Relics/Relic2x2",
-        "Metadata/Items/Relics/Relic3x1",
-        "Metadata/Items/Relics/Relic4x1",
+        "Metadata/Items/MapFragments/CurrencyVaalFragments1Complete",
+        "Metadata/Items/MapFragments/CurrencyVaalFragments2Complete",
+        "Metadata/Items/MapFragments/CurrencyProphecyFragmentsComplete",
+        "Metadata/Items/MapFragments/CurrencyShaperFragmentsComplete",
+        "Metadata/Items/MapFragments/CurrencyElderFragmentsComplete",
+        "Metadata/Items/MapFragments/CurrencyUberElderFragmentsComplete",
+        "Metadata/Items/MapFragments/CurrencySirusFragmentsComplete",
+    }
+
+    # Skip items by class ID
+    _EXCLUDE_CLASSES = {
+        "Map",
+        "NecropolisPack",
+        "HiddenItem",
+        "MapKey",
+        "RemovedItem",
     }
 
     _ITEM_SKIP_PATTERNS = {
@@ -1728,6 +1756,12 @@ class ItemsParser(SkillParserShared):
         },
         "Support Skill Gem": {
             r"Royale",
+        },
+        "StackableCurrency": {
+            r"Tencent",
+        },
+        "VaultKey": {
+            r"Tencent",
         },
         "Microtransaction": {
             r"Garena",
@@ -1748,17 +1782,12 @@ class ItemsParser(SkillParserShared):
             r"Premium.*Pet",
             r"UnifiedAuraEffect",
         },
+        "InstanceLocalItem": {
+            r"TradeProxy",
+        },
     }
 
     _PLACEHOLDER_IMAGES = {"Art/2DItems/Hideout/HideoutPlaceholder.dds"}
-
-    _attribute_map = OrderedDict(
-        (
-            ("Str", "strength"),
-            ("Dex", "dexterity"),
-            ("Int", "intelligence"),
-        )
-    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1777,6 +1806,23 @@ class ItemsParser(SkillParserShared):
             )
         else:
             self.rr2 = None
+        self._skipped_items = self._build_skip_list()
+
+    def _build_skip_list(self):
+        skip_list = set()
+        for item in self.rr["BaseItemTypes.dat64"]:
+            if item["ItemClassesKey"]["Id"] in self._EXCLUDE_CLASSES:
+                skip_list.add(item["Id"])
+            elif item["Id"] in self._SKIP_ITEMS_BY_ID:
+                skip_list.add(item["Id"])
+            elif item["ItemClassesKey"]["Id"] in self._ITEM_SKIP_PATTERNS:
+                for pattern in self._ITEM_SKIP_PATTERNS[item["ItemClassesKey"]["Id"]]:
+                    if re.search(pattern, item["Id"], flags=re.IGNORECASE):
+                        skip_list.add(item["Id"])
+        return skip_list
+
+    def _in_skip_list(self, item):
+        return item and item["Id"] in self._skipped_items
 
     def _skip_quest_contracts(self, infobox: OrderedDict, base_item_type):
         return base_item_type.rowid not in self.rr["HeistContracts.dat64"].index["BaseItemTypesKey"]
@@ -1861,6 +1907,11 @@ class ItemsParser(SkillParserShared):
             return False
         return True
 
+    _GEM_OVERLAY_MAP = {
+        constants.GEM_STYLES.TRARTHAN: "Art/2DItems/Gems/Overlays/Sparklebackground.dds",
+        constants.GEM_STYLES.EXCEPTIONAL: "Art/2DItems/Gems/Overlays/ExceptionalSupportGemOverlay.dds",
+    }
+
     def _skill_gem(self, infobox: OrderedDict, base_item_type):
         try:
             skill_gem = self.rr["SkillGems.dat64"].index["BaseItemTypesKey"][base_item_type.rowid]
@@ -1877,30 +1928,41 @@ class ItemsParser(SkillParserShared):
 
     def _skill_gem_type(self, infobox: OrderedDict, base_item_type, skill_gem, gem_type):
         name = gem_type["Name"]
-        if "[DNT]" in name:
+        if "[DNT" in name:
             return False
         if skill_gem["IsVaalVariant"]:
-            infobox["is_vaal_skill_gem"] = "true"
-            if gem_type["ItemColor"] != 3:
+            infobox["is_vaal_skill_gem"] = True
+            if gem_type["ItemColor"] != constants.GEM_STYLES.DEFAULT:
                 return False
         if skill_gem["VaalVariant_BaseItemTypesKey"]:
             infobox["vaal_variant_id"] = skill_gem["VaalVariant_BaseItemTypesKey"]["Id"]
-        if skill_gem["RegularVariant"]:
-            infobox["is_awakened_support_gem"] = "true"
         if skill_gem["AwakenedVariant"]:
             infobox["awakened_variant_id"] = skill_gem["AwakenedVariant"]["BaseItemTypesKey"]["Id"]
+        if skill_gem["RegularVariant"]:
+            infobox["regular_variant_id"] = skill_gem["RegularVariant"]["BaseItemTypesKey"]["Id"]
         if name:
             infobox["name"] = name
             infobox["base_item_id"] = infobox.pop("metadata_id")
 
         # SkillGems.dat
-        for attr_short, attr_long in self._attribute_map.items():
-            if not skill_gem[attr_short]:
-                continue
-            infobox[attr_long + "_percent"] = skill_gem[attr_short]
+        attr_map = {
+            "strength": skill_gem["StrengthRequirementPercent"],
+            "dexterity": skill_gem["DexterityRequirementPercent"],
+            "intelligence": skill_gem["IntelligenceRequirementPercent"],
+        }
+        try:
+            attr_weight = 100 / (
+                attr_map["strength"] + attr_map["dexterity"] + attr_map["intelligence"]
+            )
+        except ZeroDivisionError:
+            attr_weight = 1
+        for k, v in attr_map.items():
+            percent = math.floor(v * attr_weight)
+            if percent > 0:
+                infobox[k + "_percent"] = percent
 
         infobox["gem_tags"] = ", ".join([gt["Tag"] for gt in gem_type["GemTags"] if gt["Tag"]])
-        infobox["gem_shader"] = gem_type["ItemColor"]
+        infobox["gem_style"] = gem_type["ItemColor"]
 
         # No longer used
         #
@@ -1932,7 +1994,7 @@ class ItemsParser(SkillParserShared):
             gra_eff=ge,
             infobox=primary,
             parsed_args=self._parsed_args,
-            msg_name=gem_type["Name"],
+            msg_name=ge["ActiveSkill"] and ge["ActiveSkill"]["DisplayedName"],
             max_level=max_level,
         )
 
@@ -1973,7 +2035,7 @@ class ItemsParser(SkillParserShared):
                 gra_eff=second,
                 infobox=secondary,
                 parsed_args=self._parsed_args,
-                msg_name=base_item_type["Name"],
+                msg_name=second["ActiveSkill"] and second["ActiveSkill"]["DisplayedName"],
                 max_level=max_level,
             )
 
@@ -2067,7 +2129,9 @@ class ItemsParser(SkillParserShared):
 
         # some descriptions come from active skills which are parsed in above function
         if ge["IsSupport"] and gem_type["SupportText"]:
-            infobox["gem_description"] = gem_type["SupportText"].replace("\n", "<br>")
+            infobox["gem_description"] = (
+                gem_type["SupportText"].replace("\n", "<br>").replace("\r", "")
+            )
 
         #
         # Output handling for progression
@@ -2674,7 +2738,7 @@ class ItemsParser(SkillParserShared):
                 .index["Id"]["EssenceModLevelRestriction"]["Text"]
                 .replace("{0}", str(essence["ItemLevelRestriction"]))
             )
-            out[-1] += "<br />"
+            out[-1] += "<br>"
 
         def add_line(text, mod):
             nonlocal out
@@ -2710,7 +2774,7 @@ class ItemsParser(SkillParserShared):
             # TODO: Can't find items in clientstrings
             add_line(get_str("Other").replace("{0}", "Items"), item_mod)
 
-        infobox["description"] += "<br />" + "<br />".join(out)
+        infobox["description"] += "<br>" + "<br>".join(out)
 
         return True
 
@@ -3214,7 +3278,6 @@ class ItemsParser(SkillParserShared):
         "ManaFlask": (_type_level, _type_flask, _type_flask_charges),
         "HybridFlask": (_type_level, _type_flask, _type_flask_charges),
         "UtilityFlask": (_type_level, _type_flask, _type_flask_charges),
-        "UtilityFlaskCritical": (_type_level, _type_flask, _type_flask_charges),
         # Gems
         "Active Skill Gem": (_skill_gem,),
         "Support Skill Gem": (_skill_gem,),
@@ -3396,34 +3459,6 @@ class ItemsParser(SkillParserShared):
         "Tincture": _conflict_tincture,
     }
 
-    def _parse_class_filter(self, parsed_args):
-        if parsed_args.item_class_id:
-            return [
-                self.rr["ItemClasses.dat64"].index["Id"][cls]["Name"]
-                for cls in parsed_args.item_class_id
-            ]
-        elif parsed_args.item_class:
-            self.rr["ItemClasses.dat64"].build_index("Name")
-            return [
-                self.rr["ItemClasses.dat64"].index["Name"][cls][0]["Name"]
-                for cls in parsed_args.item_class
-            ]
-        else:
-            return []
-
-    _skipped_items = set()
-
-    def _maybe_skip(self, base_item_type):
-        if base_item_type["Id"] in self._SKIP_ITEMS_BY_ID:
-            self._skipped_items.add(base_item_type["Id"])
-            return True
-        if base_item_type["ItemClassesKey"]["Id"] in self._ITEM_SKIP_PATTERNS:
-            for pattern in self._ITEM_SKIP_PATTERNS[base_item_type["ItemClassesKey"]["Id"]]:
-                if re.search(pattern, base_item_type["Id"], flags=re.IGNORECASE):
-                    self._skipped_items.add(base_item_type["Id"])
-                    return True
-        return False
-
     def _process_purchase_costs(self, source, infobox):
         for rarity in constants.RARITY:
             if rarity.id >= 5:
@@ -3458,17 +3493,33 @@ class ItemsParser(SkillParserShared):
             parsed_args.re_id = re.compile(parsed_args.re_id, flags=re.UNICODE)
 
         items = []
-
         for item in self.rr["BaseItemTypes.dat64"]:
             if parsed_args.re_name and not parsed_args.re_name.match(item["Name"]):
                 continue
-
             if parsed_args.re_id and not parsed_args.re_id.match(item["Id"]):
                 continue
-
             items.append(item)
 
+        class_ids = self._parse_class_filter(parsed_args)
+        if class_ids:
+            items = [item for item in items if item["ItemClassesKey"]["Id"] in class_ids]
+
         return self._export(parsed_args, items)
+
+    def _parse_class_filter(self, parsed_args):
+        if parsed_args.item_class_id:
+            return [
+                self.rr["ItemClasses.dat64"].index["Id"][cls]["Id"]
+                for cls in parsed_args.item_class_id
+            ]
+        elif parsed_args.item_class:
+            self.rr["ItemClasses.dat64"].build_index("Name")
+            return [
+                self.rr["ItemClasses.dat64"].index["Name"][cls][0]["Id"]
+                for cls in parsed_args.item_class
+            ]
+        else:
+            return []
 
     def _process_base_item_type(self, base_item_type, infobox):
         m_id = base_item_type["Id"]
@@ -3541,7 +3592,7 @@ class ItemsParser(SkillParserShared):
             items = [
                 item
                 for item in rr["BaseItemTypes.dat64"].index["Name"][name]
-                if item["Id"] not in self._skipped_items
+                if not self._in_skip_list(item)
             ]
             if len(items) > 1:
                 resolver = self._conflict_resolver_map.get(cls_id)
@@ -3569,21 +3620,17 @@ class ItemsParser(SkillParserShared):
         return name
 
     def _export(self, parsed_args, items):
-        classes = self._parse_class_filter(parsed_args)
-        if classes:
-            items = [item for item in items if item["ItemClassesKey"]["Name"] in classes]
-        else:
-            items = [
-                item for item in items if item["ItemClassesKey"]["Id"] not in self._EXCLUDE_CLASSES
-            ]
-
         self._parsed_args = parsed_args
         console("Found %s items. Removing disabled items..." % len(items))
-        items = [base_item_type for base_item_type in items if not self._maybe_skip(base_item_type)]
+        items = [
+            base_item_type for base_item_type in items if not self._in_skip_list(base_item_type)
+        ]
         console("%s items left for processing." % len(items))
 
         console("Loading additional files - this may take a while...")
         self._image_init(parsed_args)
+        # Some gems require overlay images to be added to their inventory icons
+        self._make_gem_overlays(parsed_args)
 
         r = ExporterResult()
         self.rr["BaseItemTypes.dat64"].build_index("Name")
@@ -3614,7 +3661,7 @@ class ItemsParser(SkillParserShared):
                         result = f(self, item, base_item_type)
                         if result is False:
                             console(
-                                f'Required extra info for item "{name}" with class id '
+                                f'Required extra info for item "{name}" with class ID '
                                 f'"{cls_id}" not found. Skipping.',
                                 msg=Msg.warning,
                             )
@@ -3702,9 +3749,27 @@ class ItemsParser(SkillParserShared):
                         process=self._get_icon_process(infobox, base_item_type),
                     )
 
-                infobox.pop("gem_shader", None)
+                infobox.pop("gem_style", None)
 
         return r
+
+    def _make_gem_overlays(self, parsed_args):
+        if not parsed_args.store_images:
+            return
+
+        def process(img: Image):
+            img = img.crop((0, 0, 78, 78))
+            return img
+
+        for k, file_path in self._GEM_OVERLAY_MAP.items():
+            file_name = posixpath.basename(file_path)
+            ico = os.path.join(self._img_path, file_name)
+            self._write_dds(
+                data=self.file_system.get_file(file_path),
+                out_path=ico,
+                parsed_args=parsed_args,
+                process=process,
+            )
 
     def _resize_icon(self, img: Image):
         max_dimension = max(img.size)
@@ -3717,7 +3782,7 @@ class ItemsParser(SkillParserShared):
 
     def _get_icon_process(self, infobox: dict[str, str], base_item_type):
         comp = base_item_type["ItemVisualIdentityKey"]["Composition"]
-        if comp == 1:  # Flask
+        if comp == constants.ITEM_VISUAL_COMPOSITIONS.FLASK:
 
             def flask_icon_process(img: Image):
                 layer1 = img.crop((78, 0, 156, 156))
@@ -3728,39 +3793,33 @@ class ItemsParser(SkillParserShared):
                 return ico
 
             return flask_icon_process
-        if comp == 3:  # Gem
-            return self._get_gem_icon_process(infobox)
+        if base_item_type["ItemClassesKey"]["Id"] in ("Active Skill Gem", "Support Skill Gem"):
+            return self._get_gem_icon_process(infobox, comp)
         return self._resize_icon
 
-    def _get_gem_icon_process(self, infobox: dict[str, str]):
-        if "gem_shader" not in infobox:
+    def _get_gem_icon_process(self, infobox: dict[str, str], comp):
+        if "gem_style" not in infobox:
             return None
+        style = infobox.pop("gem_style")
 
-        attrs = {
-            k.lower(): int(infobox.get(f"{v}_percent", 0)) for k, v in self._attribute_map.items()
-        }
-        attr = max(attrs, key=attrs.get)
-        var = infobox.pop("gem_shader")
-
-        def process(img: Image):
-            adorn = img.crop((0, 0, 78, 78))
-            base = img.crop((2 * 78, 0, 3 * 78, 78))
-            if var == 3:
-                # Trarthian constants not known
-                return None
-            elif var == 4:
-                return Image.alpha_composite(base, adorn)
-            const = SHADE_LUT[(attr, var)]
-
+        def shade(base, style):
+            attr_map = {
+                "str": "strength",
+                "dex": "dexterity",
+                "int": "intelligence",
+            }
+            attrs = {k.lower(): int(infobox.get(f"{v}_percent", 0)) for k, v in attr_map.items()}
+            attr = max(attrs, key=attrs.get)
+            const = SHADE_LUT[(attr, style)]
             base_rgba = _srgb_to_linear(np.float32(np.asarray(base)) / 255.0)
 
             # Shade algorithm:
             # * compute luminance influence
             #   float Luminance(float3 color)
             #   {
-            #   	return dot(float3(0.299, 0.587, 0.114), color);
+            #       return dot(float3(0.299, 0.587, 0.114), color);
             #   }
-            # 	const float luminance_influence = pow(Luminance(original_rgb), 0.02);
+            #   const float luminance_influence = pow(Luminance(original_rgb), 0.02);
             base_rgb = base_rgba[:, :, :3]
             base_a = base_rgba[:, :, 3]
             lum_f = (
@@ -3776,9 +3835,9 @@ class ItemsParser(SkillParserShared):
             hsv = matplotlib.colors.rgb_to_hsv(base_rgb)
 
             # * shift HSV by XYZ, clamp H
-            # 	max(modf( hsv_sample.x + effect_params.x, ignore ), 0.024),
-            # 	saturate( hsv_sample.y + effect_params.y ),
-            # 	saturate( hsv_sample.z + effect_params.z )
+            #   max(modf( hsv_sample.x + effect_params.x, ignore ), 0.024),
+            #   saturate( hsv_sample.y + effect_params.y ),
+            #   saturate( hsv_sample.z + effect_params.z )
             h2 = np.maximum(np.modf(hsv[:, :, 0] + const.hue_factor)[0], 0.024)
             s2 = np.clip(hsv[:, :, 1] + const.sat_factor, 0.0, 1.0)
             v2 = np.clip(hsv[:, :, 2] + const.val_factor, 0.0, 1.0)
@@ -3788,11 +3847,11 @@ class ItemsParser(SkillParserShared):
             modified_rgb = matplotlib.colors.hsv_to_rgb(np.stack([h2, s2, v2], axis=2))
 
             # * mix original RGB and modified RGB by luminance influence weighted by W
-            # 	const float3 final_rgb = lerp(
-            # 		modified_rgb,
-            # 		original_rgb,
-            # 		lerp(luminance_influence, 0.f, effect_params.w)
-            # 	);
+            #   const float3 final_rgb = lerp(
+            #       modified_rgb,
+            #       original_rgb,
+            #       lerp(luminance_influence, 0.f, effect_params.w)
+            #   );
             def lerp(a, b, f):
                 return a * (1.0 - f) + b * f
 
@@ -3803,9 +3862,31 @@ class ItemsParser(SkillParserShared):
             shifted_base = Image.fromarray(np.uint8(_linear_to_srgb(shifted_rgba) * 255.0), "RGBA")
 
             # * desaturate, but the parameter for that seems to be 1 so won't bother
-            # 	return Desaturate(float4(final_rgb, 1.f) * original_a, saturation) * input.colour;
+            #   return Desaturate(float4(final_rgb, 1.f) * original_a, saturation) * input.colour;
 
-            ico = Image.alpha_composite(shifted_base, adorn)
+            return shifted_base
+
+        def overlay(base, style):
+            file_name = posixpath.basename(self._GEM_OVERLAY_MAP[style]).replace(".dds", ".png")
+            ico = os.path.join(self._img_path, file_name)
+            overlay_img = Image.open(ico)
+            base = Image.alpha_composite(overlay_img, base)
+            return base
+
+        def process(img: Image):
+            if comp == constants.ITEM_VISUAL_COMPOSITIONS.GEM:
+                base = img.crop((2 * 78, 0, 3 * 78, 78))
+                if style in (
+                    constants.GEM_STYLES.TRANSFIGURED_X,
+                    constants.GEM_STYLES.TRANSFIGURED_Y,
+                ):
+                    base = shade(base, style)
+                adorn = img.crop((0, 0, 78, 78))
+                ico = Image.alpha_composite(base, adorn)
+            else:
+                ico = img.crop((0, 0, 78, 78))
+            if style in (constants.GEM_STYLES.TRARTHAN, constants.GEM_STYLES.EXCEPTIONAL):
+                ico = overlay(ico, style)
             ico = self._resize_icon(ico)
             return ico
 

@@ -77,6 +77,8 @@ __all__ = [
     "PASSIVE_SKILL_SIZES",
     "PASSIVE_SKILL_TYPES",
     "GAME_MODES",
+    "ITEM_VISUAL_COMPOSITIONS",
+    "GEM_STYLES",
 ]
 
 MOD_MAX_STATS = 6
@@ -807,6 +809,21 @@ class GAME_MODES(IntEnumOverride):
     ALL = 0
     NORMAL = 1
     RUTHLESS = 2
+
+
+class ITEM_VISUAL_COMPOSITIONS(IntEnumOverride):
+    DEFAULT = 0
+    FLASK = 1
+    DIVCARD = 2
+    GEM = 3
+
+
+class GEM_STYLES(IntEnumOverride):
+    TRANSFIGURED_X = 1
+    TRANSFIGURED_Y = 2
+    TRARTHAN = 3
+    EXCEPTIONAL = 4
+    DEFAULT = 5
 
 
 # =============================================================================

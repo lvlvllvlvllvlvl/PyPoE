@@ -938,7 +938,7 @@ class SkillParserShared(parser.BaseParser):
             if i == 20:
                 break
             prefix = "level%s" % (i + 1)
-            infobox[prefix] = "True"
+            infobox[prefix] = row["Level"]
             prefix += "_"
 
             # Level and attribute requirements

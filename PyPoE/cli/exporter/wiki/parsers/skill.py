@@ -756,7 +756,8 @@ class SkillParserShared(parser.BaseParser):
         if gra_eff["SupportGemLetter"]:
             infobox["support_gem_letter"] = gra_eff["SupportGemLetter"]
 
-        infobox["is_support"] = gra_eff["IsSupport"]
+        if gra_eff["IsSupport"]:
+            infobox["is_support"] = True
         if not gra_eff["IsSupport"]:
             infobox["cast_time"] = gra_eff["CastTime"] / 1000
 
@@ -972,7 +973,7 @@ class SkillParserShared(parser.BaseParser):
         # Body
         for i, row in enumerate(level_data):
             prefix = "level%s" % (i + 1)
-            infobox[prefix] = "True"
+            infobox[prefix] = row["Level"]
 
             # In 3.21 the level requirement is a float so we need to cast it to int
             if "PlayerLevelReq" in row and row["PlayerLevelReq"] == int(row["PlayerLevelReq"]):

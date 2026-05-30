@@ -38,12 +38,10 @@ Interal API
 
 # Python
 import re
-from collections import OrderedDict
 from functools import partialmethod
 
 # self
 from PyPoE.cli.core import Msg, console
-from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.wiki import parser
 from PyPoE.cli.exporter.wiki.handler import ExporterHandler, ExporterResult
 
@@ -75,366 +73,321 @@ class WikiCondition(parser.WikiCondition):
 
 
 class AreaCommandHandler(ExporterHandler):
-    def __init__(self, sub_parser):
+    def __init__(self, sub_parser, *args, **kwargs):
+        super().__init__(self, sub_parser, *args, **kwargs)
         self.parser = sub_parser.add_parser(
             "area",
-            help="Area Exporter",
+            help="Area exporter",
         )
         self.parser.set_defaults(func=lambda args: self.parser.print_help())
 
-        sub = self.parser.add_subparsers()
-
-        # By id
-        a_id = sub.add_parser("id", help="Extract areas by their id.")
-        self.add_default_parsers(
-            parser=a_id,
+        area_sub = self.parser.add_subparsers()
+        self.add_default_subparser_filters(
+            sub_parser=area_sub,
             cls=AreaParser,
-            func=AreaParser.by_id,
-        )
-        a_id.add_argument(
-            "area_id",
-            help="Id of the area, can be specified multiple times.",
-            nargs="+",
         )
 
-        # by name
-        a_name = sub.add_parser("name", help="Extract areas by their name.")
+        # Filtering
+        area_filter_parser = area_sub.add_parser("filter", help="Extract areas using filters")
         self.add_default_parsers(
-            parser=a_name,
-            cls=AreaParser,
-            func=AreaParser.by_name,
-        )
-        a_name.add_argument(
-            "area_name",
-            help="Visible name of the area (localized), can be specified multiple times.",
-            nargs="+",
-        )
-
-        # by row ID
-        a_rid = sub.add_parser("rowid", help="Extract areas by rowid.")
-        self.add_default_parsers(
-            parser=a_rid,
-            cls=AreaParser,
-            func=AreaParser.by_rowid,
-        )
-        a_rid.add_argument(
-            "start",
-            help="Starting index",
-            nargs="?",
-            type=int,
-            default=0,
-        )
-        a_rid.add_argument(
-            "end",
-            nargs="?",
-            help="Ending index",
-            type=int,
-        )
-
-        # filtering
-        a_filter = sub.add_parser("filter", help="Extract areas using filters.")
-        self.add_default_parsers(
-            parser=a_filter,
+            parser=area_filter_parser,
             cls=AreaParser,
             func=AreaParser.by_filter,
         )
-
-        a_filter.add_argument(
+        area_filter_parser.add_argument(
             "-ft-id",
             "--filter-id",
             "--filter-metadata-id",
-            help="Regular expression on the id",
+            help="Filter area IDs using a regular expression",
             type=str,
             dest="re_id",
         )
 
     def add_default_parsers(self, *args, **kwargs):
         super().add_default_parsers(*args, **kwargs)
-        parser = kwargs["parser"]
-        self.add_format_argument(parser)
-
-        parser.add_argument(
-            "--skip-main-page",
-            help="Skip adding main_page argument to the template",
-            action="store_true",
-            default=False,
-            dest="skip_main_page",
-        )
+        self.add_format_argument(kwargs["parser"])
 
 
 class AreaParser(parser.BaseParser):
+    _WORLDAREAS_FILE_NAME = "WorldAreas.datc64"
+    _MAPPINS_FILE_NAME = "MapPins.datc64"
+    _ATLASNODE_FILE_NAME = "AtlasNode.datc64"
     _files = [
-        "WorldAreas.datc64",
-        "MapPins.datc64",
-        "AtlasNode.datc64",
+        _WORLDAREAS_FILE_NAME,
+        _MAPPINS_FILE_NAME,
+        _ATLASNODE_FILE_NAME,
     ]
 
     _area_column_index_filter = partialmethod(
         parser.BaseParser._column_index_filter,
-        dat_file_name="WorldAreas.dat64",
+        dat_file_name=_WORLDAREAS_FILE_NAME,
         error_msg="Several areas have not been found:\n%s",
     )
 
-    _COPY_KEYS = OrderedDict(
-        (
-            (
-                "Id",
-                {
-                    "template": "id",
-                },
-            ),
-            (
-                "Name",
-                {
-                    "template": "name",
-                },
-            ),
-            (
-                "Act",
-                {
-                    "template": "act",
-                },
-            ),
-            (
-                "AreaLevel",
-                {
-                    "template": "area_level",
-                },
-            ),
-            (
-                "MaxLevel",
-                {
-                    "template": "level_restriction_max",
-                    "default": 100,
-                },
-            ),
-            (
-                "AreaType_TagsKeys",
-                {
-                    "template": "area_type_tags",
-                    "format": lambda value: ", ".join([tag["Id"] for tag in value]),
-                    "default": [],
-                },
-            ),
-            (
-                "TagsKeys",
-                {
-                    "template": "tags",
-                    "format": lambda value: ", ".join([tag["Id"] for tag in value]),
-                    "default": [],
-                },
-            ),
-            (
-                "LoadingScreens",
-                {
-                    "template": "loading_screen",
-                    "format": lambda value: next(iter(value), "")
-                    .replace("Art/Textures/Interface/LoadingImages/", "")
-                    .replace(".dds", ""),
-                    "default": [],
-                },
-            ),
-            (
-                "Connections_WorldAreasKeys",
-                {
-                    "template": "connection_ids",
-                    "format": lambda value: ", ".join(
-                        OrderedDict.fromkeys([area["Id"] for area in value]).keys()
-                    ),
-                    "default": [],
-                },
-            ),
-            (
-                "ParentTown_WorldAreasKey",
-                {
-                    "template": "parent_area_id",
-                    "format": lambda value: value["Id"],
-                },
-            ),
-            (
-                "ModsKeys",
-                {
-                    "template": "modifier_ids",
-                    "format": lambda value: ", ".join([mod["Id"] for mod in value]),
-                    "default": [],
-                },
-            ),
-            (
-                "Bosses_MonsterVarietiesKeys",
-                {
-                    "template": "boss_monster_ids",
-                    "format": lambda value: ", ".join([mv["Id"] for mv in value]),
-                    "default": [],
-                },
-            ),
-            (
-                "Monsters_MonsterVarietiesKeys",
-                {
-                    "template": "monster_ids",
-                    "format": lambda value: ", ".join([mv["Id"] for mv in value]),
-                    "default": [],
-                },
-            ),
-            (
-                "FirstEntry_NPCTextAudioKey",
-                {
-                    "template": "entry_text",
-                    "format": lambda value: value["Text"],
-                },
-            ),
-            (
-                "FirstEntry_NPCsKey",
-                {
-                    "template": "entry_npc",
-                    "condition": lambda area: area["FirstEntry_NPCsKey"],
-                    "format": lambda value: value["Name"],
-                },
-            ),
-            (
-                "VaalArea_WorldAreasKeys",
-                {
-                    "template": "vaal_area_ids",
-                    "condition": lambda area: area["VaalArea_WorldAreasKeys"],
-                    "format": lambda value: ", ".join([area["Id"] for area in value]),
-                },
-            ),
-            # ('Strongbox_SpawnChance', {
-            #     'template': 'strongbox_spawn_chance',
-            #     'condition': lambda area: area['Strongbox_SpawnChance'] > 0,
-            # }),
-            # ('Strongbox_MaxCount', {
-            #     'template': 'strongbox_max',
-            #     'condition': lambda area: area['Strongbox_SpawnChance'] > 0,
-            #     'default': 0,
-            # }),
-            # ('Strongbox_RarityWeight', {
-            #     'template': 'strongbox_rarity_weight',
-            #     'condition': lambda area: area['Strongbox_SpawnChance'] > 0,
-            #     'default': '',
-            #     'format': lambda value: ', '.join([str(v) for v in value]),
-            # }),
-            # bools
-            (
-                "IsMapArea",
-                {
-                    "template": "is_map_area",
-                    "default": False,
-                },
-            ),
-            (
-                "IsUniqueMapArea",
-                {
-                    "template": "is_unique_map_area",
-                    "default": False,
-                },
-            ),
-            (
-                "IsTown",
-                {
-                    "template": "is_town_area",
-                    "default": False,
-                },
-            ),
-            (
-                "IsHideout",
-                {
-                    "template": "is_hideout_area",
-                    "default": False,
-                },
-            ),
-            (
-                "IsVaalArea",
-                {
-                    "template": "is_vaal_area",
-                    "default": False,
-                },
-            ),
-            (
-                "IsLabyrinthArea",
-                {
-                    "template": "is_labyrinth_area",
-                    "default": False,
-                },
-            ),
-            (
-                "IsLabyrinthAirlock",
-                {
-                    "template": "is_labyrinth_airlock_area",
-                    "default": False,
-                },
-            ),
-            (
-                "IsLabyrinthBossArea",
-                {
-                    "template": "is_labyrinth_boss_area",
-                    "default": False,
-                },
-            ),
-            (
-                "HasWaypoint",
-                {
-                    "template": "has_waypoint",
-                    "default": False,
-                },
-            ),
-        )
-    )
+    # Unreleased or disabled areas to avoid exporting to the wiki
+    _SKIP_AREAS_BY_ID = [
+        "NULL",
+        "AncestralTrialTest",
+        "AnyAfflictionEndgameArea",
+        "AnyCorruptedSideArea",
+        "AnyUberTabTrial",
+        "BetrayalTest",
+        "BlackTest",
+        "CharacterSelect",
+        "Delve_Empty",
+        "Design",
+        "DGRMulti",
+        "GuildHideout__",
+        "HideoutTencentApocalypse",
+        "HideoutYaochi",
+        "InvasionBoss",
+        "Kitavafilming",
+        "PersonalHideout",
+        "PetFlats",
+        "Programming",
+        "Programming_Lite",
+        "TGRMulti",
+        "VFXTest",
+    ]
 
-    _LANG = {
-        "English": {
-            "Low": "Low Tier",
-            "Mid": "Mid Tier",
-            "High": "High Tier",
-            "Uber": "Maximum Tier",
-        },
-        "German": {
-            "Low": "Niedrige Stufe",
-            "Mid": "Mittlere Stufe",
-            "High": "Hohe Stufe",
-            "Uber": "Maximale Stufe",
-        },
-        "Russian": {
-            "Low": "низкий уровень",
-            "Mid": "средний уровень",
-            "High": "высокий уровень",
-            "Uber": "максимальный уровень",
-        },
-    }
+    _COPY_KEYS = (
+        (
+            "Id",
+            {
+                "template": "id",
+            },
+        ),
+        (
+            "Name",
+            {
+                "template": "name",
+                "condition": lambda v: v,
+            },
+        ),
+        (
+            "Act",
+            {
+                "template": "act",
+            },
+        ),
+        (
+            "AreaLevel",
+            {
+                "template": "area_level",
+                "condition": lambda v: v > 0,
+            },
+        ),
+        (
+            "MaxLevel",
+            {
+                "template": "level_restriction_max",
+                "condition": lambda v: v < 100,
+            },
+        ),
+        (
+            "AreaTypeTags",
+            {
+                "template": "area_type_tags",
+                "condition": lambda v: v,
+                "format": lambda v: ", ".join([tag["Id"] for tag in v]),
+            },
+        ),
+        (
+            "TagsKeys",
+            {
+                "template": "tags",
+                "condition": lambda v: v,
+                "format": lambda v: ", ".join([tag["Id"] for tag in v]),
+            },
+        ),
+        (
+            "LoadingScreens",
+            {
+                "template": "loading_screen",
+                "condition": lambda v: v,
+                "format": lambda v: (
+                    v[0].replace("Art/Textures/Interface/LoadingImages/", "").replace(".dds", "")
+                    if v
+                    else ""
+                ),
+            },
+        ),
+        (
+            "Connections_WorldAreasKeys",
+            {
+                "template": "connection_ids",
+                "condition": lambda v: v,
+                "format": lambda v: ", ".join(
+                    dict.fromkeys(
+                        [area["Id"] for area in v if area["Id"] not in AreaParser._SKIP_AREAS_BY_ID]
+                    ).keys()
+                ),
+            },
+        ),
+        (
+            "ParentTown_WorldAreasKey",
+            {
+                "template": "parent_area_id",
+                "condition": lambda v: v,
+                "format": lambda v: v["Id"],
+            },
+        ),
+        (
+            "ModsKeys",
+            {
+                "template": "modifier_ids",
+                "condition": lambda v: v,
+                "format": lambda v: ", ".join([mod["Id"] for mod in v]),
+            },
+        ),
+        (
+            "Bosses_MonsterVarietiesKeys",
+            {
+                "template": "boss_monster_ids",
+                "condition": lambda v: v,
+                "format": lambda v: ", ".join([mv["Id"] for mv in v]),
+            },
+        ),
+        (
+            "Monsters_MonsterVarietiesKeys",
+            {
+                "template": "monster_ids",
+                "condition": lambda v: v,
+                "format": lambda v: ", ".join([mv["Id"] for mv in v]),
+            },
+        ),
+        (
+            "FirstEntry_NPCTextAudioKey",
+            {
+                "template": "entry_text",
+                "condition": lambda v: v,
+                "format": lambda v: v["Text"],
+            },
+        ),
+        (
+            "FirstEntry_NPCsKey",
+            {
+                "template": "entry_npc",
+                "condition": lambda v: v,
+                "format": lambda v: v["Name"],
+            },
+        ),
+        (
+            "VaalArea",
+            {
+                "template": "vaal_area_ids",
+                "condition": lambda v: v,
+                "format": lambda v: ", ".join([area["Id"] for area in v]),
+            },
+        ),
+        (
+            "IsMapArea",
+            {
+                "template": "is_map_area",
+                "condition": lambda v: v,
+            },
+        ),
+        (
+            "IsUniqueMapArea",
+            {
+                "template": "is_unique_map_area",
+                "condition": lambda v: v,
+            },
+        ),
+        (
+            "IsTown",
+            {
+                "template": "is_town_area",
+                "condition": lambda v: v,
+            },
+        ),
+        (
+            "IsHideout",
+            {
+                "template": "is_hideout_area",
+                "condition": lambda v: v,
+            },
+        ),
+        (
+            "IsVaalArea",
+            {
+                "template": "is_vaal_area",
+                "condition": lambda v: v,
+            },
+        ),
+        (
+            "IsLabyrinthArea",
+            {
+                "template": "is_labyrinth_area",
+                "condition": lambda v: v,
+            },
+        ),
+        (
+            "IsLabyrinthAirlock",
+            {
+                "template": "is_labyrinth_airlock_area",
+                "condition": lambda v: v,
+            },
+        ),
+        (
+            "IsLabyrinthBossArea",
+            {
+                "template": "is_labyrinth_boss_area",
+                "condition": lambda v: v,
+            },
+        ),
+        (
+            "HasWaypoint",
+            {
+                "template": "has_waypoint",
+                "condition": lambda v: v,
+            },
+        ),
+    )
 
     def by_rowid(self, parsed_args):
         return self.export(
             parsed_args,
-            self.rr["WorldAreas.dat64"][parsed_args.start : parsed_args.end],
+            self.rr[self._WORLDAREAS_FILE_NAME][parsed_args.start : parsed_args.end],
         )
 
     def by_id(self, parsed_args):
         return self.export(
             parsed_args,
-            self._area_column_index_filter(column_id="Id", arg_list=parsed_args.area_id),
+            self._area_column_index_filter(column_id="Id", arg_list=parsed_args.id),
         )
 
     def by_name(self, parsed_args):
         return self.export(
             parsed_args,
-            self._area_column_index_filter(column_id="Name", arg_list=parsed_args.area_name),
+            self._area_column_index_filter(column_id="Name", arg_list=parsed_args.name),
         )
 
     def by_filter(self, parsed_args):
         re_id = re.compile(parsed_args.re_id) if parsed_args.re_id else None
 
-        out = []
-        for row in self.rr["WorldAreas.dat64"]:
+        areas = []
+        for row in self.rr[self._WORLDAREAS_FILE_NAME]:
             if re_id:
                 if not re_id.match(row["Id"]):
                     continue
-            out.append(row)
+            areas.append(row)
 
-        return self.export(parsed_args, out)
+        return self.export(parsed_args, areas)
 
     def export(self, parsed_args, areas):
-        console("Found %s areas, parsing..." % len(areas))
-
         r = ExporterResult()
+
+        console("Removing disabled areas...")
+        areas = [a for a in areas if a["Id"] not in self._SKIP_AREAS_BY_ID]
+        areas = [
+            a
+            for a in areas
+            if a["Name"]
+            and not a["Name"].startswith("[DNT")
+            and not a["Name"].startswith("[UNUSED")
+        ]
+        console("%s areas left for processing." % len(areas))
 
         if not areas:
             console(
@@ -444,122 +397,45 @@ class AreaParser(parser.BaseParser):
             return r
 
         console("Accessing additional data...")
-
-        self.rr["MapPins.dat64"].build_index("WorldAreasKeys")
-        self.rr["AtlasNode.dat64"].build_index("WorldAreasKey")
+        self.rr[self._MAPPINS_FILE_NAME].build_index("WorldAreasKeys")
+        self.rr[self._ATLASNODE_FILE_NAME].build_index("Area2")
         self.rr["MapSeries.dat64"].build_index("Id")
-        if not parsed_args.skip_main_page:
-            self.rr["Maps.dat64"].build_index("Regular_WorldAreasKey")
-            self.rr["UniqueMaps.dat64"].build_index("WorldAreasKey")
-
-        console("Found %s areas. Processing..." % len(areas))
-
-        lang = self._LANG[config.get_option("language")]
+        console("Found %s areas, processing..." % len(areas))
 
         for area in areas:
-            data = OrderedDict()
+            infobox = {}
 
-            for row_key, copy_data in self._COPY_KEYS.items():
-                value = area[row_key]
-
-                condition = copy_data.get("condition")
-                if condition is not None and not condition(area):
-                    continue
-
-                # Skip default values to reduce size of template
-                if value == copy_data.get("default"):
-                    continue
-                """default = copy_data.get('default')
-                if default is not None and value == default:
-                        continue"""
-
-                fmt = copy_data.get("format")
-                if fmt:
-                    value = fmt(value)
-                data[copy_data["template"]] = value
+            # Copy over simple fields from the .dat64
+            parser.apply_simple_column_map(infobox, self._COPY_KEYS, area)
 
             for i, (tag, value) in enumerate(
                 zip(area["SpawnWeight_TagsKeys"], area["SpawnWeight_Values"]), start=1
             ):
-                data["spawn_weight%s_tag" % i] = tag["Id"]
-                data["spawn_weight%s_value" % i] = value
+                infobox["spawn_weight%s_tag" % i] = tag["Id"]
+                infobox["spawn_weight%s_value" % i] = value
 
-            map_pin = self.rr["MapPins.dat64"].index["WorldAreasKeys"].get(area)
-            if map_pin:
-                data["flavour_text"] = map_pin[0]["FlavourText"]
-
-            atlas_node = self.rr["AtlasNode.dat64"].index["WorldAreasKey"].get(area)
-            if atlas_node:
-                data["flavour_text"] = atlas_node["FlavourTextKey"]["Text"]
-
-            #
-            # Add main-page if possible
-            #
-            if not parsed_args.skip_main_page:
-                map = self.rr["Maps.dat64"].index["Regular_WorldAreasKey"].get(area)
-                if map:
-                    map = map[0]
-                    # Just set the  main page to the landing page for the overall map.
-                    # Don't try to parse out map series when the column may not even match.
-                    data["main_page"] = map["BaseItemTypesKey"]["Name"]
-                elif data.get("tags") and "map" in data["tags"]:
-                    map_version = None
-                    for row in self.rr["MapSeries.dat64"]:
-                        if not area["Id"].startswith(row["Id"]):
-                            continue
-                        map_version = row["Name"]
-
-                    if map_version:
-                        if (
-                            map_version
-                            == self.rr["MapSeries.dat64"].index["Id"]["MapWorlds"]["Name"]
-                        ):
-                            map_version = None
-
-                        if (
-                            "Unique" in area["Id"]
-                            or "BreachBoss" in area["Id"]
-                            or area["Id"].endswith("ShapersRealm")
-                        ):
-                            if map_version is None:
-                                data["main_page"] = area["Name"]
-                            else:
-                                data["main_page"] = "%s (%s)" % (area["Name"], map_version)
-                        elif "Harbinger" in area["Id"]:
-                            tier = re.sub("^.*Harbinger", "", area["Id"])
-                            if tier:
-                                if map_version is None:
-                                    # data['main_page'] = '%s (%s)' % (
-                                    #     area['Name'],
-                                    #     lang[tier],
-                                    # )
-                                    continue
-                                else:
-                                    data["main_page"] = "%s (%s) (%s)" % (
-                                        area["Name"],
-                                        lang[tier],
-                                        map_version,
-                                    )
-                            else:
-                                if map_version is None:
-                                    data["main_page"] = area["Name"]
-                                else:
-                                    data["main_page"] = "%s (%s)" % (
-                                        area["Name"],
-                                        map_version,
-                                    )
+            # Flavour text
+            flavour_text = None
+            map_pins = self.rr[self._MAPPINS_FILE_NAME].index["WorldAreasKeys"].get(area)
+            if map_pins:
+                flavour_text = map_pins[0]["FlavourText"]
+            atlas_nodes = self.rr[self._ATLASNODE_FILE_NAME].index["Area2"].get(area)
+            if atlas_nodes:
+                flavour_text = atlas_nodes[0]["FlavourText"]["Text"]
+            if flavour_text:
+                infobox["flavour_text"] = flavour_text.replace("\n", "<br>").replace("\r", "")
 
             cond = WikiCondition(
-                data=data,
+                data=infobox,
                 cmdargs=parsed_args,
             )
 
             r.add_result(
                 text=cond,
-                out_file="area_%s.txt" % data["id"],
+                out_file="area_%s.txt" % infobox["id"],
                 wiki_page=[
                     {
-                        "page": "Area:" + self._format_wiki_title(data["id"]),
+                        "page": "Area:" + self._format_wiki_title(infobox["id"]),
                         "condition": cond,
                     },
                 ],

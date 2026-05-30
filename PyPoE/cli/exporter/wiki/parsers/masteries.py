@@ -160,7 +160,7 @@ class MasteryParser(parser.BaseParser):
     def by_id(self, parsed_args):
         return self.export(
             parsed_args,
-            self._column_index_filter(
+            self._mastery_column_index_filter(
                 dat_file_name=self._MASTERY_GROUPS_FILE_NAME,
                 column_id="Id",
                 arg_list=parsed_args.id,
@@ -178,7 +178,7 @@ class MasteryParser(parser.BaseParser):
         return self.export(
             parsed_args,
             self._masteries_from_named_passives(
-                self._column_index_filter(
+                self._mastery_column_index_filter(
                     dat_file_name=self._PASSIVES_FILE_NAME,
                     column_id="Name",
                     arg_list=parsed_args.name,

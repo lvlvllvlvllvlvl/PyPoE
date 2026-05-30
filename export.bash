@@ -3,7 +3,7 @@
 QUIET=
 ARGS=()
 IMG=()
-export ALL_EXPORTERS=(gem-skills items passives skills masteries mods monsters areas maps incursion-rooms modules atlas-icons)
+export ALL_EXPORTERS=(gem-skills items passives skills masteries mods monsters areas maps incursion-rooms modules)
 EXPORTERS=()
 WIKI=wiki
 
@@ -28,7 +28,7 @@ function exporting() {
     exit 1
   fi
 
-  if [[ -z ${EXPORTERS[@]} ]] && [[ $1 != atlas-icons ]] || find $1 EXPORTERS
+  if [[ -z ${EXPORTERS[@]} ]] || find $1 EXPORTERS
   then
     echo exporting $1
   else
@@ -42,7 +42,7 @@ usage:
   '$(basename $0)' [EXPORTERS]... [OPTIONS]... [-- PYPOE_OPTIONS]
 
   exporters can be any or all of: '"${ALL_EXPORTERS[@]}"'
-  if no exporters are listed, all exporters except atlas-icons will be run
+  if no exporters are listed, all exporters will be run
 
 options:
   -h, --help            show this help message and exit
@@ -164,9 +164,7 @@ exporting items &&
 pypoe_exporter $QUIET $WIKI items item rowid "${IMG[@]}" "${ARGS[@]}" "$@"
 exporting passives && {
   pypoe_exporter $QUIET $WIKI passive passive rowid "${IMG[@]}" "${ARGS[@]}" "$@"
-  if [ "$WIKI" = "wiki" ]; then
-    pypoe_exporter $QUIET $WIKI passive alternate rowid "${IMG[@]}" "${ARGS[@]}" "$@"
-  fi
+  pypoe_exporter $QUIET $WIKI passive alternate rowid "${IMG[@]}" "${ARGS[@]}" "$@"
 }
 exporting skills &&
 pypoe_exporter $QUIET $WIKI skill by_name "${IMG[@]}" "${ARGS[@]}" "$@"
@@ -177,8 +175,8 @@ pypoe_exporter $QUIET $WIKI monster rowid "${ARGS[@]}" "$@"
 exporting areas &&
 pypoe_exporter $QUIET $WIKI area rowid "${ARGS[@]}" "$@"
 exporting maps && {
-  pypoe_exporter $QUIET $WIKI maps maps "${IMG[@]}" "${ARGS[@]}" "$@" --store-images --convert-images
-  pypoe_exporter $QUIET $WIKI maps atlas "${ARGS[@]}" "$@"
+  pypoe_exporter $QUIET $WIKI maps maps "${IMG[@]}" "${ARGS[@]}" "$@"
+  pypoe_exporter $QUIET $WIKI maps atlas "${IMG[@]}" "${ARGS[@]}" "$@"
   pypoe_exporter $QUIET $WIKI maps map_series "${ARGS[@]}" "$@"
 }
 exporting incursion-rooms &&
@@ -206,7 +204,5 @@ exporting modules && {
   pypoe_exporter $QUIET $WIKI lua ot "${ARGS[@]}" "$@"
   # pypoe_exporter $QUIET $WIKI lua packs "${ARGS[@]}" "$@"
 }
-exporting atlas-icons &&
-pypoe_exporter $QUIET $WIKI maps atlas_icons "${ARGS[@]}" "$@" --store-images --convert-images
 
 date -ud "@$SECONDS" "+Export completed in: %H:%M:%S"

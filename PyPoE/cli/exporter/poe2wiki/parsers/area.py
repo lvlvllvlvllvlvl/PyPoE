@@ -38,7 +38,6 @@ Interal API
 
 # Python
 import re
-from collections import OrderedDict
 from functools import partialmethod
 
 # self
@@ -77,103 +76,54 @@ class WikiCondition(parser.WikiCondition):
 
 
 class AreaCommandHandler(ExporterHandler):
-    def __init__(self, sub_parser):
+    def __init__(self, sub_parser, *args, **kwargs):
+        super().__init__(self, sub_parser, *args, **kwargs)
         self.parser = sub_parser.add_parser(
             "area",
-            help="Area Exporter",
+            help="Area exporter",
         )
         self.parser.set_defaults(func=lambda args: self.parser.print_help())
 
-        sub = self.parser.add_subparsers()
-
-        # By id
-        a_id = sub.add_parser("id", help="Extract areas by their id.")
-        self.add_default_parsers(
-            parser=a_id,
+        area_sub = self.parser.add_subparsers()
+        self.add_default_subparser_filters(
+            sub_parser=area_sub,
             cls=AreaParser,
-            func=AreaParser.by_id,
-        )
-        a_id.add_argument(
-            "area_id",
-            help="Id of the area, can be specified multiple times.",
-            nargs="+",
         )
 
-        # by name
-        a_name = sub.add_parser("name", help="Extract areas by their name.")
+        # Filtering
+        area_filter_parser = area_sub.add_parser("filter", help="Extract areas using filters")
         self.add_default_parsers(
-            parser=a_name,
-            cls=AreaParser,
-            func=AreaParser.by_name,
-        )
-        a_name.add_argument(
-            "area_name",
-            help="Visible name of the area (localized), can be specified multiple times.",
-            nargs="+",
-        )
-
-        # by row ID
-        a_rid = sub.add_parser("rowid", help="Extract areas by rowid.")
-        self.add_default_parsers(
-            parser=a_rid,
-            cls=AreaParser,
-            func=AreaParser.by_rowid,
-        )
-        a_rid.add_argument(
-            "start",
-            help="Starting index",
-            nargs="?",
-            type=int,
-            default=0,
-        )
-        a_rid.add_argument(
-            "end",
-            nargs="?",
-            help="Ending index",
-            type=int,
-        )
-
-        # filtering
-        a_filter = sub.add_parser("filter", help="Extract areas using filters.")
-        self.add_default_parsers(
-            parser=a_filter,
+            parser=area_filter_parser,
             cls=AreaParser,
             func=AreaParser.by_filter,
         )
-
-        a_filter.add_argument(
+        area_filter_parser.add_argument(
             "-ft-id",
             "--filter-id",
             "--filter-metadata-id",
-            help="Regular expression on the id",
+            help="Filter area IDs using a regular expression",
             type=str,
             dest="re_id",
         )
 
     def add_default_parsers(self, *args, **kwargs):
         super().add_default_parsers(*args, **kwargs)
-        parser = kwargs["parser"]
-        self.add_format_argument(parser)
-
-        parser.add_argument(
-            "--skip-main-page",
-            help="Skip adding main_page argument to the template",
-            action="store_true",
-            default=False,
-            dest="skip_main_page",
-        )
+        self.add_format_argument(kwargs["parser"])
 
 
 class AreaParser(parser.BaseParser):
+    _WORLDAREAS_FILE_NAME = "WorldAreas.datc64"
+    _MAPPINS_FILE_NAME = "MapPins.datc64"
+    _ENDGAMEMAPS_FILE_NAME = "EndgameMaps.datc64"
     _files = [
-        "WorldAreas.datc64",
-        "MapPins.datc64",
-        "EndgameMaps.datc64",
+        _WORLDAREAS_FILE_NAME,
+        _MAPPINS_FILE_NAME,
+        _ENDGAMEMAPS_FILE_NAME,
     ]
 
     _area_column_index_filter = partialmethod(
         parser.BaseParser._column_index_filter,
-        dat_file_name="WorldAreas.dat64",
+        dat_file_name=_WORLDAREAS_FILE_NAME,
         error_msg="Several areas have not been found:\n%s",
     )
 
@@ -274,7 +224,7 @@ class AreaParser(parser.BaseParser):
                 "template": "connection_ids",
                 "condition": lambda v: v,
                 "format": lambda v: ", ".join(
-                    OrderedDict.fromkeys(
+                    dict.fromkeys(
                         [area["Id"] for area in v if area["Id"] not in AreaParser._SKIP_AREAS_BY_ID]
                     ).keys()
                 ),
@@ -284,7 +234,7 @@ class AreaParser(parser.BaseParser):
             "ParentTown",
             {
                 "template": "parent_area_id",
-                "condition": lambda v: v is not None,
+                "condition": lambda v: v,
                 "format": lambda v: v["Id"],
             },
         ),
@@ -313,7 +263,7 @@ class AreaParser(parser.BaseParser):
         #    },
         # ),
         # (
-        #    "VaalArea_WorldAreasKeys",
+        #    "VaalArea",
         #    {
         #        "template": "vaal_area_ids",
         #        "condition": lambda v: v,
@@ -361,35 +311,46 @@ class AreaParser(parser.BaseParser):
     def by_rowid(self, parsed_args):
         return self.export(
             parsed_args,
-            self.rr["WorldAreas.dat64"][parsed_args.start : parsed_args.end],
+            self.rr[self._WORLDAREAS_FILE_NAME][parsed_args.start : parsed_args.end],
         )
 
     def by_id(self, parsed_args):
         return self.export(
             parsed_args,
-            self._area_column_index_filter(column_id="Id", arg_list=parsed_args.area_id),
+            self._area_column_index_filter(column_id="Id", arg_list=parsed_args.id),
         )
 
     def by_name(self, parsed_args):
         return self.export(
             parsed_args,
-            self._area_column_index_filter(column_id="Name", arg_list=parsed_args.area_name),
+            self._area_column_index_filter(column_id="Name", arg_list=parsed_args.name),
         )
 
     def by_filter(self, parsed_args):
         re_id = re.compile(parsed_args.re_id) if parsed_args.re_id else None
 
-        out = []
-        for row in self.rr["WorldAreas.dat64"]:
+        areas = []
+        for row in self.rr[self._WORLDAREAS_FILE_NAME]:
             if re_id:
                 if not re_id.match(row["Id"]):
                     continue
-            out.append(row)
+            areas.append(row)
 
-        return self.export(parsed_args, out)
+        return self.export(parsed_args, areas)
 
     def export(self, parsed_args, areas):
         r = ExporterResult()
+
+        console("Removing disabled areas...")
+        areas = [a for a in areas if a["Id"] not in self._SKIP_AREAS_BY_ID]
+        areas = [
+            a
+            for a in areas
+            if a["Name"]
+            and not a["Name"].startswith("[DNT")
+            and not a["Name"].startswith("[UNUSED")
+        ]
+        console("%s areas left for processing." % len(areas))
 
         if not areas:
             console(
@@ -398,19 +359,13 @@ class AreaParser(parser.BaseParser):
             )
             return r
 
-        console("Found %s areas, parsing..." % len(areas))
-
         console("Accessing additional data...")
-        self.rr["MapPins.dat64"].build_index("WorldAreasKeys")
-        self.rr["EndgameMaps.dat64"].build_index("WorldArea")
-
-        console("Removing disabled areas...")
-        areas = [a for a in areas if a["Id"] not in self._SKIP_AREAS_BY_ID]
-        areas = [a for a in areas if a["Name"] and not a["Name"].startswith("[DNT")]
-        console("%s areas left. Processing..." % len(areas))
+        self.rr[self._MAPPINS_FILE_NAME].build_index("WorldAreasKeys")
+        self.rr[self._ENDGAMEMAPS_FILE_NAME].build_index("WorldArea")
+        console("Found %s areas, processing..." % len(areas))
 
         for area in areas:
-            infobox = OrderedDict()
+            infobox = {}
 
             # Copy over simple fields from the .dat64
             parser.apply_simple_column_map(infobox, self._COPY_KEYS, area)
@@ -421,20 +376,17 @@ class AreaParser(parser.BaseParser):
             #    infobox["spawn_weight%s_tag" % i] = tag["Id"]
             #    infobox["spawn_weight%s_value" % i] = value
 
-            map_pin = self.rr["MapPins.dat64"].index["WorldAreasKeys"].get(area)
-            if map_pin:
-                infobox["flavour_text"] = map_pin[0]["FlavourText"]
-
-            endgame_map = self.rr["EndgameMaps.dat64"].index["WorldArea"].get(area)
+            # Flavour text
+            flavour_text = None
+            map_pins = self.rr[self._MAPPINS_FILE_NAME].index["WorldAreasKeys"].get(area)
+            if map_pins:
+                flavour_text = map_pins[0]["FlavourText"]
+            endgame_map = self.rr[self._ENDGAMEMAPS_FILE_NAME].index["WorldArea"].get(area)
             if endgame_map:
-                infobox["flavour_text"] = endgame_map["FlavourText"]
+                flavour_text = endgame_map["FlavourText"]
                 get_endgame_map_biomes(infobox, endgame_map)
-
-            if infobox.get("flavour_text"):
-                infobox["flavour_text"] = parser.parse_and_handle_description_tags(
-                    rr=self.rr,
-                    text=infobox["flavour_text"],
-                )
+            if flavour_text:
+                infobox["flavour_text"] = flavour_text.replace("\n", "<br>").replace("\r", "")
 
             cond = WikiCondition(
                 data=infobox,
@@ -477,6 +429,6 @@ def get_endgame_map_biomes(infobox, endgame_map):
 
     # Remove duplicate biomes
     if biomes:
-        infobox["biomes"] = ", ".join(OrderedDict.fromkeys(biomes))
+        infobox["biomes"] = ", ".join(dict.fromkeys(biomes))
     if adjacent_biomes:
-        infobox["adjacent_biomes"] = ", ".join(OrderedDict.fromkeys(adjacent_biomes))
+        infobox["adjacent_biomes"] = ", ".join(dict.fromkeys(adjacent_biomes))
