@@ -2793,6 +2793,11 @@ TQNumberFormat(
 )
 
 TQNumberFormat(
+    id="subtract_one",
+    addend=-1,
+)
+
+TQNumberFormat(
     id="divide_by_ten_thousand_1dp",
     divisor=10000,
     dp=1,
