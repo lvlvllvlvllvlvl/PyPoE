@@ -384,7 +384,8 @@ class AreaParser(parser.BaseParser):
             endgame_map = self.rr[self._ENDGAMEMAPS_FILE_NAME].index["WorldArea"].get(area)
             if endgame_map:
                 flavour_text = endgame_map["FlavourText"]
-                get_endgame_map_biomes(infobox, endgame_map)
+                # TODO: 0.5.0 changed biomes data, fix?
+                # get_endgame_map_biomes(infobox, endgame_map)
             if flavour_text:
                 infobox["flavour_text"] = flavour_text.replace("\n", "<br>").replace("\r", "")
 
