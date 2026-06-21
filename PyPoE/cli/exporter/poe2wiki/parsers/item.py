@@ -567,10 +567,6 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/QuestItems/Gallows/Act3/SnakeLadyPotionConsumable4": "Venom Draught of Stone",
         "Metadata/Items/QuestItems/Gallows/Act3/SnakeLadyPotionConsumable5": "Venom Draught of the Veil",
         "Metadata/Items/QuestItems/Gallows/Act3/SnakeLadyPotionConsumable6": "Venom Draught of Clarity",
-        # =================================================================
-        # Misc
-        # =================================================================
-        "Metadata/Items/TowerAugment/GenericAugment": "Precursor Tablet",
     }
 
     _NAME_OVERRIDE_BY_ID = {"English": {}}
@@ -688,10 +684,6 @@ class ItemsParser(SkillParserShared):
             # Rings
             # =================================================================
             "Metadata/Items/Rings/FourRingBase": " (base type)",
-            # =================================================================
-            # Tablets
-            # =================================================================
-            "Metadata/Items/TowerAugment/GenericAugment": " (generic)",
             # =================================================================
             # Quest items
             # =================================================================
@@ -1929,6 +1921,7 @@ class ItemsParser(SkillParserShared):
                 "MonsterMod",
                 {
                     "template": "essence_monster_modifier_ids",
+                    "condition": lambda v: v,
                     "format": lambda v: v["Id"],
                 },
             ),
@@ -2178,6 +2171,7 @@ class ItemsParser(SkillParserShared):
         ),
         "Omen": (_type_currency,),
         "IncubatorStackable": (_type_currency,),
+        "BrequelFruit": (_type_currency,),
         "DivinationCard": (_type_currency,),
         # Misc
         "Map": (_type_map,),  # Aka waystone
@@ -2444,6 +2438,12 @@ class ItemsParser(SkillParserShared):
 
         for base_item_type in items:
             if "[DNT" in base_item_type["Name"] or "[UNUSED" in base_item_type["Name"]:
+                continue
+
+            # Disable "Runemastered" items for now
+            if base_item_type["Name"].startswith("Runemastered") or base_item_type[
+                "Name"
+            ].startswith("Runeforged"):
                 continue
 
             name = base_item_type["Name"]

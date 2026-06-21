@@ -653,6 +653,7 @@ class AlternatePassiveSkillParser(BasePassiveSkillParser):
         passives = [
             p for p in passives if p["Name"] and not p["Name"].startswith(("[DNT", "[UNUSED"))
         ]
+        # poe1 passives
         passives = [
             p
             for p in passives
