@@ -2218,12 +2218,6 @@ _KEYWORD_LINK_MAP = {
     "Debuff": {
         "default": "Debuff",
     },
-    "Defences": {
-        "default": "Defence",
-        "links": [
-            "Defences",
-        ],
-    },
     "DetonationTime": {
         "links": [
             "Detonate",
@@ -2427,9 +2421,6 @@ _KEYWORD_LINK_MAP = {
             "Invoking",
         ],
     },
-    "ItemDefences": {
-        "default": "Defences",
-    },
     "ItemRarity": {
         "default": "Rarity",
         "links": [
@@ -2591,7 +2582,7 @@ _KEYWORD_LINK_MAP = {
     "PlayerPossessed": {
         "default": "Azmerian wisp",
     },
-    "PrecursorTablet": {
+    "Tablet": {
         "default": "Precursor tablet",
         "links": [
             "Precursor Tablet",
@@ -2660,9 +2651,6 @@ _KEYWORD_LINK_MAP = {
     },
     "ResistedBy": {
         "default": "Resistance",
-    },
-    "Resonance": {
-        "default": "Resonance (buff)",
     },
     "Reviving": {},
     "RivenArmour": {},
