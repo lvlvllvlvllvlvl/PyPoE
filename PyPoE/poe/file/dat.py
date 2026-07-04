@@ -435,6 +435,13 @@ class DatRecord(list):
     def __hash__(self):
         return hash((self.parent.file_name, self.rowid))
 
+    def __eq__(self, other):
+        if isinstance(other, DatRecord):
+            return self.parent.file_name == other.parent.file_name and self.rowid == other.rowid
+        elif isinstance(other, IndexResult):
+            return other.only() == self
+        return False
+
     def iter(self):
         """
         Iterates over the DatRecord and returns key, value and index
@@ -505,6 +512,15 @@ class IndexResult(list[DatRecord]):
             )
 
         return self[0]
+
+    def __eq__(self, other):
+        if isinstance(other, DatRecord):
+            return self.only() == other
+        else:
+            return super().__eq__(other)
+
+    def __hash__(self):
+        return hash(self.only())
 
     def __getitem__(self, item):
         if isinstance(item, str):

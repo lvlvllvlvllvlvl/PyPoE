@@ -11590,6 +11590,13 @@ specification = Specification(
                     type="int",
                 ),
             ),
+            virtual_fields=(
+                VirtualField(
+                    name="Life",
+                    fields=("MonsterLife",),
+                    alias=True,
+                ),
+            ),
         ),
         "DeliriumStashTabLayout.dat": File(
             fields=(

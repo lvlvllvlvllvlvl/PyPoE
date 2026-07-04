@@ -254,11 +254,15 @@ virtual_fields_mappings = {
     constants.VERSION.POE2: defaultdict(
         list[VirtualField],
         {
+            # when a column is renamed in the schema add it here with Alias(<old name>, <new name>)
             "AddBuffToTargetVarieties": [
                 Alias("StatsKeys", "Stats1Keys"),
             ],
             "BuffDefinitions": [
                 Alias("BinaryStats", "GrantedFlags"),
+            ],
+            "DefaultMonsterStats": [
+                Alias("Life", "MonsterLife"),
             ],
             "GamblePrices": [
                 Alias("Cost", "BaseCost"),
