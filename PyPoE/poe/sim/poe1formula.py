@@ -214,9 +214,6 @@ def gem_stat_requirement(level, gtype=GemTypes.support, multi=100):
             a = 0.945  # 1.575*0.6
         elif multi == 40:
             a = 0.6575  # 1.64375 * 0.6
-        elif multi == 250:
-            # linear interpolation won't work, but this multi only appears on an exceptional gem
-            return 259 if level <= 72 else 266
         else:
             raise ValueError("Unsupported multi '%s'" % multi)
     else:
@@ -225,5 +222,7 @@ def gem_stat_requirement(level, gtype=GemTypes.support, multi=100):
     if level is None:
         return 0
     result = round(level * a + b)
-    # Gems seem to have no requirements lower then 14
+    # Attribute requirements lower then 14 are not displayed in game.
+    # TODO: Would it be more appropriate to output the result as-is and
+    #       handle display on the wiki side?
     return 0 if result < 14 else result
