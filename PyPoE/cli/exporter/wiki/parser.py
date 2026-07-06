@@ -302,6 +302,7 @@ _inter_wiki_map = {
         ("(?<=[0-9] )Vicious Projectiles", {"link": "Vicious Projectiles Support"}),
         ("(?<=[0-9] )Vile Toxins", {"link": "Vile Toxins Support"}),
         ("(?<=[0-9] )Void Manipulation", {"link": "Void Manipulation Support"}),
+        ("(?<=[0-9] )Void Shockwave", {"link": "Void Shockwave Support"}),
         ("(?<=[0-9] )Volatility", {"link": "Volatility Support"}),
         ("(?<=[0-9] )Volley", {"link": "Volley Support"}),
         ("(?<=[0-9] )Windburst", {"link": "Windburst Support"}),
