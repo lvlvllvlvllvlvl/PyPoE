@@ -1007,6 +1007,7 @@ class ItemsParser(parser.BaseParser):
         "Metadata/Items/Gems/SkillGemPlaytestAttack",
         "Metadata/Items/Gems/SkillGemPlaytestSpell",
         "Metadata/Items/Gems/SkillGemPlaytestSlam",
+        "Metadata/Items/Gem/SkillGemCallMercenary",
         # =================================================================
         # Royale Gear
         # =================================================================
@@ -1736,6 +1737,7 @@ class ItemsParser(parser.BaseParser):
     _ITEM_SKIP_PATTERNS = {
         "Active Skill Gem": {
             r"Royale",
+            r"GraftGem",
         },
         "Support Skill Gem": {
             r"Royale",
@@ -2013,8 +2015,12 @@ class ItemsParser(parser.BaseParser):
                 except ValueError as e:
                     warnings.warn(str(e))
                 except KeyError:
-                    print(base_item_type["Id"], base_item_type["Name"])
-                    raise
+                    console(
+                        'Missing level requirements for skill gem "%s" - Item will be skipped'
+                        % (ge_name or base_item_type["Name"]),
+                        msg=Msg.warning,
+                    )
+                    return False
 
         # Skill icons
         if parsed_args.store_images:
