@@ -707,7 +707,7 @@ class SkillParserShared(parser.BaseParser):
 
         if gra_eff["IsSupport"]:
             infobox["is_support"] = True
-        if not gra_eff["IsSupport"]:
+        else:
             infobox["cast_time"] = gra_eff["CastTime"] / 1000
 
         # GrantedEffectsPerLevel.dat64

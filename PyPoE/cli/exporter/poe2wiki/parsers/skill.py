@@ -672,7 +672,9 @@ class SkillParserShared(parser.BaseParser):
         # From GrantedEffects.dat64
         infobox["skill_id"] = gra_eff["Id"]
 
-        if not gra_eff["IsSupport"]:
+        if gra_eff["IsSupport"]:
+            infobox["is_support"] = True
+        else:
             infobox["cast_time"] = gra_eff["CastTime"] / 1000
 
         if len(gra_eff["CostTypes"]) > 0:
