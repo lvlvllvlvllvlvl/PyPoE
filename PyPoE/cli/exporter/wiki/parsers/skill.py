@@ -144,12 +144,6 @@ class SkillHandler(ExporterHandler):
         super().add_default_parsers(*args, **kwargs)
         self.add_format_argument(kwargs["parser"])
         self.add_image_arguments(kwargs["parser"])
-        kwargs["parser"].add_argument(
-            "--allow-skill-gems",
-            action="store_true",
-            help="Disable the check that prevents skill gems skill from being exported.",
-            dest="allow_skill_gems",
-        )
 
 
 class WikiCondition(parser.WikiCondition):
@@ -202,16 +196,7 @@ class SkillParserShared(parser.BaseParser):
         "DamageEffectiveness",
     )
 
-    # def CostTypeHelper(d):
-    #     print('yep', d)
-    #     return d['Cost_TypesKeys']['Id']
-
     _SKILL_COLUMN_MAP = (
-        # ('ManaCost', {
-        #     'template': 'mana_cost',
-        #     'default': 0,
-        #     'format': lambda v: '{0:n}'.format(v),
-        # }),
         (
             "CostAmounts",
             {
@@ -1005,7 +990,6 @@ class SkillParser(SkillParserShared):
         )
 
     def by_gem(self, parsed_args):
-        parsed_args.allow_skill_gems = True
         return self.export(
             parsed_args,
             self._effects_from_gems(
@@ -1065,12 +1049,6 @@ class SkillParser(SkillParserShared):
             if gem_effect and gem_effect["SupportText"]:
                 data["gem_description"] = gem_effect["SupportText"]
             if skill_gem:
-                if not parsed_args.allow_skill_gems:
-                    console(
-                        f"Skipping skill gem skill \"{skill['Id']}\" at row {skill.rowid}",
-                        msg=Msg.warning,
-                    )
-                    continue
                 levels = self.rr["ItemExperiencePerLevel.dat64"].index["ItemExperienceType"][
                     skill_gem["ExperienceProgression"]
                 ]
