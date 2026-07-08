@@ -1045,7 +1045,7 @@ class SkillParser(SkillParserShared):
                 else None
             )
             if gem_effect and gem_effect["SupportText"]:
-                data["gem_description"] = gem_effect["SupportText"]
+                data["gem_description"] = parser.process_keywords(gem_effect["SupportText"])
             if skill_gem:
                 if not parsed_args.allow_skill_gems:
                     console(
