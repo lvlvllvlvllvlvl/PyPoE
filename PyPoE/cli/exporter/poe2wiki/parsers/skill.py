@@ -692,7 +692,6 @@ class SkillParserShared(parser.BaseParser):
 
         for row in qual_stats:
             prefix = "quality_type1_"
-            infobox[prefix + "weight"] = 1
 
             # Quality stat data
             stat_ids = [r["Id"] for r in row["StatsKeys"]]
