@@ -156,15 +156,6 @@ class SkillHandler(ExporterHandler):
 
 class WikiCondition(parser.WikiCondition):
     COPY_KEYS = (
-        # for skills
-        "radius",
-        "radius_description",
-        "radius_secondary",
-        "radius_secondary_description",
-        "radius_tertiary",
-        "radius_tertiary_description",
-        "has_percentage_mana_cost",
-        "has_reservation_mana_cost",
         "skill_screenshot",
         "skill_screenshot_file",
     )
@@ -329,39 +320,6 @@ class SkillParserShared(parser.BaseParser):
             },
         ),
     )
-
-    # Values without the Metadata/Projectiles/ prefix
-    _SKILL_ID_TO_PROJECTILE_MAP = {
-        "ArcticBreath": "ArcticBreath",
-        "BallLightning": "BallLightningPlayer",
-        "BurningArrow": "BurningArrow",
-        "EtherealKnives": "ShadowProjectile",
-        "FlameTotem": "TotemFireSpray",
-        "FreezingPulse": "FreezingPulse",
-        "ExplosiveArrow": "FuseArrow",
-        "FrostBlades": "IceStrikeProjectile",
-        "FrostBolt": "FrostBolt",
-        "Fireball": "Fireball",
-        "IceShot": "IceArrow",
-        "IceSpear": "IceSpear",
-        # 'Incinerate': 'Flamethrower1',
-        "LightningArrow": "LightningArrow",
-        "LightningTrap": "LightningTrap",
-        "MoltenStrike": "FireMortar",
-        # CausticArrow
-        "PoisonArrow": "CausticArrow",
-        "Power Siphon": "Siphon",
-        "ShrapnelShot": "ShrapnelShot",
-        "SiegeBallista": "CrossbowSnipeProjectile",
-        "Spark": "Spark",
-        "SplitArrow": "SplitArrowDefault",
-        # Spectral Throw
-        "ThrownWeapon": "ThrownWeapon",
-        "Tornado Shot": "TornadoShotArrow",
-        # TornadoShotSecondaryArrow,
-        "VaalBurningArrow": "VaalBurningArrow",
-        "WildStrike": "ElementalStrikeColdProjectile",
-    }
 
     _GEM_EFFECT_COLUMNS = [
         "GrantedEffect",
@@ -711,16 +669,7 @@ class SkillParserShared(parser.BaseParser):
 
                 infobox["equipment_requirement"] = parser.process_keywords(reqiured_eq)
 
-        # From Projectile.dat64 if available
-        # TODO - remap
-        key = self._SKILL_ID_TO_PROJECTILE_MAP.get(gra_eff["Id"])
-        if key:
-            infobox["projectile_speed"] = self.rr["Projectiles.dat64"].index["Id"][
-                "Metadata/Projectiles/" + key
-            ]["ProjectileSpeed"]
-
         # From GrantedEffects.dat64
-
         infobox["skill_id"] = gra_eff["Id"]
 
         if not gra_eff["IsSupport"]:
