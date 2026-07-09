@@ -2023,16 +2023,31 @@ class ItemsParser(parser.BaseParser):
                     return False
 
         # Skill icons
-        if parsed_args.store_images:
-            skill_icon = primary_ge["ActiveSkill"] and primary_ge["ActiveSkill"]["Icon_DDSFile"]
-            if skill_icon:
-                self._write_dds(
-                    data=self.file_system.get_file(skill_icon),
-                    out_path=os.path.join(
-                        self._img_path, "%s skill icon.dds" % (ge_name or base_item_type["Name"])
-                    ),
-                    parsed_args=parsed_args,
-                )
+        act_skill = primary_ge["ActiveSkill"]
+        if act_skill:
+            skill_name = act_skill["DisplayedName"]
+            base_skill_name = (
+                act_skill["TransfigureBase"]["DisplayedName"]
+                if act_skill["TransfigureBase"]
+                else skill_name
+            )
+            skill_icon = act_skill["Icon_DDSFile"]
+            base_skill_icon = (
+                act_skill["TransfigureBase"]["Icon_DDSFile"]
+                if act_skill["TransfigureBase"]
+                else skill_icon
+            )
+            icon_name = skill_name if skill_icon != base_skill_icon else base_skill_name
+            if parsed_args.store_images:
+                if skill_icon:
+                    self._write_dds(
+                        data=self.file_system.get_file(skill_icon),
+                        out_path=os.path.join(
+                            self._img_path,
+                            "%s skill icon.dds" % (icon_name or base_item_type["Name"]),
+                        ),
+                        parsed_args=parsed_args,
+                    )
 
         return True
 
