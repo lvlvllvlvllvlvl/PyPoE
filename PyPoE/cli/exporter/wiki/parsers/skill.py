@@ -493,7 +493,7 @@ class SkillParserShared(parser.BaseParser):
         gra_eff_per_lvl.sort(key=lambda x: x["Level"])
         gra_eff_stats_pl.sort(key=lambda x: x["GemLevel"])
         if max_level is None:
-            max_level = len(gra_eff_per_lvl) - 1
+            max_level = len(gra_eff_per_lvl)
 
         act_skill = gra_eff["ActiveSkill"]
         if act_skill:
@@ -707,6 +707,9 @@ class SkillParserShared(parser.BaseParser):
         if infobox["required_level"] % 1 != 0:
             raise ValueError("PlayerLevelReq is not a whole number")
 
+        if max_level > 1:
+            infobox["max_level"] = max_level
+
         #
         # Quality stats
         #
@@ -821,7 +824,7 @@ class SkillParserShared(parser.BaseParser):
                 values.extend(sdict["values"])
             elif key in dynamic["stats"]:
                 try:
-                    stat_dict_max = level_data[max_level]["stats"][key]
+                    stat_dict_max = level_data[max_level - 1]["stats"][key]
                 except (KeyError, IndexError):
                     maxerr = True
                 else:
@@ -885,7 +888,9 @@ class SkillParserShared(parser.BaseParser):
             )
             added = []
             for value_keys, tags, default in field_stats:
-                values = [(level_data[0][key], level_data[max_level][key]) for key in value_keys]
+                values = [
+                    (level_data[0][key], level_data[max_level - 1][key]) for key in value_keys
+                ]
                 # Account for default (0 = 100%)
                 if values[0] != default:
                     added.extend(
@@ -1056,7 +1061,7 @@ class SkillParser(SkillParserShared):
                 levels = self.rr["ItemExperiencePerLevel.dat64"].index["ItemExperienceType"][
                     skill_gem["ExperienceProgression"]
                 ]
-                max_level = len(levels) - 1 if levels else 0
+                max_level = len(levels) if levels else 1
 
             try:
                 self._skill(
