@@ -148,8 +148,8 @@ class SkillHandler(ExporterHandler):
 
 class WikiCondition(parser.WikiCondition):
     COPY_KEYS = (
+        "skill_icon",
         "skill_screenshot",
-        "skill_screenshot_file",
     )
 
     NAME = "Skill"
@@ -470,10 +470,7 @@ class SkillParserShared(parser.BaseParser):
             stat_order[stat] = -1
         return stats_output
 
-    def _skill(self, gra_eff, infobox: OrderedDict, parsed_args, max_level=None, msg_name=None):
-        if msg_name is None:
-            msg_name = gra_eff["Id"]
-
+    def _skill(self, gra_eff, infobox: OrderedDict, parsed_args, max_level=None):
         stat_set = gra_eff["StatSet"]
 
         gra_eff_per_lvl = []
@@ -487,7 +484,7 @@ class SkillParserShared(parser.BaseParser):
                 gra_eff_stats_pl.append(row)
 
         if (not gra_eff_per_lvl) and (not gra_eff_stats_pl):
-            console('No level progression found for "%s". Skipping.' % msg_name, msg=Msg.error)
+            console('No level progression found for "%s". Skipping.' % gra_eff["Id"], msg=Msg.error)
             return
 
         gra_eff_per_lvl.sort(key=lambda x: x["Level"])
@@ -507,13 +504,6 @@ class SkillParserShared(parser.BaseParser):
             except KeyError as e:
                 warnings.warn("Missing active skill in stat files: %s" % e.args[0])
                 tf = self.tc["skill_stat_descriptions.txt"]
-
-            if parsed_args.store_images and act_skill["Icon_DDSFile"]:
-                self._write_dds(
-                    data=self.file_system.get_file(act_skill["Icon_DDSFile"]),
-                    out_path=os.path.join(self._img_path, "%s skill icon.dds" % msg_name),
-                    parsed_args=parsed_args,
-                )
         else:
             tf = self.tc["gem_stat_descriptions.txt"]
 
@@ -697,16 +687,6 @@ class SkillParserShared(parser.BaseParser):
         else:
             infobox["cast_time"] = gra_eff["CastTime"] / 1000
 
-        # GrantedEffectsPerLevel.dat64
-        infobox["required_level"] = level_data[0]["PlayerLevelReq"]
-
-        # In 3.21, the player level requirement is a float
-        # Cast required level to an int
-        infobox["required_level"] = int(infobox["required_level"])
-        # If its not a whole number, raise error, just to be safe
-        if infobox["required_level"] % 1 != 0:
-            raise ValueError("PlayerLevelReq is not a whole number")
-
         if max_level > 1:
             infobox["max_level"] = max_level
 
@@ -848,7 +828,7 @@ class SkillParserShared(parser.BaseParser):
                     stat_dict = {"values": [0] * len(stat_ids)}
                 elif maxerr and minerr:
                     console(
-                        f'{msg_name} - Neither min or max level value available for "{key}".'
+                        f'{gra_eff["Id"]} - Neither min or max level value available for "{key}".'
                         " Investigate.",
                         msg=Msg.warning,
                     )
@@ -921,7 +901,7 @@ class SkillParserShared(parser.BaseParser):
             # If its not a whole number, raise error, just to be safe
             if "PlayerLevelReq" in row and row["PlayerLevelReq"] % 1 != 0:
                 console(
-                    f"{msg_name} level requirement for level {i} is {row['PlayerLevelReq']}",
+                    f"{gra_eff['Id']} level requirement for level {i} is {row['PlayerLevelReq']}",
                     msg=Msg.warning,
                 )
 
@@ -963,6 +943,33 @@ class SkillParserShared(parser.BaseParser):
                 [(s, v) for s, v in zip(stats, values) if s not in static["stat_keys"]],
                 prefix,
             )
+
+        # Skill icon
+        if act_skill:
+            skill_name = act_skill["DisplayedName"]
+            base_skill_name = (
+                act_skill["TransfigureBase"]["DisplayedName"]
+                if act_skill["TransfigureBase"]
+                else skill_name
+            )
+            skill_icon = act_skill["Icon_DDSFile"]
+            base_skill_icon = (
+                act_skill["TransfigureBase"]["Icon_DDSFile"]
+                if act_skill["TransfigureBase"]
+                else skill_icon
+            )
+            icon_name = skill_name if skill_icon != base_skill_icon else base_skill_name
+            if parsed_args.store_images:
+                if skill_icon:
+                    self._write_dds(
+                        data=self.file_system.get_file(skill_icon),
+                        out_path=os.path.join(
+                            self._img_path, "%s skill icon.dds" % (icon_name or gra_eff["Id"])
+                        ),
+                        parsed_args=parsed_args,
+                    )
+            if icon_name != skill_name:
+                infobox["skill_icon"] = icon_name
 
 
 class SkillParser(SkillParserShared):
