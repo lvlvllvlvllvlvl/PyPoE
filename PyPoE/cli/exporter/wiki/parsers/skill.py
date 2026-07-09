@@ -489,8 +489,6 @@ class SkillParserShared(parser.BaseParser):
 
         gra_eff_per_lvl.sort(key=lambda x: x["Level"])
         gra_eff_stats_pl.sort(key=lambda x: x["GemLevel"])
-        if max_level is None:
-            max_level = len(gra_eff_per_lvl)
 
         act_skill = gra_eff["ActiveSkill"]
         if act_skill:
@@ -577,6 +575,8 @@ class SkillParserShared(parser.BaseParser):
                 data[column] = lvl_stats[column]
 
             level_data.append(data)
+
+        max_level = len(level_data) if max_level is None else min(max_level, len(level_data))
 
         # Find static & dynamic stats..
 
@@ -668,10 +668,12 @@ class SkillParserShared(parser.BaseParser):
 
         # From ActiveSkills.dat64
         if act_skill:
-            infobox["gem_description"] = (
-                act_skill["Description"].replace("\n", "<br>").replace("\r", "")
-            )
-            infobox["active_skill_name"] = act_skill["DisplayedName"]
+            if act_skill["Description"]:
+                infobox["gem_description"] = (
+                    act_skill["Description"].replace("\n", "<br>").replace("\r", "")
+                )
+            if act_skill["DisplayedName"]:
+                infobox["active_skill_name"] = act_skill["DisplayedName"]
             if act_skill["WeaponRestriction_ItemClassesKeys"]:
                 infobox["item_class_id_restriction"] = ", ".join(
                     [c["Id"] for c in act_skill["WeaponRestriction_ItemClassesKeys"]]
