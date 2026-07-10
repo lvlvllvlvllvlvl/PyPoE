@@ -170,8 +170,6 @@ class SkillParserShared(parser.BaseParser):
 
     # Fields to copy from GrantedEffectsPerLevel.dat64
     _GEPL_COPY = (
-        "Level",
-        "PlayerLevelReq",
         "CostMultiplier",
         "CostAmounts",
         "CostTypes",
@@ -471,24 +469,24 @@ class SkillParserShared(parser.BaseParser):
         return stats_output
 
     def _skill(self, gra_eff, infobox: OrderedDict, parsed_args, max_level=None):
-        stat_set = gra_eff["StatSet"]
-
-        gra_eff_per_lvl = []
-        for row in self.rr["GrantedEffectsPerLevel.dat64"]:
-            if row["GrantedEffect"] == gra_eff:
-                gra_eff_per_lvl.append(row)
-
-        gra_eff_stats_pl = []
-        for row in self.rr["GrantedEffectStatSetsPerLevel.dat64"]:
-            if row["StatSet"] == stat_set:
-                gra_eff_stats_pl.append(row)
-
-        if (not gra_eff_per_lvl) and (not gra_eff_stats_pl):
-            console('No level progression found for "%s". Skipping.' % gra_eff["Id"], msg=Msg.error)
+        if "GrantedEffect" not in self.rr["GrantedEffectsPerLevel.dat64"].index:
+            self.rr["GrantedEffectsPerLevel.dat64"].build_index("GrantedEffect")
+        gra_eff_per_lvl = {}  # Use dict because we want to index by level
+        for row in self.rr["GrantedEffectsPerLevel.dat64"].index["GrantedEffect"][gra_eff]:
+            gra_eff_per_lvl[row["Level"]] = row
+        if len(gra_eff_per_lvl) == 0:
+            console('No levels found for "%s". Skipping.' % gra_eff["Id"], msg=Msg.error)
             return
 
-        gra_eff_per_lvl.sort(key=lambda x: x["Level"])
-        gra_eff_stats_pl.sort(key=lambda x: x["GemLevel"])
+        stat_set = gra_eff["StatSet"]
+        if "StatSet" not in self.rr["GrantedEffectStatSetsPerLevel.dat64"].index:
+            self.rr["GrantedEffectStatSetsPerLevel.dat64"].build_index("StatSet")
+        gra_eff_stats_pl = {}
+        for row in self.rr["GrantedEffectStatSetsPerLevel.dat64"].index["StatSet"][stat_set]:
+            gra_eff_stats_pl[row["GemLevel"]] = row
+        if len(gra_eff_stats_pl) == 0:
+            console('No level stats found for "%s". Skipping.' % gra_eff["Id"], msg=Msg.error)
+            return
 
         act_skill = gra_eff["ActiveSkill"]
         if act_skill:
@@ -510,7 +508,6 @@ class SkillParserShared(parser.BaseParser):
         stat_key_order = {
             "stats": OrderedDict(),
         }
-
         stat_order = defaultdict()
 
         # GrantedEffectStatSets.dat64
@@ -520,23 +517,42 @@ class SkillParserShared(parser.BaseParser):
         impl_stat_vals = [1 for i in range(len(impl_stats))]
 
         # Copy per-level stats into level_data
-        for i, lvl_stats in enumerate(gra_eff_stats_pl):
+        # Can't assume that gra_eff_per_lvl and gra_eff_stats_pl have the
+        # same level numbers, so iterate over all of the levels from both.
+        levels = sorted(list(gra_eff_per_lvl.keys() | gra_eff_stats_pl.keys()))
+        lvl_effects = None
+        lvl_stats = None
+        for level in levels:
             data = defaultdict(lambda: None)
-            if len(gra_eff_per_lvl) > i:
-                lvl_effects = gra_eff_per_lvl[i]
-            else:
-                lvl_effects = None
-                warnings.warn(
-                    f'GrantedEffectsPerLevel is missing level {lvl_stats["GemLevel"]} which'
-                    " GrantedEffectStatSetsPerLevel has."
-                )
 
-            if lvl_effects is not None and lvl_effects["Level"] != lvl_stats["GemLevel"]:
-                lvl_effects = None
-                warnings.warn(
-                    f'GrantedEffectsPerLevel is missing level {lvl_stats["GemLevel"]} which'
-                    " GrantedEffectStatSetsPerLevel has."
+            # If a gra_eff_per_lvl record exists for the current level, use it;
+            # otherwise, use the previous one.
+            if level in gra_eff_per_lvl:
+                lvl_effects = gra_eff_per_lvl[level]
+            if lvl_effects is None:
+                console(
+                    f"Missing level data for \"{gra_eff['Id']}\" at level {level}. Skipping.",
+                    msg=Msg.error,
                 )
+                return
+            for column in self._GEPL_COPY:
+                data[column] = lvl_effects[column]
+
+            # If a gra_eff_stats_pl record exists for the current level, use it;
+            # otherwise, use the previous one.
+            if level in gra_eff_stats_pl:
+                lvl_stats = gra_eff_stats_pl[level]
+            if lvl_stats is None:
+                console(
+                    f"Missing level stats data for \"{gra_eff['Id']}\" at level {level}. Skipping.",
+                    msg=Msg.error,
+                )
+                return
+            for column in self._GESSPL_COPY:
+                data[column] = lvl_stats[column]
+
+            data["Level"] = level
+            data["PlayerLevelReq"] = max(lvl_effects["PlayerLevelReq"], lvl_stats["PlayerLevelReq"])
 
             stats = [
                 r["Id"]
@@ -566,13 +582,6 @@ class SkillParserShared(parser.BaseParser):
             )
             for tr_stat in translated_stats.keys():
                 stat_key_order["stats"][tr_stat] = translated_stats[tr_stat]
-
-            if lvl_effects is not None:
-                for column in self._GEPL_COPY:
-                    data[column] = lvl_effects[column]
-
-            for column in self._GESSPL_COPY:
-                data[column] = lvl_stats[column]
 
             level_data.append(data)
 
@@ -771,10 +780,10 @@ class SkillParserShared(parser.BaseParser):
                 continue
 
             default = column_data.get("default")
-            if column in gra_eff_per_lvl[0].keys():
-                raw_value = gra_eff_per_lvl[0][column]
-            elif column in gra_eff_stats_pl[0].keys():
-                raw_value = gra_eff_stats_pl[0][column]
+            if column in gra_eff_per_lvl[levels[0]].keys():
+                raw_value = gra_eff_per_lvl[levels[0]][column]
+            elif column in gra_eff_stats_pl[levels[0]].keys():
+                raw_value = gra_eff_stats_pl[levels[0]][column]
             else:
                 raw_value = level_data[0][column]
 
@@ -903,7 +912,7 @@ class SkillParserShared(parser.BaseParser):
             # If its not a whole number, raise error, just to be safe
             if "PlayerLevelReq" in row and row["PlayerLevelReq"] % 1 != 0:
                 console(
-                    f"{gra_eff['Id']} level requirement for level {i} is {row['PlayerLevelReq']}",
+                    f"{gra_eff['Id']} level requirement for level {row['Level']} is {row['PlayerLevelReq']}",
                     msg=Msg.warning,
                 )
 
