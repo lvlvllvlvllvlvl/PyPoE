@@ -1425,6 +1425,8 @@ _inter_wiki_map = {
         ("Penetrate(?:|s)", {"link": "Penetrate"}),
         ("PvP", {"link": "PvP"}),
         ("Quality", {"link": "Quality"}),
+        ("Fractured", {"link": "Fractured"}),
+        ("Foulborn", {"link": "Foulborn"}),
         #
         # Late matching
         #
@@ -2589,9 +2591,9 @@ class TagHandler:
         "rareitem": partial(_default_handler, tid="rare"),
         "uniqueitem": _unique_handler,
         "divination": partial(_default_handler, tid="divination"),
-        "corrupted": partial(_link_handler, tid="corrupted"),
-        "fractured": partial(_link_handler, tid="fractured"),
-        "brequelmutated": partial(_link_handler, tid="foulborn"),
+        "corrupted": partial(_default_handler, tid="corrupted"),
+        "fractured": partial(_default_handler, tid="fractured"),
+        "brequelmutated": partial(_default_handler, tid="foulborn"),
     }
 
 

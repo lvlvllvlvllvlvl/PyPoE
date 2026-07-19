@@ -174,7 +174,7 @@ SHADE_LUT: dict[(str, int), GemShadeConstants] = {
 class WikiCondition(parser.WikiCondition):
     COPY_KEYS = (
         # all items
-        "name_list",
+        "aliases",
         "quality",
         # Icons & Visuals
         "inventory_icon",
@@ -212,9 +212,6 @@ class WikiCondition(parser.WikiCondition):
         # Version information
         "release_version",
         "removal_version",
-        # prophecies
-        "prophecy_objective",
-        "prophecy_reward",
         # Sentinels
         "sentinel_monster",
         "sentinel_monster_level",
