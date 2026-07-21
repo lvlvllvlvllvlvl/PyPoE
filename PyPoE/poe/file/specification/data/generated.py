@@ -293,7 +293,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH16",
-                    type="short",
+                    type="ushort",
                 ),
                 Field(
                     name="Flag0",
@@ -1316,7 +1316,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH16",
-                    type="short",
+                    type="ushort",
                 ),
                 Field(
                     name="CatalystMod",
@@ -2234,9 +2234,9 @@ specification = Specification(
                     key="MiscAnimated.dat",
                 ),
                 Field(
-                    name="StampFamily",
+                    name="BuffVisualOrbType",
                     type="ref|out",
-                    key="StampFamily.dat",
+                    key="BuffVisualOrbTypes.dat",
                 ),
                 Field(
                     name="MiscEffectPack",
@@ -2973,7 +2973,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH16",
-                    type="short",
+                    type="ushort",
                 ),
                 Field(
                     name="IsUniqueMap",
@@ -3861,7 +3861,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH32",
-                    type="int",
+                    type="uint",
                 ),
                 Field(
                     name="VendorRecipe_AchievementItems",
@@ -11235,7 +11235,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH32",
-                    type="int",
+                    type="uint",
                 ),
                 Field(
                     name="DropLevel",
@@ -13946,6 +13946,7 @@ specification = Specification(
                 Field(
                     name="Attribute",
                     type="int",
+                    enum="ATTRIBUTES",
                 ),
                 Field(
                     name="AddedActiveSkillTypes",
@@ -16050,7 +16051,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH32",
-                    type="int",
+                    type="uint",
                 ),
                 Field(
                     name="Replacement",
@@ -16660,7 +16661,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH16",
-                    type="short",
+                    type="ushort",
                 ),
                 Field(
                     name="HideoutFile",
@@ -17708,8 +17709,9 @@ specification = Specification(
                     type="ref|string",
                 ),
                 Field(
-                    name="Data0",
-                    type="ref|list|byte",
+                    name="ItemClasses",
+                    type="ref|list|ref|out",
+                    key="ItemClasses.dat",
                 ),
                 Field(
                     name="Unknown0",
@@ -18911,7 +18913,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH16",
-                    type="short",
+                    type="ushort",
                 ),
                 Field(
                     name="Flag0",
@@ -21672,7 +21674,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH16",
-                    type="short",
+                    type="ushort",
                 ),
                 Field(
                     name="Stats",
@@ -23370,7 +23372,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH32",
-                    type="int",
+                    type="uint",
                 ),
             ),
         ),
@@ -24999,8 +25001,9 @@ specification = Specification(
                     type="bool",
                 ),
                 Field(
-                    name="Key0",
+                    name="ImpactAnimation2",
                     type="ref|out",
+                    key="MiscAnimated.dat",
                 ),
                 Field(
                     name="Unknown9",
@@ -27122,19 +27125,21 @@ specification = Specification(
                     unique=True,
                 ),
                 Field(
-                    name="Key0",
+                    name="Rarity",
                     type="ref|out",
+                    key="Rarity.dat",
                 ),
                 Field(
-                    name="Key1",
+                    name="ItemClass",
                     type="ref|out",
+                    key="ItemClasses.dat",
                 ),
                 Field(
                     name="Unknown0",
                     type="int",
                 ),
                 Field(
-                    name="Key2",
+                    name="Key0",
                     type="ref|out",
                 ),
                 Field(
@@ -27142,8 +27147,9 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="Key3",
+                    name="Words",
                     type="ref|out",
+                    key="Words.dat",
                 ),
             ),
         ),
@@ -29313,9 +29319,9 @@ specification = Specification(
                     type="int",
                 ),
                 Field(
-                    name="GroundEffectType",
+                    name="GroundEffect",
                     type="ref|list|ref|out",
-                    key="GroundEffectTypes.dat",
+                    key="GroundEffects.dat",
                 ),
             ),
         ),
@@ -29628,7 +29634,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH32",
-                    type="int",
+                    type="uint",
                 ),
             ),
         ),
@@ -31419,12 +31425,14 @@ specification = Specification(
                     key="BuffTemplates.dat",
                 ),
                 Field(
-                    name="Key1",
+                    name="RewardType1",
                     type="ref|out",
+                    key="GenericLeagueRewardTypes.dat",
                 ),
                 Field(
-                    name="Key2",
+                    name="RewardType2",
                     type="ref|out",
+                    key="GenericLeagueRewardTypes.dat",
                 ),
             ),
         ),
@@ -32960,7 +32968,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH32",
-                    type="int",
+                    type="uint",
                 ),
                 Field(
                     name="BelongsActiveSkillsKey",
@@ -34169,7 +34177,7 @@ specification = Specification(
                 Field(
                     name="MTX",
                     type="ref|out",
-                    key="MtxTypes.dat",
+                    key="MtxTypeGameSpecific.dat",
                 ),
                 Field(
                     name="Tier",
@@ -36426,7 +36434,7 @@ specification = Specification(
                 ),
                 Field(
                     name="HASH32",
-                    type="int",
+                    type="uint",
                 ),
                 Field(
                     name="Text2",

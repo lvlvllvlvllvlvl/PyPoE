@@ -1031,6 +1031,8 @@ class ItemsParser(parser.BaseParser):
         "Metadata/Items/Gems/SupportGemTemporaryForTutorial",
         "Metadata/Items/Gems/SupportGemVaalSoulHarvesting",
         "Metadata/Items/Gems/SupportGemConflagration",
+        "Metadata/Items/Gems/SupportGemDivineBlessing",
+        "Metadata/Items/Gems/SupportGemEarthbreaker",
         # =================================================================
         # Cosmetic items
         # =================================================================

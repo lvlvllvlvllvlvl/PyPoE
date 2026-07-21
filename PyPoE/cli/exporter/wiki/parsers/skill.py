@@ -43,6 +43,7 @@ from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.wiki import parser
 from PyPoE.cli.exporter.wiki.handler import ExporterHandler, ExporterResult
+from PyPoE.poe import poe1constants as constants
 from PyPoE.poe.file.stat_filters import StatFilterFile
 from PyPoE.poe.file.translations import StatValue, TranslationFile
 
@@ -690,13 +691,14 @@ class SkillParserShared(parser.BaseParser):
 
         # From GrantedEffects.dat64
         infobox["skill_id"] = gra_eff["Id"]
-        if gra_eff["SupportGemLetter"]:
-            infobox["support_gem_letter"] = gra_eff["SupportGemLetter"]
-
         if gra_eff["IsSupport"]:
             infobox["is_support"] = True
         else:
             infobox["cast_time"] = gra_eff["CastTime"] / 1000
+        if gra_eff["SupportGemLetter"]:
+            infobox["support_gem_letter"] = gra_eff["SupportGemLetter"]
+        if gra_eff["Attribute"] != constants.ATTRIBUTES.NONE:
+            infobox["primary_attribute"] = gra_eff["Attribute"].name_lower
 
         if max_level > 1:
             infobox["max_level"] = max_level

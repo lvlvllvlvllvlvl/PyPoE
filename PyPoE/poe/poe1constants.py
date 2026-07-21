@@ -63,6 +63,7 @@ from enum import Enum, EnumMeta, IntEnum
 # =============================================================================
 
 __all__ = [
+    "ATTRIBUTES",
     "BETRAYAL_UPGRADE_SLOTS",
     "DELVE_UPGRADE_TYPE",
     "MAP_GENERATION",
@@ -272,6 +273,27 @@ class IntEnumOverride(IntEnum, metaclass=IntEnumMetaOverride):
     UNKNOWN6 = 18
     UNKNOWN7 = 19
 '''
+
+
+class ATTRIBUTES(Enum, metaclass=IntEnumMetaOverride):
+    id: int
+    name_lower: str
+    abbr_lower: str
+    colour: str
+
+    STRENGTH = (1, "strength", "str", "red")
+    DEXTERITY = (2, "dexterity", "dex", "green")
+    INTELLIGENCE = (3, "intelligence", "int", "blue")
+    NONE = (4, "none", "none", "white")
+
+    def __new__(cls, id: int, lower: str, abbr: str, colour: str):
+        obj = object.__new__(cls)
+        obj._value_ = id
+        obj.id = id
+        obj.name_lower = lower
+        obj.abbr_lower = abbr
+        obj.colour = colour
+        return obj
 
 
 class ACTIVE_SKILL_TYPES(IntEnumOverride):

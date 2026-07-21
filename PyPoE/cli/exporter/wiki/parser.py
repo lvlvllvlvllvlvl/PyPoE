@@ -212,6 +212,7 @@ _inter_wiki_map = {
             "(?<=[0-9] )Greater Multiple Projectiles",
             {"link": "Greater Multiple Projectiles Support"},
         ),
+        ("(?<=[0-9] )Greater Spell Echo", {"link": "Greater Spell Echo Support"}),
         ("(?<=[0-9] )Greater Volley", {"link": "Greater Volley Support"}),
         ("(?<=[0-9] )Guardian's Blessing", {"link": "Guardian's Blessing Support"}),
         ("(?<=[0-9] )Hex Bloom", {"link": "Hex Bloom Support"}),
@@ -312,7 +313,6 @@ _inter_wiki_map = {
         #
         ("(?<=[0-9] )Divine Blessing", {"link": "Divine Blessing Support"}),
         ("(?<=[0-9] )Earthbreaker", {"link": "Earthbreaker Support"}),
-        ("(?<=[0-9] )Greater Spell Echo", {"link": "Greater Spell Echo Support"}),
         #
         # Cluster jewel notables
         #

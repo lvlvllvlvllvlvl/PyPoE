@@ -39,6 +39,11 @@ custom_attributes = {
             enum="GEM_STYLES",
         ),
     },
+    "GrantedEffects.dat": {
+        "Attribute": CustomizedField(
+            enum="ATTRIBUTES",
+        ),
+    },
     "ItemVisualIdentity.dat": {
         "Composition": CustomizedField(
             enum="ITEM_VISUAL_COMPOSITIONS",
