@@ -1005,6 +1005,11 @@ class ItemsParser(parser.BaseParser):
         "Metadata/Items/Gems/SkillGemPlaytestSpell",
         "Metadata/Items/Gems/SkillGemPlaytestSlam",
         "Metadata/Items/Gem/SkillGemCallMercenary",
+        "Metadata/Items/Gems/SupportGemHarrowingThrong",
+        "Metadata/Items/Gems/SupportGemEdify",
+        "Metadata/Items/Gems/SupportGemMagnetism",
+        "Metadata/Items/Gems/SkillGemVaalSplitArrow",
+        "Metadata/Items/Gems/SupportGemWard",
         # =================================================================
         # Royale Gear
         # =================================================================
