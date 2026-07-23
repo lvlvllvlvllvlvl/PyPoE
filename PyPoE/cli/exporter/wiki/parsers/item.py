@@ -1005,6 +1005,11 @@ class ItemsParser(parser.BaseParser):
         "Metadata/Items/Gems/SkillGemPlaytestSpell",
         "Metadata/Items/Gems/SkillGemPlaytestSlam",
         "Metadata/Items/Gem/SkillGemCallMercenary",
+        "Metadata/Items/Gems/SupportGemHarrowingThrong",
+        "Metadata/Items/Gems/SupportGemEdify",
+        "Metadata/Items/Gems/SupportGemMagnetism",
+        "Metadata/Items/Gems/SkillGemVaalSplitArrow",
+        "Metadata/Items/Gems/SupportGemWard",
         # =================================================================
         # Royale Gear
         # =================================================================
@@ -1933,23 +1938,6 @@ class ItemsParser(parser.BaseParser):
             infobox["name"] = ge_name
             infobox["base_item_id"] = infobox.pop("metadata_id")
 
-        # Determine the gem's primary attribute
-        attr_weights = {
-            "strength": skill_gem["StrengthRequirementPercent"],
-            "dexterity": skill_gem["DexterityRequirementPercent"],
-            "intelligence": skill_gem["IntelligenceRequirementPercent"],
-        }
-        try:
-            attr_weight = 100 / (
-                attr_weights["strength"] + attr_weights["dexterity"] + attr_weights["intelligence"]
-            )
-        except ZeroDivisionError:
-            attr_weight = 1
-        for k, v in attr_weights.items():
-            percent = math.floor(v * attr_weight)
-            if percent > 50:
-                infobox["primary_attribute"] = k
-
         infobox["gem_tags"] = ", ".join([gt["Tag"] for gt in gem_effect["GemTags"] if gt["Tag"]])
         infobox["gem_style"] = gem_effect["ItemColor"]
 
@@ -2001,6 +1989,11 @@ class ItemsParser(parser.BaseParser):
             gtype = GemTypes.active
         elif base_item_type["ItemClassesKey"]["Id"] == "Support Skill Gem":
             gtype = GemTypes.support
+        attr_weights = {
+            "strength": skill_gem["StrengthRequirementPercent"],
+            "dexterity": skill_gem["DexterityRequirementPercent"],
+            "intelligence": skill_gem["IntelligenceRequirementPercent"],
+        }
         # max_level+1 for being able to corrupt gems to +1 level
         for i in range(0, max_level + 1):
             prefix = "level%s_" % (i + 1)
