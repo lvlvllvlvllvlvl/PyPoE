@@ -1427,6 +1427,7 @@ _inter_wiki_map = {
         ("Quality", {"link": "Quality"}),
         ("Fractured", {"link": "Fractured"}),
         ("Foulborn", {"link": "Foulborn"}),
+        ("Vestigial", {"link": "Vestigial"}),
         #
         # Late matching
         #
@@ -2594,6 +2595,7 @@ class TagHandler:
         "corrupted": partial(_default_handler, tid="corrupted"),
         "fractured": partial(_default_handler, tid="fractured"),
         "brequelmutated": partial(_default_handler, tid="foulborn"),
+        "legiondivergent": partial(_default_handler, tid="vestigial"),
     }
 
 
