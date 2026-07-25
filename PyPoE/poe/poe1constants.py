@@ -821,6 +821,8 @@ class PASSIVE_SKILL_SIZES(IntEnumOverride):
     SMALL = 2
     NOTABLE = 3
     KEYSTONE = 4
+    # 3.29: AlternatePassiveSkills abyss_special_ascendancy_notable_* rows
+    ASCENDANCY_NOTABLE = 5
 
 
 class PASSIVE_SKILL_TYPES(IntEnumOverride):
