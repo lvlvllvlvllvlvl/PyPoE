@@ -218,7 +218,8 @@ class WikiCondition(parser.WikiCondition):
     )
 
     COPY_MATCH = re.compile(
-        r"^(quest_reward|recipe|sell_price|implicit[0-9]+_(?:text|random_list)).*", re.UNICODE
+        r"^(quest_reward|recipe|sell_price|(?:enchantment|implicit)[0-9]+_(?:text|random_list)).*",
+        re.UNICODE,
     )
 
     NAME = "Item"
@@ -2075,14 +2076,6 @@ class ItemsParser(parser.BaseParser):
         row_index=False,
     )
 
-    def _type_amulet(self, infobox, base_item_type):
-        match = re.search("Talisman([0-9])", base_item_type["Id"])
-        if match:
-            infobox["is_talisman"] = True
-            infobox["talisman_tier"] = match.group(1)
-
-        return True
-
     _type_armour = _type_factory(
         data_file="ArmourTypes.dat64",
         data_mapping=(
@@ -3031,7 +3024,7 @@ class ItemsParser(parser.BaseParser):
     """
     _cls_map = {
         # Jewellery
-        "Amulet": (_type_amulet,),
+        "Amulet": (),
         # Armour types
         "Armour": (
             _type_level,
@@ -3443,6 +3436,9 @@ class ItemsParser(parser.BaseParser):
 
         for i, mod in enumerate(base_item_type["Implicit_ModsKeys"]):
             infobox["implicit%s" % (i + 1)] = mod["Id"]
+
+        for i, mod in enumerate(base_item_type["TalismanEnchants"]):
+            infobox["enchantment%s" % (i + 1)] = mod["Id"]
 
     def _process_name_conflicts(self, infobox, base_item_type, language):
         rr = self.rr2 if language != self._language else self.rr

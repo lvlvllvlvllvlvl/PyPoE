@@ -2425,6 +2425,15 @@ def install_data_dependant_quantifiers(relational_reader: RelationalReader):
             placeholder="&lt;random Skill&gt;",
         )
 
+    # if relational_reader.specification.sequel == 1:
+    #     TQRelationalData(
+    #         id="display_indexable_non_active_support",
+    #         relational_reader=relational_reader,
+    #         table="IndexableSupportGems.dat64",
+    #         index_column="Index",
+    #         placeholder="&lt;random Support Gem&gt;",
+    #     )
+
     if relational_reader.specification.sequel == 2:
         TQRelationalData(
             id="ultimatum_wager_type_hash",
@@ -2875,6 +2884,10 @@ TranslationQuantifier(
 
 TranslationQuantifier(
     id="mages_legacy_index",
+)
+
+TranslationQuantifier(
+    id="display_indexable_non_active_support",
 )
 
 TranslationQuantifierHandler.init()

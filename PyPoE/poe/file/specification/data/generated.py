@@ -2591,6 +2591,10 @@ specification = Specification(
                     name="LeagueIcon",
                     type="ref|string",
                 ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
             ),
             virtual_fields=(
                 VirtualField(
@@ -3940,6 +3944,23 @@ specification = Specification(
                     name="ShopTag",
                     type="ref|out",
                     key="ShopTag.dat",
+                ),
+                Field(
+                    name="Data0",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="Data1",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="Data2",
+                    type="ref|list|byte",
+                ),
+                Field(
+                    name="TalismanEnchants",
+                    type="ref|list|ref|out",
+                    key="Mods.dat",
                 ),
             ),
             virtual_fields=(
@@ -9191,6 +9212,333 @@ specification = Specification(
                 Field(
                     name="Flag2",
                     type="bool",
+                ),
+            ),
+        ),
+        "DeepwaterBalancePerLevel.dat": File(
+            fields=(
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+            ),
+        ),
+        "DeepwaterBiomes.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+            ),
+        ),
+        "DeepwaterCharts.dat": File(
+            fields=(
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                ),
+            ),
+        ),
+        "DeepwaterConnectionStrings.dat": File(
+            fields=(
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Keys0",
+                    type="ref|list|ref|out",
+                    key="ClientStrings.dat",
+                ),
+            ),
+        ),
+        "DeepwaterConstants.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Value",
+                    type="int",
+                ),
+            ),
+        ),
+        "DeepwaterCraftingClasses.dat": File(
+            fields=(
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+            ),
+        ),
+        "DeepwaterCraftingCurrencies.dat": File(
+            fields=(
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown2",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown3",
+                    type="int",
+                ),
+            ),
+        ),
+        "DeepwaterCraftingDialogueByClass.dat": File(
+            fields=(
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Keys0",
+                    type="ref|list|ref|out",
+                ),
+                Field(
+                    name="Data0",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+            ),
+        ),
+        "DeepwaterLifeScalingPerLevel.dat": File(
+            fields=(
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
+            ),
+        ),
+        "DeepwaterLockerLayout.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown2",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown3",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown4",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown5",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown6",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown7",
+                    type="int",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown8",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown9",
+                    type="ref|string",
+                ),
+            ),
+        ),
+        "DeepwaterLootBottleUniqueMessages.dat": File(
+            fields=(
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                ),
+            ),
+        ),
+        "DeepwaterLootBottles.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="int",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+            ),
+        ),
+        "DeepwaterRooms.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown0",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown1",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown2",
+                    type="ref|string",
+                ),
+                Field(
+                    name="Unknown3",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown4",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown5",
+                    type="int",
+                ),
+                Field(
+                    name="Key0",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown6",
+                    type="int",
+                ),
+                Field(
+                    name="Key1",
+                    type="ref|out",
+                ),
+                Field(
+                    name="Unknown7",
+                    type="int",
+                ),
+                Field(
+                    name="Unknown8",
+                    type="int",
+                ),
+                Field(
+                    name="Keys0",
+                    type="ref|list|ref|out",
+                ),
+                Field(
+                    name="Data0",
+                    type="ref|list|int",
+                ),
+                Field(
+                    name="Unknown9",
+                    type="ref|generic",
+                    key="DeepwaterRooms.dat",
+                ),
+                Field(
+                    name="Flag0",
+                    type="bool",
+                ),
+                Field(
+                    name="Keys1",
+                    type="ref|list|ref|out",
+                ),
+                Field(
+                    name="Flag1",
+                    type="bool",
+                ),
+            ),
+        ),
+        "DeepwaterUpgrades.dat": File(
+            fields=(
+                Field(
+                    name="Id",
+                    type="ref|string",
+                ),
+                Field(
+                    name="QuestState",
+                    type="int",
+                ),
+                Field(
+                    name="Stats",
+                    type="ref|list|ref|out",
+                    key="Stats.dat",
+                ),
+                Field(
+                    name="StatsValues",
+                    type="ref|list|int",
                 ),
             ),
         ),
@@ -17239,6 +17587,23 @@ specification = Specification(
                     name="UpgradeCurrency",
                     type="ref|out",
                     key="BaseItemTypes.dat",
+                ),
+            ),
+        ),
+        "IndexableNonActiveSupportGems.dat": File(
+            fields=(
+                Field(
+                    name="Index",
+                    type="int",
+                ),
+                Field(
+                    name="SupportGem",
+                    type="ref|out",
+                    key="SkillGems.dat",
+                ),
+                Field(
+                    name="Name",
+                    type="ref|string",
                 ),
             ),
         ),
@@ -28932,6 +29297,10 @@ specification = Specification(
                     name="IsBrequelWomb",
                     type="bool",
                 ),
+                Field(
+                    name="Flag1",
+                    type="bool",
+                ),
             ),
             virtual_fields=(
                 VirtualField(
@@ -34938,7 +35307,7 @@ specification = Specification(
                 ),
             ),
         ),
-        "UltimatumLifescalingPerLevel.dat": File(
+        "UltimatumLifeScalingPerLevel.dat": File(
             fields=(
                 Field(
                     name="Unknown0",
@@ -36951,8 +37320,12 @@ specification = Specification(
                     key="QuestFlags.dat",
                 ),
                 Field(
-                    name="Unknown14",
+                    name="QuestState",
                     type="int",
+                ),
+                Field(
+                    name="Data1",
+                    type="ref|list|byte",
                 ),
             ),
             virtual_fields=(
