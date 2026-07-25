@@ -37,12 +37,12 @@ virtual_fields_mappings = {
             ],
             "CraftingBenchOptions": [
                 Zip(
-                    name="Cost",
-                    fields=("Cost_BaseItemTypes", "Cost_Values"),
+                    "Cost",
+                    ("Cost_BaseItemTypes", "Cost_Values"),
                 ),
                 VirtualField(
-                    name="AddModOrEnchantment",
-                    fields=("AddMod", "AddEnchantment"),
+                    "AddModOrEnchantment",
+                    ("AddMod", "AddEnchantment"),
                 ),
             ],
             "CrucibleLifeScalingPerLevel": [
@@ -67,8 +67,8 @@ virtual_fields_mappings = {
             ],
             "GrantedEffectsPerLevel": [
                 VirtualField(
-                    name="StatValues",
-                    fields=(
+                    "StatValues",
+                    (
                         "Stat1Value",
                         "Stat2Value",
                         "Stat3Value",
@@ -81,8 +81,8 @@ virtual_fields_mappings = {
                     ),
                 ),
                 VirtualField(
-                    name="StatFloats",
-                    fields=(
+                    "StatFloats",
+                    (
                         "Stat1Float",
                         "Stat2Float",
                         "Stat3Float",
@@ -143,32 +143,32 @@ virtual_fields_mappings = {
                 Alias("BuffTemplate", "BuffTemplate1"),
                 Zip("SpawnWeight", ("SpawnWeight_TagsKeys", "SpawnWeight_Values")),
                 VirtualField(
-                    name="Stat1Zip",
-                    fields=("StatsKey1", "Stat1Min", "Stat1Max"),
+                    "Stat1Zip",
+                    ("StatsKey1", "Stat1Min", "Stat1Max"),
                 ),
                 VirtualField(
-                    name="Stat2Zip",
-                    fields=("StatsKey2", "Stat2Min", "Stat2Max"),
+                    "Stat2Zip",
+                    ("StatsKey2", "Stat2Min", "Stat2Max"),
                 ),
                 VirtualField(
-                    name="Stat3Zip",
-                    fields=("StatsKey3", "Stat3Min", "Stat3Max"),
+                    "Stat3Zip",
+                    ("StatsKey3", "Stat3Min", "Stat3Max"),
                 ),
                 VirtualField(
-                    name="Stat4Zip",
-                    fields=("StatsKey4", "Stat4Min", "Stat4Max"),
+                    "Stat4Zip",
+                    ("StatsKey4", "Stat4Min", "Stat4Max"),
                 ),
                 VirtualField(
-                    name="Stat5Zip",
-                    fields=("StatsKey5", "Stat5Min", "Stat5Max"),
+                    "Stat5Zip",
+                    ("StatsKey5", "Stat5Min", "Stat5Max"),
                 ),
                 VirtualField(
-                    name="Stat6Zip",
-                    fields=("StatsKey6", "Stat6Min", "Stat6Max"),
+                    "Stat6Zip",
+                    ("StatsKey6", "Stat6Min", "Stat6Max"),
                 ),
                 VirtualField(
-                    name="StatsKeys",
-                    fields=(
+                    "StatsKeys",
+                    (
                         "StatsKey1",
                         "StatsKey2",
                         "StatsKey3",
@@ -178,8 +178,8 @@ virtual_fields_mappings = {
                     ),
                 ),
                 VirtualField(
-                    name="Stats",
-                    fields=("Stat1Zip", "Stat2Zip", "Stat3Zip", "Stat4Zip", "Stat5Zip", "Stat6Zip"),
+                    "Stats",
+                    ("Stat1Zip", "Stat2Zip", "Stat3Zip", "Stat4Zip", "Stat5Zip", "Stat6Zip"),
                 ),
                 Zip("GenerationWeight", ("GenerationWeight_TagsKeys", "GenerationWeight_Values")),
             ],
@@ -197,13 +197,13 @@ virtual_fields_mappings = {
             ],
             "PassiveSkills": [
                 VirtualField(
-                    name="StatValues",
-                    fields=("Stat1Value", "Stat2Value", "Stat3Value", "Stat4Value", "Stat5Value"),
+                    "StatValues",
+                    ("Stat1Value", "Stat2Value", "Stat3Value", "Stat4Value", "Stat5Value"),
                 ),
                 Zip("StatsZip", ("Stats", "StatValues")),
                 VirtualField(
-                    name="StatValuesHardmode",
-                    fields=(
+                    "StatValuesHardmode",
+                    (
                         "Stat1ValueHardmode",
                         "Stat2ValueHardmode",
                         "Stat3ValueHardmode",
@@ -216,8 +216,8 @@ virtual_fields_mappings = {
             ],
             "PassiveSkillMasteryEffects": [
                 VirtualField(
-                    name="StatValues",
-                    fields=("Stat1Value", "Stat2Value", "Stat3Value"),
+                    "StatValues",
+                    ("Stat1Value", "Stat2Value", "Stat3Value"),
                 ),
                 Zip("StatsZip", ("Stats", "StatValues")),
             ],
@@ -276,17 +276,34 @@ virtual_fields_mappings = {
             ],
             "MonsterPacks": [
                 Alias("Formation", "PackFormation"),
-                Alias("TagsKeys", "Tags"),
-            ],
-            "NPCTextAudio": [
-                Alias("NPCs", "NPCPortrait"),
             ],
             "PantheonPanelLayout": [
                 Alias("QuestFlag", "QuestFlag1"),
             ],
             "PassiveSkills": [
                 Alias("AtlasnodeGroup", "AtlasNodeGroup"),
-                Alias("KeystoneId", "AudioEvent"),
+                VirtualField(
+                    "StatValues",
+                    ("Stat1Value", "Stat2Value", "Stat3Value", "Stat4Value", "Stat5Value"),
+                ),
+                Zip(
+                    "StatsZip",
+                    ("Stats", "StatValues"),
+                ),
+                VirtualField(
+                    "StatValuesHardmode",
+                    (
+                        "Stat1ValueHardmode",
+                        "Stat2ValueHardmode",
+                        "Stat3ValueHardmode",
+                        "Stat4ValueHardmode",
+                        "Stat5ValueHardmode",
+                    ),
+                ),
+                Zip(
+                    "StatsHardmodeZip",
+                    ("StatsHardmode", "StatValuesHardmode"),
+                ),
             ],
             "ShapeShiftFormClones": [
                 Alias("Metadata", "AfterImageEffect"),
@@ -303,6 +320,144 @@ virtual_fields_mappings = {
             ],
             "WorldAreas": [
                 Alias("Bosses", "Bosses_MonsterVarietiesKeys"),
+            ],
+            "CraftingBenchOptions": [
+                Zip(
+                    "Cost",
+                    ("Cost_BaseItemTypes", "Cost_Values"),
+                ),
+                VirtualField(
+                    "AddModOrEnchantment",
+                    ("AddMod", "AddEnchantment"),
+                ),
+            ],
+            "DelveUpgrades": [
+                Zip("Stats", ("StatsKeys", "StatValues")),
+            ],
+            "GrantedEffectsPerLevel": [
+                VirtualField(
+                    "StatValues",
+                    (
+                        "Stat1Value",
+                        "Stat2Value",
+                        "Stat3Value",
+                        "Stat4Value",
+                        "Stat5Value",
+                        "Stat6Value",
+                        "Stat7Value",
+                        "Stat8Value",
+                        "Stat9Value",
+                    ),
+                ),
+                VirtualField(
+                    "StatFloats",
+                    (
+                        "Stat1Float",
+                        "Stat2Float",
+                        "Stat3Float",
+                        "Stat4Float",
+                        "Stat5Float",
+                        "Stat6Float",
+                        "Stat7Float",
+                        "Stat8Float",
+                    ),
+                ),
+                Zip("Stats", ("StatsKeys", "StatValues")),
+                Zip(
+                    "Costs",
+                    ("CostTypesKeys", "CostAmounts"),
+                ),
+            ],
+            "MapPurchaseCosts": {
+                Zip(
+                    "NormalPurchase",
+                    ("NormalPurchase_BaseItemTypesKeys", "NormalPurchase_Costs"),
+                ),
+                Zip(
+                    "MagicPurchase",
+                    ("MagicPurchase_BaseItemTypesKeys", "MagicPurchase_Costs"),
+                ),
+                Zip(
+                    "RarePurchase",
+                    ("RarePurchase_BaseItemTypesKeys", "RarePurchase_Costs"),
+                ),
+                Zip(
+                    "UniquePurchase",
+                    ("UniquePurchase_BaseItemTypesKeys", "UniquePurchase_Costs"),
+                ),
+            },
+            "Mods": [
+                Zip(
+                    "SpawnWeight",
+                    ("SpawnWeight_TagsKeys", "SpawnWeight_Values"),
+                ),
+                VirtualField(
+                    "Stat1Zip",
+                    ("StatsKey1", "Stat1Min", "Stat1Max"),
+                ),
+                VirtualField(
+                    "Stat2Zip",
+                    ("StatsKey2", "Stat2Min", "Stat2Max"),
+                ),
+                VirtualField(
+                    "Stat3Zip",
+                    ("StatsKey3", "Stat3Min", "Stat3Max"),
+                ),
+                VirtualField(
+                    "Stat4Zip",
+                    ("StatsKey4", "Stat4Min", "Stat4Max"),
+                ),
+                VirtualField(
+                    "Stat5Zip",
+                    ("StatsKey5", "Stat5Min", "Stat5Max"),
+                ),
+                VirtualField(
+                    "Stat6Zip",
+                    ("StatsKey6", "Stat6Min", "Stat6Max"),
+                ),
+                VirtualField(
+                    "Stat7Zip",
+                    ("StatsKey7", "Stat7Min", "Stat7Max"),
+                ),
+                VirtualField(
+                    "Stat8Zip",
+                    ("StatsKey8", "Stat8Min", "Stat8Max"),
+                ),
+                VirtualField(
+                    "StatsKeys",
+                    (
+                        "StatsKey1",
+                        "StatsKey2",
+                        "StatsKey3",
+                        "StatsKey4",
+                        "StatsKey5",
+                        "StatsKey6",
+                        "StatsKey7",
+                        "StatsKey8",
+                    ),
+                ),
+                VirtualField(
+                    "Stats",
+                    (
+                        "Stat1Zip",
+                        "Stat2Zip",
+                        "Stat3Zip",
+                        "Stat4Zip",
+                        "Stat5Zip",
+                        "Stat6Zip",
+                        "Stat7Zip",
+                        "Stat8Zip",
+                    ),
+                ),
+                Zip("GenerationWeight", ("GenerationWeight_TagsKeys", "GenerationWeight_Values")),
+            ],
+            "MonsterMapBossDifficulty": [
+                VirtualField("Stats", ("Stat1", "Stat2", "Stat3", "Stat4", "Stat5"))
+            ],
+            "MonsterMapDifficulty": [VirtualField("Stats", ("Stat1", "Stat2", "Stat3", "Stat4"))],
+            "PassiveSkillMasteryEffects": [
+                VirtualField("StatValues", ("Stat1Value", "Stat2Value", "Stat3Value")),
+                Zip("StatsZip", ("Stats", "StatValues")),
             ],
         },
     ),

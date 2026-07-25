@@ -667,6 +667,7 @@ class VirtualField(_Common, ReprMixin):
 class Alias(VirtualField):
     def __init__(self, name: str, target: str):
         super().__init__(name, (target,), alias=True)
+        self.target = target
 
 
 class Zip(VirtualField):
