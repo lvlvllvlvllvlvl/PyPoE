@@ -610,9 +610,13 @@ class MOD_DOMAIN(IntEnumOverride):
     NECROPOLIS_MONSTER = 36
     MAP_RELIC = 37
     BREQUEL_GRAFT = 38
+    DEEPWATER_CHART = 39
+    DEEPWATER_BORDER = 40
+    INFAMOUS = 41
+    ALLFLAME = 42
 
     # Items that can't have mods (may need to increase the number when new values are added)
-    MODS_DISALLOWED = 39
+    MODS_DISALLOWED = 43
 
     # legacy names
     MASTER = CRAFTED
@@ -723,6 +727,7 @@ class MOD_GENERATION_TYPE(IntEnumOverride):
     NECROPOLIS_MONSTER = 34
     NECROPOLIS_DEVOTED_MONSTER = 35
     MEMORY_ALTAR = 36
+    DEEPWATER = 37
 
 
 class WORDLISTS(IntEnumOverride):
