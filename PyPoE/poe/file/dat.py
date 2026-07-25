@@ -922,29 +922,33 @@ class DatReader(ReprMixin):
             raise
 
     def _process_row(self, rowid):
-        offset = 4 + rowid * self.table_record_length
-        row_data = DatRecord(self, rowid)
-        data_raw = self._file_raw[offset : offset + self.table_record_length]
+        try:
+            offset = 4 + rowid * self.table_record_length
+            row_data = DatRecord(self, rowid)
+            data_raw = self._file_raw[offset : offset + self.table_record_length]
 
-        # We don't have any data, return early
-        if len(data_raw) == 0:
-            return row_data
+            # We don't have any data, return early
+            if len(data_raw) == 0:
+                return row_data
 
-        # Unpacking the entire row in one go will help breaking down the
-        # function calls significantly
-        row_unpacked = struct.unpack(self.cast_row, data_raw[: self.cast_size])
-        i = 0
-        for spec, casts in self.cast_spec:
-            if casts[0][0] in [3, 6]:
-                cell_data = row_unpacked[i : i + 2]
+            # Unpacking the entire row in one go will help breaking down the
+            # function calls significantly
+            row_unpacked = struct.unpack(self.cast_row, data_raw[: self.cast_size])
+            i = 0
+            for spec, casts in self.cast_spec:
+                if casts[0][0] in [3, 6]:
+                    cell_data = row_unpacked[i : i + 2]
+                    i += 1
+                else:
+                    cell_data = (row_unpacked[i],)
+                row_data.append(self._cast_from_spec(spec, casts, data=cell_data, offset=offset))
+                offset += casts[0][1]
                 i += 1
-            else:
-                cell_data = (row_unpacked[i],)
-            row_data.append(self._cast_from_spec(spec, casts, data=cell_data, offset=offset))
-            offset += casts[0][1]
-            i += 1
 
-        return row_data
+            return row_data
+        except Exception as e:
+            e.add_note(f"Error processing row {rowid} of {self.file_name}")
+            raise
 
     def read(self, raw):
         # TODO: consider memory issues for saving raw contents
@@ -1277,70 +1281,74 @@ class RelationalReader(AbstractFileCache[DatFile]):
         if file_name in self.files:
             return self.files[file_name]
 
-        df = self._create_instance(file_name)
+        try:
+            df = self._create_instance(file_name)
 
-        # Helpful during the 3.20 patch .dat purge and transition to reading .dat64 format.
-        # TODO: Comment this out before committing.
+            # Helpful during the 3.20 patch .dat purge and transition to reading .dat64 format.
+            # TODO: Comment this out before committing.
 
-        # print(df)
+            # print(df)
 
-        self.files[file_name] = df
+            self.files[file_name] = df
 
-        vf = self._dv_set_value if df.reader.use_dat_value else self._simple_set_value
+            vf = self._dv_set_value if df.reader.use_dat_value else self._simple_set_value
 
-        for key, spec_row in df.reader.specification.fields.items():
-            if spec_row.key:
-                if df.reader.x64:
-                    spec_row_key = spec_row.key.replace(".dat", ".datc64")
-                else:
-                    spec_row_key = spec_row.key
-
-                try:
-                    df_other_reader = self[spec_row_key]
-                except FileNotFoundError:
-                    msg = f'Did not find table {spec_row_key} for foreign ref column "{key}" in {file_name}'
-                    if self.raise_error_on_missing_relation:
-                        raise SpecificationError(
-                            SpecificationError.ERRORS.RUNTIME_MISSING_FOREIGN_KEY, msg
-                        )
+            for key, spec_row in df.reader.specification.fields.items():
+                if spec_row.key:
+                    if df.reader.x64:
+                        spec_row_key = spec_row.key.replace(".dat", ".datc64")
                     else:
-                        warnings.warn(msg, SpecificationWarning)
-                        continue
+                        spec_row_key = spec_row.key
 
-                key_id = spec_row.key_id
-                key_offset = spec_row.key_offset
-                # Don't need to rebuild the index if it was specified as generic
-                # read option already.
-                if not self.read_options.get("auto_build_index") and not key_offset and key_id:
-                    df_other_reader.build_index(key_id)
-
-                index = df.reader.table_columns[key]["index"]
-
-                for i, row in enumerate(df.reader.table_data):
                     try:
-                        df.reader.table_data[i][index] = vf(
-                            row[key],
-                            df_other_reader,
-                            key_id,
-                            key_offset,
-                        )
-                    except SpecificationError as e:
-                        raise SpecificationError(
-                            e.code,
-                            "%(fn)s:%(rn)s->%(on)s:%(msg)s"
-                            % {
-                                "fn": file_name,
-                                "rn": key,
-                                "on": spec_row.key,
-                                "msg": e.msg,
-                            },
-                        )
-            elif spec_row.enum:
-                const_enum = getattr(self.specification.constants, spec_row.enum)
-                index = df.reader.table_columns[key]["index"]
-                for i, row in enumerate(df.reader.table_data):
-                    df.reader.table_data[i][index] = vf(
-                        value=row[index], other=const_enum, key=None, offset=0
-                    )
+                        df_other_reader = self[spec_row_key]
+                    except FileNotFoundError:
+                        msg = f'Did not find table {spec_row_key} for foreign ref column "{key}" in {file_name}'
+                        if self.raise_error_on_missing_relation:
+                            raise SpecificationError(
+                                SpecificationError.ERRORS.RUNTIME_MISSING_FOREIGN_KEY, msg
+                            )
+                        else:
+                            warnings.warn(msg, SpecificationWarning)
+                            continue
 
-        return df
+                    key_id = spec_row.key_id
+                    key_offset = spec_row.key_offset
+                    # Don't need to rebuild the index if it was specified as generic
+                    # read option already.
+                    if not self.read_options.get("auto_build_index") and not key_offset and key_id:
+                        df_other_reader.build_index(key_id)
+
+                    index = df.reader.table_columns[key]["index"]
+
+                    for i, row in enumerate(df.reader.table_data):
+                        try:
+                            df.reader.table_data[i][index] = vf(
+                                row[key],
+                                df_other_reader,
+                                key_id,
+                                key_offset,
+                            )
+                        except SpecificationError as e:
+                            raise SpecificationError(
+                                e.code,
+                                "%(fn)s:%(rn)s->%(on)s:%(msg)s"
+                                % {
+                                    "fn": file_name,
+                                    "rn": key,
+                                    "on": spec_row.key,
+                                    "msg": e.msg,
+                                },
+                            )
+                elif spec_row.enum:
+                    const_enum = getattr(self.specification.constants, spec_row.enum)
+                    index = df.reader.table_columns[key]["index"]
+                    for i, row in enumerate(df.reader.table_data):
+                        df.reader.table_data[i][index] = vf(
+                            value=row[index], other=const_enum, key=None, offset=0
+                        )
+
+            return df
+        except Exception as e:
+            e.add_note(f"Loading file {file_name}")
+            raise
