@@ -167,6 +167,14 @@ virtual_fields_mappings = {
                     ("StatsKey6", "Stat6Min", "Stat6Max"),
                 ),
                 VirtualField(
+                    "Stat7Zip",
+                    ("StatsKey7", "Stat7Min", "Stat7Max"),
+                ),
+                VirtualField(
+                    "Stat8Zip",
+                    ("StatsKey8", "Stat8Min", "Stat8Max"),
+                ),
+                VirtualField(
                     "StatsKeys",
                     (
                         "StatsKey1",
@@ -175,11 +183,22 @@ virtual_fields_mappings = {
                         "StatsKey4",
                         "StatsKey5",
                         "StatsKey6",
+                        "StatsKey7",
+                        "StatsKey8",
                     ),
                 ),
                 VirtualField(
                     "Stats",
-                    ("Stat1Zip", "Stat2Zip", "Stat3Zip", "Stat4Zip", "Stat5Zip", "Stat6Zip"),
+                    (
+                        "Stat1Zip",
+                        "Stat2Zip",
+                        "Stat3Zip",
+                        "Stat4Zip",
+                        "Stat5Zip",
+                        "Stat6Zip",
+                        "Stat7Zip",
+                        "Stat8Zip",
+                    ),
                 ),
                 Zip("GenerationWeight", ("GenerationWeight_TagsKeys", "GenerationWeight_Values")),
             ],
@@ -393,47 +412,47 @@ virtual_fields_mappings = {
                 ),
                 VirtualField(
                     "Stat1Zip",
-                    ("StatsKey1", "Stat1Min", "Stat1Max"),
+                    ("Stat1", "Stat1Min", "Stat1Max"),
                 ),
                 VirtualField(
                     "Stat2Zip",
-                    ("StatsKey2", "Stat2Min", "Stat2Max"),
+                    ("Stat2", "Stat2Min", "Stat2Max"),
                 ),
                 VirtualField(
                     "Stat3Zip",
-                    ("StatsKey3", "Stat3Min", "Stat3Max"),
+                    ("Stat3", "Stat3Min", "Stat3Max"),
                 ),
                 VirtualField(
                     "Stat4Zip",
-                    ("StatsKey4", "Stat4Min", "Stat4Max"),
+                    ("Stat4", "Stat4Min", "Stat4Max"),
                 ),
                 VirtualField(
                     "Stat5Zip",
-                    ("StatsKey5", "Stat5Min", "Stat5Max"),
+                    ("Stat5", "Stat5Min", "Stat5Max"),
                 ),
                 VirtualField(
                     "Stat6Zip",
-                    ("StatsKey6", "Stat6Min", "Stat6Max"),
+                    ("Stat6", "Stat6Min", "Stat6Max"),
                 ),
                 VirtualField(
                     "Stat7Zip",
-                    ("StatsKey7", "Stat7Min", "Stat7Max"),
+                    ("Stat7", "Stat7Min", "Stat7Max"),
                 ),
                 VirtualField(
                     "Stat8Zip",
-                    ("StatsKey8", "Stat8Min", "Stat8Max"),
+                    ("Stat8", "Stat8Min", "Stat8Max"),
                 ),
                 VirtualField(
                     "StatsKeys",
                     (
-                        "StatsKey1",
-                        "StatsKey2",
-                        "StatsKey3",
-                        "StatsKey4",
-                        "StatsKey5",
-                        "StatsKey6",
-                        "StatsKey7",
-                        "StatsKey8",
+                        "Stat1",
+                        "Stat2",
+                        "Stat3",
+                        "Stat4",
+                        "Stat5",
+                        "Stat6",
+                        "Stat7",
+                        "Stat8",
                     ),
                 ),
                 VirtualField(
