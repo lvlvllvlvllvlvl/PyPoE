@@ -40,7 +40,6 @@ import struct
 import warnings
 from collections import OrderedDict
 from dataclasses import dataclass
-from functools import partialmethod
 
 import matplotlib.colors
 import numpy as np
@@ -52,7 +51,6 @@ from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.wiki import parser
 from PyPoE.cli.exporter.wiki.handler import ExporterHandler, ExporterResult
-from PyPoE.cli.exporter.wiki.parsers.skill import SkillParserShared
 
 # Self
 from PyPoE.poe import poe1constants as constants
@@ -175,15 +173,8 @@ SHADE_LUT: dict[(str, int), GemShadeConstants] = {
 
 class WikiCondition(parser.WikiCondition):
     COPY_KEYS = (
-        # for skills
-        "radius",
-        "radius_description",
-        "radius_secondary",
-        "radius_secondary_description",
-        "radius_tertiary",
-        "radius_tertiary_description",
         # all items
-        "name_list",
+        "aliases",
         "quality",
         # Icons & Visuals
         "inventory_icon",
@@ -191,7 +182,6 @@ class WikiCondition(parser.WikiCondition):
         "frame_type",
         "influences",
         "card_background",
-        "skill_icon",
         # Drop restrictions
         "drop_enabled",
         "acquisition_tags",
@@ -222,16 +212,14 @@ class WikiCondition(parser.WikiCondition):
         # Version information
         "release_version",
         "removal_version",
-        # prophecies
-        "prophecy_objective",
-        "prophecy_reward",
         # Sentinels
         "sentinel_monster",
         "sentinel_monster_level",
     )
 
     COPY_MATCH = re.compile(
-        r"^(quest_reward|recipe|sell_price|implicit[0-9]+_(?:text|random_list)).*", re.UNICODE
+        r"^(quest_reward|recipe|sell_price|(?:enchantment|implicit)[0-9]+_(?:text|random_list)).*",
+        re.UNICODE,
     )
 
     NAME = "Item"
@@ -308,18 +296,12 @@ class ItemsHandler(ExporterHandler):
             dest="english_file_link",
             default=True,
         )
-        kwargs["parser"].add_argument(
-            "--omit-skill-data",
-            action="store_true",
-            help="Don't export skill data for gem items.",
-            dest="omit_skill_data",
-        )
 
         if type == "item":
             self.add_image_arguments(parser)
 
 
-class ItemsParser(SkillParserShared):
+class ItemsParser(parser.BaseParser):
     _regex_format = re.compile(r"(?P<index>x|y|z)" r"(?:[\W]*)" r"(?P<tag>%|second)", re.IGNORECASE)
 
     # Core files we need to load
@@ -334,12 +316,6 @@ class ItemsParser(SkillParserShared):
         "skill_stat_descriptions.txt",
         "active_skill_gem_stat_descriptions.txt",
     ]
-
-    _item_column_index_filter = partialmethod(
-        SkillParserShared._column_index_filter,
-        dat_file_name="BaseItemTypes.dat64",
-        error_msg="Several items have not been found:\n%s",
-    )
 
     # Item inventory icons are scaled down so that this is the largest dimension
     _ICON_MAX_DIMENSION = 312
@@ -974,16 +950,21 @@ class ItemsParser(SkillParserShared):
         # Skill Gems
         # =================================================================
         "Metadata/Items/Gems/SkillGemBackstab",
+        "Metadata/Items/Gems/SkillGemBlindingAura",
         "Metadata/Items/Gems/SkillGemBlitz",
+        "Metadata/Items/Gems/SkillGemBloodOffering",
         "Metadata/Items/Gems/SkillGemBloodWhirl",
         "Metadata/Items/Gems/SkillGemBoneArmour",
         "Metadata/Items/Gems/SkillGemCaptureMonster",
         "Metadata/Items/Gems/SkillGemCoilingAssault",
         "Metadata/Items/Gems/SkillGemComboStrike",
         "Metadata/Items/Gems/SkillGemDamageInfusion",
+        "Metadata/Items/Gems/SkillGemDeathAura",
         "Metadata/Items/Gems/SkillGemDiscorectangleSlam",
         "Metadata/Items/Gems/SkillGemElementalProjectiles",
+        "Metadata/Items/Gems/SkillGemEnvy",
         "Metadata/Items/Gems/SkillGemFireWeapon",
+        "Metadata/Items/Gems/SkillGemGluttonyOfElements",
         "Metadata/Items/Gems/SkillGemHeraldOfBlood",
         "Metadata/Items/Gems/SkillGemIceFire",
         "Metadata/Items/Gems/SkillGemIcefire",
@@ -1024,6 +1005,12 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SkillGemPlaytestAttack",
         "Metadata/Items/Gems/SkillGemPlaytestSpell",
         "Metadata/Items/Gems/SkillGemPlaytestSlam",
+        "Metadata/Items/Gem/SkillGemCallMercenary",
+        "Metadata/Items/Gems/SupportGemHarrowingThrong",
+        "Metadata/Items/Gems/SupportGemEdify",
+        "Metadata/Items/Gems/SupportGemMagnetism",
+        "Metadata/Items/Gems/SkillGemVaalSplitArrow",
+        "Metadata/Items/Gems/SupportGemWard",
         # =================================================================
         # Royale Gear
         # =================================================================
@@ -1050,6 +1037,8 @@ class ItemsParser(SkillParserShared):
         "Metadata/Items/Gems/SupportGemTemporaryForTutorial",
         "Metadata/Items/Gems/SupportGemVaalSoulHarvesting",
         "Metadata/Items/Gems/SupportGemConflagration",
+        "Metadata/Items/Gems/SupportGemDivineBlessing",
+        "Metadata/Items/Gems/SupportGemEarthbreaker",
         # =================================================================
         # Cosmetic items
         # =================================================================
@@ -1753,6 +1742,7 @@ class ItemsParser(SkillParserShared):
     _ITEM_SKIP_PATTERNS = {
         "Active Skill Gem": {
             r"Royale",
+            r"GraftGem",
         },
         "Support Skill Gem": {
             r"Royale",
@@ -1781,6 +1771,7 @@ class ItemsParser(SkillParserShared):
             r"Convert.*Scroll",
             r"Premium.*Pet",
             r"UnifiedAuraEffect",
+            r"Wuzhiqi",
         },
         "InstanceLocalItem": {
             r"TradeProxy",
@@ -1912,27 +1903,29 @@ class ItemsParser(SkillParserShared):
         constants.GEM_STYLES.EXCEPTIONAL: "Art/2DItems/Gems/Overlays/ExceptionalSupportGemOverlay.dds",
     }
 
-    def _skill_gem(self, infobox: OrderedDict, base_item_type):
+    def _type_gem(self, infobox: OrderedDict, base_item_type):
         try:
             skill_gem = self.rr["SkillGems.dat64"].index["BaseItemTypesKey"][base_item_type.rowid]
         except KeyError:
             return False
 
         result = []
-        for gem_type in skill_gem["GemEffects"]:
+        for gem_effect in skill_gem["GemEffects"]:
             copy = infobox.copy()
-            if self._skill_gem_type(copy, base_item_type, skill_gem, gem_type):
+            if self._gem_effect(copy, base_item_type, skill_gem, gem_effect):
                 result.append(copy)
 
         return result
 
-    def _skill_gem_type(self, infobox: OrderedDict, base_item_type, skill_gem, gem_type):
-        name = gem_type["Name"]
-        if "[DNT" in name:
+    def _gem_effect(self, infobox: OrderedDict, base_item_type, skill_gem, gem_effect):
+        parsed_args = self._parsed_args
+        ge_name = gem_effect["Name"]
+        if "[DNT" in ge_name:
             return False
         if skill_gem["IsVaalVariant"]:
             infobox["is_vaal_skill_gem"] = True
-            if gem_type["ItemColor"] != constants.GEM_STYLES.DEFAULT:
+            # Do not export transfigured Vaal skill gems
+            if gem_effect["ItemColor"] != constants.GEM_STYLES.DEFAULT:
                 return False
         if skill_gem["VaalVariant_BaseItemTypesKey"]:
             infobox["vaal_variant_id"] = skill_gem["VaalVariant_BaseItemTypesKey"]["Id"]
@@ -1940,239 +1933,114 @@ class ItemsParser(SkillParserShared):
             infobox["awakened_variant_id"] = skill_gem["AwakenedVariant"]["BaseItemTypesKey"]["Id"]
         if skill_gem["RegularVariant"]:
             infobox["regular_variant_id"] = skill_gem["RegularVariant"]["BaseItemTypesKey"]["Id"]
-        if name:
-            infobox["name"] = name
+        if ge_name:
+            # A gem effect with a given name indicates that this gem is a variant
+            # derived from the base gem. These include transfigured skill gems.
+            infobox["name"] = ge_name
             infobox["base_item_id"] = infobox.pop("metadata_id")
 
-        # SkillGems.dat
-        attr_map = {
-            "strength": skill_gem["StrengthRequirementPercent"],
-            "dexterity": skill_gem["DexterityRequirementPercent"],
-            "intelligence": skill_gem["IntelligenceRequirementPercent"],
-        }
-        try:
-            attr_weight = 100 / (
-                attr_map["strength"] + attr_map["dexterity"] + attr_map["intelligence"]
-            )
-        except ZeroDivisionError:
-            attr_weight = 1
-        for k, v in attr_map.items():
-            percent = math.floor(v * attr_weight)
-            if percent > 0:
-                infobox[k + "_percent"] = percent
+        infobox["gem_tags"] = ", ".join([gt["Tag"] for gt in gem_effect["GemTags"] if gt["Tag"]])
+        infobox["gem_style"] = gem_effect["ItemColor"]
 
-        infobox["gem_tags"] = ", ".join([gt["Tag"] for gt in gem_type["GemTags"] if gt["Tag"]])
-        infobox["gem_style"] = gem_type["ItemColor"]
+        # Skill IDs
+        primary_ge = gem_effect["GrantedEffect"]
+        infobox["skill_id"] = primary_ge["Id"]
+        if gem_effect["GrantedEffectHardmode"]:
+            infobox["ruthless_skill_id"] = gem_effect["GrantedEffectHardmode"]["Id"]
+        if gem_effect["GrantedEffect2"]:
+            infobox["secondary_skill_id"] = gem_effect["GrantedEffect2"]["Id"]
+        if gem_effect["GrantedEffect2Hardmode"]:
+            infobox["ruthless_secondary_skill_id"] = gem_effect["GrantedEffect2Hardmode"]["Id"]
 
-        # No longer used
-        #
-        exp_type = skill_gem["ExperienceProgression"]["Id"]
+        # Level requirements
+        if "GrantedEffect" not in self.rr["GrantedEffectsPerLevel.dat64"].index:
+            self.rr["GrantedEffectsPerLevel.dat64"].build_index("GrantedEffect")
+        ge_per_lvl = self.rr["GrantedEffectsPerLevel.dat64"].index["GrantedEffect"][primary_ge]
+        # The level requirement is a float, so we need to cast it to int
+        infobox["required_level"] = int(ge_per_lvl[0]["PlayerLevelReq"])
+        for i, row in enumerate(ge_per_lvl):
+            # Issue warning if level requirement is not a whole number
+            if row["PlayerLevelReq"] % 1 != 0:
+                console(
+                    f"{primary_ge['Id']} level requirement for level {i} is {row['PlayerLevelReq']}",
+                    msg=Msg.warning,
+                )
+            req_lvl = int(row["PlayerLevelReq"])
+            infobox["level%s_level_requirement" % (i + 1)] = req_lvl
 
-        # TODO: Maybe catch empty stuff here?
-        exp = 0
-        exp_level = []
-        exp_total = []
-        for row in self.rr["ItemExperiencePerLevel.dat64"]:
-            if row["ItemExperienceType"]["Id"] == exp_type:
-                exp_new = row["Experience"]
-                exp_level.append(exp_new - exp)
-                exp_total.append(exp_new)
-                exp = exp_new
-        if not exp_level:
+        # Experience
+        exp_type = skill_gem["ItemExperienceType"]
+        if "ItemExperienceType" not in self.rr["ItemExperiencePerLevel.dat64"].index:
+            self.rr["ItemExperiencePerLevel.dat64"].build_index("ItemExperienceType")
+        exp_per_lvl = self.rr["ItemExperiencePerLevel.dat64"].index["ItemExperienceType"][exp_type]
+        max_level = 1
+        if len(exp_per_lvl) > 0:
+            for i, row in enumerate(exp_per_lvl):
+                infobox["level%s_experience" % (i + 1)] = row["Experience"]
+                max_level = row["ItemCurrentLevel"]
+        else:
             console(
                 'No experience progression found for "%s" - assuming max level 1'
-                % base_item_type["Name"],
+                % (ge_name or base_item_type["Name"]),
                 msg=Msg.warning,
             )
-            exp_total = [0]
 
-        max_level = len(exp_total) - 1
-        ge = gem_type["GrantedEffect"]
-
-        primary = OrderedDict()
-        self._skill(
-            gra_eff=ge,
-            infobox=primary,
-            parsed_args=self._parsed_args,
-            msg_name=ge["ActiveSkill"] and ge["ActiveSkill"]["DisplayedName"],
-            max_level=max_level,
-        )
-
-        # Some skills have a secondary skill effect.
-        #
-        # Currently there is no great way of handling this in the wiki, so the
-        # secondary effects are just added. Skills that have their own entry
-        # are excluded so we don't get vaal skill gems here.
-        second = gem_type["GrantedEffect2"]
-        vaal = False
-        if second:
-            infobox["secondary_skill_id"] = second["Id"]
-            index = None
-            try:
-                index = self.rr["GemEffects.dat64"].index["GrantedEffect"]
-            except KeyError:
-                self.rr["GemEffects.dat64"].build_index("GrantedEffect")
-                index = self.rr["GemEffects.dat64"].index["GrantedEffect"]
-
-            if index[second]:
-                # If there is a skill granting this as its primary effect, skip it
-                vaal = True
-
-        if gem_type["GrantedEffectHardmode"] and not any(
-            tag["Id"] == "movement" for tag in gem_type["GemTags"]
-        ):
-            infobox["ruthless_skill_id"] = gem_type["GrantedEffectHardmode"]["Id"]
-        if gem_type["GrantedEffect2Hardmode"] and not any(
-            tag["Id"] == "movement" for tag in gem_type["GemTags"]
-        ):
-            infobox["ruthless_secondary_skill_id"] = gem_type["GrantedEffect2Hardmode"]["Id"]
-
-        if self._parsed_args.omit_skill_data:
-            infobox["skill_id"] = ge["Id"]
-        elif second and not vaal:
-            secondary = OrderedDict()
-            self._skill(
-                gra_eff=second,
-                infobox=secondary,
-                parsed_args=self._parsed_args,
-                msg_name=second["ActiveSkill"] and second["ActiveSkill"]["DisplayedName"],
-                max_level=max_level,
-            )
-
-            def get_stat(i, prefix, data):
-                return (data["%s_stat%s_id" % (prefix, i)], data["%s_stat%s_value" % (prefix, i)])
-
-            def set_stat(i, prefix, sid, sv):
-                infobox["%s_stat%s_id" % (prefix, i)] = sid
-                infobox["%s_stat%s_value" % (prefix, i)] = sv
-
-            def cp_stats(prefix):
-                i = 1
-                while True:
-                    try:
-                        sid, sv = get_stat(i, prefix, primary)
-                    except KeyError:
-                        break
-                    set_stat(i, prefix, sid, sv)
-                    i += 1
-
-                j = 1
-                while True:
-                    try:
-                        sid, sv = get_stat(j, prefix, secondary)
-                    except KeyError:
-                        break
-                    set_stat(j + i - 1, prefix, sid, sv)
-                    j += 1
-
-            def get_quality_stats(prefix, source, result):
-                i = 1
-                while True:
-                    try:
-                        id, value = get_stat(i, prefix, source)
-                        if id != "dummy_stat_display_nothing":
-                            result[id] = value
-                    except KeyError:
-                        return
-                    i += 1
-
-            def cp_quality(prefix):
-                stats: OrderedDict[str, int] = OrderedDict()
-                stextkey = f"{prefix}_stat_text"
-                text1 = primary.get(stextkey)
-                text2 = secondary.get(stextkey)
-                stext = text1 if text1 == text2 else "<br>".join(filter(bool, [text1, text2]))
-                if not stext:
-                    return
-                # Both primary and secondary can have stats eg CoC has
-                # quality_type1_stat1_id = attack_critical_strike_chance_+% on primary and
-                # quality_type1_stat1_id = spell_critical_strike_chance_+% on secondary
-                get_quality_stats(prefix, primary, stats)
-                get_quality_stats(prefix, secondary, stats)
-                for i, (sid, sv) in enumerate(stats.items()):
-                    set_stat(i + 1, prefix, sid, sv)
-                infobox[stextkey] = stext
-
-            for k, v in list(primary.items()) + list(secondary.items()):
-                # Just override the stuff if needs be.
-                if "stat" not in k[k.startswith("static_") and 6 :] and k not in infobox.keys():
-                    infobox[k] = v
-
-            cp_quality("quality_type1")
-            cp_quality("quality_type2")
-            cp_quality("quality_type3")
-            cp_quality("quality_type4")
-
-            infobox["stat_text"] = "<br>".join(
-                [x for x in (primary["stat_text"], secondary["stat_text"]) if x]
-            )
-
-            # Stat merging...
-            cp_stats("static")
-            lv = 1
-            while True:
-                prefix = "level%s" % lv
-                try:
-                    primary[prefix]
-                except KeyError:
-                    break
-
-                for k in ("_stat_text",):
-                    k = prefix + k
-                    infobox[k] = "<br>".join([x[k] for x in (primary, secondary) if k in x])
-                cp_stats(prefix)
-
-                lv += 1
-        else:
-            for k, v in primary.items():
-                infobox[k] = v
-
-        # some descriptions come from active skills which are parsed in above function
-        if ge["IsSupport"] and gem_type["SupportText"]:
-            infobox["gem_description"] = (
-                gem_type["SupportText"].replace("\n", "<br>").replace("\r", "")
-            )
-
-        #
-        # Output handling for progression
-        #
-
-        # Body
-        map2 = {
-            "Str": "strength_requirement",
-            "Int": "intelligence_requirement",
-            "Dex": "dexterity_requirement",
-        }
-
+        # Attribute requirements
         if base_item_type["ItemClassesKey"]["Id"] == "Active Skill Gem":
             gtype = GemTypes.active
         elif base_item_type["ItemClassesKey"]["Id"] == "Support Skill Gem":
             gtype = GemTypes.support
+        attr_weights = {
+            "strength": skill_gem["StrengthRequirementPercent"],
+            "dexterity": skill_gem["DexterityRequirementPercent"],
+            "intelligence": skill_gem["IntelligenceRequirementPercent"],
+        }
+        # max_level+1 for being able to corrupt gems to +1 level
+        for i in range(0, max_level + 1):
+            prefix = "level%s_" % (i + 1)
+            for k, v in attr_weights.items():
+                try:
+                    infobox[f"{prefix}{k}_requirement"] = gem_stat_requirement(
+                        level=infobox[prefix + "level_requirement"],
+                        gtype=gtype,
+                        multi=v,
+                    )
+                except ValueError as e:
+                    warnings.warn(str(e))
+                except KeyError:
+                    console(
+                        'Missing level requirements for skill gem "%s" - Item will be skipped'
+                        % (ge_name or base_item_type["Name"]),
+                        msg=Msg.warning,
+                    )
+                    return False
 
-        # +1 for gem levels starting at 1
-        # +1 for being able to corrupt gems to +1 level
-        # +1 for python counting only up to, but not including the number
-        for i in range(1, max_level + 3):
-            prefix = "level%s_" % i
-            for attr in ("Str", "Dex", "Int"):
-                if skill_gem[attr]:
-                    try:
-                        infobox[prefix + map2[attr]] = gem_stat_requirement(
-                            level=primary.get(prefix + "level_requirement"),
-                            gtype=gtype,
-                            multi=skill_gem[attr],
-                        )
-
-                    except ValueError as e:
-                        warnings.warn(str(e))
-                    except KeyError:
-                        print(base_item_type["Id"], base_item_type["Name"])
-                        raise
-            try:
-                # Index starts at 0 while levels start at 1
-                infobox[prefix + "experience"] = exp_total[i - 1]
-            except IndexError:
-                pass
+        # Skill icons
+        act_skill = primary_ge["ActiveSkill"]
+        if act_skill:
+            skill_name = act_skill["DisplayedName"]
+            base_skill_name = (
+                act_skill["TransfigureBase"]["DisplayedName"]
+                if act_skill["TransfigureBase"]
+                else skill_name
+            )
+            skill_icon = act_skill["Icon_DDSFile"]
+            base_skill_icon = (
+                act_skill["TransfigureBase"]["Icon_DDSFile"]
+                if act_skill["TransfigureBase"]
+                else skill_icon
+            )
+            icon_name = skill_name if skill_icon != base_skill_icon else base_skill_name
+            if parsed_args.store_images:
+                if skill_icon:
+                    self._write_dds(
+                        data=self.file_system.get_file(skill_icon),
+                        out_path=os.path.join(
+                            self._img_path,
+                            "%s skill icon.dds" % (icon_name or base_item_type["Name"]),
+                        ),
+                        parsed_args=parsed_args,
+                    )
 
         return True
 
@@ -2207,14 +2075,6 @@ class ItemsParser(SkillParserShared):
         ),
         row_index=False,
     )
-
-    def _type_amulet(self, infobox, base_item_type):
-        match = re.search("Talisman([0-9])", base_item_type["Id"])
-        if match:
-            infobox["is_talisman"] = True
-            infobox["talisman_tier"] = match.group(1)
-
-        return True
 
     _type_armour = _type_factory(
         data_file="ArmourTypes.dat64",
@@ -3164,7 +3024,7 @@ class ItemsParser(SkillParserShared):
     """
     _cls_map = {
         # Jewellery
-        "Amulet": (_type_amulet,),
+        "Amulet": (),
         # Armour types
         "Armour": (
             _type_level,
@@ -3279,8 +3139,8 @@ class ItemsParser(SkillParserShared):
         "HybridFlask": (_type_level, _type_flask, _type_flask_charges),
         "UtilityFlask": (_type_level, _type_flask, _type_flask_charges),
         # Gems
-        "Active Skill Gem": (_skill_gem,),
-        "Support Skill Gem": (_skill_gem,),
+        "Active Skill Gem": (_type_gem,),
+        "Support Skill Gem": (_type_gem,),
         # Currency-like items
         "Currency": (_type_currency,),
         "StackableCurrency": (_type_currency, _type_essence, _type_blight_item, _tattoo),
@@ -3478,12 +3338,18 @@ class ItemsParser(SkillParserShared):
 
     def by_id(self, parsed_args):
         return self._export(
-            parsed_args, self._item_column_index_filter(column_id="Id", arg_list=parsed_args.id)
+            parsed_args,
+            self._column_index_filter(
+                dat_file_name="BaseItemTypes.dat64", column_id="Id", arg_list=parsed_args.id
+            ),
         )
 
     def by_name(self, parsed_args):
         return self._export(
-            parsed_args, self._item_column_index_filter(column_id="Name", arg_list=parsed_args.name)
+            parsed_args,
+            self._column_index_filter(
+                dat_file_name="BaseItemTypes.dat64", column_id="Name", arg_list=parsed_args.name
+            ),
         )
 
     def by_filter(self, parsed_args):
@@ -3570,6 +3436,9 @@ class ItemsParser(SkillParserShared):
 
         for i, mod in enumerate(base_item_type["Implicit_ModsKeys"]):
             infobox["implicit%s" % (i + 1)] = mod["Id"]
+
+        for i, mod in enumerate(base_item_type["TalismanEnchants"]):
+            infobox["enchantment%s" % (i + 1)] = mod["Id"]
 
     def _process_name_conflicts(self, infobox, base_item_type, language):
         rr = self.rr2 if language != self._language else self.rr

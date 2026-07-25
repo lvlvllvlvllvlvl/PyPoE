@@ -156,15 +156,6 @@ class SkillHandler(ExporterHandler):
 
 class WikiCondition(parser.WikiCondition):
     COPY_KEYS = (
-        # for skills
-        "radius",
-        "radius_description",
-        "radius_secondary",
-        "radius_secondary_description",
-        "radius_tertiary",
-        "radius_tertiary_description",
-        "has_percentage_mana_cost",
-        "has_reservation_mana_cost",
         "skill_screenshot",
         "skill_screenshot_file",
     )
@@ -330,39 +321,6 @@ class SkillParserShared(parser.BaseParser):
         ),
     )
 
-    # Values without the Metadata/Projectiles/ prefix
-    _SKILL_ID_TO_PROJECTILE_MAP = {
-        "ArcticBreath": "ArcticBreath",
-        "BallLightning": "BallLightningPlayer",
-        "BurningArrow": "BurningArrow",
-        "EtherealKnives": "ShadowProjectile",
-        "FlameTotem": "TotemFireSpray",
-        "FreezingPulse": "FreezingPulse",
-        "ExplosiveArrow": "FuseArrow",
-        "FrostBlades": "IceStrikeProjectile",
-        "FrostBolt": "FrostBolt",
-        "Fireball": "Fireball",
-        "IceShot": "IceArrow",
-        "IceSpear": "IceSpear",
-        # 'Incinerate': 'Flamethrower1',
-        "LightningArrow": "LightningArrow",
-        "LightningTrap": "LightningTrap",
-        "MoltenStrike": "FireMortar",
-        # CausticArrow
-        "PoisonArrow": "CausticArrow",
-        "Power Siphon": "Siphon",
-        "ShrapnelShot": "ShrapnelShot",
-        "SiegeBallista": "CrossbowSnipeProjectile",
-        "Spark": "Spark",
-        "SplitArrow": "SplitArrowDefault",
-        # Spectral Throw
-        "ThrownWeapon": "ThrownWeapon",
-        "Tornado Shot": "TornadoShotArrow",
-        # TornadoShotSecondaryArrow,
-        "VaalBurningArrow": "VaalBurningArrow",
-        "WildStrike": "ElementalStrikeColdProjectile",
-    }
-
     _GEM_EFFECT_COLUMNS = [
         "GrantedEffect",
         "GrantedEffect2",
@@ -501,8 +459,6 @@ class SkillParserShared(parser.BaseParser):
 
         gra_eff_per_lvl.sort(key=lambda x: x["Level"])
         gra_eff_stats_pl.sort(key=lambda x: x["GemLevel"])
-        if max_level is None:
-            max_level = len(gra_eff_per_lvl) - 1
 
         act_skill = gra_eff["ActiveSkill"]
         if act_skill:
@@ -596,6 +552,8 @@ class SkillParserShared(parser.BaseParser):
                 data[column] = lvl_stats[column]
 
             level_data.append(data)
+
+        max_level = len(level_data) if max_level is None else min(max_level, len(level_data))
 
         # Find static & dynamic stats..
 
@@ -711,25 +669,21 @@ class SkillParserShared(parser.BaseParser):
 
                 infobox["equipment_requirement"] = parser.process_keywords(reqiured_eq)
 
-        # From Projectile.dat64 if available
-        # TODO - remap
-        key = self._SKILL_ID_TO_PROJECTILE_MAP.get(gra_eff["Id"])
-        if key:
-            infobox["projectile_speed"] = self.rr["Projectiles.dat64"].index["Id"][
-                "Metadata/Projectiles/" + key
-            ]["ProjectileSpeed"]
-
         # From GrantedEffects.dat64
-
         infobox["skill_id"] = gra_eff["Id"]
 
-        if not gra_eff["IsSupport"]:
+        if gra_eff["IsSupport"]:
+            infobox["is_support"] = True
+        else:
             infobox["cast_time"] = gra_eff["CastTime"] / 1000
 
         if len(gra_eff["CostTypes"]) > 0:
             infobox["static_cost_types"] = ",".join(ct["Id"] for ct in gra_eff["CostTypes"])
             # cost_types are static so no need for 'static_'?
             # infobox["cost_types"] = ",".join(ct["Id"] for ct in gra_eff["CostTypes"])
+
+        if max_level > 1:
+            infobox["max_level"] = max_level
 
         #
         # Quality stats
@@ -741,7 +695,6 @@ class SkillParserShared(parser.BaseParser):
 
         for row in qual_stats:
             prefix = "quality_type1_"
-            infobox[prefix + "weight"] = 1
 
             # Quality stat data
             stat_ids = [r["Id"] for r in row["StatsKeys"]]
@@ -848,7 +801,7 @@ class SkillParserShared(parser.BaseParser):
                 values.extend(sdict["values"])
             elif key in dynamic["stats"]:
                 try:
-                    stat_dict_max = level_data[max_level]["stats"][key]
+                    stat_dict_max = level_data[max_level - 1]["stats"][key]
                 except (KeyError, IndexError):
                     maxerr = True
                 else:
@@ -912,7 +865,9 @@ class SkillParserShared(parser.BaseParser):
             )
             added = []
             for value_keys, tags, default in field_stats:
-                values = [(level_data[0][key], level_data[max_level][key]) for key in value_keys]
+                values = [
+                    (level_data[0][key], level_data[max_level - 1][key]) for key in value_keys
+                ]
                 # Account for default (0 = 100%)
                 if values[0] != default:
                     added.extend(
@@ -1095,7 +1050,7 @@ class SkillParser(SkillParserShared):
                 else None
             )
             if gem_effect and gem_effect["SupportText"]:
-                data["gem_description"] = gem_effect["SupportText"]
+                data["gem_description"] = parser.process_keywords(gem_effect["SupportText"])
             if skill_gem:
                 if not parsed_args.allow_skill_gems:
                     console(
@@ -1106,7 +1061,7 @@ class SkillParser(SkillParserShared):
                 levels = self.rr["ItemExperiencePerLevel.dat64"].index["ItemExperienceType"][
                     skill_gem["ExperienceProgression"]
                 ]
-                max_level = len(levels) - 1 if levels else 0
+                max_level = len(levels) if levels else 1
 
             try:
                 self._skill(

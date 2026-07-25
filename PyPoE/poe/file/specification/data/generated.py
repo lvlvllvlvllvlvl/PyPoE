@@ -14294,6 +14294,7 @@ specification = Specification(
                 Field(
                     name="Attribute",
                     type="int",
+                    enum="ATTRIBUTES",
                 ),
                 Field(
                     name="AddedActiveSkillTypes",

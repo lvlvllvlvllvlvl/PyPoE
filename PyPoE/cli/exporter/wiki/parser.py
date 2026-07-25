@@ -212,6 +212,7 @@ _inter_wiki_map = {
             "(?<=[0-9] )Greater Multiple Projectiles",
             {"link": "Greater Multiple Projectiles Support"},
         ),
+        ("(?<=[0-9] )Greater Spell Echo", {"link": "Greater Spell Echo Support"}),
         ("(?<=[0-9] )Greater Volley", {"link": "Greater Volley Support"}),
         ("(?<=[0-9] )Guardian's Blessing", {"link": "Guardian's Blessing Support"}),
         ("(?<=[0-9] )Hex Bloom", {"link": "Hex Bloom Support"}),
@@ -302,6 +303,7 @@ _inter_wiki_map = {
         ("(?<=[0-9] )Vicious Projectiles", {"link": "Vicious Projectiles Support"}),
         ("(?<=[0-9] )Vile Toxins", {"link": "Vile Toxins Support"}),
         ("(?<=[0-9] )Void Manipulation", {"link": "Void Manipulation Support"}),
+        ("(?<=[0-9] )Void Shockwave", {"link": "Void Shockwave Support"}),
         ("(?<=[0-9] )Volatility", {"link": "Volatility Support"}),
         ("(?<=[0-9] )Volley", {"link": "Volley Support"}),
         ("(?<=[0-9] )Windburst", {"link": "Windburst Support"}),
@@ -311,7 +313,6 @@ _inter_wiki_map = {
         #
         ("(?<=[0-9] )Divine Blessing", {"link": "Divine Blessing Support"}),
         ("(?<=[0-9] )Earthbreaker", {"link": "Earthbreaker Support"}),
-        ("(?<=[0-9] )Greater Spell Echo", {"link": "Greater Spell Echo Support"}),
         #
         # Cluster jewel notables
         #
@@ -1424,6 +1425,9 @@ _inter_wiki_map = {
         ("Penetrate(?:|s)", {"link": "Penetrate"}),
         ("PvP", {"link": "PvP"}),
         ("Quality", {"link": "Quality"}),
+        ("Fractured", {"link": "Fractured"}),
+        ("Foulborn", {"link": "Foulborn"}),
+        ("Vestigial", {"link": "Vestigial"}),
         #
         # Late matching
         #
@@ -2588,9 +2592,10 @@ class TagHandler:
         "rareitem": partial(_default_handler, tid="rare"),
         "uniqueitem": _unique_handler,
         "divination": partial(_default_handler, tid="divination"),
-        "corrupted": partial(_link_handler, tid="corrupted"),
-        "fractured": partial(_link_handler, tid="fractured"),
-        "brequelmutated": partial(_link_handler, tid="foulborn"),
+        "corrupted": partial(_default_handler, tid="corrupted"),
+        "fractured": partial(_default_handler, tid="fractured"),
+        "brequelmutated": partial(_default_handler, tid="foulborn"),
+        "legiondivergent": partial(_default_handler, tid="vestigial"),
     }
 
 

@@ -63,6 +63,7 @@ from enum import Enum, EnumMeta, IntEnum
 # =============================================================================
 
 __all__ = [
+    "ATTRIBUTES",
     "BETRAYAL_UPGRADE_SLOTS",
     "DELVE_UPGRADE_TYPE",
     "MAP_GENERATION",
@@ -272,6 +273,27 @@ class IntEnumOverride(IntEnum, metaclass=IntEnumMetaOverride):
     UNKNOWN6 = 18
     UNKNOWN7 = 19
 '''
+
+
+class ATTRIBUTES(Enum, metaclass=IntEnumMetaOverride):
+    id: int
+    name_lower: str
+    abbr_lower: str
+    colour: str
+
+    STRENGTH = (1, "strength", "str", "red")
+    DEXTERITY = (2, "dexterity", "dex", "green")
+    INTELLIGENCE = (3, "intelligence", "int", "blue")
+    NONE = (4, "none", "none", "white")
+
+    def __new__(cls, id: int, lower: str, abbr: str, colour: str):
+        obj = object.__new__(cls)
+        obj._value_ = id
+        obj.id = id
+        obj.name_lower = lower
+        obj.abbr_lower = abbr
+        obj.colour = colour
+        return obj
 
 
 class ACTIVE_SKILL_TYPES(IntEnumOverride):
@@ -612,11 +634,8 @@ class MOD_DOMAIN(IntEnumOverride):
     BREQUEL_GRAFT = 38
     DEEPWATER_CHART = 39
     DEEPWATER_BORDER = 40
-    INFAMOUS = 41
-    ALLFLAME = 42
-
-    # Items that can't have mods (may need to increase the number when new values are added)
-    MODS_DISALLOWED = 43
+    MERCENARY = 41
+    DUCAT_CRAFTED = 42
 
     # legacy names
     MASTER = CRAFTED
@@ -727,7 +746,7 @@ class MOD_GENERATION_TYPE(IntEnumOverride):
     NECROPOLIS_MONSTER = 34
     NECROPOLIS_DEVOTED_MONSTER = 35
     MEMORY_ALTAR = 36
-    DEEPWATER = 37
+    DEEPWATER_CHART = 37
 
 
 class WORDLISTS(IntEnumOverride):

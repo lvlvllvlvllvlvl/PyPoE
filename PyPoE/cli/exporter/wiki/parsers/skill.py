@@ -43,6 +43,7 @@ from PyPoE.cli.core import Msg, console
 from PyPoE.cli.exporter import config
 from PyPoE.cli.exporter.wiki import parser
 from PyPoE.cli.exporter.wiki.handler import ExporterHandler, ExporterResult
+from PyPoE.poe import poe1constants as constants
 from PyPoE.poe.file.stat_filters import StatFilterFile
 from PyPoE.poe.file.translations import StatValue, TranslationFile
 
@@ -144,27 +145,12 @@ class SkillHandler(ExporterHandler):
         super().add_default_parsers(*args, **kwargs)
         self.add_format_argument(kwargs["parser"])
         self.add_image_arguments(kwargs["parser"])
-        kwargs["parser"].add_argument(
-            "--allow-skill-gems",
-            action="store_true",
-            help="Disable the check that prevents skill gems skill from being exported.",
-            dest="allow_skill_gems",
-        )
 
 
 class WikiCondition(parser.WikiCondition):
     COPY_KEYS = (
-        # for skills
-        "radius",
-        "radius_description",
-        "radius_secondary",
-        "radius_secondary_description",
-        "radius_tertiary",
-        "radius_tertiary_description",
-        "has_percentage_mana_cost",
-        "has_reservation_mana_cost",
+        "skill_icon",
         "skill_screenshot",
-        "skill_screenshot_file",
     )
 
     NAME = "Skill"
@@ -185,8 +171,6 @@ class SkillParserShared(parser.BaseParser):
 
     # Fields to copy from GrantedEffectsPerLevel.dat64
     _GEPL_COPY = (
-        "Level",
-        "PlayerLevelReq",
         "CostMultiplier",
         "CostAmounts",
         "CostTypes",
@@ -211,16 +195,7 @@ class SkillParserShared(parser.BaseParser):
         "DamageEffectiveness",
     )
 
-    # def CostTypeHelper(d):
-    #     print('yep', d)
-    #     return d['Cost_TypesKeys']['Id']
-
     _SKILL_COLUMN_MAP = (
-        # ('ManaCost', {
-        #     'template': 'mana_cost',
-        #     'default': 0,
-        #     'format': lambda v: '{0:n}'.format(v),
-        # }),
         (
             "CostAmounts",
             {
@@ -386,39 +361,6 @@ class SkillParserShared(parser.BaseParser):
         ),
     )
 
-    # Values without the Metadata/Projectiles/ prefix
-    _SKILL_ID_TO_PROJECTILE_MAP = {
-        "ArcticBreath": "ArcticBreath",
-        "BallLightning": "BallLightningPlayer",
-        "BurningArrow": "BurningArrow",
-        "EtherealKnives": "ShadowProjectile",
-        "FlameTotem": "TotemFireSpray",
-        "FreezingPulse": "FreezingPulse",
-        "ExplosiveArrow": "FuseArrow",
-        "FrostBlades": "IceStrikeProjectile",
-        "FrostBolt": "FrostBolt",
-        "Fireball": "Fireball",
-        "IceShot": "IceArrow",
-        "IceSpear": "IceSpear",
-        # 'Incinerate': 'Flamethrower1',
-        "LightningArrow": "LightningArrow",
-        "LightningTrap": "LightningTrap",
-        "MoltenStrike": "FireMortar",
-        # CausticArrow
-        "PoisonArrow": "CausticArrow",
-        "Power Siphon": "Siphon",
-        "ShrapnelShot": "ShrapnelShot",
-        "SiegeBallista": "CrossbowSnipeProjectile",
-        "Spark": "Spark",
-        "SplitArrow": "SplitArrowDefault",
-        # Spectral Throw
-        "ThrownWeapon": "ThrownWeapon",
-        "Tornado Shot": "TornadoShotArrow",
-        # TornadoShotSecondaryArrow,
-        "VaalBurningArrow": "VaalBurningArrow",
-        "WildStrike": "ElementalStrikeColdProjectile",
-    }
-
     _GEM_EFFECT_COLUMNS = [
         "GrantedEffect",
         "GrantedEffect2",
@@ -527,30 +469,25 @@ class SkillParserShared(parser.BaseParser):
             stat_order[stat] = -1
         return stats_output
 
-    def _skill(self, gra_eff, infobox: OrderedDict, parsed_args, max_level=None, msg_name=None):
-        if msg_name is None:
-            msg_name = gra_eff["Id"]
-
-        stat_set = gra_eff["StatSet"]
-
-        gra_eff_per_lvl = []
-        for row in self.rr["GrantedEffectsPerLevel.dat64"]:
-            if row["GrantedEffect"] == gra_eff:
-                gra_eff_per_lvl.append(row)
-
-        gra_eff_stats_pl = []
-        for row in self.rr["GrantedEffectStatSetsPerLevel.dat64"]:
-            if row["StatSet"] == stat_set:
-                gra_eff_stats_pl.append(row)
-
-        if (not gra_eff_per_lvl) and (not gra_eff_stats_pl):
-            console('No level progression found for "%s". Skipping.' % msg_name, msg=Msg.error)
+    def _skill(self, gra_eff, infobox: OrderedDict, parsed_args, max_level=None):
+        if "GrantedEffect" not in self.rr["GrantedEffectsPerLevel.dat64"].index:
+            self.rr["GrantedEffectsPerLevel.dat64"].build_index("GrantedEffect")
+        gra_eff_per_lvl = {}  # Use dict because we want to index by level
+        for row in self.rr["GrantedEffectsPerLevel.dat64"].index["GrantedEffect"][gra_eff]:
+            gra_eff_per_lvl[row["Level"]] = row
+        if len(gra_eff_per_lvl) == 0:
+            console('No levels found for "%s". Skipping.' % gra_eff["Id"], msg=Msg.error)
             return
 
-        gra_eff_per_lvl.sort(key=lambda x: x["Level"])
-        gra_eff_stats_pl.sort(key=lambda x: x["GemLevel"])
-        if max_level is None:
-            max_level = len(gra_eff_per_lvl) - 1
+        stat_set = gra_eff["StatSet"]
+        if "StatSet" not in self.rr["GrantedEffectStatSetsPerLevel.dat64"].index:
+            self.rr["GrantedEffectStatSetsPerLevel.dat64"].build_index("StatSet")
+        gra_eff_stats_pl = {}
+        for row in self.rr["GrantedEffectStatSetsPerLevel.dat64"].index["StatSet"][stat_set]:
+            gra_eff_stats_pl[row["GemLevel"]] = row
+        if len(gra_eff_stats_pl) == 0:
+            console('No level stats found for "%s". Skipping.' % gra_eff["Id"], msg=Msg.error)
+            return
 
         act_skill = gra_eff["ActiveSkill"]
         if act_skill:
@@ -564,13 +501,6 @@ class SkillParserShared(parser.BaseParser):
             except KeyError as e:
                 warnings.warn("Missing active skill in stat files: %s" % e.args[0])
                 tf = self.tc["skill_stat_descriptions.txt"]
-
-            if parsed_args.store_images and act_skill["Icon_DDSFile"]:
-                self._write_dds(
-                    data=self.file_system.get_file(act_skill["Icon_DDSFile"]),
-                    out_path=os.path.join(self._img_path, "%s skill icon.dds" % msg_name),
-                    parsed_args=parsed_args,
-                )
         else:
             tf = self.tc["gem_stat_descriptions.txt"]
 
@@ -579,7 +509,6 @@ class SkillParserShared(parser.BaseParser):
         stat_key_order = {
             "stats": OrderedDict(),
         }
-
         stat_order = defaultdict()
 
         # GrantedEffectStatSets.dat64
@@ -589,23 +518,42 @@ class SkillParserShared(parser.BaseParser):
         impl_stat_vals = [1 for i in range(len(impl_stats))]
 
         # Copy per-level stats into level_data
-        for i, lvl_stats in enumerate(gra_eff_stats_pl):
+        # Can't assume that gra_eff_per_lvl and gra_eff_stats_pl have the
+        # same level numbers, so iterate over all of the levels from both.
+        levels = sorted(list(gra_eff_per_lvl.keys() | gra_eff_stats_pl.keys()))
+        lvl_effects = None
+        lvl_stats = None
+        for level in levels:
             data = defaultdict(lambda: None)
-            if len(gra_eff_per_lvl) > i:
-                lvl_effects = gra_eff_per_lvl[i]
-            else:
-                lvl_effects = None
-                warnings.warn(
-                    f'GrantedEffectsPerLevel is missing level {lvl_stats["GemLevel"]} which'
-                    " GrantedEffectStatSetsPerLevel has."
-                )
 
-            if lvl_effects is not None and lvl_effects["Level"] != lvl_stats["GemLevel"]:
-                lvl_effects = None
-                warnings.warn(
-                    f'GrantedEffectsPerLevel is missing level {lvl_stats["GemLevel"]} which'
-                    " GrantedEffectStatSetsPerLevel has."
+            # If a gra_eff_per_lvl record exists for the current level, use it;
+            # otherwise, use the previous one.
+            if level in gra_eff_per_lvl:
+                lvl_effects = gra_eff_per_lvl[level]
+            if lvl_effects is None:
+                console(
+                    f"Missing level data for \"{gra_eff['Id']}\" at level {level}. Skipping.",
+                    msg=Msg.error,
                 )
+                return
+            for column in self._GEPL_COPY:
+                data[column] = lvl_effects[column]
+
+            # If a gra_eff_stats_pl record exists for the current level, use it;
+            # otherwise, use the previous one.
+            if level in gra_eff_stats_pl:
+                lvl_stats = gra_eff_stats_pl[level]
+            if lvl_stats is None:
+                console(
+                    f"Missing level stats data for \"{gra_eff['Id']}\" at level {level}. Skipping.",
+                    msg=Msg.error,
+                )
+                return
+            for column in self._GESSPL_COPY:
+                data[column] = lvl_stats[column]
+
+            data["Level"] = level
+            data["PlayerLevelReq"] = max(lvl_effects["PlayerLevelReq"], lvl_stats["PlayerLevelReq"])
 
             stats = [
                 r["Id"]
@@ -636,14 +584,9 @@ class SkillParserShared(parser.BaseParser):
             for tr_stat in translated_stats.keys():
                 stat_key_order["stats"][tr_stat] = translated_stats[tr_stat]
 
-            if lvl_effects is not None:
-                for column in self._GEPL_COPY:
-                    data[column] = lvl_effects[column]
-
-            for column in self._GESSPL_COPY:
-                data[column] = lvl_stats[column]
-
             level_data.append(data)
+
+        max_level = len(level_data) if max_level is None else min(max_level, len(level_data))
 
         # Find static & dynamic stats..
 
@@ -735,41 +678,30 @@ class SkillParserShared(parser.BaseParser):
 
         # From ActiveSkills.dat64
         if act_skill:
-            infobox["gem_description"] = act_skill["Description"].replace("\n", "<br>")
-            infobox["active_skill_name"] = act_skill["DisplayedName"]
+            if act_skill["Description"]:
+                infobox["gem_description"] = (
+                    act_skill["Description"].replace("\n", "<br>").replace("\r", "")
+                )
+            if act_skill["DisplayedName"]:
+                infobox["active_skill_name"] = act_skill["DisplayedName"]
             if act_skill["WeaponRestriction_ItemClassesKeys"]:
                 infobox["item_class_id_restriction"] = ", ".join(
                     [c["Id"] for c in act_skill["WeaponRestriction_ItemClassesKeys"]]
                 )
 
-        # From Projectile.dat64 if available
-        # TODO - remap
-        key = self._SKILL_ID_TO_PROJECTILE_MAP.get(gra_eff["Id"])
-        if key:
-            infobox["projectile_speed"] = self.rr["Projectiles.dat64"].index["Id"][
-                "Metadata/Projectiles/" + key
-            ]["ProjectileSpeed"]
-
         # From GrantedEffects.dat64
-
         infobox["skill_id"] = gra_eff["Id"]
-        if gra_eff["SupportGemLetter"]:
-            infobox["support_gem_letter"] = gra_eff["SupportGemLetter"]
-
         if gra_eff["IsSupport"]:
             infobox["is_support"] = True
-        if not gra_eff["IsSupport"]:
+        else:
             infobox["cast_time"] = gra_eff["CastTime"] / 1000
+        if gra_eff["SupportGemLetter"]:
+            infobox["support_gem_letter"] = gra_eff["SupportGemLetter"]
+        if gra_eff["Attribute"] != constants.ATTRIBUTES.NONE:
+            infobox["primary_attribute"] = gra_eff["Attribute"].name_lower
 
-        # GrantedEffectsPerLevel.dat64
-        infobox["required_level"] = level_data[0]["PlayerLevelReq"]
-
-        # In 3.21, the player level requirement is a float
-        # Cast required level to an int
-        infobox["required_level"] = int(infobox["required_level"])
-        # If its not a whole number, raise error, just to be safe
-        if infobox["required_level"] % 1 != 0:
-            raise ValueError("PlayerLevelReq is not a whole number")
+        if max_level > 1:
+            infobox["max_level"] = max_level
 
         #
         # Quality stats
@@ -781,7 +713,6 @@ class SkillParserShared(parser.BaseParser):
 
         for row in qual_stats:
             prefix = "quality_type1_"
-            infobox[prefix + "weight"] = 1
 
             # Quality stat data
             stat_ids = [r["Id"] for r in row["StatsKeys"]]
@@ -851,10 +782,10 @@ class SkillParserShared(parser.BaseParser):
                 continue
 
             default = column_data.get("default")
-            if column in gra_eff_per_lvl[0].keys():
-                raw_value = gra_eff_per_lvl[0][column]
-            elif column in gra_eff_stats_pl[0].keys():
-                raw_value = gra_eff_stats_pl[0][column]
+            if column in gra_eff_per_lvl[levels[0]].keys():
+                raw_value = gra_eff_per_lvl[levels[0]][column]
+            elif column in gra_eff_stats_pl[levels[0]].keys():
+                raw_value = gra_eff_stats_pl[levels[0]][column]
             else:
                 raw_value = level_data[0][column]
 
@@ -886,7 +817,7 @@ class SkillParserShared(parser.BaseParser):
                 values.extend(sdict["values"])
             elif key in dynamic["stats"]:
                 try:
-                    stat_dict_max = level_data[max_level]["stats"][key]
+                    stat_dict_max = level_data[max_level - 1]["stats"][key]
                 except (KeyError, IndexError):
                     maxerr = True
                 else:
@@ -910,7 +841,7 @@ class SkillParserShared(parser.BaseParser):
                     stat_dict = {"values": [0] * len(stat_ids)}
                 elif maxerr and minerr:
                     console(
-                        f'{msg_name} - Neither min or max level value available for "{key}".'
+                        f'{gra_eff["Id"]} - Neither min or max level value available for "{key}".'
                         " Investigate.",
                         msg=Msg.warning,
                     )
@@ -950,7 +881,9 @@ class SkillParserShared(parser.BaseParser):
             )
             added = []
             for value_keys, tags, default in field_stats:
-                values = [(level_data[0][key], level_data[max_level][key]) for key in value_keys]
+                values = [
+                    (level_data[0][key], level_data[max_level - 1][key]) for key in value_keys
+                ]
                 # Account for default (0 = 100%)
                 if values[0] != default:
                     added.extend(
@@ -981,7 +914,7 @@ class SkillParserShared(parser.BaseParser):
             # If its not a whole number, raise error, just to be safe
             if "PlayerLevelReq" in row and row["PlayerLevelReq"] % 1 != 0:
                 console(
-                    f"{msg_name} level requirement for level {i} is {row['PlayerLevelReq']}",
+                    f"{gra_eff['Id']} level requirement for level {row['Level']} is {row['PlayerLevelReq']}",
                     msg=Msg.warning,
                 )
 
@@ -1024,6 +957,33 @@ class SkillParserShared(parser.BaseParser):
                 prefix,
             )
 
+        # Skill icon
+        if act_skill:
+            skill_name = act_skill["DisplayedName"]
+            base_skill_name = (
+                act_skill["TransfigureBase"]["DisplayedName"]
+                if act_skill["TransfigureBase"]
+                else skill_name
+            )
+            skill_icon = act_skill["Icon_DDSFile"]
+            base_skill_icon = (
+                act_skill["TransfigureBase"]["Icon_DDSFile"]
+                if act_skill["TransfigureBase"]
+                else skill_icon
+            )
+            icon_name = skill_name if skill_icon != base_skill_icon else base_skill_name
+            if parsed_args.store_images:
+                if skill_icon:
+                    self._write_dds(
+                        data=self.file_system.get_file(skill_icon),
+                        out_path=os.path.join(
+                            self._img_path, "%s skill icon.dds" % (icon_name or gra_eff["Id"])
+                        ),
+                        parsed_args=parsed_args,
+                    )
+            if icon_name != skill_name:
+                infobox["skill_icon"] = icon_name
+
 
 class SkillParser(SkillParserShared):
     def by_id(self, parsed_args):
@@ -1057,7 +1017,6 @@ class SkillParser(SkillParserShared):
         )
 
     def by_gem(self, parsed_args):
-        parsed_args.allow_skill_gems = True
         return self.export(
             parsed_args,
             self._effects_from_gems(
@@ -1115,18 +1074,14 @@ class SkillParser(SkillParserShared):
                 else None
             )
             if gem_effect and gem_effect["SupportText"]:
-                data["gem_description"] = gem_effect["SupportText"]
+                data["gem_description"] = (
+                    gem_effect["SupportText"].replace("\n", "<br>").replace("\r", "")
+                )
             if skill_gem:
-                if not parsed_args.allow_skill_gems:
-                    console(
-                        f"Skipping skill gem skill \"{skill['Id']}\" at row {skill.rowid}",
-                        msg=Msg.warning,
-                    )
-                    continue
                 levels = self.rr["ItemExperiencePerLevel.dat64"].index["ItemExperienceType"][
                     skill_gem["ExperienceProgression"]
                 ]
-                max_level = len(levels) - 1 if levels else 0
+                max_level = len(levels) if levels else 1
 
             try:
                 self._skill(
