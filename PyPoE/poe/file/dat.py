@@ -972,7 +972,7 @@ class DatReader(ReprMixin):
             if self.table_length == -1:
                 raise ValueError(f'Did not find data magic number in "{self.file_name}"')
 
-            if self.table_length % self.table_rows:
+            if self.table_rows and self.table_length % self.table_rows:
                 # Not aligned to the end of a row; check again starting from next byte
                 self.table_length = self.table_length + 1
             else:
@@ -990,7 +990,7 @@ class DatReader(ReprMixin):
         if self.specification is None:
             self.cast_size = self.table_record_length
 
-        if self.cast_size > self.table_record_length:
+        if self.table_rows and self.cast_size > self.table_record_length:
             raise SpecificationError(
                 SpecificationError.ERRORS.RUNTIME_ROWSIZE_MISMATCH,
                 f'"{self.file_name}": Specification row size {self.cast_size} vs real size {self.table_record_length}',
